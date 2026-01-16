@@ -3,6 +3,7 @@ import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { LanguageProvider } from '@/components/i18n/LanguageContext';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import OfflineIndicator from '@/components/common/OfflineIndicator';
+import DisclaimerBanner from '@/components/common/DisclaimerBanner';
 
 export default function Layout({ children, currentPageName }) {
   return (
@@ -10,7 +11,8 @@ export default function Layout({ children, currentPageName }) {
       <ThemeProvider>
         <ErrorBoundary>
           <OfflineIndicator />
-        <style>{`
+          <DisclaimerBanner />
+          <style>{`
           :root {
             --color-primary: 99 102 241;
             --color-secondary: 139 92 246;
