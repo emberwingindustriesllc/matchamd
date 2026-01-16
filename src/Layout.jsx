@@ -1,11 +1,15 @@
 import React from 'react';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { LanguageProvider } from '@/components/i18n/LanguageContext';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
+import OfflineIndicator from '@/components/common/OfflineIndicator';
 
 export default function Layout({ children, currentPageName }) {
   return (
     <LanguageProvider>
       <ThemeProvider>
+        <ErrorBoundary>
+          <OfflineIndicator />
         <style>{`
           :root {
             --color-primary: 99 102 241;
@@ -70,11 +74,12 @@ export default function Layout({ children, currentPageName }) {
             to { opacity: 1; transform: translateY(0); }
           }
         `}</style>
-        
+
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white transition-colors duration-300">
           {children}
         </div>
-      </ThemeProvider>
-    </LanguageProvider>
+        </ErrorBoundary>
+        </ThemeProvider>
+        </LanguageProvider>
   );
 }
