@@ -22,29 +22,40 @@ Deno.serve(async (req) => {
       case 'checkout.session.completed': {
         const session = event.data.object;
         const userId = session.metadata.user_id;
-        const plan = session.metadata.plan;
 
-        const subscriptions = await base44.asServiceRole.entities.Subscription.filter({ user_id: userId });
-
-        if (subscriptions.length > 0) {
-          await base44.asServiceRole.entities.Subscription.update(subscriptions[0].id, {
-            plan,
-            status: 'active',
-            stripe_customer_id: session.customer,
-            stripe_subscription_id: session.subscription,
-            current_period_start: new Date().toISOString(),
-            current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        if (session.metadata.type === 'add_on') {
+          const addOnId = session.metadata.add_on_id;
+          await base44.asServiceRole.entities.PurchasedContent.create({
+            user_id: userId,
+            content_type: addOnId.includes('quiz') ? 'quiz_pack' : addOnId.includes('specialty') ? 'specialty_guide' : 'interview_prep',
+            content_id: addOnId,
+            price: session.amount_total / 100,
+            stripe_payment_id: session.payment_intent
           });
         } else {
-          await base44.asServiceRole.entities.Subscription.create({
-            user_id: userId,
-            plan,
-            status: 'active',
-            stripe_customer_id: session.customer,
-            stripe_subscription_id: session.subscription,
-            current_period_start: new Date().toISOString(),
-            current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-          });
+          const plan = session.metadata.plan;
+          const subscriptions = await base44.asServiceRole.entities.Subscription.filter({ user_id: userId });
+
+          if (subscriptions.length > 0) {
+            await base44.asServiceRole.entities.Subscription.update(subscriptions[0].id, {
+              plan,
+              status: 'active',
+              stripe_customer_id: session.customer,
+              stripe_subscription_id: session.subscription,
+              current_period_start: new Date().toISOString(),
+              current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+            });
+          } else {
+            await base44.asServiceRole.entities.Subscription.create({
+              user_id: userId,
+              plan,
+              status: 'active',
+              stripe_customer_id: session.customer,
+              stripe_subscription_id: session.subscription,
+              current_period_start: new Date().toISOString(),
+              current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+            });
+          }
         }
         break;
       }
