@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { getStripe } from '@/components/stripe/StripeProvider';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -127,40 +128,43 @@ export default function Subscription() {
 
   const upgradeMutation = useMutation({
     mutationFn: async (planId) => {
-      // In production, this would integrate with Stripe
-      if (currentSubscription) {
-        return base44.entities.Subscription.update(currentSubscription.id, {
-          plan: planId,
-          status: 'active',
-          current_period_start: new Date().toISOString(),
-          current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        });
-      } else {
-        return base44.entities.Subscription.create({
-          user_id: user.id,
-          plan: planId,
-          status: 'active',
-          current_period_start: new Date().toISOString(),
-          current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        });
+      if (planId === 'free') {
+        if (currentSubscription) {
+          return base44.entities.Subscription.update(currentSubscription.id, {
+            plan: 'free',
+            status: 'active'
+          });
+        }
+        return;
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+
+      const { data } = await base44.functions.invoke('stripeCheckout', { planId });
+      const stripe = await getStripe();
+      if (stripe && data.url) {
+        window.location.href = data.url;
+      }
     }
   });
 
   const purchaseAddOnMutation = useMutation({
     mutationFn: async (addOn) => {
-      return base44.entities.PurchasedContent.create({
-        user_id: user.id,
-        content_type: addOn.id.includes('quiz') ? 'quiz_pack' : addOn.id.includes('specialty') ? 'specialty_guide' : 'interview_prep',
-        content_id: addOn.id,
-        price: addOn.price
+      const { data } = await base44.functions.invoke('stripeOneTimeCheckout', {
+        addOnId: addOn.id,
+        addOnName: addOn.name
       });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['purchases'] });
+      const stripe = await getStripe();
+      if (stripe && data.url) {
+        window.location.href = data.url;
+      }
+    }
+  });
+
+  const manageSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await base44.functions.invoke('stripePortal', {});
+      if (data.url) {
+        window.location.href = data.url;
+      }
     }
   });
 
@@ -172,17 +176,27 @@ export default function Subscription() {
 
       <main className="px-4 py-6 max-w-4xl mx-auto">
         {/* Current Plan */}
-        {currentSubscription && (
+        {currentSubscription && currentSubscription.plan !== 'free' && (
           <Card className="p-6 mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-800">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <div>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Current Plan</p>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white capitalize">
                   {currentSubscription.plan}
                 </h3>
               </div>
-              <Badge className="bg-green-500 text-white">Active</Badge>
+              <Badge className="bg-green-500 text-white">
+                {currentSubscription.status === 'active' ? 'Active' : currentSubscription.status}
+              </Badge>
             </div>
+            <Button 
+              variant="outline"
+              onClick={() => manageSubscriptionMutation.mutate()}
+              disabled={manageSubscriptionMutation.isPending}
+              className="w-full"
+            >
+              Manage Subscription
+            </Button>
           </Card>
         )}
 
@@ -242,11 +256,11 @@ export default function Subscription() {
                     
                     <Button
                       onClick={() => upgradeMutation.mutate(plan.id)}
-                      disabled={isCurrentPlan || upgradeMutation.isPending}
+                      disabled={isCurrentPlan}
                       className={`w-full ${plan.popular ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}`}
                       variant={isCurrentPlan ? 'outline' : 'default'}
                     >
-                      {isCurrentPlan ? 'Current Plan' : plan.price === 0 ? 'Select Free' : 'Upgrade'}
+                      {isCurrentPlan ? 'Current Plan' : plan.price === 0 ? 'Downgrade to Free' : 'Subscribe'}
                     </Button>
                   </Card>
                 </motion.div>
@@ -285,7 +299,7 @@ export default function Subscription() {
                   
                   <Button
                     onClick={() => purchaseAddOnMutation.mutate(addOn)}
-                    disabled={purchased || purchaseAddOnMutation.isPending}
+                    disabled={purchased}
                     size="sm"
                     className="w-full"
                     variant={purchased ? 'outline' : 'default'}
