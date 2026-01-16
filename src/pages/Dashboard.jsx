@@ -1,0 +1,241 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import Header from '@/components/navigation/Header';
+import BottomNav from '@/components/navigation/BottomNav';
+import ProgressRing from '@/components/common/ProgressRing';
+import BadgeIcon from '@/components/common/BadgeIcon';
+import StepCard from '@/components/common/StepCard';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { 
+  Bell, 
+  ChevronRight, 
+  Calendar, 
+  Trophy, 
+  Flame,
+  Sparkles,
+  Users
+} from 'lucide-react';
+
+const residencySteps = [
+  { id: 'ecfmg_pathways', title: 'ECFMG Pathways', description: 'Complete certification pathways application', deadline: 'Jan 31, 2026' },
+  { id: 'usmle_step1', title: 'USMLE Step 1', description: 'Pass the first licensing exam' },
+  { id: 'usmle_step2', title: 'USMLE Step 2 CK', description: 'Pass Clinical Knowledge exam' },
+  { id: 'oet_medicine', title: 'OET Medicine', description: 'English proficiency test for healthcare', deadline: 'Dec 2025' },
+  { id: 'eras_registration', title: 'ERAS Registration', description: 'Register for residency application', deadline: 'Sept 2025' },
+  { id: 'personal_statement', title: 'Personal Statement', description: 'Write your compelling story' },
+  { id: 'lors', title: 'Letters of Recommendation', description: 'Secure strong recommendation letters' },
+  { id: 'nrmp_match', title: 'NRMP Match', description: 'Register for the matching program', deadline: 'March 2026' }
+];
+
+export default function Dashboard() {
+  const navigate = useNavigate();
+  
+  const { data: user } = useQuery({
+    queryKey: ['user'],
+    queryFn: () => base44.auth.me()
+  });
+
+  const { data: profiles } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
+    enabled: !!user?.id
+  });
+
+  const { data: progressList = [] } = useQuery({
+    queryKey: ['progress'],
+    queryFn: () => base44.entities.Progress.filter({ user_id: user?.id }),
+    enabled: !!user?.id
+  });
+
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => base44.entities.Notification.filter({ user_id: user?.id, read: false }),
+    enabled: !!user?.id
+  });
+
+  const profile = profiles?.[0];
+
+  useEffect(() => {
+    if (user && profiles !== undefined && !profile) {
+      navigate(createPageUrl('Onboarding'));
+    }
+  }, [user, profiles, profile, navigate]);
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const currentSteps = residencySteps;
+  const completedSteps = progressList.filter(p => p.status === 'completed').length;
+  const totalSteps = currentSteps.length;
+  const overallProgress = Math.round((completedSteps / totalSteps) * 100);
+
+  const getStepStatus = (stepId) => {
+    const progress = progressList.find(p => p.module_id === stepId);
+    return progress?.status || 'not_started';
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
+      <Header 
+        title="FMG Pathway" 
+        rightContent={
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative rounded-xl"
+            onClick={() => navigate(createPageUrl('Notifications'))}
+          >
+            <Bell className="w-5 h-5" />
+            {notifications.length > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+            )}
+          </Button>
+        }
+      />
+
+      <main className="px-4 py-6 max-w-lg mx-auto space-y-6">
+        {/* Welcome Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-6 text-white"
+        >
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+          
+          <div className="relative">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <p className="text-white/80 text-sm mb-1">Welcome back,</p>
+                <h2 className="text-2xl font-bold">{profile.display_name || user?.full_name}</h2>
+              </div>
+              <ProgressRing progress={overallProgress} size={80} strokeWidth={6} />
+            </div>
+            
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-center gap-2 bg-white/20 rounded-full px-3 py-1.5">
+                <Trophy className="w-4 h-4" />
+                <span className="text-sm font-medium">{profile.points || 0} pts</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/20 rounded-full px-3 py-1.5">
+                <Flame className="w-4 h-4" />
+                <span className="text-sm font-medium">3 day streak</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-3">
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            onClick={() => navigate(createPageUrl('Community'))}
+            className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all text-left"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center mb-3">
+              <Users className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="font-semibold text-slate-800 dark:text-white">Community</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Connect with peers</p>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            onClick={() => navigate(createPageUrl('Mentors'))}
+            className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all text-left"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mb-3">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="font-semibold text-slate-800 dark:text-white">Find Mentor</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Get guidance</p>
+          </motion.button>
+        </div>
+
+        {/* Upcoming Deadlines */}
+        <Card className="p-4 rounded-2xl border-slate-200 dark:border-slate-700">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-indigo-500" />
+              <h3 className="font-semibold text-slate-800 dark:text-white">Upcoming Deadlines</h3>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-400" />
+          </div>
+          <div className="space-y-3">
+            {currentSteps.filter(s => s.deadline).slice(0, 3).map(step => (
+              <div key={step.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{step.title}</span>
+                <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">{step.deadline}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Badges */}
+        {profile.badges?.length > 0 && (
+          <div>
+            <h3 className="font-semibold text-slate-800 dark:text-white mb-3">Your Achievements</h3>
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {profile.badges.map(badge => (
+                <BadgeIcon key={badge} type={badge} size="lg" showLabel />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Your Pathway */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-slate-800 dark:text-white">
+              Your {profile.primary_goal === 'residency' ? 'Residency' : profile.primary_goal === 'fellowship' ? 'Fellowship' : 'Med School'} Path
+            </h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(createPageUrl('Guides'))}
+              className="text-indigo-600 dark:text-indigo-400"
+            >
+              View All
+            </Button>
+          </div>
+
+          <div className="space-y-3">
+            {currentSteps.slice(0, 4).map((step, idx) => (
+              <motion.div
+                key={step.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + idx * 0.05 }}
+              >
+                <StepCard
+                  step={idx + 1}
+                  title={step.title}
+                  description={step.description}
+                  status={getStepStatus(step.id)}
+                  deadline={step.deadline}
+                  onClick={() => navigate(createPageUrl(`GuideDetail?id=${step.id}`))}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      <BottomNav />
+    </div>
+  );
+}
