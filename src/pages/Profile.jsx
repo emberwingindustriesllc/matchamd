@@ -41,7 +41,9 @@ import {
   Moon,
   Globe,
   GraduationCap,
-  BookOpen
+  BookOpen,
+  Crown,
+  Shield
 } from 'lucide-react';
 
 const languages = [
@@ -310,6 +312,33 @@ export default function Profile() {
             <p className="text-slate-600 dark:text-slate-400">{profile.bio}</p>
           </Card>
         )}
+
+        {/* Premium */}
+        <Card className="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-slate-900 dark:text-white">Upgrade to Premium</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Unlock all features & content</p>
+            </div>
+            <Button 
+              onClick={() => navigate(createPageUrl('Subscription'))}
+              className="bg-gradient-to-r from-indigo-600 to-purple-600"
+            >
+              <Crown className="w-4 h-4 mr-2" />
+              Upgrade
+            </Button>
+          </div>
+        </Card>
+
+        {/* Legal */}
+        <Button 
+          variant="outline" 
+          onClick={() => navigate(createPageUrl('Legal'))}
+          className="w-full h-12 rounded-xl"
+        >
+          <Shield className="w-5 h-5 mr-2" />
+          Legal & Privacy
+        </Button>
 
         {/* Actions */}
         <Button 
