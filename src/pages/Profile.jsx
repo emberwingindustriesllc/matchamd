@@ -39,7 +39,9 @@ import {
   CheckCircle2,
   Camera,
   Moon,
-  Globe
+  Globe,
+  GraduationCap,
+  BookOpen
 } from 'lucide-react';
 
 const languages = [
@@ -101,6 +103,9 @@ export default function Profile() {
       bio: profile?.bio || '',
       target_specialty: profile?.target_specialty || '',
       country: profile?.country || '',
+      medical_school: profile?.medical_school || '',
+      medical_school_country: profile?.medical_school_country || '',
+      undergraduate_college: profile?.undergraduate_college || '',
       preferred_language: profile?.preferred_language || 'en',
       dark_mode: profile?.dark_mode || false
     });
@@ -214,6 +219,31 @@ export default function Profile() {
             </div>
             
             <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                <GraduationCap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Medical School</p>
+                <p className="font-medium text-slate-800 dark:text-white">{profile.medical_school || 'Not set'}</p>
+                {profile.medical_school_country && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{profile.medical_school_country}</p>
+                )}
+              </div>
+            </div>
+
+            {profile.undergraduate_college && (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Undergraduate College</p>
+                  <p className="font-medium text-slate-800 dark:text-white">{profile.undergraduate_college}</p>
+                </div>
+              </div>
+            )}
+            
+            <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                 <Globe className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
@@ -301,6 +331,36 @@ export default function Profile() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <Label>Medical School</Label>
+                <Input
+                  value={editData.medical_school}
+                  onChange={(e) => setEditData({ ...editData, medical_school: e.target.value })}
+                  placeholder="Your medical school name"
+                  className="rounded-xl mt-1"
+                />
+              </div>
+
+              <div>
+                <Label>Medical School Country</Label>
+                <Input
+                  value={editData.medical_school_country}
+                  onChange={(e) => setEditData({ ...editData, medical_school_country: e.target.value })}
+                  placeholder="Country"
+                  className="rounded-xl mt-1"
+                />
+              </div>
+
+              <div>
+                <Label>Undergraduate College (Optional)</Label>
+                <Input
+                  value={editData.undergraduate_college}
+                  onChange={(e) => setEditData({ ...editData, undergraduate_college: e.target.value })}
+                  placeholder="Your undergraduate institution"
+                  className="rounded-xl mt-1"
+                />
               </div>
               
               <div>

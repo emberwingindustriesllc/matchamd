@@ -7,6 +7,7 @@ import PostDetail from './pages/PostDetail';
 import Mentors from './pages/Mentors';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -24,4 +25,5 @@ export const PAGES = {
 export const pagesConfig = {
     mainPage: "Onboarding",
     Pages: PAGES,
+    Layout: __Layout,
 };

@@ -32,6 +32,16 @@ const countries = [
   'Jordan', 'Saudi Arabia', 'UAE', 'United Kingdom', 'Canada', 'Other'
 ];
 
+const commonMedSchools = {
+  'India': ['AIIMS', 'JIPMER', 'CMC Vellore', 'Armed Forces Medical College', 'Maulana Azad Medical College', 'Other'],
+  'Pakistan': ['Aga Khan University', 'King Edward Medical University', 'Dow Medical College', 'Allama Iqbal Medical College', 'Other'],
+  'Nigeria': ['University of Ibadan', 'University of Lagos', 'Obafemi Awolowo University', 'University of Nigeria', 'Other'],
+  'Philippines': ['University of the Philippines', 'University of Santo Tomas', 'Far Eastern University', 'Other'],
+  'Egypt': ['Cairo University', 'Ain Shams University', 'Alexandria University', 'Other'],
+  'Mexico': ['UNAM', 'IPN', 'UAG', 'TEC de Monterrey', 'Other'],
+  'Other': ['Other']
+};
+
 const languages = [
   { code: 'en', name: 'English' },
   { code: 'es', name: 'Español' },
@@ -79,7 +89,9 @@ export default function Onboarding() {
   const [profile, setProfile] = useState({
     display_name: '',
     country: '',
+    medical_school: '',
     medical_school_country: '',
+    undergraduate_college: '',
     languages: ['en'],
     preferred_language: 'en',
     primary_goal: '',
@@ -187,7 +199,10 @@ export default function Onboarding() {
 
         <div>
           <Label className="text-slate-700 dark:text-slate-300">Medical School Country</Label>
-          <Select value={profile.medical_school_country} onValueChange={(v) => updateProfile('medical_school_country', v)}>
+          <Select value={profile.medical_school_country} onValueChange={(v) => {
+            updateProfile('medical_school_country', v);
+            updateProfile('medical_school', ''); // Reset medical school when country changes
+          }}>
             <SelectTrigger className="h-12 rounded-xl mt-1">
               <SelectValue placeholder="Where did you study medicine?" />
             </SelectTrigger>
@@ -197,6 +212,40 @@ export default function Onboarding() {
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        {profile.medical_school_country && (
+          <div>
+            <Label className="text-slate-700 dark:text-slate-300">Medical School</Label>
+            <Select value={profile.medical_school} onValueChange={(v) => updateProfile('medical_school', v)}>
+              <SelectTrigger className="h-12 rounded-xl mt-1">
+                <SelectValue placeholder="Select your medical school" />
+              </SelectTrigger>
+              <SelectContent>
+                {(commonMedSchools[profile.medical_school_country] || commonMedSchools['Other']).map(school => (
+                  <SelectItem key={school} value={school}>{school}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {profile.medical_school === 'Other' && (
+              <Input
+                placeholder="Enter medical school name"
+                value={profile.medical_school_custom || ''}
+                onChange={(e) => updateProfile('medical_school_custom', e.target.value)}
+                className="h-12 rounded-xl mt-2"
+              />
+            )}
+          </div>
+        )}
+
+        <div>
+          <Label className="text-slate-700 dark:text-slate-300">Undergraduate College (Optional)</Label>
+          <Input
+            placeholder="e.g., Delhi University"
+            value={profile.undergraduate_college}
+            onChange={(e) => updateProfile('undergraduate_college', e.target.value)}
+            className="h-12 rounded-xl mt-1"
+          />
         </div>
       </div>
     </motion.div>,
@@ -377,7 +426,7 @@ export default function Onboarding() {
   const canProceed = () => {
     switch(step) {
       case 0: return profile.display_name.length > 0;
-      case 1: return profile.country && profile.medical_school_country;
+      case 1: return profile.country && profile.medical_school_country && profile.medical_school;
       case 2: return profile.languages.length > 0;
       case 3: return profile.primary_goal;
       case 4: return true;
