@@ -25,7 +25,7 @@ const translations = {
       subtitle: 'Your personalized guide to achieving your US medical career goals',
       yourName: 'Your name',
       location: 'Where are you located?',
-      locationSubtitle: "We'll customize visa and location-specific guidance",
+      locationSubtitle: "We will customize visa and location-specific guidance",
       currentCountry: 'Current Country',
       selectCountry: 'Select your country',
       medSchoolCountry: 'Medical School Country',
@@ -115,7 +115,7 @@ const translations = {
     mentors: {
       title: 'Find a Mentor',
       connect: 'Connect with Success',
-      connectDesc: "Get guidance from verified FMGs who've matched into their dream programs",
+      connectDesc: "Get guidance from verified FMGs who have matched into their dream programs",
       search: 'Search mentors...',
       allSpecialties: 'All Specialties',
       allLocations: 'All Locations',
@@ -123,7 +123,7 @@ const translations = {
       connected: 'Connected',
       pending: 'Request Pending',
       sendRequest: 'Send Request',
-      introduce: 'Introduce yourself and explain what you\'re looking for in a mentor...',
+      introduce: "Introduce yourself and explain what you're looking for in a mentor...",
       noMentors: 'No mentors found',
       adjustFilters: 'Try adjusting your search filters'
     },
