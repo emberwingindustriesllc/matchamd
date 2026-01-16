@@ -19,10 +19,10 @@ const pathways = {
     steps: [
       { id: 'ecfmg_pathways', title: 'ECFMG Pathways', description: 'Complete one of 6 pathways to certification', deadline: 'Jan 31, 2026' },
       { id: 'usmle_step1', title: 'USMLE Step 1', description: 'First licensing exam covering basic sciences' },
-      { id: 'usmle_step2', title: 'USMLE Step 2 CK', description: 'Clinical knowledge examination' },
+      { id: 'usmle_step2', title: 'USMLE Step 2 CK', description: 'Clinical knowledge examination - aim for high score!' },
       { id: 'oet_medicine', title: 'OET Medicine', description: 'Occupational English Test for healthcare professionals', deadline: 'Dec 2025' },
-      { id: 'clinical_experience', title: 'US Clinical Experience', description: 'Rotations, observerships, or externships' },
-      { id: 'research', title: 'Research Experience', description: 'Publications and research projects' },
+      { id: 'clinical_experience', title: 'US Clinical Experience', description: 'Critical for Surgery - hands-on rotations at US programs' },
+      { id: 'research', title: 'Research Experience', description: 'Essential for competitive specialties - publications strengthen your CV' },
       { id: 'eras_registration', title: 'ERAS Registration', description: 'Electronic Residency Application Service', deadline: 'Sept 2025' },
       { id: 'personal_statement', title: 'Personal Statement', description: 'Your unique story and motivation' },
       { id: 'lors', title: 'Letters of Recommendation', description: 'Strong letters from physicians' },

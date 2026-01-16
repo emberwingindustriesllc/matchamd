@@ -68,6 +68,53 @@ const guideContent = {
       { title: 'UWorld Qbank', url: 'https://www.uworld.com', type: 'website' }
     ]
   },
+  clinical_experience: {
+    title: 'US Clinical Experience',
+    overview: 'US Clinical Experience (USCE) is crucial for competitive specialties like Surgery. It demonstrates your ability to work in the US healthcare system and provides valuable letters of recommendation.',
+    checklist: [
+      { id: 1, text: 'Research observership vs externship programs' },
+      { id: 2, text: 'Apply to multiple programs (start 6-12 months early)' },
+      { id: 3, text: 'Secure at least 2-3 rotations in your specialty' },
+      { id: 4, text: 'Focus on programs that write strong LORs' },
+      { id: 5, text: 'Network with attending physicians' },
+      { id: 6, text: 'Document all experiences for ERAS' }
+    ],
+    tips: [
+      'FOR SURGERY: Aim for at least one rotation at a university program',
+      'Hands-on externships are valued more than observerships',
+      'Target programs in your desired geographic location',
+      'Be proactive - volunteer for cases and research opportunities',
+      'Ask for letters from program directors or division chiefs'
+    ],
+    resources: [
+      { title: 'AMOpportunities', url: 'https://www.amopportunities.org', type: 'website' },
+      { title: 'VSLO (AAMC)', url: 'https://students-residents.aamc.org/vslo', type: 'website' },
+      { title: 'IMG Clinical Experience Guide', url: 'https://www.ama-assn.org/education/international-medical-education', type: 'document' }
+    ]
+  },
+  research: {
+    title: 'Research Experience',
+    overview: 'Research experience is especially important for competitive specialties like Surgery. Publications and presentations strengthen your application significantly.',
+    checklist: [
+      { id: 1, text: 'Identify research opportunities in your target specialty' },
+      { id: 2, text: 'Join research projects remotely if needed' },
+      { id: 3, text: 'Aim for at least 1-2 publications' },
+      { id: 4, text: 'Present at conferences if possible' },
+      { id: 5, text: 'List all research on ERAS with proper citations' }
+    ],
+    tips: [
+      'FOR SURGERY: Research is highly valued - aim for surgical outcomes or education research',
+      'Quality over quantity - one first-author paper is better than multiple abstracts',
+      'Network with researchers at programs you want to match at',
+      'Case reports and systematic reviews are good starting points',
+      'Join surgical societies (e.g., SAGES, ACS) for networking'
+    ],
+    resources: [
+      { title: 'Research Match', url: 'https://www.researchmatch.org', type: 'website' },
+      { title: 'ACS Research Resources', url: 'https://www.facs.org', type: 'website' },
+      { title: 'PubMed', url: 'https://pubmed.ncbi.nlm.nih.gov', type: 'website' }
+    ]
+  },
   usmle_step2: {
     title: 'USMLE Step 2 CK',
     overview: 'Step 2 CK assesses clinical knowledge through multiple-choice questions. A high score is crucial for competitive specialties.',

@@ -102,6 +102,8 @@ export default function Profile() {
       display_name: profile?.display_name || '',
       bio: profile?.bio || '',
       target_specialty: profile?.target_specialty || '',
+      target_city: profile?.target_city || '',
+      target_state: profile?.target_state || '',
       country: profile?.country || '',
       medical_school: profile?.medical_school || '',
       medical_school_country: profile?.medical_school_country || '',
@@ -152,9 +154,27 @@ export default function Profile() {
                   {profile.display_name?.[0]?.toUpperCase() || user?.full_name?.[0]?.toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <button className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
+              <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-gray-50 transition-colors">
                 <Camera className="w-4 h-4 text-indigo-600" />
-              </button>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      try {
+                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                        await base44.entities.UserProfile.update(profile.id, { avatar_url: file_url });
+                        queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+                      } catch (error) {
+                        console.error('Error uploading avatar:', error);
+                      }
+                    }
+                  }}
+                />
+              </label>
             </div>
             
             <div className="flex-1">
@@ -239,6 +259,20 @@ export default function Profile() {
                 <div>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Undergraduate College</p>
                   <p className="font-medium text-slate-800 dark:text-white">{profile.undergraduate_college}</p>
+                </div>
+              </div>
+            )}
+
+            {(profile.target_city || profile.target_state) && (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+                  <MapPin className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Target Location</p>
+                  <p className="font-medium text-slate-800 dark:text-white">
+                    {profile.target_city ? `${profile.target_city}, ${profile.target_state || ''}` : profile.target_state}
+                  </p>
                 </div>
               </div>
             )}
@@ -359,6 +393,26 @@ export default function Profile() {
                   value={editData.undergraduate_college}
                   onChange={(e) => setEditData({ ...editData, undergraduate_college: e.target.value })}
                   placeholder="Your undergraduate institution"
+                  className="rounded-xl mt-1"
+                />
+              </div>
+
+              <div>
+                <Label>Target City (Optional)</Label>
+                <Input
+                  value={editData.target_city}
+                  onChange={(e) => setEditData({ ...editData, target_city: e.target.value })}
+                  placeholder="e.g., New York, Los Angeles"
+                  className="rounded-xl mt-1"
+                />
+              </div>
+
+              <div>
+                <Label>Target State (Optional)</Label>
+                <Input
+                  value={editData.target_state}
+                  onChange={(e) => setEditData({ ...editData, target_state: e.target.value })}
+                  placeholder="e.g., NY, CA"
                   className="rounded-xl mt-1"
                 />
               </div>

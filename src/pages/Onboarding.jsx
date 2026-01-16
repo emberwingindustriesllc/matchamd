@@ -82,6 +82,14 @@ const specialties = [
   'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology', 'Other'
 ];
 
+const usStates = [
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 
+  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 
+  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 
+  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 
+  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+];
+
 export default function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
@@ -89,6 +97,8 @@ export default function Onboarding() {
   const [profile, setProfile] = useState({
     display_name: '',
     country: '',
+    target_city: '',
+    target_state: '',
     medical_school: '',
     medical_school_country: '',
     undergraduate_college: '',
@@ -359,19 +369,45 @@ export default function Onboarding() {
 
       <div className="space-y-4">
         {profile.primary_goal !== 'med_school' && (
-          <div>
-            <Label className="text-slate-700 dark:text-slate-300">Target Specialty</Label>
-            <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
-              <SelectTrigger className="h-12 rounded-xl mt-1">
-                <SelectValue placeholder="Select specialty" />
-              </SelectTrigger>
-              <SelectContent>
-                {specialties.map(s => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <>
+            <div>
+              <Label className="text-slate-700 dark:text-slate-300">Target Specialty</Label>
+              <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
+                <SelectTrigger className="h-12 rounded-xl mt-1">
+                  <SelectValue placeholder="Select specialty" />
+                </SelectTrigger>
+                <SelectContent>
+                  {specialties.map(s => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-slate-700 dark:text-slate-300">Target City (Optional)</Label>
+              <Input
+                placeholder="e.g., New York, Los Angeles, Chicago"
+                value={profile.target_city}
+                onChange={(e) => updateProfile('target_city', e.target.value)}
+                className="h-12 rounded-xl mt-1"
+              />
+            </div>
+
+            <div>
+              <Label className="text-slate-700 dark:text-slate-300">Target State (Optional)</Label>
+              <Select value={profile.target_state} onValueChange={(v) => updateProfile('target_state', v)}>
+                <SelectTrigger className="h-12 rounded-xl mt-1">
+                  <SelectValue placeholder="Select state" />
+                </SelectTrigger>
+                <SelectContent>
+                  {usStates.map(state => (
+                    <SelectItem key={state} value={state}>{state}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </>
         )}
 
         <div>

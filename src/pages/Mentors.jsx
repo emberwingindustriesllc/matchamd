@@ -40,6 +40,7 @@ export default function Mentors() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [specialtyFilter, setSpecialtyFilter] = useState('all');
+  const [locationFilter, setLocationFilter] = useState('all');
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [requestMessage, setRequestMessage] = useState('');
 
@@ -90,12 +91,17 @@ export default function Mentors() {
 
   const filteredMentors = mentors.filter(mentor => {
     const matchesSearch = mentor.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         mentor.target_specialty?.toLowerCase().includes(searchQuery.toLowerCase());
+                         mentor.target_specialty?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         mentor.matched_city?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSpecialty = specialtyFilter === 'all' || mentor.target_specialty === specialtyFilter;
-    return matchesSearch && matchesSpecialty;
+    const matchesLocation = locationFilter === 'all' || 
+                           mentor.matched_city === locationFilter || 
+                           mentor.matched_state === locationFilter;
+    return matchesSearch && matchesSpecialty && matchesLocation;
   });
 
   const specialties = [...new Set(mentors.map(m => m.target_specialty).filter(Boolean))];
+  const locations = [...new Set(mentors.map(m => m.matched_city || m.matched_state).filter(Boolean))];
 
   const hasPendingRequest = (mentorId) => {
     return myRequests.some(r => r.mentor_id === mentorId && r.status === 'pending');
@@ -151,6 +157,18 @@ export default function Mentors() {
               ))}
             </SelectContent>
           </Select>
+
+          <Select value={locationFilter} onValueChange={setLocationFilter}>
+            <SelectTrigger className="h-12 rounded-xl">
+              <SelectValue placeholder="All Locations" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Locations</SelectItem>
+              {locations.map(loc => (
+                <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Mentors List */}
@@ -186,10 +204,10 @@ export default function Mentors() {
                         {mentor.target_specialty}
                       </Badge>
                     )}
-                    {mentor.country && (
+                    {(mentor.matched_city || mentor.matched_state) && (
                       <Badge variant="secondary" className="bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400">
                         <MapPin className="w-3 h-3 mr-1" />
-                        {mentor.country}
+                        {mentor.matched_city ? `${mentor.matched_city}, ${mentor.matched_state || ''}` : mentor.matched_state}
                       </Badge>
                     )}
                     {mentor.ecfmg_certified && (
