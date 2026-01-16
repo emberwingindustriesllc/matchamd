@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
+import ErrorState from '@/components/common/ErrorState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -81,12 +82,14 @@ export default function Community() {
     enabled: !!user?.id
   });
 
-  const { data: posts = [], isLoading } = useQuery({
+  const { data: posts = [], isLoading, error: postsError, refetch } = useQuery({
     queryKey: ['posts', activeCategory, sortBy],
     queryFn: async () => {
       const filter = activeCategory !== 'all' ? { category: activeCategory } : {};
       return base44.entities.ForumPost.filter(filter, sortBy === 'recent' ? '-created_date' : '-likes_count');
-    }
+    },
+    retry: 2,
+    staleTime: 2 * 60 * 1000
   });
 
   const profile = profiles?.[0];
@@ -225,7 +228,17 @@ export default function Community() {
           </Dialog>
         </div>
 
+        {/* Error State */}
+        {postsError && (
+          <ErrorState 
+            title="Unable to Load Posts"
+            message="We couldn't load community posts. Please try again."
+            onRetry={refetch}
+          />
+        )}
+
         {/* Posts List */}
+        {!postsError && (
         <div className="space-y-4">
           <AnimatePresence>
             {filteredPosts.map((post, idx) => (
@@ -321,6 +334,7 @@ export default function Community() {
             </div>
           )}
         </div>
+        )}
       </main>
 
       <BottomNav />

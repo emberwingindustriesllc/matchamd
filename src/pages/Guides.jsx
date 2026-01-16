@@ -7,6 +7,7 @@ import { createPageUrl } from '@/utils';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import StepCard from '@/components/common/StepCard';
+import ErrorState from '@/components/common/ErrorState';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Search, Stethoscope, GraduationCap, BookOpen } from 'lucide-react';
@@ -74,13 +75,30 @@ export default function Guides() {
   const { data: progressList = [] } = useQuery({
     queryKey: ['progress'],
     queryFn: () => base44.entities.Progress.filter({ user_id: user?.id }),
-    enabled: !!user?.id
+    enabled: !!user?.id,
+    retry: 2,
+    staleTime: 2 * 60 * 1000
   });
 
-  const { data: profiles } = useQuery({
+  const { data: profiles, error: profileError } = useQuery({
     queryKey: ['userProfile'],
     queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
-    enabled: !!user?.id
+    enabled: !!user?.id,
+    retry: 2,
+    staleTime: 5 * 60 * 1000
+  });
+
+  const { data: dynamicGuides = [], isLoading: guidesLoading, error: guidesError } = useQuery({
+    queryKey: ['guides', profiles?.[0]?.primary_goal],
+    queryFn: async () => {
+      const guides = await base44.entities.Guide.filter(
+        { category: profiles?.[0]?.primary_goal, published: true },
+        'order'
+      );
+      return guides;
+    },
+    enabled: !!profiles?.[0],
+    staleTime: 10 * 60 * 1000
   });
 
   const profile = profiles?.[0];

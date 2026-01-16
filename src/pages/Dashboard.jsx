@@ -9,6 +9,7 @@ import BottomNav from '@/components/navigation/BottomNav';
 import ProgressRing from '@/components/common/ProgressRing';
 import BadgeIcon from '@/components/common/BadgeIcon';
 import StepCard from '@/components/common/StepCard';
+import ErrorState from '@/components/common/ErrorState';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { 
@@ -40,22 +41,28 @@ export default function Dashboard() {
     queryFn: () => base44.auth.me()
   });
 
-  const { data: profiles } = useQuery({
+  const { data: profiles, error: profileError } = useQuery({
     queryKey: ['userProfile'],
     queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
-    enabled: !!user?.id
+    enabled: !!user?.id,
+    retry: 2,
+    staleTime: 5 * 60 * 1000
   });
 
   const { data: progressList = [] } = useQuery({
     queryKey: ['progress'],
     queryFn: () => base44.entities.Progress.filter({ user_id: user?.id }),
-    enabled: !!user?.id
+    enabled: !!user?.id,
+    retry: 2,
+    staleTime: 2 * 60 * 1000
   });
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['notifications'],
     queryFn: () => base44.entities.Notification.filter({ user_id: user?.id, read: false }),
-    enabled: !!user?.id
+    enabled: !!user?.id,
+    retry: 1,
+    staleTime: 1 * 60 * 1000
   });
 
   const profile = profiles?.[0];
@@ -67,6 +74,19 @@ export default function Dashboard() {
   }, [user, profiles, profile, navigate]);
 
   if (!profile) {
+    if (profileError) {
+      return (
+        <>
+          <Header title="FMG Pathway" />
+          <ErrorState 
+            title="Unable to Load Profile"
+            message="We couldn't load your profile. Please check your connection and try again."
+            onRetry={() => window.location.reload()}
+          />
+          <BottomNav />
+        </>
+      );
+    }
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
         <div className="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin" />
