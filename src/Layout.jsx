@@ -1,9 +1,11 @@
 import React from 'react';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
+import { LanguageProvider } from '@/components/ui/LanguageProvider';
 
 export default function Layout({ children, currentPageName }) {
   return (
     <ThemeProvider>
+      <LanguageProvider>
       <style>{`
         :root {
           --color-primary: 99 102 241;
@@ -69,9 +71,10 @@ export default function Layout({ children, currentPageName }) {
         }
       `}</style>
       
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white transition-colors duration-300">
-        {children}
-      </div>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white transition-colors duration-300">
+          {children}
+        </div>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }
