@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
+import { useTranslation } from '@/components/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -92,6 +93,7 @@ const usStates = [
 
 export default function Onboarding() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profile, setProfile] = useState({
@@ -158,15 +160,15 @@ export default function Onboarding() {
         <Sparkles className="w-10 h-10 text-white" />
       </div>
       <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-3">
-        Welcome to FMG Pathway
+        {t('onboarding.welcome')}
       </h1>
       <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-sm mx-auto">
-        Your personalized guide to achieving your US medical career goals
+        {t('onboarding.subtitle')}
       </p>
       
       <div className="space-y-3 mb-8">
         <Input
-          placeholder="Your name"
+          placeholder={t('onboarding.yourName')}
           value={profile.display_name}
           onChange={(e) => updateProfile('display_name', e.target.value)}
           className="h-12 rounded-xl text-center text-lg"
@@ -186,18 +188,18 @@ export default function Onboarding() {
         <Globe className="w-8 h-8 text-white" />
       </div>
       <h2 className="text-2xl font-bold text-center text-slate-800 dark:text-white mb-2">
-        Where are you located?
+        {t('onboarding.location')}
       </h2>
       <p className="text-slate-500 dark:text-slate-400 text-center mb-6">
-        We'll customize visa and location-specific guidance
+        {t('onboarding.locationSubtitle')}
       </p>
 
       <div className="space-y-4">
         <div>
-          <Label className="text-slate-700 dark:text-slate-300">Current Country</Label>
+          <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.currentCountry')}</Label>
           <Select value={profile.country} onValueChange={(v) => updateProfile('country', v)}>
             <SelectTrigger className="h-12 rounded-xl mt-1">
-              <SelectValue placeholder="Select your country" />
+              <SelectValue placeholder={t('onboarding.selectCountry')} />
             </SelectTrigger>
             <SelectContent>
               {countries.map(c => (
@@ -208,13 +210,13 @@ export default function Onboarding() {
         </div>
 
         <div>
-          <Label className="text-slate-700 dark:text-slate-300">Medical School Country</Label>
+          <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.medSchoolCountry')}</Label>
           <Select value={profile.medical_school_country} onValueChange={(v) => {
             updateProfile('medical_school_country', v);
             updateProfile('medical_school', ''); // Reset medical school when country changes
           }}>
             <SelectTrigger className="h-12 rounded-xl mt-1">
-              <SelectValue placeholder="Where did you study medicine?" />
+              <SelectValue placeholder={t('onboarding.whereStudied')} />
             </SelectTrigger>
             <SelectContent>
               {countries.map(c => (
@@ -226,10 +228,10 @@ export default function Onboarding() {
 
         {profile.medical_school_country && (
           <div>
-            <Label className="text-slate-700 dark:text-slate-300">Medical School</Label>
+            <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.medSchool')}</Label>
             <Select value={profile.medical_school} onValueChange={(v) => updateProfile('medical_school', v)}>
               <SelectTrigger className="h-12 rounded-xl mt-1">
-                <SelectValue placeholder="Select your medical school" />
+                <SelectValue placeholder={t('onboarding.selectMedSchool')} />
               </SelectTrigger>
               <SelectContent>
                 {(commonMedSchools[profile.medical_school_country] || commonMedSchools['Other']).map(school => (
@@ -239,7 +241,7 @@ export default function Onboarding() {
             </Select>
             {profile.medical_school === 'Other' && (
               <Input
-                placeholder="Enter medical school name"
+                placeholder={t('onboarding.enterMedSchool')}
                 value={profile.medical_school_custom || ''}
                 onChange={(e) => updateProfile('medical_school_custom', e.target.value)}
                 className="h-12 rounded-xl mt-2"
@@ -249,9 +251,9 @@ export default function Onboarding() {
         )}
 
         <div>
-          <Label className="text-slate-700 dark:text-slate-300">Undergraduate College (Optional)</Label>
+          <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.undergrad')}</Label>
           <Input
-            placeholder="e.g., Delhi University"
+            placeholder={t('onboarding.undergradPlaceholder')}
             value={profile.undergraduate_college}
             onChange={(e) => updateProfile('undergraduate_college', e.target.value)}
             className="h-12 rounded-xl mt-1"
@@ -272,10 +274,10 @@ export default function Onboarding() {
         <Languages className="w-8 h-8 text-white" />
       </div>
       <h2 className="text-2xl font-bold text-center text-slate-800 dark:text-white mb-2">
-        Languages you speak
+        {t('onboarding.languages')}
       </h2>
       <p className="text-slate-500 dark:text-slate-400 text-center mb-6">
-        Select all that apply
+        {t('onboarding.languagesSubtitle')}
       </p>
 
       <div className="grid grid-cols-2 gap-3 mb-6">
@@ -295,7 +297,7 @@ export default function Onboarding() {
       </div>
 
       <div>
-        <Label className="text-slate-700 dark:text-slate-300">Preferred app language</Label>
+        <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.preferredLanguage')}</Label>
         <Select value={profile.preferred_language} onValueChange={(v) => updateProfile('preferred_language', v)}>
           <SelectTrigger className="h-12 rounded-xl mt-1">
             <SelectValue />
@@ -321,10 +323,10 @@ export default function Onboarding() {
         <Target className="w-8 h-8 text-white" />
       </div>
       <h2 className="text-2xl font-bold text-center text-slate-800 dark:text-white mb-2">
-        What's your goal?
+        {t('onboarding.goal')}
       </h2>
       <p className="text-slate-500 dark:text-slate-400 text-center mb-6">
-        Choose your primary pathway
+        {t('onboarding.goalSubtitle')}
       </p>
 
       <div className="space-y-3">
@@ -343,8 +345,8 @@ export default function Onboarding() {
                 <goal.icon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-slate-800 dark:text-white">{goal.title}</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{goal.description}</p>
+                <h3 className="font-semibold text-slate-800 dark:text-white">{t(`goals.${goal.id}`)}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t(`goals.${goal.id}Desc`)}</p>
               </div>
             </div>
           </button>
@@ -361,20 +363,20 @@ export default function Onboarding() {
       className="px-6"
     >
       <h2 className="text-2xl font-bold text-center text-slate-800 dark:text-white mb-2">
-        A few more details
+        {t('onboarding.details')}
       </h2>
       <p className="text-slate-500 dark:text-slate-400 text-center mb-6">
-        Help us personalize your journey
+        {t('onboarding.detailsSubtitle')}
       </p>
 
       <div className="space-y-4">
         {profile.primary_goal !== 'med_school' && (
           <>
             <div>
-              <Label className="text-slate-700 dark:text-slate-300">Target Specialty</Label>
+              <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.targetSpecialty')}</Label>
               <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
                 <SelectTrigger className="h-12 rounded-xl mt-1">
-                  <SelectValue placeholder="Select specialty" />
+                  <SelectValue placeholder={t('onboarding.selectSpecialty')} />
                 </SelectTrigger>
                 <SelectContent>
                   {specialties.map(s => (
@@ -385,9 +387,9 @@ export default function Onboarding() {
             </div>
 
             <div>
-              <Label className="text-slate-700 dark:text-slate-300">Target City (Optional)</Label>
+              <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.targetCity')}</Label>
               <Input
-                placeholder="e.g., New York, Los Angeles, Chicago"
+                placeholder={t('onboarding.targetCityPlaceholder')}
                 value={profile.target_city}
                 onChange={(e) => updateProfile('target_city', e.target.value)}
                 className="h-12 rounded-xl mt-1"
@@ -395,10 +397,10 @@ export default function Onboarding() {
             </div>
 
             <div>
-              <Label className="text-slate-700 dark:text-slate-300">Target State (Optional)</Label>
+              <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.targetState')}</Label>
               <Select value={profile.target_state} onValueChange={(v) => updateProfile('target_state', v)}>
                 <SelectTrigger className="h-12 rounded-xl mt-1">
-                  <SelectValue placeholder="Select state" />
+                  <SelectValue placeholder={t('onboarding.selectState')} />
                 </SelectTrigger>
                 <SelectContent>
                   {usStates.map(state => (
@@ -411,31 +413,31 @@ export default function Onboarding() {
         )}
 
         <div>
-          <Label className="text-slate-700 dark:text-slate-300">USMLE Step 1 Status</Label>
+          <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.step1Status')}</Label>
           <Select value={profile.usmle_step1_status} onValueChange={(v) => updateProfile('usmle_step1_status', v)}>
             <SelectTrigger className="h-12 rounded-xl mt-1">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="not_started">Not started</SelectItem>
-              <SelectItem value="studying">Currently studying</SelectItem>
-              <SelectItem value="scheduled">Exam scheduled</SelectItem>
-              <SelectItem value="passed">Passed</SelectItem>
+              <SelectItem value="not_started">{t('onboarding.notStarted')}</SelectItem>
+              <SelectItem value="studying">{t('onboarding.studying')}</SelectItem>
+              <SelectItem value="scheduled">{t('onboarding.scheduled')}</SelectItem>
+              <SelectItem value="passed">{t('onboarding.passed')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div>
-          <Label className="text-slate-700 dark:text-slate-300">USMLE Step 2 CK Status</Label>
+          <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.step2Status')}</Label>
           <Select value={profile.usmle_step2_status} onValueChange={(v) => updateProfile('usmle_step2_status', v)}>
             <SelectTrigger className="h-12 rounded-xl mt-1">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="not_started">Not started</SelectItem>
-              <SelectItem value="studying">Currently studying</SelectItem>
-              <SelectItem value="scheduled">Exam scheduled</SelectItem>
-              <SelectItem value="passed">Passed</SelectItem>
+              <SelectItem value="not_started">{t('onboarding.notStarted')}</SelectItem>
+              <SelectItem value="studying">{t('onboarding.studying')}</SelectItem>
+              <SelectItem value="scheduled">{t('onboarding.scheduled')}</SelectItem>
+              <SelectItem value="passed">{t('onboarding.passed')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -445,7 +447,7 @@ export default function Onboarding() {
             checked={profile.ecfmg_certified}
             onCheckedChange={(v) => updateProfile('ecfmg_certified', v)}
           />
-          <span className="text-slate-700 dark:text-slate-300">I am ECFMG certified</span>
+          <span className="text-slate-700 dark:text-slate-300">{t('onboarding.ecfmgCertified')}</span>
         </div>
 
         <div className="flex items-center gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
@@ -453,7 +455,7 @@ export default function Onboarding() {
             checked={profile.us_clinical_experience}
             onCheckedChange={(v) => updateProfile('us_clinical_experience', v)}
           />
-          <span className="text-slate-700 dark:text-slate-300">I have US clinical experience</span>
+          <span className="text-slate-700 dark:text-slate-300">{t('onboarding.usClinical')}</span>
         </div>
       </div>
     </motion.div>
@@ -509,9 +511,9 @@ export default function Onboarding() {
           {isSubmitting ? (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
           ) : step === steps.length - 1 ? (
-            'Start My Journey'
+            t('onboarding.startJourney')
           ) : (
-            <>Continue <ChevronRight className="w-5 h-5 ml-2" /></>
+            <>{t('continue')} <ChevronRight className="w-5 h-5 ml-2" /></>
           )}
         </Button>
       </div>

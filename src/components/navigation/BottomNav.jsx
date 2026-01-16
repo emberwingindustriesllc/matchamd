@@ -4,17 +4,19 @@ import { Home, BookOpen, Users, User, Bell } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { useTranslation } from '@/components/i18n/LanguageContext';
 
 const navItems = [
-  { icon: Home, label: 'Home', page: 'Dashboard' },
-  { icon: BookOpen, label: 'Guides', page: 'Guides' },
-  { icon: Users, label: 'Community', page: 'Community' },
-  { icon: Bell, label: 'Alerts', page: 'Notifications' },
-  { icon: User, label: 'Profile', page: 'Profile' }
+  { icon: Home, labelKey: 'nav.home', page: 'Dashboard' },
+  { icon: BookOpen, labelKey: 'nav.guides', page: 'Guides' },
+  { icon: Users, labelKey: 'nav.community', page: 'Community' },
+  { icon: Bell, labelKey: 'nav.alerts', page: 'Notifications' },
+  { icon: User, labelKey: 'nav.profile', page: 'Profile' }
 ];
 
 export default function BottomNav() {
   const location = useLocation();
+  const { t } = useTranslation();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 safe-area-bottom">
@@ -44,7 +46,7 @@ export default function BottomNav() {
               )}
               <item.icon className={cn('w-5 h-5 relative z-10', isActive && 'stroke-[2.5px]')} />
               <span className={cn('text-[10px] mt-1 relative z-10 font-medium', isActive && 'font-semibold')}>
-                {item.label}
+                {t(item.labelKey)}
               </span>
             </Link>
           );
