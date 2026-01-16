@@ -3,6 +3,10 @@ import Dashboard from './pages/Dashboard';
 import Guides from './pages/Guides';
 import GuideDetail from './pages/GuideDetail';
 import Community from './pages/Community';
+import PostDetail from './pages/PostDetail';
+import Mentors from './pages/Mentors';
+import Profile from './pages/Profile';
+import Notifications from './pages/Notifications';
 
 
 export const PAGES = {
@@ -11,6 +15,10 @@ export const PAGES = {
     "Guides": Guides,
     "GuideDetail": GuideDetail,
     "Community": Community,
+    "PostDetail": PostDetail,
+    "Mentors": Mentors,
+    "Profile": Profile,
+    "Notifications": Notifications,
 }
 
 export const pagesConfig = {
