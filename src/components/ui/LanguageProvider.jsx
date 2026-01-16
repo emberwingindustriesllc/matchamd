@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import translations from '@/translations';
+import translations from '@/components/translations';
 
 const LanguageContext = createContext({ 
   t: (key) => key, 
