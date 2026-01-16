@@ -122,7 +122,7 @@ export const translations = {
       connected: 'Connected',
       pending: 'Request Pending',
       sendRequest: 'Send Request',
-      introduce: 'Introduce yourself and explain what you're looking for in a mentor...',
+      introduce: "Introduce yourself and explain what you're looking for in a mentor...",
       noMentors: 'No mentors found',
       adjustFilters: 'Try adjusting your search filters'
     },
@@ -175,7 +175,7 @@ export const translations = {
       subtitle: 'Tu guía personalizada para alcanzar tus metas médicas en EE.UU.',
       yourName: 'Tu nombre',
       location: '¿Dónde te encuentras?',
-      locationSubtitle: 'Personalizaremos la orientación sobre visas y ubicación',
+      locationSubtitle: "Personalizaremos la orientación sobre visas y ubicación",
       currentCountry: 'País Actual',
       selectCountry: 'Selecciona tu país',
       medSchoolCountry: 'País de la Escuela de Medicina',
@@ -276,7 +276,7 @@ export const translations = {
       connected: 'Conectado',
       pending: 'Solicitud Pendiente',
       sendRequest: 'Enviar Solicitud',
-      introduce: 'Preséntate y explica qué buscas en un mentor...',
+      introduce: "Preséntate y explica qué buscas en un mentor...",
       noMentors: 'No se encontraron mentores',
       adjustFilters: 'Intenta ajustar tus filtros de búsqueda'
     },
