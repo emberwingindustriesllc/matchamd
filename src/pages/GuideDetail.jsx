@@ -8,6 +8,7 @@ import ResourceLink from '@/components/common/ResourceLink';
 import ProgressMountain from '@/components/gamification/ProgressMountain';
 import ProgressTree from '@/components/gamification/ProgressTree';
 import ProgressRocket from '@/components/gamification/ProgressRocket';
+import ShareMilestone from '@/components/gamification/ShareMilestone';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,7 +22,8 @@ import {
   AlertCircle,
   Lightbulb,
   FileText,
-  Zap
+  Zap,
+  Share2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -200,6 +202,8 @@ export default function GuideDetail() {
   
   const [notes, setNotes] = useState('');
   const [visualMode, setVisualMode] = useState('mountain'); // 'mountain', 'tree', 'rocket'
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const visualRef = React.useRef(null);
   
   const guide = guideContent[guideId] || guideContent.ecfmg_pathways;
 
@@ -273,10 +277,25 @@ export default function GuideDetail() {
       <main className="px-4 py-6 max-w-lg mx-auto space-y-6">
         {/* Visual Progress */}
         <motion.div
+          ref={visualRef}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700"
         >
+          {/* Header with Share Button */}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-white">Your Progress</h2>
+            <Button
+              onClick={() => setShowShareDialog(true)}
+              size="sm"
+              variant="outline"
+              className="rounded-xl"
+            >
+              <Share2 className="w-4 h-4 mr-1" />
+              Share
+            </Button>
+          </div>
+
           {/* Mode Selector */}
           <div className="flex gap-2 mb-4 justify-center">
             <Button
@@ -433,6 +452,14 @@ export default function GuideDetail() {
           </Button>
         </Card>
       </main>
+
+      <ShareMilestone
+        isOpen={showShareDialog}
+        onClose={() => setShowShareDialog(false)}
+        guideTitle={guide.title}
+        completionPercentage={progressPercentage}
+        visualRef={visualRef}
+      />
 
       <BottomNav />
     </div>
