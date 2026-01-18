@@ -18,8 +18,11 @@ import {
   Trophy,
   Users,
   BookOpen,
-  MessageSquare
+  MessageSquare,
+  TrendingUp,
+  Lock
 } from 'lucide-react';
+import BenefitComparison from '@/components/subscription/BenefitComparison';
 
 const plans = [
   {
@@ -28,17 +31,14 @@ const plans = [
     price: 0,
     icon: Star,
     color: 'from-slate-500 to-slate-600',
+    description: 'Start your journey with essential tools',
     features: [
-      'Basic pathway guides',
-      'Community access',
-      'Progress tracking',
+      'Access to basic pathway guides',
+      'Community forum participation',
+      'Progress tracking dashboard',
       'Public mentor directory',
-      'Weekly newsletter'
-    ],
-    limitations: [
-      'Limited to 3 mentor requests/month',
-      'No specialty-specific guides',
-      'Standard support'
+      'Weekly newsletter with tips',
+      '3 mentor connection requests per month'
     ]
   },
   {
@@ -48,15 +48,16 @@ const plans = [
     icon: Crown,
     color: 'from-indigo-500 to-purple-500',
     popular: true,
+    description: 'Perfect for serious applicants',
     features: [
-      'All Free features',
-      'Unlimited mentor requests',
-      'Specialty-specific guides',
-      'Interview prep materials',
-      'Priority community support',
-      'Personalized timeline',
-      'CV/PS templates',
-      'Ad-free experience'
+      'Everything in Free, plus:',
+      'Unlimited mentor connection requests',
+      'Complete specialty-specific guides',
+      'Comprehensive interview preparation materials',
+      'Priority support in community',
+      'Personalized application timeline',
+      'Professional CV & personal statement templates',
+      'Ad-free experience across the platform'
     ]
   },
   {
@@ -65,15 +66,16 @@ const plans = [
     price: 19.99,
     icon: Sparkles,
     color: 'from-amber-500 to-orange-500',
+    description: 'Maximum support for competitive advantage',
     features: [
-      'All Premium features',
-      '1-on-1 monthly mentor session',
-      'Application review service',
-      'Mock interview access',
-      'Exclusive webinars',
-      'Program research assistance',
-      'Early access to new features',
-      'White-glove support'
+      'Everything in Premium, plus:',
+      'One scheduled 1-on-1 mentor session monthly',
+      'Professional application review service',
+      'Access to mock interview sessions',
+      'Exclusive live webinars with program directors',
+      'Personalized program research assistance',
+      'Early access to new features & content',
+      'White-glove priority support (2-hour response)'
     ]
   }
 ];
@@ -175,6 +177,26 @@ export default function Subscription() {
       <Header title="Premium" showBack />
 
       <main className="px-4 py-6 max-w-4xl mx-auto">
+        {/* Hero Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 border border-indigo-200 dark:border-indigo-800 mb-4">
+            <TrendingUp className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+              Accelerate Your Medical Career
+            </span>
+          </div>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-3">
+            Choose Your Success Plan
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            Get personalized guidance, exclusive resources, and expert mentorship to match into your dream program
+          </p>
+        </motion.div>
+
         {/* Current Plan */}
         {currentSubscription && currentSubscription.plan !== 'free' && (
           <Card className="p-6 mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-800">
@@ -202,7 +224,15 @@ export default function Subscription() {
 
         {/* Subscription Plans */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Choose Your Plan</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Subscription Plans</h2>
+            <div className="text-sm text-slate-600 dark:text-slate-400">
+              <span className="inline-flex items-center gap-1">
+                <Lock className="w-4 h-4" />
+                Cancel anytime
+              </span>
+            </div>
+          </div>
           <div className="grid md:grid-cols-3 gap-6">
             {plans.map((plan) => {
               const Icon = plan.icon;
@@ -228,9 +258,13 @@ export default function Subscription() {
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
                       {plan.name}
                     </h3>
+                    
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                      {plan.description}
+                    </p>
                     
                     <div className="mb-6">
                       <span className="text-3xl font-bold text-slate-900 dark:text-white">
@@ -242,14 +276,8 @@ export default function Subscription() {
                     <ul className="space-y-3 mb-6">
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm">
-                          <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                          <span className="text-slate-700 dark:text-slate-300">{feature}</span>
-                        </li>
-                      ))}
-                      {plan.limitations?.map((limit, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-slate-500">
-                          <span className="w-5 h-5 flex-shrink-0">•</span>
-                          <span>{limit}</span>
+                          <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span className="text-slate-700 dark:text-slate-300 leading-relaxed">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -267,6 +295,11 @@ export default function Subscription() {
               );
             })}
           </div>
+        </div>
+
+        {/* Feature Comparison */}
+        <div className="mb-12">
+          <BenefitComparison />
         </div>
 
         {/* Add-ons */}

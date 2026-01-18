@@ -32,7 +32,9 @@ import {
   Stethoscope, 
   MessageSquare,
   CheckCircle2,
-  Star
+  Star,
+  Filter,
+  X
 } from 'lucide-react';
 
 export default function Mentors() {
@@ -43,6 +45,7 @@ export default function Mentors() {
   const [locationFilter, setLocationFilter] = useState('all');
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [requestMessage, setRequestMessage] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -135,40 +138,117 @@ export default function Mentors() {
         </motion.div>
 
         {/* Search & Filters */}
-        <div className="space-y-3 mb-6">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <Input
-              placeholder="Search mentors..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 rounded-2xl border-slate-200 dark:border-slate-700"
-            />
+        <div className="space-y-4 mb-6">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Input
+                placeholder="Search by name, specialty, or location..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 h-12 rounded-2xl border-slate-200 dark:border-slate-700"
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShowFilters(!showFilters)}
+              className={`h-12 w-12 rounded-2xl ${showFilters ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-500' : ''}`}
+            >
+              <Filter className="w-5 h-5" />
+            </Button>
           </div>
-          
-          <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
-            <SelectTrigger className="h-12 rounded-xl">
-              <SelectValue placeholder="All Specialties" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Specialties</SelectItem>
-              {specialties.map(s => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
-          <Select value={locationFilter} onValueChange={setLocationFilter}>
-            <SelectTrigger className="h-12 rounded-xl">
-              <SelectValue placeholder="All Locations" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Locations</SelectItem>
-              {locations.map(loc => (
-                <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+          {/* Quick Specialty Chips */}
+          {!showFilters && (
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              <button
+                onClick={() => setSpecialtyFilter('all')}
+                className={`px-4 py-2 rounded-xl whitespace-nowrap text-sm font-medium transition-all flex-shrink-0 ${
+                  specialtyFilter === 'all'
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                }`}
+              >
+                All Specialties
+              </button>
+              {specialties.slice(0, 6).map(specialty => (
+                <button
+                  key={specialty}
+                  onClick={() => setSpecialtyFilter(specialty)}
+                  className={`px-4 py-2 rounded-xl whitespace-nowrap text-sm font-medium transition-all flex-shrink-0 ${
+                    specialtyFilter === specialty
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+                      : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                  }`}
+                >
+                  {specialty}
+                </button>
               ))}
-            </SelectContent>
-          </Select>
+            </div>
+          )}
+
+          {/* Advanced Filters */}
+          {showFilters && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="space-y-3"
+            >
+              <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
+                <SelectTrigger className="h-12 rounded-xl">
+                  <SelectValue placeholder="Filter by Specialty" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Specialties</SelectItem>
+                  {specialties.map(s => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={locationFilter} onValueChange={setLocationFilter}>
+                <SelectTrigger className="h-12 rounded-xl">
+                  <SelectValue placeholder="Filter by Location" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Locations</SelectItem>
+                  {locations.map(loc => (
+                    <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {(specialtyFilter !== 'all' || locationFilter !== 'all') && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSpecialtyFilter('all');
+                    setLocationFilter('all');
+                  }}
+                  className="w-full rounded-xl"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Clear Filters
+                </Button>
+              )}
+            </motion.div>
+          )}
+
+          {/* Stats */}
+          <div className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+            <span className="flex items-center gap-1">
+              <Users className="w-4 h-4" />
+              {filteredMentors.length} mentor{filteredMentors.length !== 1 ? 's' : ''} available
+            </span>
+            {specialtyFilter !== 'all' && (
+              <span className="flex items-center gap-1">
+                <Stethoscope className="w-4 h-4" />
+                {specialtyFilter}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Mentors List */}

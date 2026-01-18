@@ -474,14 +474,39 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 flex flex-col">
-      {/* Progress bar */}
-      <div className="h-1 bg-slate-200 dark:bg-slate-700">
-        <motion.div
-          className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
-          initial={{ width: 0 }}
-          animate={{ width: `${((step + 1) / steps.length) * 100}%` }}
-          transition={{ duration: 0.3 }}
-        />
+      {/* Progress bar with step indicators */}
+      <div className="px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-between max-w-lg mx-auto">
+          {steps.map((_, idx) => (
+            <div key={idx} className="flex items-center flex-1">
+              <motion.div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
+                  idx <= step
+                    ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg'
+                    : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                }`}
+                initial={{ scale: 0.8 }}
+                animate={{ scale: idx === step ? 1.1 : 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {idx + 1}
+              </motion.div>
+              {idx < steps.length - 1 && (
+                <div className={`flex-1 h-1 mx-2 rounded-full transition-all ${
+                  idx < step ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : 'bg-slate-200 dark:bg-slate-700'
+                }`} />
+              )}
+            </div>
+          ))}
+        </div>
+        <motion.p
+          key={step}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center text-sm text-slate-600 dark:text-slate-400 mt-3"
+        >
+          Step {step + 1} of {steps.length}
+        </motion.p>
       </div>
 
       {/* Content */}
