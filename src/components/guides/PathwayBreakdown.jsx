@@ -10,8 +10,10 @@ import {
   CheckCircle2, 
   ExternalLink,
   Upload,
-  Search
+  Search,
+  MessageCircle
 } from 'lucide-react';
+import { createPageUrl } from '@/utils';
 
 const pathways = [
   {
@@ -322,6 +324,29 @@ export default function PathwayBreakdown() {
                       </ul>
                     </div>
                   )}
+
+                  {/* Community Link */}
+                  <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-3 border border-indigo-200 dark:border-indigo-800">
+                    <div className="flex items-center gap-2 mb-2">
+                      <MessageCircle className="w-4 h-4 text-indigo-600" />
+                      <span className="font-semibold text-sm text-indigo-800 dark:text-indigo-300">
+                        Share Your Experience
+                      </span>
+                    </div>
+                    <p className="text-xs text-indigo-700 dark:text-indigo-400 mb-2">
+                      Connect with others who used Pathway {pathway.id}
+                    </p>
+                    <Button
+                      asChild
+                      size="sm"
+                      className="w-full rounded-lg"
+                      variant="outline"
+                    >
+                      <a href={createPageUrl('Community')}>
+                        Join Community Discussion →
+                      </a>
+                    </Button>
+                  </div>
 
                   {/* Official Link */}
                   <Button

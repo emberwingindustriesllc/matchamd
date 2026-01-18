@@ -12,6 +12,8 @@ import ShareMilestone from '@/components/gamification/ShareMilestone';
 import PathwayBreakdown from '@/components/guides/PathwayBreakdown';
 import OETRequirements from '@/components/guides/OETRequirements';
 import ApplicationTimeline from '@/components/guides/ApplicationTimeline';
+import PathwayEligibilityQuiz from '@/components/guides/PathwayEligibilityQuiz';
+import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,8 +28,10 @@ import {
   Lightbulb,
   FileText,
   Zap,
-  Share2
+  Share2,
+  HelpCircle
 } from 'lucide-react';
+import { createPageUrl } from '@/utils';
 import confetti from 'canvas-confetti';
 
 const guideContent = {
@@ -278,11 +282,17 @@ export default function GuideDetail() {
   const completedCount = localChecklist.filter(i => i.completed).length;
   const progressPercentage = Math.round((completedCount / localChecklist.length) * 100);
 
+  const breadcrumbItems = [
+    { label: 'Guides', href: createPageUrl('Guides') },
+    { label: guide.title }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
       <Header title={guide.title} showBack />
 
       <main className="px-4 py-6 max-w-lg mx-auto space-y-6">
+        <Breadcrumb items={breadcrumbItems} />
         {/* Visual Progress */}
         <motion.div
           ref={visualRef}
@@ -380,6 +390,15 @@ export default function GuideDetail() {
 
             {/* Application Timeline */}
             <ApplicationTimeline />
+
+            {/* Eligibility Quiz */}
+            <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">
+              <h3 className="font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                <HelpCircle className="w-5 h-5 text-indigo-500" />
+                Am I Eligible? Quick Assessment
+              </h3>
+              <PathwayEligibilityQuiz />
+            </Card>
 
             {/* Pathway Breakdown */}
             <PathwayBreakdown />
