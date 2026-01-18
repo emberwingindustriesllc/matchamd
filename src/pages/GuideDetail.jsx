@@ -13,6 +13,7 @@ import PathwayBreakdown from '@/components/guides/PathwayBreakdown';
 import OETRequirements from '@/components/guides/OETRequirements';
 import ApplicationTimeline from '@/components/guides/ApplicationTimeline';
 import PathwayEligibilityQuiz from '@/components/guides/PathwayEligibilityQuiz';
+import PathwayTimeline from '@/components/guides/PathwayTimeline';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -390,6 +391,9 @@ export default function GuideDetail() {
 
             {/* Application Timeline */}
             <ApplicationTimeline />
+
+            {/* Visual Process Timeline */}
+            <PathwayTimeline pathway={pathway} />
 
             {/* Eligibility Quiz */}
             <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">
