@@ -5,6 +5,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import ResourceLink from '@/components/common/ResourceLink';
+import ProgressMountain from '@/components/gamification/ProgressMountain';
+import ProgressTree from '@/components/gamification/ProgressTree';
+import ProgressRocket from '@/components/gamification/ProgressRocket';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,8 +20,10 @@ import {
   CheckCircle2,
   AlertCircle,
   Lightbulb,
-  FileText
+  FileText,
+  Zap
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 const guideContent = {
   ecfmg_pathways: {
@@ -194,6 +199,7 @@ export default function GuideDetail() {
   const pathway = urlParams.get('pathway') || 'residency';
   
   const [notes, setNotes] = useState('');
+  const [visualMode, setVisualMode] = useState('mountain'); // 'mountain', 'tree', 'rocket'
   
   const guide = guideContent[guideId] || guideContent.ecfmg_pathways;
 
@@ -239,6 +245,16 @@ export default function GuideDetail() {
     const completedCount = newChecklist.filter(i => i.completed).length;
     const total = newChecklist.length;
     const percentage = Math.round((completedCount / total) * 100);
+    const wasComplete = localChecklist.filter(i => i.completed).length === total;
+    
+    // Celebration for completion
+    if (percentage === 100 && !wasComplete) {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
     
     updateProgressMutation.mutate({
       checklist_items: newChecklist,
@@ -255,49 +271,58 @@ export default function GuideDetail() {
       <Header title={guide.title} showBack />
 
       <main className="px-4 py-6 max-w-lg mx-auto space-y-6">
-        {/* Progress Header */}
+        {/* Visual Progress */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700"
         >
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                progressPercentage === 100 
-                  ? 'bg-emerald-100 dark:bg-emerald-900/30' 
-                  : 'bg-indigo-100 dark:bg-indigo-900/30'
-              }`}>
-                {progressPercentage === 100 ? (
-                  <CheckCircle2 className="w-6 h-6 text-emerald-600" />
-                ) : (
-                  <BookOpen className="w-6 h-6 text-indigo-600" />
-                )}
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Progress</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-white">{progressPercentage}%</p>
-              </div>
+          {/* Mode Selector */}
+          <div className="flex gap-2 mb-4 justify-center">
+            <Button
+              variant={visualMode === 'mountain' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setVisualMode('mountain')}
+              className="rounded-xl"
+            >
+              🏔️ Mountain
+            </Button>
+            <Button
+              variant={visualMode === 'tree' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setVisualMode('tree')}
+              className="rounded-xl"
+            >
+              🌳 Tree
+            </Button>
+            <Button
+              variant={visualMode === 'rocket' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setVisualMode('rocket')}
+              className="rounded-xl"
+            >
+              🚀 Rocket
+            </Button>
+          </div>
+
+          {/* Visual Display */}
+          {visualMode === 'mountain' && (
+            <ProgressMountain completedCount={completedCount} totalCount={localChecklist.length} />
+          )}
+          {visualMode === 'tree' && (
+            <ProgressTree completedCount={completedCount} totalCount={localChecklist.length} />
+          )}
+          {visualMode === 'rocket' && (
+            <ProgressRocket completedCount={completedCount} totalCount={localChecklist.length} />
+          )}
+
+          {/* Deadline */}
+          {guide.deadline && (
+            <div className="flex items-center justify-center gap-2 mt-4 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
+              <Clock className="w-4 h-4 text-amber-600" />
+              <span className="text-sm font-medium text-amber-700 dark:text-amber-400">Due: {guide.deadline}</span>
             </div>
-            {guide.deadline && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
-                <Clock className="w-4 h-4 text-amber-600" />
-                <span className="text-sm font-medium text-amber-700 dark:text-amber-400">{guide.deadline}</span>
-              </div>
-            )}
-          </div>
-          <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-            <motion.div
-              className={`h-full rounded-full ${
-                progressPercentage === 100 
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500' 
-                  : 'bg-gradient-to-r from-indigo-500 to-purple-500'
-              }`}
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPercentage}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
+          )}
         </motion.div>
 
         {/* Overview */}
@@ -323,20 +348,40 @@ export default function GuideDetail() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.05 }}
                 onClick={() => toggleChecklistItem(item.id)}
-                className={`w-full flex items-center gap-3 p-4 rounded-xl transition-all ${
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`w-full flex items-center gap-3 p-4 rounded-xl transition-all relative overflow-hidden ${
                   item.completed
-                    ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800'
-                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
-                } border`}
+                    ? 'bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-300 dark:border-emerald-700'
+                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700'
+                } border-2`}
               >
+                {item.completed && (
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    className="absolute top-2 right-2"
+                  >
+                    <Zap className="w-5 h-5 text-amber-500 fill-amber-500" />
+                  </motion.div>
+                )}
                 <Checkbox checked={item.completed} className="pointer-events-none" />
-                <span className={`flex-1 text-left ${
+                <span className={`flex-1 text-left font-medium ${
                   item.completed 
-                    ? 'text-slate-500 dark:text-slate-400 line-through' 
+                    ? 'text-emerald-700 dark:text-emerald-400' 
                     : 'text-slate-700 dark:text-slate-300'
                 }`}>
                   {item.text}
                 </span>
+                {item.completed && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-2xl"
+                  >
+                    ✨
+                  </motion.div>
+                )}
               </motion.button>
             ))}
           </div>
