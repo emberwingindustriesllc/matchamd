@@ -14,6 +14,7 @@ import OETRequirements from '@/components/guides/OETRequirements';
 import ApplicationTimeline from '@/components/guides/ApplicationTimeline';
 import PathwayEligibilityQuiz from '@/components/guides/PathwayEligibilityQuiz';
 import PathwayTimeline from '@/components/guides/PathwayTimeline';
+import OfficialReferences from '@/components/guides/OfficialReferences';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -406,6 +407,9 @@ export default function GuideDetail() {
 
             {/* Pathway Breakdown */}
             <PathwayBreakdown />
+
+            {/* Official References & Citations */}
+            <OfficialReferences />
           </>
         )}
 
