@@ -10,6 +10,8 @@ import ProgressTree from '@/components/gamification/ProgressTree';
 import ProgressRocket from '@/components/gamification/ProgressRocket';
 import ShareMilestone from '@/components/gamification/ShareMilestone';
 import PathwayBreakdown from '@/components/guides/PathwayBreakdown';
+import OETRequirements from '@/components/guides/OETRequirements';
+import ApplicationTimeline from '@/components/guides/ApplicationTimeline';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
@@ -31,29 +33,31 @@ import confetti from 'canvas-confetti';
 const guideContent = {
   ecfmg_pathways: {
     title: 'ECFMG Certification Pathways',
-    overview: 'The 2026 Pathways are designed for IMGs needing clinical/communication skills fulfillment or revalidation. All pathways require a satisfactory OET Medicine score (minimum 350 in each of listening, reading, writing, speaking) from tests taken on/after January 1, 2024. Important: 2026 Pathways expire on December 31, 2028 and require revalidation for ongoing use, including the 2026 NRMP Match (ROL deadline March 2026).',
-    deadline: 'December 31, 2028 (Pathway Expiration)',
+    overview: 'ECFMG certification is REQUIRED for IMGs to enter US residency programs. The 2026 Pathways fulfill the clinical/communication skills component of certification. IMPORTANT: You MUST also pass USMLE Step 1 and Step 2 CK - pathways do NOT substitute for these exams. Apply via MyIntealth portal (launched Aug 2025).',
+    deadline: 'January 31, 2026 (Certification Deadline)',
     checklist: [
-      { id: 1, text: 'Pass USMLE Step 1' },
-      { id: 2, text: 'Pass USMLE Step 2 CK' },
-      { id: 3, text: 'Pass OET Medicine (min. 350 each skill, test date Jan 1, 2024+)' },
-      { id: 4, text: 'Complete one of the 6 Pathways for clinical/communication skills' },
-      { id: 5, text: 'Submit Pathways Application' },
-      { id: 6, text: 'Receive ECFMG certification (valid until Dec 31, 2028)' }
+      { id: 1, text: '✅ Pass USMLE Step 1 (REQUIRED - not part of pathways)' },
+      { id: 2, text: '✅ Pass USMLE Step 2 CK (REQUIRED - not part of pathways)' },
+      { id: 3, text: 'Pass OET Medicine (min. 350 ALL skills, test Jan 1, 2024+)' },
+      { id: 4, text: 'Complete ONE of the 6 Pathways (clinical/communication skills)' },
+      { id: 5, text: 'Submit application via MyIntealth portal' },
+      { id: 6, text: 'Receive ECFMG certification by Jan 31, 2026 for Match' }
     ],
     tips: [
-      'CRITICAL: OET scores must be from Jan 1, 2024 or later with minimum 350 in ALL four skills',
-      '2026 Pathways expire Dec 31, 2028 - plan for revalidation if needed beyond this date',
-      'For 2026 NRMP Match: ROL deadline is March 2026, ensure pathway completion beforehand',
-      'Start preparing documents early - verification takes time',
-      'Check if your medical school is in the WFME/FAIMER World Directory',
-      'Pathway 1 (minimum clinical requirements) is most common for practicing physicians'
+      'CRITICAL: USMLE Step 1 & Step 2 CK are SEPARATE requirements - must pass both',
+      'Pathways only fulfill clinical/communication component - not full certification',
+      'OET test date MUST be Jan 1, 2024 or later (older scores not accepted)',
+      'Apply early via MyIntealth - verification can take weeks',
+      'For 2026 Match: ERAS opens Sept 24, 2025; certification due Jan 31, 2026',
+      '2026 Pathways expire Dec 31, 2028 - revalidation needed beyond this date',
+      'Pathway 6 is fallback option for those who failed Step 2 CS or ineligible for others'
     ],
     resources: [
-      { title: 'ECFMG 2026 Pathways Official', url: 'https://www.ecfmg.org/certification-pathways', type: 'website' },
+      { title: 'ECFMG Official - Pathways Info', url: 'https://www.ecfmg.org/certification-pathways', type: 'website' },
+      { title: 'MyIntealth Application Portal', url: 'https://www.ecfmg.org/certification-pathways/myintealth.html', type: 'website' },
       { title: 'OET Medicine Registration', url: 'https://www.occupationalenglishtest.org', type: 'website' },
-      { title: 'NRMP 2026 Match Timeline', url: 'https://www.nrmp.org/match-process', type: 'website' },
-      { title: 'ECFMG Pathway Requirements', url: 'https://www.ecfmg.org/certification-pathways/requirements.html', type: 'document' }
+      { title: 'USMLE Step 1 Info', url: 'https://www.usmle.org/step-1', type: 'website' },
+      { title: 'USMLE Step 2 CK Info', url: 'https://www.usmle.org/step-2-ck', type: 'website' }
     ]
   },
   usmle_step1: {
@@ -357,9 +361,29 @@ export default function GuideDetail() {
           <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{guide.overview}</p>
         </Card>
 
-        {/* Pathway Breakdown (ECFMG Pathways only) */}
+        {/* ECFMG-Specific Content */}
         {guideId === 'ecfmg_pathways' && (
-          <PathwayBreakdown />
+          <>
+            {/* Disclaimer */}
+            <Card className="p-4 rounded-2xl border-2 border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-900/20">
+              <p className="text-sm text-rose-800 dark:text-rose-300">
+                ⚠️ <strong>DISCLAIMER:</strong> This information is for guidance only and may not reflect the latest updates. Always consult the official ECFMG website ({' '}
+                <a href="https://www.ecfmg.org" target="_blank" rel="noopener noreferrer" className="underline">
+                  ecfmg.org
+                </a>
+                ) for authoritative and current requirements. ECFMG certification requires BOTH passing USMLE exams AND completing a pathway.
+              </p>
+            </Card>
+
+            {/* OET Requirements */}
+            <OETRequirements />
+
+            {/* Application Timeline */}
+            <ApplicationTimeline />
+
+            {/* Pathway Breakdown */}
+            <PathwayBreakdown />
+          </>
         )}
 
         {/* Checklist */}
