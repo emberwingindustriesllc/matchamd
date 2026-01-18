@@ -6,8 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
-import StepCard from '@/components/common/StepCard';
-import ErrorState from '@/components/common/ErrorState';
+import PathwayAccordion from '@/components/guides/PathwayAccordion';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Search, Stethoscope, GraduationCap, BookOpen } from 'lucide-react';
@@ -63,9 +62,9 @@ const pathways = {
 };
 
 export default function Guides() {
-  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('residency');
+  const [viewMode, setViewMode] = useState('accordion'); // 'accordion' or 'list'
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -149,55 +148,20 @@ export default function Guides() {
           </TabsList>
         </Tabs>
 
-        {/* Progress Overview */}
+        {/* Interactive Pathway Accordion */}
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${currentPathway.color} p-5 text-white mb-6`}
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
-          <div className="relative flex items-center gap-4">
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-              <PathIcon className="w-7 h-7" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold">{currentPathway.title} Pathway</h2>
-              <p className="text-white/80">
-                {completedCount} of {currentPathway.steps.length} steps completed
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 h-2 bg-white/20 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-white/80 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${(completedCount / currentPathway.steps.length) * 100}%` }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-            />
-          </div>
+          <PathwayAccordion
+            pathway={currentPathway.title}
+            steps={filteredSteps}
+            progressList={progressList}
+            icon={PathIcon}
+            color={currentPathway.color}
+          />
         </motion.div>
-
-        {/* Steps List */}
-        <div className="space-y-3">
-          {filteredSteps.map((step, idx) => (
-            <motion.div
-              key={step.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.03 }}
-            >
-              <StepCard
-                step={idx + 1}
-                title={step.title}
-                description={step.description}
-                status={getStepStatus(step.id)}
-                deadline={step.deadline}
-                onClick={() => navigate(createPageUrl(`GuideDetail?id=${step.id}&pathway=${activeTab}`))}
-              />
-            </motion.div>
-          ))}
-        </div>
       </main>
 
       <BottomNav />

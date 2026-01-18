@@ -94,7 +94,10 @@ export const translations = {
       complete: 'Complete',
       inProgress: 'In Progress',
       toDo: 'To Do',
-      deadline: 'Deadline'
+      deadline: 'Deadline',
+      officialResources: 'Official Resources',
+      viewGuide: 'View Guide',
+      start: 'Start'
     },
     
     // Community
@@ -250,7 +253,10 @@ export const translations = {
       complete: 'Completo',
       inProgress: 'En Progreso',
       toDo: 'Por Hacer',
-      deadline: 'Fecha Límite'
+      deadline: 'Fecha Límite',
+      officialResources: 'Recursos Oficiales',
+      viewGuide: 'Ver Guía',
+      start: 'Comenzar'
     },
     
     community: {
@@ -402,7 +408,10 @@ export const translations = {
       complete: 'مكتمل',
       inProgress: 'قيد التنفيذ',
       toDo: 'للقيام به',
-      deadline: 'الموعد النهائي'
+      deadline: 'الموعد النهائي',
+      officialResources: 'الموارد الرسمية',
+      viewGuide: 'عرض الدليل',
+      start: 'ابدأ'
     },
     
     community: {
@@ -553,7 +562,10 @@ export const translations = {
       complete: 'पूर्ण',
       inProgress: 'प्रगति में',
       toDo: 'करने के लिए',
-      deadline: 'समय सीमा'
+      deadline: 'समय सीमा',
+      officialResources: 'आधिकारिक संसाधन',
+      viewGuide: 'गाइड देखें',
+      start: 'शुरू करें'
     },
     
     community: {
