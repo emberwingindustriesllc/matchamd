@@ -9,6 +9,7 @@ import ProgressMountain from '@/components/gamification/ProgressMountain';
 import ProgressTree from '@/components/gamification/ProgressTree';
 import ProgressRocket from '@/components/gamification/ProgressRocket';
 import ShareMilestone from '@/components/gamification/ShareMilestone';
+import PathwayBreakdown from '@/components/guides/PathwayBreakdown';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
@@ -355,6 +356,11 @@ export default function GuideDetail() {
           </h3>
           <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{guide.overview}</p>
         </Card>
+
+        {/* Pathway Breakdown (ECFMG Pathways only) */}
+        {guideId === 'ecfmg_pathways' && (
+          <PathwayBreakdown />
+        )}
 
         {/* Checklist */}
         <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">
