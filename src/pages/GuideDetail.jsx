@@ -30,26 +30,29 @@ import confetti from 'canvas-confetti';
 const guideContent = {
   ecfmg_pathways: {
     title: 'ECFMG Certification Pathways',
-    overview: 'The Educational Commission for Foreign Medical Graduates (ECFMG) certification is required for IMGs to enter US residency programs. In 2024, ECFMG introduced new pathways replacing ECFMG certification.',
-    deadline: 'January 31, 2026',
+    overview: 'The 2026 Pathways are designed for IMGs needing clinical/communication skills fulfillment or revalidation. All pathways require a satisfactory OET Medicine score (minimum 350 in each of listening, reading, writing, speaking) from tests taken on/after January 1, 2024. Important: 2026 Pathways expire on December 31, 2028 and require revalidation for ongoing use, including the 2026 NRMP Match (ROL deadline March 2026).',
+    deadline: 'December 31, 2028 (Pathway Expiration)',
     checklist: [
       { id: 1, text: 'Pass USMLE Step 1' },
       { id: 2, text: 'Pass USMLE Step 2 CK' },
-      { id: 3, text: 'Pass OET Medicine (by Dec 2025)' },
-      { id: 4, text: 'Complete one of the 6 Pathways' },
+      { id: 3, text: 'Pass OET Medicine (min. 350 each skill, test date Jan 1, 2024+)' },
+      { id: 4, text: 'Complete one of the 6 Pathways for clinical/communication skills' },
       { id: 5, text: 'Submit Pathways Application' },
-      { id: 6, text: 'Receive ECFMG certification' }
+      { id: 6, text: 'Receive ECFMG certification (valid until Dec 31, 2028)' }
     ],
     tips: [
+      'CRITICAL: OET scores must be from Jan 1, 2024 or later with minimum 350 in ALL four skills',
+      '2026 Pathways expire Dec 31, 2028 - plan for revalidation if needed beyond this date',
+      'For 2026 NRMP Match: ROL deadline is March 2026, ensure pathway completion beforehand',
       'Start preparing documents early - verification takes time',
-      'Check if your medical school is in the World Directory',
-      'Pathway 1 is most common for practicing physicians',
-      'Keep all documents in both physical and digital copies'
+      'Check if your medical school is in the WFME/FAIMER World Directory',
+      'Pathway 1 (minimum clinical requirements) is most common for practicing physicians'
     ],
     resources: [
-      { title: 'ECFMG Official Website', url: 'https://www.ecfmg.org', type: 'website' },
-      { title: 'Pathways Requirements', url: 'https://www.ecfmg.org/certification-pathways', type: 'document' },
-      { title: 'OET Medicine', url: 'https://www.occupationalenglishtest.org', type: 'website' }
+      { title: 'ECFMG 2026 Pathways Official', url: 'https://www.ecfmg.org/certification-pathways', type: 'website' },
+      { title: 'OET Medicine Registration', url: 'https://www.occupationalenglishtest.org', type: 'website' },
+      { title: 'NRMP 2026 Match Timeline', url: 'https://www.nrmp.org/match-process', type: 'website' },
+      { title: 'ECFMG Pathway Requirements', url: 'https://www.ecfmg.org/certification-pathways/requirements.html', type: 'document' }
     ]
   },
   usmle_step1: {
