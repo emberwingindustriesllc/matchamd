@@ -23,17 +23,52 @@ const pathways = [
     requirements: [
       'License must be unsupervised (training/supervised licenses are NOT eligible)',
       'License can be from any country',
-      'Certificate of Good Standing required for documentation',
-      'License must have been active on or after January 1, 2021'
+      'License must have been active on or after January 1, 2021',
+      'Application fee: $925 (non-refundable)'
     ],
     warnings: [
       'Training licenses or supervised practice permits are commonly rejected',
       'Ensure license is for independent/unsupervised practice',
-      'Certificate must be recent and directly from licensing authority'
+      'Name discrepancies may require additional identity proofs',
+      'Authority delays can impact verification - start early'
     ],
     color: 'from-blue-500 to-indigo-500',
-    documents: ['Certificate of Good Standing', 'License verification'],
-    link: 'https://www.ecfmg.org/certification-pathways/pathway-1.html'
+    documents: ['Certificate of Good Standing', 'Letter of Current Professional Status', 'License verification', 'Certified English translations (if needed)'],
+    link: 'https://www.ecfmg.org/certification-pathways/pathway-1.html',
+    documentationMethods: [
+      {
+        method: 'Direct from Authority (Preferred)',
+        pros: 'Fastest verification; preferred for accuracy',
+        cons: 'Relies on authority's responsiveness',
+        deadline: 'January 31, 2026',
+        details: 'Sent to licensure@ecfmg.org; must be issued within 90 days of receipt by ECFMG if post-submission, or 90 days of issuance if pre-submission'
+      },
+      {
+        method: 'Upload During Application',
+        pros: 'Convenient for applicants',
+        cons: 'Potential delays in ECFMG verification',
+        deadline: 'Issued within 90 days of submission; verified by Jan 31, 2026',
+        details: 'Upload during MyIntealth application; ECFMG conducts primary-source verification'
+      },
+      {
+        method: 'Upload License Copy (Not Recommended)',
+        pros: 'Minimal initial effort',
+        cons: 'High risk of delays or incomplete verification',
+        deadline: 'Authority response by Jan 31, 2026',
+        details: 'ECFMG requests verification from authority; no guarantee of timely response'
+      }
+    ],
+    translationService: {
+      name: 'Straker Translations (ECFMG Recommended)',
+      url: 'https://www.straker.ai/ecfmg',
+      note: 'Non-English documents require certified English translations'
+    },
+    fees: {
+      amount: '$925',
+      refundable: false,
+      note: 'Covers application processing; non-refundable even if ineligible or incomplete'
+    },
+    expirationNote: 'ECFMG Certificate expires with the pathway (December 31, 2028 for 2026 applicants) unless made indefinite through revalidation'
   },
   {
     id: 2,
@@ -243,6 +278,90 @@ export default function PathwayBreakdown() {
                       ))}
                     </div>
                   </div>
+
+                  {/* Documentation Methods (Pathway 1) */}
+                  {pathway.documentationMethods && (
+                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                      <h5 className="font-semibold text-blue-800 dark:text-blue-400 mb-3 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Documentation Submission Options
+                      </h5>
+                      <div className="space-y-3">
+                        {pathway.documentationMethods.map((method, idx) => (
+                          <div key={idx} className="bg-white dark:bg-slate-800 rounded-lg p-3 border border-blue-200 dark:border-blue-700">
+                            <div className="flex items-start justify-between mb-2">
+                              <h6 className="font-semibold text-sm text-slate-800 dark:text-white">
+                                {method.method}
+                              </h6>
+                              <Badge variant="outline" className="text-xs">
+                                {method.deadline}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">
+                              {method.details}
+                            </p>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div>
+                                <span className="text-emerald-600 dark:text-emerald-400">✓ Pros:</span>
+                                <p className="text-slate-700 dark:text-slate-300">{method.pros}</p>
+                              </div>
+                              <div>
+                                <span className="text-amber-600 dark:text-amber-400">⚠ Cons:</span>
+                                <p className="text-slate-700 dark:text-slate-300">{method.cons}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Translation Service (Pathway 1) */}
+                  {pathway.translationService && (
+                    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3 border border-purple-200 dark:border-purple-800">
+                      <h5 className="font-semibold text-purple-800 dark:text-purple-400 mb-2">
+                        Translation Requirements
+                      </h5>
+                      <p className="text-sm text-purple-700 dark:text-purple-300 mb-2">
+                        {pathway.translationService.note}
+                      </p>
+                      <a
+                        href={pathway.translationService.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-purple-700 dark:text-purple-300 hover:underline font-medium"
+                      >
+                        {pathway.translationService.name}
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Fees & Expiration (Pathway 1) */}
+                  {pathway.fees && (
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 border border-amber-200 dark:border-amber-800">
+                        <h5 className="font-semibold text-amber-800 dark:text-amber-400 mb-1 text-sm">
+                          Application Fee
+                        </h5>
+                        <div className="text-2xl font-bold text-amber-900 dark:text-amber-300 mb-1">
+                          {pathway.fees.amount}
+                        </div>
+                        <p className="text-xs text-amber-700 dark:text-amber-400">
+                          {pathway.fees.note}
+                        </p>
+                      </div>
+                      <div className="bg-rose-50 dark:bg-rose-900/20 rounded-xl p-3 border border-rose-200 dark:border-rose-800">
+                        <h5 className="font-semibold text-rose-800 dark:text-rose-400 mb-1 text-sm flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          Certificate Expiration
+                        </h5>
+                        <p className="text-xs text-rose-700 dark:text-rose-400">
+                          {pathway.expirationNote}
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Accepted Exams (Pathway 2) */}
                   {pathway.acceptedExams && (
