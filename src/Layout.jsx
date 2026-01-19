@@ -4,12 +4,14 @@ import { LanguageProvider } from '@/components/i18n/LanguageContext';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import OfflineIndicator from '@/components/common/OfflineIndicator';
 import DisclaimerBanner from '@/components/common/DisclaimerBanner';
+import ServiceWorkerRegistration from '@/components/common/ServiceWorkerRegistration';
 
 export default function Layout({ children, currentPageName }) {
   return (
     <LanguageProvider>
       <ThemeProvider>
         <ErrorBoundary>
+          <ServiceWorkerRegistration />
           <OfflineIndicator />
           <DisclaimerBanner />
           <style>{`

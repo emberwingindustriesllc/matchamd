@@ -627,74 +627,461 @@ export const translations = {
   },
   
   zh: {
+    welcome: '欢迎来到 FMG Pathway',
     continue: '继续',
     back: '返回',
     save: '保存',
     cancel: '取消',
+    loading: '加载中',
+    search: '搜索',
+    
     onboarding: {
       welcome: '欢迎来到 FMG Pathway',
       subtitle: '您实现美国医疗职业目标的个性化指南',
       yourName: '您的姓名',
-      startJourney: '开始我的旅程'
+      location: '您在哪里？',
+      locationSubtitle: '我们将定制签证和位置特定的指导',
+      currentCountry: '当前国家',
+      selectCountry: '选择您的国家',
+      medSchoolCountry: '医学院国家',
+      whereStudied: '您在哪里学习医学？',
+      medSchool: '医学院',
+      selectMedSchool: '选择您的医学院',
+      enterMedSchool: '输入医学院名称',
+      undergrad: '本科学院（可选）',
+      undergradPlaceholder: '例如，北京大学',
+      languages: '您会说的语言',
+      languagesSubtitle: '选择所有适用项',
+      preferredLanguage: '首选应用语言',
+      goal: '您的目标是什么？',
+      goalSubtitle: '选择您的主要途径',
+      details: '更多详细信息',
+      detailsSubtitle: '帮助我们个性化您的旅程',
+      targetSpecialty: '目标专业',
+      selectSpecialty: '选择专业',
+      targetCity: '目标城市（可选）',
+      targetCityPlaceholder: '例如，纽约、洛杉矶、芝加哥',
+      targetState: '目标州（可选）',
+      selectState: '选择州',
+      step1Status: 'USMLE Step 1 状态',
+      step2Status: 'USMLE Step 2 CK 状态',
+      ecfmgCertified: '我已通过 ECFMG 认证',
+      usClinical: '我有美国临床经验',
+      startJourney: '开始我的旅程',
+      notStarted: '未开始',
+      studying: '正在学习',
+      scheduled: '已安排考试',
+      passed: '已通过'
     },
+    
+    goals: {
+      residency: '住院医师',
+      residencyDesc: '申请美国医疗住院医师项目',
+      fellowship: '专科培训',
+      fellowshipDesc: '追求亚专科培训',
+      medSchool: '医学院',
+      medSchoolDesc: '申请美国医学院'
+    },
+    
     dashboard: {
       welcomeBack: '欢迎回来，',
+      journeyProgress: '旅程进度',
+      stepsCompleted: '已完成步骤',
+      of: '/',
+      total: '总计',
       community: '社区',
-      findMentor: '寻找导师'
+      connectPeers: '与同行联系',
+      findMentor: '寻找导师',
+      getGuidance: '获取指导',
+      upcomingDeadlines: '即将到来的截止日期',
+      achievements: '您的成就',
+      path: '路径',
+      viewAll: '查看全部'
     },
+    
     nav: {
       home: '首页',
       guides: '指南',
       community: '社区',
+      alerts: '提醒',
       profile: '个人资料'
+    },
+    
+    guides: {
+      title: '指南',
+      searchGuides: '搜索指南...',
+      pathway: '路径',
+      completed: '已完成',
+      complete: '完成',
+      inProgress: '进行中',
+      toDo: '待办',
+      deadline: '截止日期',
+      officialResources: '官方资源',
+      viewGuide: '查看指南',
+      start: '开始'
+    },
+    
+    community: {
+      title: '社区',
+      searchDiscussions: '搜索讨论...',
+      allPosts: '所有帖子',
+      post: '发布',
+      createPost: '创建帖子',
+      title_label: '标题',
+      content: '分享您的问题、建议或经验...',
+      noPosts: '暂无帖子',
+      beFirst: '成为第一个开始讨论的人！'
+    },
+    
+    mentors: {
+      title: '寻找导师',
+      connectSuccess: '与成功联系',
+      subtitle: '从已匹配到梦想项目的经过验证的 FMG 获得指导',
+      searchMentors: '搜索导师...',
+      allSpecialties: '所有专业',
+      allLocations: '所有位置',
+      requestMentorship: '请求指导',
+      connected: '已连接',
+      pending: '请求待处理',
+      sendRequest: '发送请求',
+      introduce: '介绍自己并解释您在导师身上寻找什么...',
+      noMentors: '未找到导师',
+      adjustFilters: '尝试调整您的搜索过滤器'
+    },
+    
+    profile: {
+      title: '个人资料',
+      editProfile: '编辑个人资料',
+      yourDetails: '您的详细信息',
+      location: '位置',
+      specialty: '目标专业',
+      language: '语言',
+      medSchool: '医学院',
+      undergrad: '本科学院',
+      targetLocation: '目标位置',
+      about: '关于',
+      signOut: '退出',
+      saveChanges: '保存更改',
+      displayName: '显示名称',
+      bio: '简介',
+      bioPlaceholder: '告诉其他人关于您自己...',
+      darkMode: '暗黑模式',
+      notSet: '未设置'
+    },
+    
+    notifications: {
+      title: '通知',
+      markAllRead: '全部标记为已读',
+      unread: '未读通知',
+      allCaughtUp: '全部看完了！',
+      noNotifications: '您没有通知',
+      urgent: '紧急'
     }
   },
   
   fr: {
+    welcome: 'Bienvenue sur FMG Pathway',
     continue: 'Continuer',
     back: 'Retour',
     save: 'Enregistrer',
     cancel: 'Annuler',
+    loading: 'Chargement',
+    search: 'Rechercher',
+    
     onboarding: {
       welcome: 'Bienvenue sur FMG Pathway',
       subtitle: 'Votre guide personnalisé pour atteindre vos objectifs de carrière médicale aux États-Unis',
       yourName: 'Votre nom',
-      startJourney: 'Commencer Mon Voyage'
+      location: 'Où êtes-vous situé?',
+      locationSubtitle: 'Nous personnaliserons les conseils sur les visas et la localisation',
+      currentCountry: 'Pays actuel',
+      selectCountry: 'Sélectionnez votre pays',
+      medSchoolCountry: 'Pays de l\'école de médecine',
+      whereStudied: 'Où avez-vous étudié la médecine?',
+      medSchool: 'École de médecine',
+      selectMedSchool: 'Sélectionnez votre école de médecine',
+      enterMedSchool: 'Entrez le nom de l\'école de médecine',
+      undergrad: 'Collège de premier cycle (facultatif)',
+      undergradPlaceholder: 'par ex., Université de Paris',
+      languages: 'Langues que vous parlez',
+      languagesSubtitle: 'Sélectionnez toutes les options applicables',
+      preferredLanguage: 'Langue préférée de l\'application',
+      goal: 'Quel est votre objectif?',
+      goalSubtitle: 'Choisissez votre parcours principal',
+      details: 'Quelques détails supplémentaires',
+      detailsSubtitle: 'Aidez-nous à personnaliser votre parcours',
+      targetSpecialty: 'Spécialité cible',
+      selectSpecialty: 'Sélectionnez la spécialité',
+      targetCity: 'Ville cible (facultatif)',
+      targetCityPlaceholder: 'par ex., New York, Los Angeles, Chicago',
+      targetState: 'État cible (facultatif)',
+      selectState: 'Sélectionnez l\'état',
+      step1Status: 'Statut USMLE Step 1',
+      step2Status: 'Statut USMLE Step 2 CK',
+      ecfmgCertified: 'Je suis certifié ECFMG',
+      usClinical: 'J\'ai une expérience clinique aux États-Unis',
+      startJourney: 'Commencer Mon Voyage',
+      notStarted: 'Pas commencé',
+      studying: 'Actuellement en train d\'étudier',
+      scheduled: 'Examen programmé',
+      passed: 'Réussi'
     },
+    
+    goals: {
+      residency: 'Résidence',
+      residencyDesc: 'Postuler aux programmes de résidence médicale aux États-Unis',
+      fellowship: 'Fellowship',
+      fellowshipDesc: 'Poursuivre une formation en sous-spécialité',
+      medSchool: 'École de médecine',
+      medSchoolDesc: 'Postuler aux écoles de médecine aux États-Unis'
+    },
+    
     dashboard: {
       welcomeBack: 'Bon retour,',
+      journeyProgress: 'Progrès du voyage',
+      stepsCompleted: 'Étapes terminées',
+      of: 'sur',
+      total: 'total',
       community: 'Communauté',
-      findMentor: 'Trouver un Mentor'
+      connectPeers: 'Connectez-vous avec des pairs',
+      findMentor: 'Trouver un Mentor',
+      getGuidance: 'Obtenir des conseils',
+      upcomingDeadlines: 'Échéances à venir',
+      achievements: 'Vos réalisations',
+      path: 'Chemin',
+      viewAll: 'Voir tout'
     },
+    
     nav: {
       home: 'Accueil',
       guides: 'Guides',
       community: 'Communauté',
+      alerts: 'Alertes',
       profile: 'Profil'
+    },
+    
+    guides: {
+      title: 'Guides',
+      searchGuides: 'Rechercher des guides...',
+      pathway: 'Chemin',
+      completed: 'terminé',
+      complete: 'Complet',
+      inProgress: 'En cours',
+      toDo: 'À faire',
+      deadline: 'Date limite',
+      officialResources: 'Ressources officielles',
+      viewGuide: 'Voir le guide',
+      start: 'Commencer'
+    },
+    
+    community: {
+      title: 'Communauté',
+      searchDiscussions: 'Rechercher des discussions...',
+      allPosts: 'Toutes les publications',
+      post: 'Publier',
+      createPost: 'Créer une publication',
+      title_label: 'Titre',
+      content: 'Partagez votre question, conseil ou expérience...',
+      noPosts: 'Pas encore de publications',
+      beFirst: 'Soyez le premier à lancer une discussion!'
+    },
+    
+    mentors: {
+      title: 'Trouver un Mentor',
+      connectSuccess: 'Connectez-vous avec le succès',
+      subtitle: 'Obtenez des conseils de FMG vérifiés qui ont réussi leurs programmes de rêve',
+      searchMentors: 'Rechercher des mentors...',
+      allSpecialties: 'Toutes les spécialités',
+      allLocations: 'Tous les emplacements',
+      requestMentorship: 'Demander un mentorat',
+      connected: 'Connecté',
+      pending: 'Demande en attente',
+      sendRequest: 'Envoyer la demande',
+      introduce: 'Présentez-vous et expliquez ce que vous recherchez chez un mentor...',
+      noMentors: 'Aucun mentor trouvé',
+      adjustFilters: 'Essayez d\'ajuster vos filtres de recherche'
+    },
+    
+    profile: {
+      title: 'Profil',
+      editProfile: 'Modifier le profil',
+      yourDetails: 'Vos détails',
+      location: 'Emplacement',
+      specialty: 'Spécialité cible',
+      language: 'Langue',
+      medSchool: 'École de médecine',
+      undergrad: 'Collège de premier cycle',
+      targetLocation: 'Emplacement cible',
+      about: 'À propos',
+      signOut: 'Se déconnecter',
+      saveChanges: 'Enregistrer les modifications',
+      displayName: 'Nom d\'affichage',
+      bio: 'Biographie',
+      bioPlaceholder: 'Parlez aux autres de vous...',
+      darkMode: 'Mode sombre',
+      notSet: 'Non défini'
+    },
+    
+    notifications: {
+      title: 'Notifications',
+      markAllRead: 'Tout marquer comme lu',
+      unread: 'Notifications non lues',
+      allCaughtUp: 'Tout est à jour!',
+      noNotifications: 'Vous n\'avez pas de notifications',
+      urgent: 'Urgent'
     }
   },
   
   pt: {
+    welcome: 'Bem-vindo ao FMG Pathway',
     continue: 'Continuar',
     back: 'Voltar',
     save: 'Salvar',
     cancel: 'Cancelar',
+    loading: 'Carregando',
+    search: 'Pesquisar',
+    
     onboarding: {
       welcome: 'Bem-vindo ao FMG Pathway',
       subtitle: 'Seu guia personalizado para alcançar seus objetivos de carreira médica nos EUA',
       yourName: 'Seu nome',
-      startJourney: 'Começar Minha Jornada'
+      location: 'Onde você está localizado?',
+      locationSubtitle: 'Vamos personalizar orientações sobre visto e localização',
+      currentCountry: 'País atual',
+      selectCountry: 'Selecione seu país',
+      medSchoolCountry: 'País da faculdade de medicina',
+      whereStudied: 'Onde você estudou medicina?',
+      medSchool: 'Faculdade de medicina',
+      selectMedSchool: 'Selecione sua faculdade de medicina',
+      enterMedSchool: 'Digite o nome da faculdade de medicina',
+      undergrad: 'Faculdade de graduação (opcional)',
+      undergradPlaceholder: 'ex., Universidade de São Paulo',
+      languages: 'Idiomas que você fala',
+      languagesSubtitle: 'Selecione todos os aplicáveis',
+      preferredLanguage: 'Idioma preferido do aplicativo',
+      goal: 'Qual é o seu objetivo?',
+      goalSubtitle: 'Escolha seu caminho principal',
+      details: 'Mais alguns detalhes',
+      detailsSubtitle: 'Ajude-nos a personalizar sua jornada',
+      targetSpecialty: 'Especialidade almejada',
+      selectSpecialty: 'Selecione a especialidade',
+      targetCity: 'Cidade almejada (opcional)',
+      targetCityPlaceholder: 'ex., Nova York, Los Angeles, Chicago',
+      targetState: 'Estado almejado (opcional)',
+      selectState: 'Selecione o estado',
+      step1Status: 'Status USMLE Step 1',
+      step2Status: 'Status USMLE Step 2 CK',
+      ecfmgCertified: 'Sou certificado pelo ECFMG',
+      usClinical: 'Tenho experiência clínica nos EUA',
+      startJourney: 'Começar Minha Jornada',
+      notStarted: 'Não iniciado',
+      studying: 'Estudando atualmente',
+      scheduled: 'Exame agendado',
+      passed: 'Aprovado'
     },
+    
+    goals: {
+      residency: 'Residência',
+      residencyDesc: 'Candidatar-se a programas de residência médica nos EUA',
+      fellowship: 'Fellowship',
+      fellowshipDesc: 'Buscar treinamento em subespecialidade',
+      medSchool: 'Faculdade de medicina',
+      medSchoolDesc: 'Candidatar-se a faculdades de medicina nos EUA'
+    },
+    
     dashboard: {
       welcomeBack: 'Bem-vindo de volta,',
+      journeyProgress: 'Progresso da jornada',
+      stepsCompleted: 'Etapas concluídas',
+      of: 'de',
+      total: 'total',
       community: 'Comunidade',
-      findMentor: 'Encontrar Mentor'
+      connectPeers: 'Conecte-se com colegas',
+      findMentor: 'Encontrar Mentor',
+      getGuidance: 'Obter orientação',
+      upcomingDeadlines: 'Prazos futuros',
+      achievements: 'Suas conquistas',
+      path: 'Caminho',
+      viewAll: 'Ver tudo'
     },
+    
     nav: {
       home: 'Início',
       guides: 'Guias',
       community: 'Comunidade',
+      alerts: 'Alertas',
       profile: 'Perfil'
+    },
+    
+    guides: {
+      title: 'Guias',
+      searchGuides: 'Pesquisar guias...',
+      pathway: 'Caminho',
+      completed: 'concluído',
+      complete: 'Completo',
+      inProgress: 'Em andamento',
+      toDo: 'A fazer',
+      deadline: 'Prazo',
+      officialResources: 'Recursos oficiais',
+      viewGuide: 'Ver guia',
+      start: 'Começar'
+    },
+    
+    community: {
+      title: 'Comunidade',
+      searchDiscussions: 'Pesquisar discussões...',
+      allPosts: 'Todas as postagens',
+      post: 'Postar',
+      createPost: 'Criar postagem',
+      title_label: 'Título',
+      content: 'Compartilhe sua pergunta, dica ou experiência...',
+      noPosts: 'Ainda não há postagens',
+      beFirst: 'Seja o primeiro a iniciar uma discussão!'
+    },
+    
+    mentors: {
+      title: 'Encontrar Mentor',
+      connectSuccess: 'Conecte-se com o sucesso',
+      subtitle: 'Obtenha orientação de FMGs verificados que combinaram com seus programas dos sonhos',
+      searchMentors: 'Pesquisar mentores...',
+      allSpecialties: 'Todas as especialidades',
+      allLocations: 'Todas as localizações',
+      requestMentorship: 'Solicitar mentoria',
+      connected: 'Conectado',
+      pending: 'Solicitação pendente',
+      sendRequest: 'Enviar solicitação',
+      introduce: 'Apresente-se e explique o que você procura em um mentor...',
+      noMentors: 'Nenhum mentor encontrado',
+      adjustFilters: 'Tente ajustar seus filtros de pesquisa'
+    },
+    
+    profile: {
+      title: 'Perfil',
+      editProfile: 'Editar perfil',
+      yourDetails: 'Seus detalhes',
+      location: 'Localização',
+      specialty: 'Especialidade almejada',
+      language: 'Idioma',
+      medSchool: 'Faculdade de medicina',
+      undergrad: 'Faculdade de graduação',
+      targetLocation: 'Localização almejada',
+      about: 'Sobre',
+      signOut: 'Sair',
+      saveChanges: 'Salvar alterações',
+      displayName: 'Nome de exibição',
+      bio: 'Biografia',
+      bioPlaceholder: 'Conte aos outros sobre você...',
+      darkMode: 'Modo escuro',
+      notSet: 'Não definido'
+    },
+    
+    notifications: {
+      title: 'Notificações',
+      markAllRead: 'Marcar tudo como lido',
+      unread: 'Notificações não lidas',
+      allCaughtUp: 'Tudo em dia!',
+      noNotifications: 'Você não tem notificações',
+      urgent: 'Urgente'
     }
   }
 };
