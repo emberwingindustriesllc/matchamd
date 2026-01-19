@@ -215,21 +215,104 @@ const pathways = [
     id: 3,
     title: 'Pathway 3: WFME-Accredited School',
     eligibility: 'Medical school accredited by WFME-recognized agency',
+    description: 'Leverages WFME-recognized accreditation to demonstrate clinical competence through school attestation. Takes precedence over Pathway 4 for dual-eligible schools.',
     requirements: [
-      'School must have current WFME recognition',
-      'For recent graduates: graduated after 2023 if school accredited post-2023',
-      'Accreditation must be active at time of application',
-      'Check WFME World Directory for your school'
+      'School must have current accreditation by WFME-recognized agency',
+      'Graduated on or after January 1, 2023',
+      'Clinical Skills Attestation from authorized school official',
+      'No Step 2 CS failures (one or more failures redirect to Pathway 6)',
+      'Passed USMLE Step 1 and Step 2 CK',
+      'OET Medicine scores ≥350 in each sub-test (listening, reading, writing, speaking) from Jan 1, 2024 onwards',
+      'Full compliance with general ECFMG eligibility (no disciplinary history)',
+      'Application fee: $925 (non-refundable)'
     ],
     warnings: [
-      'Timing matters: school must be accredited when you graduated',
-      'Some schools lost/gained accreditation - verify current status',
-      'Provisional accreditation may not qualify'
+      'CRITICAL: If you failed Step 2 CS one or more times, you MUST use Pathway 6 (not eligible for Pathway 3)',
+      'Graduates before January 1, 2023 are NOT eligible',
+      'School must be accredited at time of application - verify current status regularly',
+      'Timing matters: school must have been accredited when you graduated',
+      'Provisional accreditation may not qualify - confirm with ECFMG',
+      'Some schools lost/gained accreditation - check WFME Directory frequently',
+      'Application auto-deletes if not completed within 5 calendar days of initiation',
+      'You are responsible for ensuring school submits attestation on time - ECFMG will not approve without it',
+      'Name discrepancies between attestation and ECFMG records may require identity confirmation'
     ],
     color: 'from-purple-500 to-pink-500',
-    documents: ['Medical school diploma', 'Transcript', 'WFME verification'],
+    documents: ['Clinical Skills Attestation (electronic via portal OR paper form)', 'Certified English translations (if needed)', 'Identity confirmation documents (if name discrepancies)'],
     link: 'https://www.ecfmg.org/certification-pathways/pathway-3.html',
-    checker: 'https://www.wfme.org/accreditation/accrediting-agencies-status/'
+    checker: 'https://www.wfme.org/accreditation/accrediting-agencies-status/',
+    applicationProcess: {
+      portal: 'MyIntealth (https://pathways.myintealth.app/)',
+      deadline: 'January 31, 2026 (Eastern Time)',
+      completionWindow: '5 calendar days from initiation (or application auto-deletes)',
+      processingTime: 'Initial review ~5 business days + document incorporation ~5 days + final evaluation ~5 days (total depends on verification)',
+      steps: [
+        'Log in to MyIntealth account (or create/claim account)',
+        'Complete initial eligibility screening',
+        'System confirms school eligibility and routes to Pathway 3',
+        'Complete application within 5 calendar days',
+        'ECFMG automatically notifies participating schools via Clinical Skills Evaluation Portal',
+        'For non-participating schools: download Clinical Skills Attestation form and coordinate with school',
+        'Pay $925 non-refundable fee (Visa, MasterCard, Discover, American Express)',
+        'Submit application'
+      ],
+      postSubmission: 'Case manager reviews materials and may request clarifications. Track status via online portal. Ensure school submits attestation by deadline.'
+    },
+    attestationMethods: [
+      {
+        method: 'Electronic Attestation (Participating Schools)',
+        pros: 'Automated, faster processing, integrated system',
+        cons: 'Only for schools in MyIntealth Entity Portal',
+        deadline: 'February 15, 2026',
+        details: 'ECFMG automatically notifies school after application submission. School submits electronically via Clinical Skills Evaluation and Attestation Portal.'
+      },
+      {
+        method: 'Paper Form Attestation (Non-Participating Schools)',
+        pros: 'Available for all WFME-accredited schools',
+        cons: 'Manual process, relies on school timeliness, potential delays',
+        deadline: 'January 31, 2026',
+        details: 'Applicant downloads Clinical Skills Attestation form. School official completes and sends directly to ECFMG. Applicant responsible for ensuring timely submission.'
+      }
+    ],
+    translationService: {
+      name: 'Straker Translations (ECFMG Recommended)',
+      url: 'https://www.straker.ai/ecfmg',
+      note: 'Non-English documents require certified English translations',
+      email: 'Contact ECFMG support for unlisted schools or issues'
+    },
+    fees: {
+      amount: '$925',
+      refundable: false,
+      note: 'Covers application processing; non-refundable even if rejected, withdrawn, or incomplete. Applicants responsible for any school or translation fees.'
+    },
+    timeline: {
+      applicationOpened: 'August 2025',
+      submissionDeadline: 'January 31, 2026 (Eastern Time)',
+      documentDeadline: 'All documentation by Jan 31, 2026 (or Feb 15 for electronic attestations)',
+      nrmpRankDeadline: 'Typically March (for 2026 Match)',
+      note: 'For 2026 NRMP Match, ECFMG must finalize pathway outcome, confirm USMLE passing, and report certification to NRMP by rank order list deadline',
+      lastRevised: 'August 18, 2025 (subject to change - monitor ECFMG website)'
+    },
+    integration: {
+      ecfmgRequirements: 'Pathway 3 (Clinical Attestation) + OET Medicine + USMLE Step 1 + Step 2 CK = ECFMG Certificate',
+      certificateValidity: 'Valid until December 31, 2028 (for 2026 pathways)',
+      revalidation: 'For expired pathways, similar application process applies for revalidation',
+      nextSteps: 'Enables USMLE Step 3 eligibility, NRMP Match participation, and program interviews',
+      matchStats: 'IMGs face ~58% match rate for non-U.S. citizens (NRMP data)'
+    },
+    schoolEligibility: {
+      requirement: 'Current accreditation by WFME-recognized agency',
+      checker: 'Check WFME World Directory regularly - new schools may be added throughout season',
+      note: 'For dual-eligible schools (Pathway 3 and 4), Pathway 3 takes precedence',
+      verification: 'ECFMG performs primary-source verification on all attestations'
+    },
+    expirationNote: 'ECFMG Certificate expires December 31, 2028 for 2026 applicants unless made indefinite through revalidation',
+    keyCitations: [
+      { title: 'Requirements for 2026 Pathways for ECFMG Certification', url: 'https://www.ecfmg.org/certification-pathways/' },
+      { title: 'ECFMG 2026 Information Booklet', url: 'https://www.ecfmg.org' },
+      { title: 'Pathway 3 Official Page', url: 'https://www.ecfmg.org/certification-pathways/pathway-3.html' },
+      { title: 'WFME Accreditation Directory', url: 'https://www.wfme.org/accreditation/accrediting-agencies-status/' }
+    ]
   },
   {
     id: 4,
@@ -600,7 +683,7 @@ export default function PathwayBreakdown() {
 
                   {/* School Checker (Pathway 3) */}
                   {pathway.checker && (
-                    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3">
+                    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3 border border-purple-200 dark:border-purple-800">
                       <h5 className="font-semibold text-purple-800 dark:text-purple-400 mb-2 flex items-center gap-2">
                         <Search className="w-4 h-4" />
                         Verify Your School
@@ -609,11 +692,64 @@ export default function PathwayBreakdown() {
                         href={pathway.checker}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-purple-700 dark:text-purple-300 hover:underline"
+                        className="inline-flex items-center gap-2 text-sm text-purple-700 dark:text-purple-300 hover:underline font-medium"
                       >
                         Check WFME Accreditation Status
                         <ExternalLink className="w-3 h-3" />
                       </a>
+                      {pathway.schoolEligibility && (
+                        <div className="mt-3 space-y-2 text-xs">
+                          <div className="bg-white dark:bg-slate-800 rounded-lg p-2">
+                            <p className="text-purple-700 dark:text-purple-300">{pathway.schoolEligibility.note}</p>
+                          </div>
+                          <div className="bg-white dark:bg-slate-800 rounded-lg p-2">
+                            <span className="font-medium text-purple-700 dark:text-purple-300">Verification:</span>
+                            <p className="text-purple-600 dark:text-purple-400 mt-1">{pathway.schoolEligibility.verification}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Attestation Methods (Pathway 3) */}
+                  {pathway.attestationMethods && (
+                    <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-4 border border-pink-200 dark:border-pink-800">
+                      <h5 className="font-semibold text-pink-800 dark:text-pink-400 mb-3 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Clinical Skills Attestation Options
+                      </h5>
+                      <div className="space-y-3">
+                        {pathway.attestationMethods.map((method, idx) => (
+                          <div key={idx} className="bg-white dark:bg-slate-800 rounded-lg p-3 border border-pink-200 dark:border-pink-700">
+                            <div className="flex items-start justify-between mb-2">
+                              <h6 className="font-semibold text-sm text-slate-800 dark:text-white">
+                                {method.method}
+                              </h6>
+                              <Badge variant="outline" className="text-xs">
+                                {method.deadline}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">
+                              {method.details}
+                            </p>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div>
+                                <span className="text-emerald-600 dark:text-emerald-400">✓ Pros:</span>
+                                <p className="text-slate-700 dark:text-slate-300">{method.pros}</p>
+                              </div>
+                              <div>
+                                <span className="text-amber-600 dark:text-amber-400">⚠ Cons:</span>
+                                <p className="text-slate-700 dark:text-slate-300">{method.cons}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-3 bg-rose-100 dark:bg-rose-900/30 rounded-lg p-2 border border-rose-300 dark:border-rose-700">
+                        <p className="text-xs text-rose-800 dark:text-rose-300">
+                          <strong>⚠️ Critical:</strong> You are responsible for ensuring your school submits the attestation on time. ECFMG will not approve your application without it.
+                        </p>
+                      </div>
                     </div>
                   )}
 
