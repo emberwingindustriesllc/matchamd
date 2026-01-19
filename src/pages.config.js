@@ -9,6 +9,8 @@ import Onboarding from './pages/Onboarding';
 import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
 import Subscription from './pages/Subscription';
+import AdminModeration from './pages/AdminModeration';
+import Deadlines from './pages/Deadlines';
 import __Layout from './Layout.jsx';
 
 
@@ -24,6 +26,8 @@ export const PAGES = {
     "PostDetail": PostDetail,
     "Profile": Profile,
     "Subscription": Subscription,
+    "AdminModeration": AdminModeration,
+    "Deadlines": Deadlines,
 }
 
 export const pagesConfig = {
