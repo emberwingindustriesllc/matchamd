@@ -10,6 +10,7 @@ import ProgressRing from '@/components/common/ProgressRing';
 import BadgeIcon from '@/components/common/BadgeIcon';
 import StepCard from '@/components/common/StepCard';
 import ErrorState from '@/components/common/ErrorState';
+import LocationAwareTips from '@/components/location/LocationAwareTips';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { 
@@ -154,6 +155,9 @@ export default function Dashboard() {
             </div>
           </div>
         </motion.div>
+
+        {/* Location-Aware Tips */}
+        <LocationAwareTips compact />
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
