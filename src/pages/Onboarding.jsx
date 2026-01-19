@@ -162,9 +162,36 @@ export default function Onboarding() {
       <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-3">
         {t('onboarding.welcome')}
       </h1>
-      <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-sm mx-auto">
+      <p className="text-slate-600 dark:text-slate-400 mb-4 max-w-sm mx-auto">
         {t('onboarding.subtitle')}
       </p>
+      
+      {/* Immediate Value Preview */}
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-2xl p-4 mb-6 border border-indigo-200 dark:border-indigo-800 space-y-2 text-left max-w-md mx-auto">
+        <h3 className="font-semibold text-slate-900 dark:text-white text-sm">What You'll Get:</h3>
+        <ul className="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
+          <li className="flex items-start gap-2">
+            <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
+            <span>Step-by-step ECFMG pathway guidance (Pathway 1, 3, 4, 5, 6)</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
+            <span>USMLE prep roadmap with score targets (\u2265240 Step 2)</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
+            <span>NRMP Match timeline & deadlines (March 2026)</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
+            <span>Vetted resources: ECFMG.org, UWorld, ERAS tips</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
+            <span>Community of 16,000+ FMGs & verified mentors</span>
+          </li>
+        </ul>
+      </div>
       
       <div className="space-y-3 mb-8">
         <Input
