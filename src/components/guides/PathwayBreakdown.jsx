@@ -115,27 +115,100 @@ const pathways = [
   },
   {
     id: 2,
-    title: 'Pathway 2: Clinical Skills Exam',
-    eligibility: 'Passed a standardized clinical skills exam for medical licensure',
+    title: 'Pathway 2: Medical School OSCE',
+    eligibility: 'School-administered OSCE required by Medical Regulatory Authority (MRA) for licensure',
+    description: 'Verifies clinical competence through existing OSCE from your medical school, mandated by your home country\'s MRA for licensure.',
     requirements: [
-      'Exam must be required for medical licensure (not just graduation)',
-      'Accepted exams include: PLAB 2 (UK), AMC CAT (Australia), MCCQE Part II (Canada)',
-      'Must be taken for licensure purposes',
-      'Score report or certificate required'
+      'OSCE must be mandatory for ALL students/graduates seeking licensure (not just graduation)',
+      'Medical school must be accredited by the MRA or its designated agency',
+      'School must be in a country/region WITHOUT WFME-recognized or NCFMEA-comparable accrediting agencies',
+      'OSCE mandate must predate 2020 (established before 2020 by MRA)',
+      'Graduated on or after January 1, 2023',
+      'No Step 2 CS failures (one or more failures redirect to Pathway 6)',
+      'Passed USMLE Step 1 and Step 2 CK',
+      'OET Medicine scores ≥350 in each sub-test (listening, reading, writing, speaking) from Jan 1, 2024 onwards',
+      'Application fee: $925 (non-refundable)'
     ],
     warnings: [
-      'Clinical exams for graduation only do NOT qualify',
-      'Verify your exam is on ECFMG accepted list before applying',
-      'Some countries have multiple exams - ensure you take the licensure one'
+      'CRITICAL: If you failed Step 2 CS one or more times, you MUST use Pathway 6 (not eligible for Pathway 2)',
+      'Graduates before January 1, 2023 are NOT eligible',
+      'OSCE for graduation purposes only does NOT qualify - must be required for MRA licensure',
+      'Schools in WFME/NCFMEA recognized regions are NOT eligible for this pathway',
+      'OSCE mandate established after 2019 disqualifies the school',
+      'Verify your school is on ECFMG\'s eligible list before applying',
+      'Name discrepancies between diploma and application may require additional identity proofs',
+      'School response delays can impact verification - coordinate with your institution early'
     ],
     color: 'from-emerald-500 to-teal-500',
-    documents: ['Exam score report', 'Licensure board confirmation'],
+    documents: ['Final diploma (for graduates)', 'OSCE Attestation form (for students/non-diploma holders)', 'Certified English translations (if needed)'],
     link: 'https://www.ecfmg.org/certification-pathways/pathway-2.html',
-    acceptedExams: [
-      { name: 'PLAB Part 2', country: 'United Kingdom', url: 'https://www.gmc-uk.org/registration-and-licensing/join-the-register/plab' },
-      { name: 'AMC Clinical Exam', country: 'Australia', url: 'https://www.amc.org.au' },
-      { name: 'MCCQE Part II', country: 'Canada', url: 'https://mcc.ca/examinations/mccqe-part-ii/' },
-      { name: 'LMCC', country: 'Canada', url: 'https://mcc.ca/examinations/lmcc/' }
+    applicationProcess: {
+      portal: 'MyIntealth (https://myintealth.ecfmg.org)',
+      deadline: 'January 31, 2026 (Eastern Time)',
+      completionWindow: '5 days from starting application (or draft deleted)',
+      processingTime: 'Initial review ~5 business days per stage + verification time',
+      steps: [
+        'Log in to MyIntealth portal',
+        'Complete initial eligibility quiz',
+        'Proceed to Pathway 2 specific questions',
+        'Upload final diploma (graduates) OR coordinate OSCE Attestation form submission from school',
+        'Certify information accuracy',
+        'Pay $925 non-refundable fee (credit cards only)',
+        'Submit application'
+      ],
+      postSubmission: 'ECFMG assigns case manager for review; status trackable online; may request additional information'
+    },
+    documentationMethods: [
+      {
+        method: 'Diploma Upload (For Graduates)',
+        pros: 'Direct submission by applicant',
+        cons: 'Potential verification delays',
+        deadline: 'By January 31, 2026',
+        details: 'Upload final diploma with certified English translation if non-English. ECFMG conducts primary-source verification with issuing institution.'
+      },
+      {
+        method: 'OSCE Attestation Form (For Students/Non-Diploma Holders)',
+        pros: 'School handles official documentation',
+        cons: 'Relies on school timeliness and responsiveness',
+        deadline: 'Received by ECFMG by January 31, 2026',
+        details: 'Downloadable form completed by school official and sent directly to ECFMG. Applicant coordinates with medical school to ensure timely submission.'
+      }
+    ],
+    translationService: {
+      name: 'Straker Translations (ECFMG Recommended)',
+      url: 'https://www.straker.ai/ecfmg',
+      note: 'Non-English documents require certified English translations',
+      email: 'Contact ECFMG if your school is not on the eligible list - additions possible if vetted'
+    },
+    fees: {
+      amount: '$925',
+      refundable: false,
+      note: 'Covers application processing; non-refundable even if rejected or incomplete. Applicants responsible for any fees charged by institutions.'
+    },
+    timeline: {
+      applicationOpened: 'August 2025',
+      submissionDeadline: 'January 31, 2026',
+      documentDeadline: 'All docs/verifications received by January 31, 2026',
+      nrmpRankDeadline: 'Typically March (for 2026 Match)',
+      note: 'For 2026 NRMP Match, full certification (Pathway 2 + USMLE + OET) must be reported to NRMP by rank order list certification deadline'
+    },
+    integration: {
+      ecfmgRequirements: 'Pathway 2 (OSCE) + OET Medicine + USMLE Step 1 + Step 2 CK = ECFMG Certificate',
+      certificateValidity: 'Valid until December 31, 2028 (for 2026 pathways)',
+      revalidation: 'For expired pathways, similar revalidation process applies',
+      nextSteps: 'Enables USMLE Step 3 eligibility and NRMP Match participation',
+      matchStats: 'IMGs face ~58% match rate for non-U.S. citizens (NRMP data)'
+    },
+    schoolEligibility: {
+      requirement: 'School must be in non-WFME/NCFMEA regions and MRA-accredited',
+      checker: 'Confirm school eligibility via ECFMG\'s official list',
+      note: 'Schools can be added if they meet criteria and pass ECFMG vetting process'
+    },
+    expirationNote: 'ECFMG Certificate expires December 31, 2028 for 2026 applicants unless made indefinite through revalidation',
+    keyCitations: [
+      { title: 'Requirements for 2026 Pathways for ECFMG Certification', url: 'https://www.ecfmg.org/certification-pathways/' },
+      { title: 'ECFMG 2026 Information Booklet', url: 'https://www.ecfmg.org' },
+      { title: 'Pathway 2 Official Page', url: 'https://www.ecfmg.org/certification-pathways/pathway-2.html' }
     ]
   },
   {
@@ -500,32 +573,27 @@ export default function PathwayBreakdown() {
                     </div>
                   )}
 
-                  {/* Accepted Exams (Pathway 2) */}
-                  {pathway.acceptedExams && (
-                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3">
-                      <h5 className="font-semibold text-blue-800 dark:text-blue-400 mb-2">
-                        Accepted Clinical Exams
+                  {/* School Eligibility (Pathway 2) */}
+                  {pathway.schoolEligibility && (
+                    <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-3 border border-emerald-200 dark:border-emerald-800">
+                      <h5 className="font-semibold text-emerald-800 dark:text-emerald-400 mb-2 flex items-center gap-2">
+                        <Search className="w-4 h-4" />
+                        School Eligibility Requirements
                       </h5>
-                      <div className="space-y-2">
-                        {pathway.acceptedExams.map((exam, idx) => (
-                          <a
-                            key={idx}
-                            href={exam.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded-lg hover:shadow-md transition-shadow"
-                          >
-                            <div>
-                              <div className="font-medium text-sm text-slate-800 dark:text-white">
-                                {exam.name}
-                              </div>
-                              <div className="text-xs text-slate-600 dark:text-slate-400">
-                                {exam.country}
-                              </div>
-                            </div>
-                            <ExternalLink className="w-4 h-4 text-blue-600" />
-                          </a>
-                        ))}
+                      <div className="space-y-2 text-xs">
+                        <div className="bg-white dark:bg-slate-800 rounded-lg p-2">
+                          <span className="font-medium text-emerald-700 dark:text-emerald-300">Geographic Requirement:</span>
+                          <p className="text-emerald-600 dark:text-emerald-400 mt-1">{pathway.schoolEligibility.requirement}</p>
+                        </div>
+                        <div className="bg-white dark:bg-slate-800 rounded-lg p-2">
+                          <span className="font-medium text-emerald-700 dark:text-emerald-300">Verification:</span>
+                          <p className="text-emerald-600 dark:text-emerald-400 mt-1">{pathway.schoolEligibility.checker}</p>
+                        </div>
+                        <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-2 border border-blue-300 dark:border-blue-700">
+                          <p className="text-blue-800 dark:text-blue-300">
+                            📝 {pathway.schoolEligibility.note}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )}
