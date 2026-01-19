@@ -20,19 +20,43 @@ import {
   Trophy, 
   Flame,
   Sparkles,
-  Users
+  Users,
+  GraduationCap,
+  Target
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
-const residencySteps = [
-  { id: 'ecfmg_pathways', title: 'ECFMG Pathways', description: 'Complete certification pathways application', deadline: 'Jan 31, 2026' },
-  { id: 'usmle_step1', title: 'USMLE Step 1', description: 'Pass the first licensing exam' },
-  { id: 'usmle_step2', title: 'USMLE Step 2 CK', description: 'Pass Clinical Knowledge exam' },
-  { id: 'oet_medicine', title: 'OET Medicine', description: 'English proficiency test for healthcare', deadline: 'Dec 2025' },
-  { id: 'eras_registration', title: 'ERAS Registration', description: 'Register for residency application', deadline: 'Sept 2025' },
-  { id: 'personal_statement', title: 'Personal Statement', description: 'Write your compelling story' },
-  { id: 'lors', title: 'Letters of Recommendation', description: 'Secure strong recommendation letters' },
-  { id: 'nrmp_match', title: 'NRMP Match', description: 'Register for the matching program', deadline: 'March 2026' }
-];
+const getPathwaySteps = (primaryGoal) => {
+  const pathwayStepsMap = {
+    residency: [
+      { id: 'ecfmg_pathways', title: 'ECFMG Pathways', description: 'Complete certification pathways application', deadline: 'Jan 31, 2026' },
+      { id: 'usmle_step1', title: 'USMLE Step 1', description: 'Pass the first licensing exam' },
+      { id: 'usmle_step2', title: 'USMLE Step 2 CK', description: 'Pass Clinical Knowledge exam' },
+      { id: 'oet_medicine', title: 'OET Medicine', description: 'English proficiency test for healthcare', deadline: 'Dec 2025' },
+      { id: 'eras_registration', title: 'ERAS Registration', description: 'Register for residency application', deadline: 'Sept 2025' },
+      { id: 'personal_statement', title: 'Personal Statement', description: 'Write your compelling story' },
+      { id: 'lors', title: 'Letters of Recommendation', description: 'Secure strong recommendation letters' },
+      { id: 'nrmp_match', title: 'NRMP Match', description: 'Register for the matching program', deadline: 'March 2026' }
+    ],
+    fellowship: [
+      { id: 'ecfmg_certification', title: 'ECFMG Certification', description: 'Required for fellowship training' },
+      { id: 'residency_completion', title: 'Residency Completion', description: 'Complete accredited residency program' },
+      { id: 'board_eligibility', title: 'Board Eligibility', description: 'Meet specialty board requirements' },
+      { id: 'fellowship_eras', title: 'Fellowship Application', description: 'ERAS or Fellowship Council' },
+      { id: 'fellowship_interview', title: 'Fellowship Interviews', description: 'Interview at subspecialty programs' },
+      { id: 'fellowship_match', title: 'Fellowship Match', description: 'NRMP SMS or other matching systems' }
+    ],
+    med_school: [
+      { id: 'prerequisites', title: 'Prerequisites', description: 'US coursework and requirements' },
+      { id: 'mcat', title: 'MCAT Exam', description: 'Medical College Admission Test' },
+      { id: 'amcas', title: 'AMCAS Application', description: 'Primary application process' },
+      { id: 'secondaries', title: 'Secondary Applications', description: 'School-specific applications' },
+      { id: 'med_interviews', title: 'Interviews', description: 'MMI and traditional interviews' },
+      { id: 'financial_proof', title: 'Financial Documentation', description: 'Proof of funding for 4 years' }
+    ]
+  };
+  return pathwayStepsMap[primaryGoal] || pathwayStepsMap.residency;
+};
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -66,6 +90,19 @@ export default function Dashboard() {
     staleTime: 1 * 60 * 1000
   });
 
+  const { data: guides = [] } = useQuery({
+    queryKey: ['guides', profiles?.[0]?.primary_goal],
+    queryFn: async () => {
+      const guides = await base44.entities.Guide.filter(
+        { category: profiles?.[0]?.primary_goal, published: true },
+        'order'
+      );
+      return guides;
+    },
+    enabled: !!profiles?.[0],
+    staleTime: 10 * 60 * 1000
+  });
+
   const profile = profiles?.[0];
 
   useEffect(() => {
@@ -95,7 +132,7 @@ export default function Dashboard() {
     );
   }
 
-  const currentSteps = residencySteps;
+  const currentSteps = getPathwaySteps(profile?.primary_goal);
   const completedSteps = progressList.filter(p => p.status === 'completed').length;
   const totalSteps = currentSteps.length;
   const overallProgress = Math.round((completedSteps / totalSteps) * 100);
@@ -158,6 +195,40 @@ export default function Dashboard() {
 
         {/* Location-Aware Tips */}
         <LocationAwareTips compact />
+
+        {/* Your ECFMG Pathway - Prominent Section */}
+        {profile?.primary_goal === 'residency' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            onClick={() => navigate(createPageUrl('GuideDetail?id=ecfmg_pathways'))}
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 p-6 text-white shadow-lg cursor-pointer hover:shadow-xl transition-all"
+          >
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                  Critical First Step
+                </Badge>
+              </div>
+              <h3 className="text-xl font-bold mb-1">Your ECFMG Pathway</h3>
+              <p className="text-white/90 text-sm mb-3">
+                Choose from 6 certification pathways based on your medical school and licensure status
+              </p>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="flex items-center gap-1 bg-white/20 rounded-full px-3 py-1">
+                  <Target className="w-3 h-3" />
+                  Pathway 1, 3, 4, 5, or 6
+                </span>
+                <ChevronRight className="w-5 h-5 ml-auto" />
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">

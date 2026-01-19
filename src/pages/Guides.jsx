@@ -64,7 +64,7 @@ const pathways = {
 export default function Guides() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('residency');
-  const [viewMode, setViewMode] = useState('accordion'); // 'accordion' or 'list'
+  const [viewMode, setViewMode] = useState('accordion');
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -101,6 +101,14 @@ export default function Guides() {
   });
 
   const profile = profiles?.[0];
+  
+  // Set default tab based on user's primary goal
+  React.useEffect(() => {
+    if (profile?.primary_goal && pathways[profile.primary_goal]) {
+      setActiveTab(profile.primary_goal);
+    }
+  }, [profile?.primary_goal]);
+
   const currentPathway = pathways[activeTab];
   
   const getStepStatus = (stepId) => {
@@ -131,6 +139,46 @@ export default function Guides() {
             className="pl-12 h-12 rounded-2xl border-slate-200 dark:border-slate-700"
           />
         </div>
+
+        {/* Dynamic Guides from Database */}
+        {dynamicGuides.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-slate-800 dark:text-white">
+                Your Personalized {profile?.primary_goal === 'residency' ? 'Residency' : profile?.primary_goal === 'fellowship' ? 'Fellowship' : 'Med School'} Guides
+              </h2>
+            </div>
+            <div className="grid gap-3">
+              {dynamicGuides.slice(0, 3).map((guide, idx) => (
+                <motion.button
+                  key={guide.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  onClick={() => window.location.href = createPageUrl(`GuideDetail?id=${guide.slug}`)}
+                  className="p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-indigo-200 dark:border-indigo-800 shadow-sm hover:shadow-lg hover:border-indigo-400 transition-all text-left"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-lg">{idx + 1}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-slate-800 dark:text-white mb-1">{guide.title}</h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-1">{guide.overview}</p>
+                      {guide.deadline && (
+                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">⏰ {guide.deadline}</p>
+                      )}
+                    </div>
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Pathway Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
