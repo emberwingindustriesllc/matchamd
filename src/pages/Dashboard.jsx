@@ -13,6 +13,8 @@ import ErrorState from '@/components/common/ErrorState';
 import LocationAwareTips from '@/components/location/LocationAwareTips';
 import QuickStartChecklist from '@/components/dashboard/QuickStartChecklist';
 import ResourceHub from '@/components/dashboard/ResourceHub';
+import PathwayEligibilityChat from '@/components/ai/PathwayEligibilityChat';
+import PremiumFeatureCard from '@/components/premium/PremiumFeatureCard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { 
@@ -24,7 +26,8 @@ import {
   Sparkles,
   Users,
   GraduationCap,
-  Target
+  Target,
+  Video
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -263,11 +266,28 @@ export default function Dashboard() {
           </motion.button>
         </div>
 
+        {/* AI Pathway Assistant - Free Feature */}
+        <PathwayEligibilityChat userProfile={profile} />
+
         {/* Quick Start Checklist - Immediate Value */}
         <QuickStartChecklist profile={profile} progressList={progressList} />
 
         {/* Essential Resources - Vetted Links */}
         <ResourceHub />
+
+        {/* Premium Feature Teaser */}
+        <PremiumFeatureCard
+          title="Advanced Mentorship"
+          description="Get personalized 1-on-1 guidance from verified mentors who've successfully matched"
+          features={[
+            'Monthly video sessions with matched physicians',
+            'Personal statement review & feedback',
+            'Mock interviews with specialty-specific mentors',
+            'Priority access to limited mentorship slots'
+          ]}
+          isPremium={true}
+          unlocked={false}
+        />
 
         {/* Upcoming Deadlines */}
         <Card className="p-4 rounded-2xl border-slate-200 dark:border-slate-700">
