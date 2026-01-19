@@ -110,7 +110,11 @@ export default function Onboarding() {
     target_specialty: '',
     graduation_year: null,
     usmle_step1_status: 'not_started',
+    usmle_step1_score: '',
     usmle_step2_status: 'not_started',
+    usmle_step2_score: '',
+    usmle_step3_status: 'not_started',
+    usmle_step3_result: 'not_applicable',
     ecfmg_certified: false,
     visa_status: 'none',
     us_clinical_experience: false
@@ -454,6 +458,18 @@ export default function Onboarding() {
           </Select>
         </div>
 
+        {profile.usmle_step1_status === 'passed' && (
+          <div>
+            <Label className="text-slate-700 dark:text-slate-300">Step 1 Score (Optional)</Label>
+            <Input
+              placeholder="e.g., 230"
+              value={profile.usmle_step1_score}
+              onChange={(e) => updateProfile('usmle_step1_score', e.target.value)}
+              className="h-12 rounded-xl mt-1"
+            />
+          </div>
+        )}
+
         <div>
           <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.step2Status')}</Label>
           <Select value={profile.usmle_step2_status} onValueChange={(v) => updateProfile('usmle_step2_status', v)}>
@@ -468,6 +484,51 @@ export default function Onboarding() {
             </SelectContent>
           </Select>
         </div>
+
+        {profile.usmle_step2_status === 'passed' && (
+          <div>
+            <Label className="text-slate-700 dark:text-slate-300">Step 2 CK Score (Critical for Matching)</Label>
+            <Input
+              placeholder="e.g., 245 - aim for ≥240 for best chances"
+              value={profile.usmle_step2_score}
+              onChange={(e) => updateProfile('usmle_step2_score', e.target.value)}
+              className="h-12 rounded-xl mt-1"
+            />
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Step 2 CK score is a major factor for IMG matching success
+            </p>
+          </div>
+        )}
+
+        <div>
+          <Label className="text-slate-700 dark:text-slate-300">USMLE Step 3 Status</Label>
+          <Select value={profile.usmle_step3_status} onValueChange={(v) => updateProfile('usmle_step3_status', v)}>
+            <SelectTrigger className="h-12 rounded-xl mt-1">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="not_started">Not Started</SelectItem>
+              <SelectItem value="studying">Studying</SelectItem>
+              <SelectItem value="scheduled">Scheduled</SelectItem>
+              <SelectItem value="passed">Passed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {profile.usmle_step3_status === 'passed' && (
+          <div>
+            <Label className="text-slate-700 dark:text-slate-300">Step 3 Result</Label>
+            <Select value={profile.usmle_step3_result} onValueChange={(v) => updateProfile('usmle_step3_result', v)}>
+              <SelectTrigger className="h-12 rounded-xl mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pass">Pass</SelectItem>
+                <SelectItem value="fail">Fail</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         <div className="flex items-center gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
           <Checkbox

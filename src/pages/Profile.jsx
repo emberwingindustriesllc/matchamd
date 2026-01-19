@@ -264,6 +264,50 @@ export default function Profile() {
                 </div>
               </div>
             )}
+          </div>
+        </Card>
+
+        {/* USMLE Scores */}
+        <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">
+          <h3 className="font-semibold text-slate-800 dark:text-white mb-4">USMLE Progress</h3>
+          
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+              <div>
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Step 1</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{profile.usmle_step1_status}</p>
+              </div>
+              {profile.usmle_step1_score && (
+                <div className="text-right">
+                  <p className="text-lg font-bold text-slate-900 dark:text-white">{profile.usmle_step1_score}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+              <div>
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Step 2 CK</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{profile.usmle_step2_status}</p>
+              </div>
+              {profile.usmle_step2_score && (
+                <div className="text-right">
+                  <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{profile.usmle_step2_score}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Critical for matching</p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+              <div>
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Step 3</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{profile.usmle_step3_status || 'not_started'}</p>
+              </div>
+              {profile.usmle_step3_result && profile.usmle_step3_result !== 'not_applicable' && (
+                <Badge className={profile.usmle_step3_result === 'pass' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}>
+                  {profile.usmle_step3_result}
+                </Badge>
+              )}
+            </div>
 
             {(profile.target_city || profile.target_state) && (
               <div className="flex items-center gap-3">

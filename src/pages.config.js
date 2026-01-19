@@ -1,5 +1,7 @@
+import AdminModeration from './pages/AdminModeration';
 import Community from './pages/Community';
 import Dashboard from './pages/Dashboard';
+import Deadlines from './pages/Deadlines';
 import GuideDetail from './pages/GuideDetail';
 import Guides from './pages/Guides';
 import Legal from './pages/Legal';
@@ -9,14 +11,16 @@ import Onboarding from './pages/Onboarding';
 import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
 import Subscription from './pages/Subscription';
-import AdminModeration from './pages/AdminModeration';
-import Deadlines from './pages/Deadlines';
+import ResearchOpportunities from './pages/ResearchOpportunities';
+import IMGPrograms from './pages/IMGPrograms';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AdminModeration": AdminModeration,
     "Community": Community,
     "Dashboard": Dashboard,
+    "Deadlines": Deadlines,
     "GuideDetail": GuideDetail,
     "Guides": Guides,
     "Legal": Legal,
@@ -26,8 +30,8 @@ export const PAGES = {
     "PostDetail": PostDetail,
     "Profile": Profile,
     "Subscription": Subscription,
-    "AdminModeration": AdminModeration,
-    "Deadlines": Deadlines,
+    "ResearchOpportunities": ResearchOpportunities,
+    "IMGPrograms": IMGPrograms,
 }
 
 export const pagesConfig = {
