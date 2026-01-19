@@ -34,8 +34,11 @@ import {
   CheckCircle2,
   Star,
   Filter,
-  X
+  X,
+  Users,
+  Video
 } from 'lucide-react';
+import VideoCallModal from '@/components/mentorship/VideoCallModal';
 
 export default function Mentors() {
   const navigate = useNavigate();
@@ -46,6 +49,7 @@ export default function Mentors() {
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [requestMessage, setRequestMessage] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [videoCallMentor, setVideoCallMentor] = useState(null);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -306,10 +310,18 @@ export default function Mentors() {
                   
                   <div className="flex gap-2">
                     {hasAcceptedConnection(mentor.user_id) ? (
-                      <Button className="rounded-xl bg-emerald-600" disabled>
-                        <CheckCircle2 className="w-4 h-4 mr-2" />
-                        Connected
-                      </Button>
+                      <>
+                        <Button 
+                          onClick={() => setVideoCallMentor(mentor)}
+                          className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                        >
+                          <Video className="w-4 h-4 mr-2" />
+                          Video Call
+                        </Button>
+                        <Button variant="outline" className="rounded-xl">
+                          <MessageSquare className="w-4 h-4" />
+                        </Button>
+                      </>
                     ) : hasPendingRequest(mentor.user_id) ? (
                       <Button variant="outline" className="rounded-xl" disabled>
                         Request Pending
@@ -371,6 +383,12 @@ export default function Mentors() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <VideoCallModal
+        isOpen={!!videoCallMentor}
+        onClose={() => setVideoCallMentor(null)}
+        mentorName={videoCallMentor?.display_name || 'Mentor'}
+      />
 
       <BottomNav />
     </div>
