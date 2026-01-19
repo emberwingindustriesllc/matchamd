@@ -20,21 +20,44 @@ const pathways = [
     id: 1,
     title: 'Pathway 1: Medical License/Registration',
     eligibility: 'Holds or recently held unsupervised medical license/registration (on/after Jan 1, 2021)',
+    description: 'Leverages prior licensure to demonstrate readiness for unsupervised practice. Verifies existing credentials rather than requiring new assessments.',
     requirements: [
-      'License must be unsupervised (training/supervised licenses are NOT eligible)',
-      'License can be from any country',
-      'License must have been active on or after January 1, 2021',
+      'Full, unrestricted license permitting independent patient care from any country',
+      'License must have been valid at any point on or after January 1, 2021 (does not need to be current)',
+      'No disciplinary actions against the license',
+      'Met all local requirements for practice in the issuing country',
+      'Passed USMLE Step 1 and Step 2 CK',
+      'OET Medicine scores ≥350 in each sub-test (listening, reading, writing, speaking) from Jan 1, 2024 onwards',
       'Application fee: $925 (non-refundable)'
     ],
     warnings: [
-      'Training licenses or supervised practice permits are commonly rejected',
-      'Ensure license is for independent/unsupervised practice',
+      'CRITICAL: If you failed Step 2 CS one or more times, you MUST use Pathway 6 (not eligible for Pathway 1)',
+      'Supervised, training, resident, or restricted licenses do NOT qualify',
+      'Provisional licenses only qualify if they explicitly permit unsupervised practice',
+      'ECFMG verifies disciplinary history directly with issuing authority - any issues lead to rejection',
       'Name discrepancies may require additional identity proofs',
-      'Authority delays can impact verification - start early'
+      'Authority delays can impact verification - submit early (applications opened August 2025)',
+      'Initial issuance date can be before 2021, but license must have been active during or after Jan 1, 2021'
     ],
     color: 'from-blue-500 to-indigo-500',
-    documents: ['Certificate of Good Standing', 'Letter of Current Professional Status', 'License verification', 'Certified English translations (if needed)'],
+    documents: ['Certificate of Good Standing', 'Letter of Current Professional Status', 'License verification', 'Certified English translations (if needed)', 'Evidence of meeting local regulatory requirements (if requested)'],
     link: 'https://www.ecfmg.org/certification-pathways/pathway-1.html',
+    applicationProcess: {
+      portal: 'MyIntealth (https://myintealth.ecfmg.org)',
+      deadline: 'January 31, 2026 (Eastern Time)',
+      completionWindow: '5 days from starting application (or draft deleted)',
+      processingTime: 'Initial review ~5 business days + verification time',
+      steps: [
+        'Log in to MyIntealth portal',
+        'Complete general eligibility check',
+        'Provide license details: country, authority, dates, status, disciplinary history',
+        'Select documentation submission method',
+        'Certify information accuracy',
+        'Pay $925 non-refundable fee (major credit cards accepted)',
+        'Submit application'
+      ],
+      postSubmission: 'ECFMG assigns case manager; status updates available in portal; may request clarifications'
+    },
     documentationMethods: [
       {
         method: 'Direct from Authority (Preferred)',
@@ -61,14 +84,34 @@ const pathways = [
     translationService: {
       name: 'Straker Translations (ECFMG Recommended)',
       url: 'https://www.straker.ai/ecfmg',
-      note: 'Non-English documents require certified English translations'
+      note: 'Non-English documents require certified English translations',
+      email: 'Contact casemanager@ecfmg.org if your authority is not listed in the dropdown'
     },
     fees: {
       amount: '$925',
       refundable: false,
-      note: 'Covers application processing; non-refundable even if ineligible or incomplete'
+      note: 'Covers application processing; non-refundable even if ineligible or incomplete. Additional fees charged by authorities are applicant responsibility.'
     },
-    expirationNote: 'ECFMG Certificate expires with the pathway (December 31, 2028 for 2026 applicants) unless made indefinite through revalidation'
+    timeline: {
+      applicationOpened: 'August 2025',
+      submissionDeadline: 'January 31, 2026',
+      documentDeadline: 'January 31, 2026',
+      nrmpRankDeadline: 'Typically March (for 2026 Match)',
+      note: 'For 2026 NRMP Match, pathway approval + USMLE passing scores must be finalized and reported to NRMP by rank order list certification deadline'
+    },
+    integration: {
+      ecfmgRequirements: 'Pathway 1 + USMLE Step 1 + Step 2 CK + OET Medicine = ECFMG Certificate',
+      certificateValidity: 'Valid until December 31, 2028 (for 2026 pathways)',
+      revalidation: 'Same process applies for revalidation of expired pathways',
+      nextSteps: 'Enables USMLE Step 3 eligibility and NRMP Match participation',
+      matchStats: 'IMGs face ~58% match rate for non-U.S. citizens (NRMP data)'
+    },
+    expirationNote: 'ECFMG Certificate expires with the pathway (December 31, 2028 for 2026 applicants) unless made indefinite through revalidation',
+    keyCitations: [
+      { title: 'Requirements for 2026 Pathways for ECFMG Certification', url: 'https://www.ecfmg.org/certification-pathways/' },
+      { title: 'ECFMG 2026 Information Booklet', url: 'https://www.ecfmg.org' },
+      { title: 'Pathway 1 Official Page', url: 'https://www.ecfmg.org/certification-pathways/pathway-1.html' }
+    ]
   },
   {
     id: 2,
@@ -359,6 +402,100 @@ export default function PathwayBreakdown() {
                         <p className="text-xs text-rose-700 dark:text-rose-400">
                           {pathway.expirationNote}
                         </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Application Process (Pathway 1) */}
+                  {pathway.applicationProcess && (
+                    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+                      <h5 className="font-semibold text-indigo-800 dark:text-indigo-400 mb-3">
+                        Application Process & Timeline
+                      </h5>
+                      <div className="space-y-3">
+                        <div className="grid md:grid-cols-3 gap-2 text-xs">
+                          <div>
+                            <span className="font-medium text-indigo-700 dark:text-indigo-300">Portal:</span>
+                            <p className="text-indigo-600 dark:text-indigo-400">{pathway.applicationProcess.portal}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium text-indigo-700 dark:text-indigo-300">Deadline:</span>
+                            <p className="text-indigo-600 dark:text-indigo-400">{pathway.applicationProcess.deadline}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium text-indigo-700 dark:text-indigo-300">Processing:</span>
+                            <p className="text-indigo-600 dark:text-indigo-400">{pathway.applicationProcess.processingTime}</p>
+                          </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-800 rounded-lg p-3">
+                          <h6 className="font-medium text-xs text-slate-800 dark:text-white mb-2">Application Steps:</h6>
+                          <ol className="space-y-1">
+                            {pathway.applicationProcess.steps.map((step, idx) => (
+                              <li key={idx} className="text-xs text-slate-600 dark:text-slate-400 flex gap-2">
+                                <span className="font-bold text-indigo-600">{idx + 1}.</span>
+                                <span>{step}</span>
+                              </li>
+                            ))}
+                          </ol>
+                        </div>
+                        <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-2 border border-blue-300 dark:border-blue-700">
+                          <p className="text-xs text-blue-800 dark:text-blue-300">
+                            <strong>After Submission:</strong> {pathway.applicationProcess.postSubmission}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Integration & Timeline (Pathway 1) */}
+                  {pathway.integration && (
+                    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
+                      <h5 className="font-semibold text-green-800 dark:text-green-400 mb-3">
+                        Integration with ECFMG Certification
+                      </h5>
+                      <div className="space-y-2 text-xs">
+                        <div className="bg-white dark:bg-slate-800 rounded-lg p-2">
+                          <span className="font-medium text-green-700 dark:text-green-300">Complete Requirements:</span>
+                          <p className="text-green-600 dark:text-green-400 mt-1">{pathway.integration.ecfmgRequirements}</p>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-2">
+                          <div className="bg-white dark:bg-slate-800 rounded-lg p-2">
+                            <span className="font-medium text-green-700 dark:text-green-300">Certificate Validity:</span>
+                            <p className="text-green-600 dark:text-green-400 mt-1">{pathway.integration.certificateValidity}</p>
+                          </div>
+                          <div className="bg-white dark:bg-slate-800 rounded-lg p-2">
+                            <span className="font-medium text-green-700 dark:text-green-300">Next Steps:</span>
+                            <p className="text-green-600 dark:text-green-400 mt-1">{pathway.integration.nextSteps}</p>
+                          </div>
+                        </div>
+                        <div className="bg-yellow-100 dark:bg-yellow-900/30 rounded-lg p-2 border border-yellow-300 dark:border-yellow-700">
+                          <p className="text-yellow-800 dark:text-yellow-300">
+                            <strong>Match Stats:</strong> {pathway.integration.matchStats}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Key Citations (Pathway 1) */}
+                  {pathway.keyCitations && (
+                    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-700">
+                      <h5 className="font-semibold text-slate-800 dark:text-white mb-2 text-sm">
+                        Official Resources
+                      </h5>
+                      <div className="space-y-1.5">
+                        {pathway.keyCitations.map((citation, idx) => (
+                          <a
+                            key={idx}
+                            href={citation.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded-lg hover:shadow-md transition-shadow text-xs"
+                          >
+                            <span className="text-slate-700 dark:text-slate-300">{citation.title}</span>
+                            <ExternalLink className="w-3 h-3 text-slate-400" />
+                          </a>
+                        ))}
                       </div>
                     </div>
                   )}
