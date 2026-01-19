@@ -11,6 +11,8 @@ import BadgeIcon from '@/components/common/BadgeIcon';
 import StepCard from '@/components/common/StepCard';
 import ErrorState from '@/components/common/ErrorState';
 import LocationAwareTips from '@/components/location/LocationAwareTips';
+import QuickStartChecklist from '@/components/dashboard/QuickStartChecklist';
+import ResourceHub from '@/components/dashboard/ResourceHub';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { 
@@ -260,6 +262,12 @@ export default function Dashboard() {
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Get guidance</p>
           </motion.button>
         </div>
+
+        {/* Quick Start Checklist - Immediate Value */}
+        <QuickStartChecklist profile={profile} progressList={progressList} />
+
+        {/* Essential Resources - Vetted Links */}
+        <ResourceHub />
 
         {/* Upcoming Deadlines */}
         <Card className="p-4 rounded-2xl border-slate-200 dark:border-slate-700">
