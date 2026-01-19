@@ -17,6 +17,7 @@ import PathwayTimeline from '@/components/guides/PathwayTimeline';
 import OfficialReferences from '@/components/guides/OfficialReferences';
 import MatchProcessFlowchart from '@/components/guides/MatchProcessFlowchart';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
+import PathwayEligibilityChat from '@/components/ai/PathwayEligibilityChat';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
@@ -399,6 +400,9 @@ export default function GuideDetail() {
 
             {/* Match Process Flowchart */}
             <MatchProcessFlowchart />
+
+            {/* AI Pathway Assistant */}
+            <PathwayEligibilityChat userProfile={user} />
 
             {/* Eligibility Quiz */}
             <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">
