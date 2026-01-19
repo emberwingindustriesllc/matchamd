@@ -39,7 +39,7 @@ const pathways = [
       {
         method: 'Direct from Authority (Preferred)',
         pros: 'Fastest verification; preferred for accuracy',
-        cons: 'Relies on authority's responsiveness',
+        cons: "Relies on authority's responsiveness",
         deadline: 'January 31, 2026',
         details: 'Sent to licensure@ecfmg.org; must be issued within 90 days of receipt by ECFMG if post-submission, or 90 days of issuance if pre-submission'
       },
