@@ -3,9 +3,13 @@ import Stripe from 'npm:stripe@17.5.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
+// Create products & prices in Stripe Dashboard:
+// 1. Premium - $9.99/month - Recurring
+// 2. Pro - $19.99/month - Recurring
+// Then paste the price IDs here
 const priceIds = {
-  premium: 'price_premium', // Replace with your actual Stripe price IDs
-  pro: 'price_pro'
+  premium: Deno.env.get('STRIPE_PRICE_PREMIUM') || 'price_premium',
+  pro: Deno.env.get('STRIPE_PRICE_PRO') || 'price_pro'
 };
 
 Deno.serve(async (req) => {
