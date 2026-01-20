@@ -84,43 +84,55 @@ const residencySpecialties = [
 ];
 
 const pediatricFellowships = [
-  'Neonatal-Perinatal Medicine',
-  'Transplant Hepatology',
-  'Rheumatology',
-  'Pulmonology',
-  'Nephrology',
-  'Infectious Disease',
-  'Hospital Medicine',
-  'Hematology-Oncology',
-  'Gastroenterology',
-  'Endocrinology',
-  'Emergency Medicine',
-  'Sports Medicine',
-  'Neurology',
-  'Child and Adolescent Psychiatry',
   'Adolescent Medicine',
-  'Child Abuse Pediatrics',
-  'Developmental-Behavioral Pediatrics',
+  'Allergy and Immunology',
   'Cardiology',
-  'Critical Care Medicine'
+  'Child Abuse Pediatrics',
+  'Child and Adolescent Psychiatry',
+  'Critical Care Medicine',
+  'Developmental-Behavioral Pediatrics',
+  'Emergency Medicine',
+  'Endocrinology',
+  'Gastroenterology',
+  'Hematology-Oncology',
+  'Hospital Medicine',
+  'Infectious Disease',
+  'Neonatal-Perinatal Medicine',
+  'Nephrology',
+  'Neurology',
+  'Pulmonology',
+  'Rheumatology',
+  'Sports Medicine',
+  'Transplant Hepatology'
 ];
 
-const adultFellowships = [
+const internalMedicineFellowships = [
+  'Adolescent Medicine',
+  'Adult Congenital Heart Disease',
+  'Advanced Heart Failure and Transplant Cardiology',
   'Cardiovascular Disease',
-  'Gastroenterology',
-  'Pulmonary Disease',
-  'Endocrinology',
-  'Rheumatology',
-  'Infectious Disease',
-  'Hematology-Oncology',
-  'Nephrology',
-  'Geriatric Medicine',
-  'Sports Medicine',
-  'Hospice and Palliative Medicine',
-  'Sleep Medicine',
+  'Clinical Cardiac Electrophysiology',
   'Critical Care Medicine',
-  'Other'
+  'Endocrinology, Diabetes and Metabolism',
+  'Gastroenterology',
+  'Geriatric Medicine',
+  'Hematology',
+  'Hospice and Palliative Medicine',
+  'Infectious Disease',
+  'Interventional Cardiology',
+  'Medical Oncology',
+  'Nephrology',
+  'Neurocritical Care',
+  'Pulmonary Disease',
+  'Rheumatology',
+  'Sleep Medicine',
+  'Sports Medicine',
+  'Transplant Hepatology'
 ];
+
+const combinedMedPedsFellowships = [
+  ...new Set([...pediatricFellowships, ...internalMedicineFellowships])
+].sort();
 
 const usStates = [
   'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 
@@ -452,8 +464,9 @@ export default function Onboarding() {
                 <SelectValue placeholder="Select fellowship type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pediatric">Pediatric Fellowship</SelectItem>
-                <SelectItem value="adult">Adult Fellowship</SelectItem>
+                <SelectItem value="pediatrics">Pediatrics</SelectItem>
+                <SelectItem value="internal_medicine_pediatrics">Internal Medicine-Pediatrics</SelectItem>
+                <SelectItem value="internal_medicine">Internal Medicine</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -475,7 +488,7 @@ export default function Onboarding() {
           </div>
         )}
 
-        {profile.primary_goal === 'fellowship' && profile.fellowship_type === 'pediatric' && (
+        {profile.primary_goal === 'fellowship' && profile.fellowship_type === 'pediatrics' && (
           <div>
             <Label className="text-slate-700 dark:text-slate-300">Pediatric Subspecialty</Label>
             <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
@@ -491,15 +504,31 @@ export default function Onboarding() {
           </div>
         )}
 
-        {profile.primary_goal === 'fellowship' && profile.fellowship_type === 'adult' && (
+        {profile.primary_goal === 'fellowship' && profile.fellowship_type === 'internal_medicine' && (
           <div>
-            <Label className="text-slate-700 dark:text-slate-300">Adult Subspecialty</Label>
+            <Label className="text-slate-700 dark:text-slate-300">Internal Medicine Subspecialty</Label>
             <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
               <SelectTrigger className="h-12 rounded-xl mt-1">
                 <SelectValue placeholder="Select subspecialty" />
               </SelectTrigger>
               <SelectContent>
-                {adultFellowships.map(s => (
+                {internalMedicineFellowships.map(s => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {profile.primary_goal === 'fellowship' && profile.fellowship_type === 'internal_medicine_pediatrics' && (
+          <div>
+            <Label className="text-slate-700 dark:text-slate-300">Med-Peds Subspecialty</Label>
+            <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
+              <SelectTrigger className="h-12 rounded-xl mt-1">
+                <SelectValue placeholder="Select subspecialty" />
+              </SelectTrigger>
+              <SelectContent>
+                {combinedMedPedsFellowships.map(s => (
                   <SelectItem key={s} value={s}>{s}</SelectItem>
                 ))}
               </SelectContent>
