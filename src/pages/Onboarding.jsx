@@ -77,10 +77,49 @@ const goals = [
   }
 ];
 
-const specialties = [
+const residencySpecialties = [
   'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery', 
   'Emergency Medicine', 'Psychiatry', 'OB/GYN', 'Neurology',
   'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology', 'Other'
+];
+
+const pediatricFellowships = [
+  'Neonatal-Perinatal Medicine',
+  'Transplant Hepatology',
+  'Rheumatology',
+  'Pulmonology',
+  'Nephrology',
+  'Infectious Disease',
+  'Hospital Medicine',
+  'Hematology-Oncology',
+  'Gastroenterology',
+  'Endocrinology',
+  'Emergency Medicine',
+  'Sports Medicine',
+  'Neurology',
+  'Child and Adolescent Psychiatry',
+  'Adolescent Medicine',
+  'Child Abuse Pediatrics',
+  'Developmental-Behavioral Pediatrics',
+  'Cardiology',
+  'Critical Care Medicine'
+];
+
+const adultFellowships = [
+  'Cardiovascular Disease',
+  'Gastroenterology',
+  'Pulmonary Disease',
+  'Endocrinology',
+  'Rheumatology',
+  'Infectious Disease',
+  'Hematology-Oncology',
+  'Nephrology',
+  'Geriatric Medicine',
+  'Sports Medicine',
+  'Hospice and Palliative Medicine',
+  'Sleep Medicine',
+  'Critical Care Medicine',
+  'Other'
 ];
 
 const usStates = [
@@ -107,6 +146,7 @@ export default function Onboarding() {
     languages: ['en'],
     preferred_language: 'en',
     primary_goal: '',
+    fellowship_type: '',
     target_specialty: '',
     graduation_year: null,
     usmle_step1_status: 'not_started',
@@ -401,21 +441,75 @@ export default function Onboarding() {
       </p>
 
       <div className="space-y-4">
+        {profile.primary_goal === 'fellowship' && (
+          <div>
+            <Label className="text-slate-700 dark:text-slate-300">Fellowship Type</Label>
+            <Select value={profile.fellowship_type} onValueChange={(v) => {
+              updateProfile('fellowship_type', v);
+              updateProfile('target_specialty', ''); // Reset specialty when type changes
+            }}>
+              <SelectTrigger className="h-12 rounded-xl mt-1">
+                <SelectValue placeholder="Select fellowship type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pediatric">Pediatric Fellowship</SelectItem>
+                <SelectItem value="adult">Adult Fellowship</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {profile.primary_goal === 'residency' && (
+          <div>
+            <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.targetSpecialty')}</Label>
+            <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
+              <SelectTrigger className="h-12 rounded-xl mt-1">
+                <SelectValue placeholder={t('onboarding.selectSpecialty')} />
+              </SelectTrigger>
+              <SelectContent>
+                {residencySpecialties.map(s => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {profile.primary_goal === 'fellowship' && profile.fellowship_type === 'pediatric' && (
+          <div>
+            <Label className="text-slate-700 dark:text-slate-300">Pediatric Subspecialty</Label>
+            <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
+              <SelectTrigger className="h-12 rounded-xl mt-1">
+                <SelectValue placeholder="Select subspecialty" />
+              </SelectTrigger>
+              <SelectContent>
+                {pediatricFellowships.map(s => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {profile.primary_goal === 'fellowship' && profile.fellowship_type === 'adult' && (
+          <div>
+            <Label className="text-slate-700 dark:text-slate-300">Adult Subspecialty</Label>
+            <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
+              <SelectTrigger className="h-12 rounded-xl mt-1">
+                <SelectValue placeholder="Select subspecialty" />
+              </SelectTrigger>
+              <SelectContent>
+                {adultFellowships.map(s => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         {profile.primary_goal !== 'med_school' && (
           <>
             <div>
-              <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.targetSpecialty')}</Label>
-              <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
-                <SelectTrigger className="h-12 rounded-xl mt-1">
-                  <SelectValue placeholder={t('onboarding.selectSpecialty')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {specialties.map(s => (
-                    <SelectItem key={s} value={s}>{s}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
 
             <div>
               <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.targetCity')}</Label>

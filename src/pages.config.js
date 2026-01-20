@@ -4,15 +4,15 @@ import Dashboard from './pages/Dashboard';
 import Deadlines from './pages/Deadlines';
 import GuideDetail from './pages/GuideDetail';
 import Guides from './pages/Guides';
+import IMGPrograms from './pages/IMGPrograms';
 import Legal from './pages/Legal';
 import Mentors from './pages/Mentors';
 import Notifications from './pages/Notifications';
 import Onboarding from './pages/Onboarding';
 import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
-import Subscription from './pages/Subscription';
 import ResearchOpportunities from './pages/ResearchOpportunities';
-import IMGPrograms from './pages/IMGPrograms';
+import Subscription from './pages/Subscription';
 import __Layout from './Layout.jsx';
 
 
@@ -23,15 +23,15 @@ export const PAGES = {
     "Deadlines": Deadlines,
     "GuideDetail": GuideDetail,
     "Guides": Guides,
+    "IMGPrograms": IMGPrograms,
     "Legal": Legal,
     "Mentors": Mentors,
     "Notifications": Notifications,
     "Onboarding": Onboarding,
     "PostDetail": PostDetail,
     "Profile": Profile,
-    "Subscription": Subscription,
     "ResearchOpportunities": ResearchOpportunities,
-    "IMGPrograms": IMGPrograms,
+    "Subscription": Subscription,
 }
 
 export const pagesConfig = {
