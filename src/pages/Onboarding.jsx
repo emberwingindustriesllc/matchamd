@@ -510,8 +510,6 @@ export default function Onboarding() {
         {profile.primary_goal !== 'med_school' && (
           <>
             <div>
-
-            <div>
               <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.targetCity')}</Label>
               <Input
                 placeholder={t('onboarding.targetCityPlaceholder')}
