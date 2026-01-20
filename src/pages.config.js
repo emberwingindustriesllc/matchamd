@@ -13,6 +13,9 @@ import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
 import ResearchOpportunities from './pages/ResearchOpportunities';
 import Subscription from './pages/Subscription';
+import USMLEQuizPack from './pages/USMLEQuizPack';
+import SurgeryGuide from './pages/SurgeryGuide';
+import InterviewCourse from './pages/InterviewCourse';
 import __Layout from './Layout.jsx';
 
 
@@ -32,6 +35,9 @@ export const PAGES = {
     "Profile": Profile,
     "ResearchOpportunities": ResearchOpportunities,
     "Subscription": Subscription,
+    "USMLEQuizPack": USMLEQuizPack,
+    "SurgeryGuide": SurgeryGuide,
+    "InterviewCourse": InterviewCourse,
 }
 
 export const pagesConfig = {
