@@ -73,24 +73,24 @@ export default function Dashboard() {
 
   const { data: profiles, error: profileError } = useQuery({
     queryKey: ['userProfile'],
-    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
-    enabled: !!user?.id,
+    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.email }),
+    enabled: !!user?.email,
     retry: 2,
     staleTime: 5 * 60 * 1000
   });
 
   const { data: progressList = [] } = useQuery({
     queryKey: ['progress'],
-    queryFn: () => base44.entities.Progress.filter({ user_id: user?.id }),
-    enabled: !!user?.id,
+    queryFn: () => base44.entities.Progress.filter({ user_id: user?.email }),
+    enabled: !!user?.email,
     retry: 2,
     staleTime: 2 * 60 * 1000
   });
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['notifications'],
-    queryFn: () => base44.entities.Notification.filter({ user_id: user?.id, read: false }),
-    enabled: !!user?.id,
+    queryFn: () => base44.entities.Notification.filter({ user_id: user?.email, read: false }),
+    enabled: !!user?.email,
     retry: 1,
     staleTime: 1 * 60 * 1000
   });
