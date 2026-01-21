@@ -189,6 +189,8 @@ export default function Onboarding() {
     setIsSubmitting(true);
     try {
       const user = await base44.auth.me();
+      
+      // Create user profile
       await base44.entities.UserProfile.create({
         ...profile,
         user_id: user.id,
@@ -196,9 +198,20 @@ export default function Onboarding() {
         badges: [],
         points: 0
       });
+
+      // Create free subscription by default
+      await base44.entities.Subscription.create({
+        user_id: user.id,
+        plan: 'free',
+        status: 'active'
+      });
+
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
       console.error('Error creating profile:', error);
+      alert('Error creating profile. Please try again.');
+      setIsSubmitting(false);
+      return;
     }
     setIsSubmitting(false);
   };

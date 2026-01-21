@@ -5,6 +5,7 @@ import Deadlines from './pages/Deadlines';
 import GuideDetail from './pages/GuideDetail';
 import Guides from './pages/Guides';
 import IMGPrograms from './pages/IMGPrograms';
+import InterviewCourse from './pages/InterviewCourse';
 import Legal from './pages/Legal';
 import Mentors from './pages/Mentors';
 import Notifications from './pages/Notifications';
@@ -13,9 +14,8 @@ import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
 import ResearchOpportunities from './pages/ResearchOpportunities';
 import Subscription from './pages/Subscription';
-import USMLEQuizPack from './pages/USMLEQuizPack';
 import SurgeryGuide from './pages/SurgeryGuide';
-import InterviewCourse from './pages/InterviewCourse';
+import USMLEQuizPack from './pages/USMLEQuizPack';
 import __Layout from './Layout.jsx';
 
 
@@ -27,6 +27,7 @@ export const PAGES = {
     "GuideDetail": GuideDetail,
     "Guides": Guides,
     "IMGPrograms": IMGPrograms,
+    "InterviewCourse": InterviewCourse,
     "Legal": Legal,
     "Mentors": Mentors,
     "Notifications": Notifications,
@@ -35,9 +36,8 @@ export const PAGES = {
     "Profile": Profile,
     "ResearchOpportunities": ResearchOpportunities,
     "Subscription": Subscription,
-    "USMLEQuizPack": USMLEQuizPack,
     "SurgeryGuide": SurgeryGuide,
-    "InterviewCourse": InterviewCourse,
+    "USMLEQuizPack": USMLEQuizPack,
 }
 
 export const pagesConfig = {
