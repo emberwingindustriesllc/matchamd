@@ -190,6 +190,9 @@ export default function Onboarding() {
     try {
       const user = await base44.auth.me();
       
+      console.log('Creating profile for user:', user.id);
+      console.log('Profile data:', profile);
+      
       // Create user profile
       await base44.entities.UserProfile.create({
         ...profile,
@@ -199,6 +202,8 @@ export default function Onboarding() {
         points: 0
       });
 
+      console.log('Profile created, creating subscription');
+
       // Create free subscription by default
       await base44.entities.Subscription.create({
         user_id: user.id,
@@ -206,10 +211,13 @@ export default function Onboarding() {
         status: 'active'
       });
 
+      console.log('Subscription created, navigating to dashboard');
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
-      console.error('Error creating profile:', error);
-      alert('Error creating profile. Please try again.');
+      console.error('Full error details:', error);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      alert(`Error: ${error.message || 'Please try again'}`);
       setIsSubmitting(false);
       return;
     }
