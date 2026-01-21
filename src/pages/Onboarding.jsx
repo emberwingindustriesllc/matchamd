@@ -190,28 +190,34 @@ export default function Onboarding() {
     try {
       // Get current authenticated user
       const user = await base44.auth.me();
+      console.log('Authenticated user:', user);
       
+      if (!user || !user.email) {
+        throw new Error('User not authenticated');
+      }
+
       // Create user profile with required fields
       const profileData = {
         user_id: user.email,
         primary_goal: profile.primary_goal,
         display_name: profile.display_name || user.full_name,
-        country: profile.country,
-        target_city: profile.target_city,
-        target_state: profile.target_state,
-        medical_school: profile.medical_school,
-        medical_school_country: profile.medical_school_country,
-        undergraduate_college: profile.undergraduate_college,
-        languages: profile.languages || [],
+        country: profile.country || '',
+        target_city: profile.target_city || '',
+        target_state: profile.target_state || '',
+        medical_school: profile.medical_school || '',
+        medical_school_country: profile.medical_school_country || '',
+        undergraduate_college: profile.undergraduate_college || '',
+        languages: profile.languages || ['en'],
         preferred_language: profile.preferred_language || 'en',
-        fellowship_type: profile.fellowship_type,
-        target_specialty: profile.target_specialty,
-        graduation_year: profile.graduation_year,
+        fellowship_type: profile.fellowship_type || '',
+        target_specialty: profile.target_specialty || '',
+        graduation_year: profile.graduation_year || null,
         usmle_step1_status: profile.usmle_step1_status || 'not_started',
-        usmle_step1_score: profile.usmle_step1_score,
+        usmle_step1_score: profile.usmle_step1_score || '',
         usmle_step2_status: profile.usmle_step2_status || 'not_started',
-        usmle_step2_score: profile.usmle_step2_score,
+        usmle_step2_score: profile.usmle_step2_score || '',
         usmle_step3_status: profile.usmle_step3_status || 'not_started',
+        usmle_step3_result: profile.usmle_step3_result || 'not_applicable',
         ecfmg_certified: profile.ecfmg_certified || false,
         visa_status: profile.visa_status || 'none',
         us_clinical_experience: profile.us_clinical_experience || false,
@@ -222,18 +228,28 @@ export default function Onboarding() {
         points: 0
       };
 
-      await base44.entities.UserProfile.create(profileData);
+      console.log('Creating profile:', profileData);
+      const createdProfile = await base44.entities.UserProfile.create(profileData);
+      console.log('Profile created:', createdProfile);
 
       // Create free subscription
-      await base44.entities.Subscription.create({
+      console.log('Creating subscription...');
+      const subscription = await base44.entities.Subscription.create({
         user_id: user.email,
         plan: 'free',
         status: 'active'
       });
+      console.log('Subscription created:', subscription);
 
+      console.log('Navigating to dashboard...');
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
       console.error('Onboarding error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response
+      });
       alert(`Setup failed: ${error.message || 'Please try again'}`);
     }
     setIsSubmitting(false);
