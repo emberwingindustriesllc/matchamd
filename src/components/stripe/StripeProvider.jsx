@@ -1,8 +1,7 @@
 import React from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 
-// Stripe publishable key - must be set in Stripe dashboard settings
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Sq3vGAgk0bRnEn1LZ7TSINlIEzyv64d8guOpuQiJRvyMmJrMRiteLqzaOK69q2NbHRBHPTyRciMCvmUiXZlYKrG007lPWf5IG';
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
 let stripePromise;
 const getStripe = () => {
