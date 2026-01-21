@@ -147,7 +147,6 @@ export default function Onboarding() {
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [profile, setProfile] = useState({
     display_name: '',
     country: '',
@@ -172,23 +171,6 @@ export default function Onboarding() {
     visa_status: 'none',
     us_clinical_experience: false
   });
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const isAuth = await base44.auth.isAuthenticated();
-        if (!isAuth) {
-          base44.auth.redirectToLogin(window.location.pathname);
-          return;
-        }
-        setIsCheckingAuth(false);
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        base44.auth.redirectToLogin(window.location.pathname);
-      }
-    };
-    checkAuth();
-  }, []);
 
   const updateProfile = (field, value) => {
     setProfile(prev => ({ ...prev, [field]: value }));
@@ -750,14 +732,6 @@ export default function Onboarding() {
       default: return false;
     }
   };
-
-  if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 flex flex-col">
