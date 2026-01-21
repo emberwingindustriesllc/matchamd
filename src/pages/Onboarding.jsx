@@ -188,38 +188,53 @@ export default function Onboarding() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
+      // Get current authenticated user
       const user = await base44.auth.me();
       
-      console.log('Creating profile for user:', user.id);
-      console.log('Profile data:', profile);
-      
-      // Create user profile
-      await base44.entities.UserProfile.create({
-        ...profile,
-        user_id: user.id,
+      // Create user profile with required fields
+      const profileData = {
+        user_id: user.email,
+        primary_goal: profile.primary_goal,
+        display_name: profile.display_name || user.full_name,
+        country: profile.country,
+        target_city: profile.target_city,
+        target_state: profile.target_state,
+        medical_school: profile.medical_school,
+        medical_school_country: profile.medical_school_country,
+        undergraduate_college: profile.undergraduate_college,
+        languages: profile.languages || [],
+        preferred_language: profile.preferred_language || 'en',
+        fellowship_type: profile.fellowship_type,
+        target_specialty: profile.target_specialty,
+        graduation_year: profile.graduation_year,
+        usmle_step1_status: profile.usmle_step1_status || 'not_started',
+        usmle_step1_score: profile.usmle_step1_score,
+        usmle_step2_status: profile.usmle_step2_status || 'not_started',
+        usmle_step2_score: profile.usmle_step2_score,
+        usmle_step3_status: profile.usmle_step3_status || 'not_started',
+        ecfmg_certified: profile.ecfmg_certified || false,
+        visa_status: profile.visa_status || 'none',
+        us_clinical_experience: profile.us_clinical_experience || false,
         onboarding_complete: true,
+        is_mentor: false,
+        mentor_verified: false,
         badges: [],
         points: 0
-      });
+      };
 
-      console.log('Profile created, creating subscription');
+      await base44.entities.UserProfile.create(profileData);
 
-      // Create free subscription by default
+      // Create free subscription
       await base44.entities.Subscription.create({
-        user_id: user.id,
+        user_id: user.email,
         plan: 'free',
         status: 'active'
       });
 
-      console.log('Subscription created, navigating to dashboard');
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
-      console.error('Full error details:', error);
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-      alert(`Error: ${error.message || 'Please try again'}`);
-      setIsSubmitting(false);
-      return;
+      console.error('Onboarding error:', error);
+      alert(`Setup failed: ${error.message || 'Please try again'}`);
     }
     setIsSubmitting(false);
   };
