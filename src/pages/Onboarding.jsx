@@ -192,7 +192,7 @@ export default function Onboarding() {
       const user = await base44.auth.me();
       console.log('Authenticated user:', user);
       
-      if (!user || !user.email) {
+      if (!user || !user.id) {
         throw new Error('User not authenticated');
       }
 
