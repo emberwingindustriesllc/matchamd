@@ -9,10 +9,10 @@ import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Check, 
-  Crown, 
-  Zap, 
+import {
+  Check,
+  Crown,
+  Zap,
   Star,
   Sparkles,
   Trophy,
@@ -141,8 +141,7 @@ export default function Subscription() {
       }
 
       const { data } = await base44.functions.invoke('stripeCheckout', { planId });
-      const stripe = await getStripe();
-      if (stripe && data.url) {
+      if (data.url) {
         window.location.href = data.url;
       }
     }
@@ -154,8 +153,7 @@ export default function Subscription() {
         addOnId: addOn.id,
         addOnName: addOn.name
       });
-      const stripe = await getStripe();
-      if (stripe && data.url) {
+      if (data.url) {
         window.location.href = data.url;
       }
     }
@@ -211,7 +209,7 @@ export default function Subscription() {
                 {currentSubscription.status === 'active' ? 'Active' : currentSubscription.status}
               </Badge>
             </div>
-            <Button 
+            <Button
               variant="outline"
               onClick={() => manageSubscriptionMutation.mutate()}
               disabled={manageSubscriptionMutation.isPending}
@@ -237,7 +235,7 @@ export default function Subscription() {
             {plans.map((plan) => {
               const Icon = plan.icon;
               const isCurrentPlan = currentSubscription?.plan === plan.id;
-              
+
               return (
                 <motion.div
                   key={plan.id}
@@ -252,27 +250,27 @@ export default function Subscription() {
                       </Badge>
                     </div>
                   )}
-                  
+
                   <Card className={`p-6 h-full ${plan.popular ? 'border-2 border-indigo-500 dark:border-indigo-400' : ''}`}>
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${plan.color} flex items-center justify-center mb-4`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
-                    
+
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
                       {plan.name}
                     </h3>
-                    
+
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
                       {plan.description}
                     </p>
-                    
+
                     <div className="mb-6">
                       <span className="text-3xl font-bold text-slate-900 dark:text-white">
                         ${plan.price}
                       </span>
                       <span className="text-slate-500 dark:text-slate-400">/month</span>
                     </div>
-                    
+
                     <ul className="space-y-3 mb-6">
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm">
@@ -281,7 +279,7 @@ export default function Subscription() {
                         </li>
                       ))}
                     </ul>
-                    
+
                     <Button
                       onClick={() => upgradeMutation.mutate(plan.id)}
                       disabled={isCurrentPlan}
@@ -306,12 +304,12 @@ export default function Subscription() {
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Premium Add-ons</h2>
           <p className="text-slate-600 dark:text-slate-400 mb-6">One-time purchases to enhance your journey</p>
-          
+
           <div className="grid md:grid-cols-3 gap-4">
             {addOns.map((addOn) => {
               const Icon = addOn.icon;
               const purchased = hasPurchased(addOn.id);
-              
+
               return (
                 <Card key={addOn.id} className="p-5">
                   <div className="flex items-center gap-3 mb-3">
@@ -325,11 +323,11 @@ export default function Subscription() {
                       <p className="text-xs text-slate-500">${addOn.price}</p>
                     </div>
                   </div>
-                  
+
                   <p className="text-xs text-slate-600 dark:text-slate-400 mb-4">
                     {addOn.description}
                   </p>
-                  
+
                   <Button
                     onClick={() => purchaseAddOnMutation.mutate(addOn)}
                     disabled={purchased}

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
+import {
   Video,
   CheckCircle2,
   PlayCircle,
@@ -82,18 +82,28 @@ export default function InterviewCourse() {
     queryFn: () => base44.auth.me()
   });
 
+  const { data: subscriptions } = useQuery({
+    queryKey: ['subscription', user?.id],
+    queryFn: () => base44.entities.Subscription.filter({ user_id: user?.id }),
+    enabled: !!user?.id
+  });
+
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', user?.id],
     queryFn: () => base44.entities.PurchasedContent.filter({ user_id: user?.id }),
     enabled: !!user?.id
   });
 
+  const currentSubscription = subscriptions?.[0];
+  const isSubscriber = currentSubscription?.status === 'active' &&
+    (currentSubscription?.plan === 'premium' || currentSubscription?.plan === 'pro');
+
   const hasPurchased = purchases.some(p => p.content_id === 'interview_premium');
 
   const totalLessons = courseModules.reduce((acc, module) => acc + module.lessons.length, 0);
   const completedLessons = 0; // Will track progress later
 
-  if (!hasPurchased) {
+  if (!hasPurchased && !isSubscriber) {
     return (
       <PremiumGate
         title="Interview Mastery Course"

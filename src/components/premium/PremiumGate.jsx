@@ -20,8 +20,7 @@ export default function PremiumGate({ title, description, price, features, conte
         addOnId: contentId,
         addOnName: title
       });
-      const stripe = await getStripe();
-      if (stripe && data.url) {
+      if (data.url) {
         window.location.href = data.url;
       }
     }

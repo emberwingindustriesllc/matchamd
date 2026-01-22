@@ -5,19 +5,19 @@ import { useTranslation } from '@/components/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  GraduationCap, 
-  Stethoscope, 
-  BookOpen, 
-  ChevronRight, 
+import {
+  GraduationCap,
+  Stethoscope,
+  BookOpen,
+  ChevronRight,
   ChevronLeft,
   Globe,
   Languages,
@@ -28,7 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
 const countries = [
-  'India', 'Pakistan', 'Nigeria', 'Philippines', 'Egypt', 'Mexico', 'Brazil', 
+  'India', 'Pakistan', 'Nigeria', 'Philippines', 'Egypt', 'Mexico', 'Brazil',
   'Colombia', 'China', 'Bangladesh', 'Iran', 'Iraq', 'Syria', 'Lebanon',
   'Jordan', 'Saudi Arabia', 'UAE', 'United Kingdom', 'Canada', 'Other'
 ];
@@ -54,23 +54,23 @@ const languages = [
 ];
 
 const goals = [
-  { 
-    id: 'residency', 
-    icon: Stethoscope, 
+  {
+    id: 'residency',
+    icon: Stethoscope,
     title: 'Residency',
     description: 'Apply for US medical residency programs',
     color: 'from-indigo-500 to-purple-500'
   },
-  { 
-    id: 'fellowship', 
-    icon: GraduationCap, 
+  {
+    id: 'fellowship',
+    icon: GraduationCap,
     title: 'Fellowship',
     description: 'Pursue subspecialty training',
     color: 'from-emerald-500 to-teal-500'
   },
-  { 
-    id: 'med_school', 
-    icon: BookOpen, 
+  {
+    id: 'med_school',
+    icon: BookOpen,
     title: 'Med School',
     description: 'Apply to US medical schools',
     color: 'from-amber-500 to-orange-500'
@@ -78,7 +78,7 @@ const goals = [
 ];
 
 const residencySpecialties = [
-  'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery', 
+  'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery',
   'Emergency Medicine', 'Psychiatry', 'OB/GYN', 'Neurology',
   'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology', 'Other'
 ];
@@ -135,10 +135,10 @@ const combinedMedPedsFellowships = [
 ].sort();
 
 const usStates = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 
-  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 
-  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 
-  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
   'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
 ];
 
@@ -191,7 +191,7 @@ export default function Onboarding() {
       // Get current authenticated user
       const user = await base44.auth.me();
       console.log('Authenticated user:', user);
-      
+
       if (!user || !user.email) {
         throw new Error('User not authenticated');
       }
@@ -233,7 +233,7 @@ export default function Onboarding() {
       console.log('Profile created:', createdProfile);
 
       // Create free subscription
-      console.log('Creating subscription...');
+      console.log('Creating subscription for user ID:', user.id);
       const subscription = await base44.entities.Subscription.create({
         user_id: user.id,
         plan: 'free',
@@ -241,18 +241,15 @@ export default function Onboarding() {
       });
       console.log('Subscription created:', subscription);
 
-      console.log('Navigating to dashboard...');
+      console.log('Onboarding complete. Navigating to dashboard...');
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
-      console.error('Onboarding error:', error);
-      console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        response: error.response
-      });
-      alert(`Setup failed: ${error.message || 'Please try again'}`);
+      console.error('Onboarding SUBMIT error:', error);
+      console.error('Error stack:', error.stack);
+      alert('Failed to complete onboarding: ' + error.message);
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   const steps = [
@@ -273,7 +270,7 @@ export default function Onboarding() {
       <p className="text-slate-600 dark:text-slate-400 mb-4 max-w-sm mx-auto">
         {t('onboarding.subtitle')}
       </p>
-      
+
       {/* Immediate Value Preview */}
       <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-2xl p-4 mb-6 border border-indigo-200 dark:border-indigo-800 space-y-2 text-left max-w-md mx-auto">
         <h3 className="font-semibold text-slate-900 dark:text-white text-sm">What You'll Get:</h3>
@@ -300,7 +297,7 @@ export default function Onboarding() {
           </li>
         </ul>
       </div>
-      
+
       <div className="space-y-3 mb-8">
         <Input
           placeholder={t('onboarding.yourName')}
@@ -420,11 +417,10 @@ export default function Onboarding() {
           <button
             key={lang.code}
             onClick={() => toggleLanguage(lang.code)}
-            className={`p-4 rounded-xl border-2 transition-all ${
-              profile.languages.includes(lang.code)
-                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
-                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
-            }`}
+            className={`p-4 rounded-xl border-2 transition-all ${profile.languages.includes(lang.code)
+              ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
+              : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+              }`}
           >
             <span className="font-medium text-slate-800 dark:text-white">{lang.name}</span>
           </button>
@@ -469,11 +465,10 @@ export default function Onboarding() {
           <button
             key={goal.id}
             onClick={() => updateProfile('primary_goal', goal.id)}
-            className={`w-full p-5 rounded-2xl border-2 text-left transition-all ${
-              profile.primary_goal === goal.id
-                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
-                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
-            }`}
+            className={`w-full p-5 rounded-2xl border-2 text-left transition-all ${profile.primary_goal === goal.id
+              ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
+              : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+              }`}
           >
             <div className="flex items-center gap-4">
               <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${goal.color} flex items-center justify-center`}>
@@ -723,7 +718,7 @@ export default function Onboarding() {
   ];
 
   const canProceed = () => {
-    switch(step) {
+    switch (step) {
       case 0: return profile.display_name.length > 0;
       case 1: return profile.country && profile.medical_school_country && profile.medical_school;
       case 2: return profile.languages.length > 0;
@@ -741,11 +736,10 @@ export default function Onboarding() {
           {steps.map((_, idx) => (
             <div key={idx} className="flex items-center flex-1">
               <motion.div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
-                  idx <= step
-                    ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg'
-                    : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
-                }`}
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${idx <= step
+                  ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg'
+                  : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                  }`}
                 initial={{ scale: 0.8 }}
                 animate={{ scale: idx === step ? 1.1 : 1 }}
                 transition={{ duration: 0.3 }}
@@ -753,9 +747,8 @@ export default function Onboarding() {
                 {idx + 1}
               </motion.div>
               {idx < steps.length - 1 && (
-                <div className={`flex-1 h-1 mx-2 rounded-full transition-all ${
-                  idx < step ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : 'bg-slate-200 dark:bg-slate-700'
-                }`} />
+                <div className={`flex-1 h-1 mx-2 rounded-full transition-all ${idx < step ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : 'bg-slate-200 dark:bg-slate-700'
+                  }`} />
               )}
             </div>
           ))}
@@ -788,7 +781,7 @@ export default function Onboarding() {
             <ChevronLeft className="w-5 h-5" />
           </Button>
         )}
-        
+
         <Button
           onClick={() => step === steps.length - 1 ? handleSubmit() : setStep(step + 1)}
           disabled={!canProceed() || isSubmitting}
