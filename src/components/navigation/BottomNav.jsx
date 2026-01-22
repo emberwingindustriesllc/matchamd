@@ -4,7 +4,7 @@ import { Home, BookOpen, Users, User, Bell } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { useTranslation } from '@/components/i18n/LanguageContext';
+import { useTranslation } from '@/components/ui/LanguageProvider';
 
 const navItemsConfig = [
   { icon: Home, key: 'home', page: 'Dashboard' },

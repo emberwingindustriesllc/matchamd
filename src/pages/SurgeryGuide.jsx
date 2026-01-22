@@ -6,7 +6,7 @@ import BottomNav from '@/components/navigation/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import {
+import { 
   Scissors,
   Users,
   TrendingUp,
@@ -194,25 +194,15 @@ export default function SurgeryGuide() {
     queryFn: () => base44.auth.me()
   });
 
-  const { data: subscriptions } = useQuery({
-    queryKey: ['subscription', user?.id],
-    queryFn: () => base44.entities.Subscription.filter({ user_id: user?.id }),
-    enabled: !!user?.id
-  });
-
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', user?.id],
     queryFn: () => base44.entities.PurchasedContent.filter({ user_id: user?.id }),
     enabled: !!user?.id
   });
 
-  const currentSubscription = subscriptions?.[0];
-  const isSubscriber = currentSubscription?.status === 'active' &&
-    (currentSubscription?.plan === 'premium' || currentSubscription?.plan === 'pro');
-
   const hasPurchased = purchases.some(p => p.content_id === 'specialty_surgery');
 
-  if (!hasPurchased && !isSubscriber) {
+  if (!hasPurchased) {
     return (
       <PremiumGate
         title="Surgery Specialty Guide"
