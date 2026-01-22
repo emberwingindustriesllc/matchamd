@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { WifiOff, Wifi } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from '@/components/ui/LanguageProvider';
 
 export default function OfflineIndicator() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showNotification, setShowNotification] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handleOnline = () => {
@@ -37,10 +39,11 @@ export default function OfflineIndicator() {
           className="fixed top-20 left-1/2 -translate-x-1/2 z-50"
         >
           <div
-            className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-lg ${isOnline
-              ? 'bg-green-500 text-white'
-              : 'bg-red-500 text-white'
-              }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-lg ${
+              isOnline
+                ? 'bg-green-500 text-white'
+                : 'bg-red-500 text-white'
+            }`}
           >
             {isOnline ? (
               <>

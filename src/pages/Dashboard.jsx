@@ -17,11 +17,11 @@ import PathwayEligibilityChat from '@/components/ai/PathwayEligibilityChat';
 import PremiumFeatureCard from '@/components/premium/PremiumFeatureCard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import {
-  Bell,
-  ChevronRight,
-  Calendar,
-  Trophy,
+import { 
+  Bell, 
+  ChevronRight, 
+  Calendar, 
+  Trophy, 
   Flame,
   Sparkles,
   Users,
@@ -65,7 +65,7 @@ const getPathwaySteps = (primaryGoal) => {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-
+  
   const { data: user } = useQuery({
     queryKey: ['user'],
     queryFn: () => base44.auth.me()
@@ -73,24 +73,24 @@ export default function Dashboard() {
 
   const { data: profiles, error: profileError } = useQuery({
     queryKey: ['userProfile'],
-    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
-    enabled: !!user?.id,
+    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.email }),
+    enabled: !!user?.email,
     retry: 2,
     staleTime: 5 * 60 * 1000
   });
 
   const { data: progressList = [] } = useQuery({
     queryKey: ['progress'],
-    queryFn: () => base44.entities.Progress.filter({ user_id: user?.id }),
-    enabled: !!user?.id,
+    queryFn: () => base44.entities.Progress.filter({ user_id: user?.email }),
+    enabled: !!user?.email,
     retry: 2,
     staleTime: 2 * 60 * 1000
   });
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['notifications'],
-    queryFn: () => base44.entities.Notification.filter({ user_id: user?.id, read: false }),
-    enabled: !!user?.id,
+    queryFn: () => base44.entities.Notification.filter({ user_id: user?.email, read: false }),
+    enabled: !!user?.email,
     retry: 1,
     staleTime: 1 * 60 * 1000
   });
@@ -121,7 +121,7 @@ export default function Dashboard() {
       return (
         <>
           <Header title="FMG Pathway" />
-          <ErrorState
+          <ErrorState 
             title="Unable to Load Profile"
             message="We couldn't load your profile. Please check your connection and try again."
             onRetry={() => window.location.reload()}
@@ -149,8 +149,8 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
-      <Header
-        title="FMG Pathway"
+      <Header 
+        title="FMG Pathway" 
         rightContent={
           <Button
             variant="ghost"
@@ -175,7 +175,7 @@ export default function Dashboard() {
         >
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
-
+          
           <div className="relative">
             <div className="flex items-start justify-between mb-4">
               <div>
@@ -184,7 +184,7 @@ export default function Dashboard() {
               </div>
               <ProgressRing progress={overallProgress} size={80} strokeWidth={6} />
             </div>
-
+            
             <div className="flex items-center gap-4 mt-4">
               <div className="flex items-center gap-2 bg-white/20 rounded-full px-3 py-1.5">
                 <Trophy className="w-4 h-4" />
