@@ -198,7 +198,7 @@ export default function Onboarding() {
 
       // Create user profile with required fields
       const profileData = {
-        user_id: user.email,
+        user_id: user.id,
         primary_goal: profile.primary_goal,
         display_name: profile.display_name || user.full_name,
         country: profile.country || '',
@@ -235,7 +235,7 @@ export default function Onboarding() {
       // Create free subscription
       console.log('Creating subscription...');
       const subscription = await base44.entities.Subscription.create({
-        user_id: user.email,
+        user_id: user.id,
         plan: 'free',
         status: 'active'
       });
