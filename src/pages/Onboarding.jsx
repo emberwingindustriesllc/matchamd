@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useTranslation } from '@/components/i18n/LanguageContext';
@@ -172,6 +172,16 @@ export default function Onboarding() {
     us_clinical_experience: false
   });
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const isAuth = await base44.auth.isAuthenticated();
+      if (!isAuth) {
+        base44.auth.redirectToLogin(window.location.href);
+      }
+    };
+    checkAuth();
+  }, []);
+
   const updateProfile = (field, value) => {
     setProfile(prev => ({ ...prev, [field]: value }));
   };
@@ -188,15 +198,18 @@ export default function Onboarding() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      // Get current authenticated user
-      const user = await base44.auth.me();
-      console.log('Authenticated user:', user);
-      
-      if (!user || !user.id) {
-        throw new Error('User not authenticated');
+      const isAuth = await base44.auth.isAuthenticated();
+      if (!isAuth) {
+        base44.auth.redirectToLogin(window.location.href);
+        return;
       }
 
-      // Create user profile with required fields
+      const user = await base44.auth.me();
+      
+      if (!user || !user.id) {
+        throw new Error('Unable to get user information. Please try logging in again.');
+      }
+
       const profileData = {
         user_id: user.id,
         primary_goal: profile.primary_goal,
@@ -228,22 +241,19 @@ export default function Onboarding() {
         points: 0
       };
 
-      console.log('Creating profile:', profileData);
-      const createdProfile = await base44.entities.UserProfile.create(profileData);
-      console.log('Profile created:', createdProfile);
-
-      console.log('Navigating to dashboard...');
+      await base44.entities.UserProfile.create(profileData);
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
       console.error('Onboarding error:', error);
-      console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        response: error.response
-      });
-      alert(`Setup failed: ${error.message || 'Please try again'}`);
+      if (error.message?.includes('Authentication') || error.status === 401) {
+        alert('Your session has expired. Please log in again.');
+        base44.auth.redirectToLogin(window.location.href);
+      } else {
+        alert(`Setup failed: ${error.message || 'Please try again'}`);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   const steps = [
@@ -275,7 +285,7 @@ export default function Onboarding() {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
-            <span>USMLE prep roadmap with score targets (\u2265240 Step 2)</span>
+            <span>USMLE prep roadmap with score targets (≥240 Step 2)</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
@@ -339,7 +349,7 @@ export default function Onboarding() {
           <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.medSchoolCountry')}</Label>
           <Select value={profile.medical_school_country} onValueChange={(v) => {
             updateProfile('medical_school_country', v);
-            updateProfile('medical_school', ''); // Reset medical school when country changes
+            updateProfile('medical_school', '');
           }}>
             <SelectTrigger className="h-12 rounded-xl mt-1">
               <SelectValue placeholder={t('onboarding.whereStudied')} />
@@ -501,7 +511,7 @@ export default function Onboarding() {
             <Label className="text-slate-700 dark:text-slate-300">Fellowship Type</Label>
             <Select value={profile.fellowship_type} onValueChange={(v) => {
               updateProfile('fellowship_type', v);
-              updateProfile('target_specialty', ''); // Reset specialty when type changes
+              updateProfile('target_specialty', '');
             }}>
               <SelectTrigger className="h-12 rounded-xl mt-1">
                 <SelectValue placeholder="Select fellowship type" />
@@ -726,7 +736,6 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 flex flex-col">
-      {/* Progress bar with step indicators */}
       <div className="px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           {steps.map((_, idx) => (
@@ -761,14 +770,12 @@ export default function Onboarding() {
         </motion.p>
       </div>
 
-      {/* Content */}
       <div className="flex-1 flex flex-col justify-center py-8">
         <AnimatePresence mode="wait">
           {steps[step]}
         </AnimatePresence>
       </div>
 
-      {/* Navigation */}
       <div className="p-6 flex gap-3">
         {step > 0 && (
           <Button
