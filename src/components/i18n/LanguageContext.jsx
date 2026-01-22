@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { translations } from './translations';
+import { useLocation } from 'react-router-dom';
 
 const LanguageContext = createContext({ 
   t: (key) => key, 
@@ -12,6 +13,8 @@ const LanguageContext = createContext({
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState('en');
   const [isRTL, setIsRTL] = useState(false);
+  const location = useLocation();
+  const isOnboarding = location.pathname.includes('Onboarding');
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -20,9 +23,10 @@ export function LanguageProvider({ children }) {
   });
 
   const { data: profiles } = useQuery({
-    queryKey: ['userProfile'],
+    queryKey: ['userProfile', user?.id],
     queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
-    enabled: !!user?.id
+    enabled: !!user?.id && !isOnboarding,
+    staleTime: 5 * 60 * 1000
   });
 
   const profile = profiles?.[0];
