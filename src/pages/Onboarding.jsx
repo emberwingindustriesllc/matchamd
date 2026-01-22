@@ -232,15 +232,6 @@ export default function Onboarding() {
       const createdProfile = await base44.entities.UserProfile.create(profileData);
       console.log('Profile created:', createdProfile);
 
-      // Create free subscription
-      console.log('Creating subscription...');
-      const subscription = await base44.entities.Subscription.create({
-        user_id: user.id,
-        plan: 'free',
-        status: 'active'
-      });
-      console.log('Subscription created:', subscription);
-
       console.log('Navigating to dashboard...');
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
