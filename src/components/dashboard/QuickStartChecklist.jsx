@@ -46,7 +46,7 @@ export default function QuickStartChecklist({ profile, progressList }) {
     },
     {
       id: 'join_community',
-      title: 'Connect with FMG Community',
+      title: 'Connect with IMG Community',
       description: 'Get advice from 16,000+ IMG applicants',
       link: createPageUrl('Community'),
       external: false,
@@ -68,16 +68,16 @@ export default function QuickStartChecklist({ profile, progressList }) {
   };
 
   return (
-    <Card className="border-indigo-200 dark:border-indigo-800">
+    <Card className="border-[rgb(var(--color-primary),0.2)] dark:border-[rgb(var(--color-primary),0.4)]">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Quick Start Checklist</CardTitle>
-          <Badge variant="secondary" className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
+          <Badge variant="secondary" className="bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))] dark:bg-[rgba(var(--color-primary),0.2)] dark:text-emerald-400">
             {completedCount}/{quickStartItems.length}
           </Badge>
         </div>
         <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-          Essential first steps for FMG Match success
+          Essential first steps for US medical match success
         </p>
       </CardHeader>
       <CardContent className="space-y-2">

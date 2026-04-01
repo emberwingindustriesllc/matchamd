@@ -1,5 +1,5 @@
 {
-  "name": "base44-app",
+  "name": "matchamd",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -79,6 +79,9 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.3.0",
+    "@capacitor/core": "^8.3.0",
+    "@capacitor/ios": "^8.3.0",
     "@eslint/js": "^9.19.0",
     "@types/node": "^22.13.5",
     "@types/react": "^18.2.66",

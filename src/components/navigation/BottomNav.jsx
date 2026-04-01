@@ -34,14 +34,14 @@ export default function BottomNav() {
               className={cn(
                 'relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-colors',
                 isActive 
-                  ? 'text-indigo-600 dark:text-indigo-400' 
+                  ? 'text-[rgb(var(--color-primary))]' 
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
               )}
             >
               {isActive && (
                 <motion.div
                   layoutId="navIndicator"
-                  className="absolute inset-0 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl"
+                  className="absolute inset-0 bg-[rgba(var(--color-primary),0.1)] dark:bg-[rgba(var(--color-primary),0.2)] rounded-2xl"
                   transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                 />
               )}

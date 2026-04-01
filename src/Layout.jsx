@@ -27,8 +27,9 @@ export default function Layout({ children, currentPageName }) {
             <DisclaimerBanner />
           <style>{`
           :root {
-            --color-primary: 99 102 241;
-            --color-secondary: 139 92 246;
+            --color-primary: 103 45% 21%; /* Deep Matcha */
+            --color-secondary: 79 47% 51%; /* Logo Green */
+            --color-accent: 180 36% 74%; /* Mint MD+ */
           }
           
           .dark {
@@ -36,9 +37,13 @@ export default function Layout({ children, currentPageName }) {
           }
           
           body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+          }
+          
+          .safe-area-top {
+            padding-top: env(safe-area-inset-top, 0);
           }
           
           .safe-area-bottom {
@@ -66,7 +71,7 @@ export default function Layout({ children, currentPageName }) {
           
           /* Gradient text */
           .gradient-text {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            background: linear-gradient(135deg, hsl(103 45% 21%) 0%, hsl(79 47% 51%) 50%, hsl(180 36% 74%) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -74,9 +79,9 @@ export default function Layout({ children, currentPageName }) {
           
           /* Glass effect */
           .glass {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(var(--color-secondary), 0.1);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(var(--color-primary), 0.2);
           }
           
           /* Smooth page transitions */
@@ -89,8 +94,7 @@ export default function Layout({ children, currentPageName }) {
             to { opacity: 1; transform: translateY(0); }
           }
         `}</style>
-
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white transition-colors duration-300">
+        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
           {children}
         </div>
         </ErrorBoundary>

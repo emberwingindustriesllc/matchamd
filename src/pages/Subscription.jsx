@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import logo from '@/assets/logo.png';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { getStripe } from '@/components/stripe/StripeProvider';
+import { purchaseManager } from '@/lib/purchaseManager';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -43,12 +44,12 @@ const plans = [
   },
   {
     id: 'premium',
-    name: 'Premium',
+    name: 'MatchaMD+',
     price: 9.99,
-    icon: Crown,
-    color: 'from-indigo-500 to-purple-500',
+    icon: logo ? (({ className }) => <img src={logo} className={className} alt="MatchaMD+" />) : Crown,
+    color: 'from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))]',
     popular: true,
-    description: 'Perfect for serious applicants',
+    description: 'The ultimate USMLE & Match companion',
     features: [
       'Everything in Free, plus:',
       'Unlimited mentor connection requests',
@@ -128,7 +129,8 @@ export default function Subscription() {
 
   const currentSubscription = subscriptions?.[0];
 
-  const upgradeMutation = useMutation({
+  const purchaseMutation = useMutation({
+    /** @param {string} planId */
     mutationFn: async (planId) => {
       if (planId === 'free') {
         if (currentSubscription) {
@@ -139,42 +141,33 @@ export default function Subscription() {
         }
         return;
       }
-
-      const { data } = await base44.functions.invoke('stripeCheckout', { planId });
-      const stripe = await getStripe();
-      if (stripe && data.url) {
-        window.location.href = data.url;
-      }
+      
+      await purchaseManager.purchasePlan(planId);
     }
   });
 
   const purchaseAddOnMutation = useMutation({
+    /** @param {{id: string, name: string}} addOn */
     mutationFn: async (addOn) => {
-      const { data } = await base44.functions.invoke('stripeOneTimeCheckout', {
-        addOnId: addOn.id,
-        addOnName: addOn.name
-      });
-      const stripe = await getStripe();
-      if (stripe && data.url) {
-        window.location.href = data.url;
-      }
+      await purchaseManager.purchaseAddOn(addOn.id, addOn.name);
     }
   });
 
   const manageSubscriptionMutation = useMutation({
     mutationFn: async () => {
-      const { data } = await base44.functions.invoke('stripePortal', {});
-      if (data.url) {
-        window.location.href = data.url;
-      }
+      await purchaseManager.manageSubscription();
     }
   });
 
   const hasPurchased = (addOnId) => purchases.some(p => p.content_id === addOnId);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
-      <Header title="Premium" showBack />
+    <div className="min-h-screen bg-background pb-20">
+      <Header 
+        title="MatchaMD Subscription" 
+        logo={logo}
+        showBack={true} 
+      />
 
       <main className="px-4 py-6 max-w-4xl mx-auto">
         {/* Hero Section */}
@@ -183,9 +176,9 @@ export default function Subscription() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 border border-indigo-200 dark:border-indigo-800 mb-4">
-            <TrendingUp className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[rgba(var(--color-primary),0.1)] to-[rgba(var(--color-primary),0.2)] border border-[rgba(var(--color-primary),0.3)] mb-4">
+            <TrendingUp className="w-4 h-4 text-[rgb(var(--color-primary))]" />
+            <span className="text-sm font-medium text-[rgb(var(--color-primary))]">
               Accelerate Your Medical Career
             </span>
           </div>
@@ -199,7 +192,7 @@ export default function Subscription() {
 
         {/* Current Plan */}
         {currentSubscription && currentSubscription.plan !== 'free' && (
-          <Card className="p-6 mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-800">
+          <Card className="p-6 mb-8 bg-gradient-to-br from-[rgba(var(--color-primary),0.1)] to-[rgba(var(--color-primary),0.2)] border-[rgba(var(--color-primary),0.3)]">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Current Plan</p>
@@ -247,13 +240,13 @@ export default function Subscription() {
                 >
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                      <Badge className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4">
+                      <Badge className="bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(110,135,30)] text-white px-4">
                         Most Popular
                       </Badge>
                     </div>
                   )}
                   
-                  <Card className={`p-6 h-full ${plan.popular ? 'border-2 border-indigo-500 dark:border-indigo-400' : ''}`}>
+                  <Card className={`p-6 h-full ${plan.popular ? 'border-2 border-[rgb(var(--color-primary))]' : ''}`}>
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${plan.color} flex items-center justify-center mb-4`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
@@ -283,9 +276,9 @@ export default function Subscription() {
                     </ul>
                     
                     <Button
-                      onClick={() => upgradeMutation.mutate(plan.id)}
+                      onClick={() => purchaseMutation.mutate(plan.id)}
                       disabled={isCurrentPlan}
-                      className={`w-full ${plan.popular ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}`}
+                      className={`w-full ${plan.popular ? 'bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] text-white' : ''}`}
                       variant={isCurrentPlan ? 'outline' : 'default'}
                     >
                       {isCurrentPlan ? 'Current Plan' : plan.price === 0 ? 'Downgrade to Free' : 'Subscribe'}

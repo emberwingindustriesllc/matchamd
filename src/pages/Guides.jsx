@@ -15,7 +15,7 @@ const pathways = {
   residency: {
     icon: Stethoscope,
     title: 'Residency',
-    color: 'from-indigo-500 to-purple-500',
+    color: 'from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))]',
     steps: [
       { id: 'ecfmg_pathways', title: 'ECFMG Pathways', description: 'Complete one of 6 pathways to certification', deadline: 'Jan 31, 2026' },
       { id: 'usmle_step1', title: 'USMLE Step 1', description: 'First licensing exam covering basic sciences' },
@@ -48,7 +48,7 @@ const pathways = {
   med_school: {
     icon: BookOpen,
     title: 'Med School',
-    color: 'from-amber-500 to-orange-500',
+    color: 'from-amber-400 to-orange-500',
     steps: [
       { id: 'prerequisites', title: 'Prerequisites', description: 'US coursework and requirements' },
       { id: 'mcat', title: 'MCAT Exam', description: 'Medical College Admission Test' },
@@ -125,7 +125,7 @@ export default function Guides() {
   const PathIcon = currentPathway.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       <Header title="Guides" showSearch />
 
       <main className="px-4 py-6 max-w-lg mx-auto">
@@ -136,7 +136,7 @@ export default function Guides() {
             placeholder="Search guides..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-12 rounded-2xl border-slate-200 dark:border-slate-700"
+            className="pl-12 h-12 rounded-2xl border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm focus:ring-[rgb(var(--color-primary))]"
           />
         </div>
 
@@ -160,11 +160,11 @@ export default function Guides() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
                   onClick={() => window.location.href = createPageUrl(`GuideDetail?id=${guide.slug}`)}
-                  className="p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-indigo-200 dark:border-indigo-800 shadow-sm hover:shadow-lg hover:border-indigo-400 transition-all text-left"
+                  className="p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-[rgba(var(--color-primary),0.2)] dark:border-[rgba(var(--color-primary),0.4)] shadow-sm hover:shadow-lg hover:border-[rgb(var(--color-primary))] transition-all text-left group"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white text-lg">{idx + 1}</span>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform">
+                      <span className="text-white text-lg font-bold">{idx + 1}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-slate-800 dark:text-white mb-1">{guide.title}</h3>
@@ -182,12 +182,12 @@ export default function Guides() {
 
         {/* Pathway Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="w-full h-auto p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl grid grid-cols-3">
+          <TabsList className="w-full h-auto p-1 bg-slate-100 dark:bg-slate-800/50 rounded-2xl grid grid-cols-3">
             {Object.entries(pathways).map(([key, path]) => (
               <TabsTrigger
                 key={key}
                 value={key}
-                className="rounded-xl py-3 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm"
+                className="rounded-xl py-3 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-md data-[state=active]:text-[rgb(var(--color-primary))] transition-all"
               >
                 <path.icon className="w-4 h-4 mr-2" />
                 {path.title}

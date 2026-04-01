@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import logo from '@/assets/logo.png';
 import { base44 } from '@/api/base44Client';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
@@ -74,6 +75,9 @@ const courseModules = [
   }
 ];
 
+/**
+ * Interview Mastery Course Component
+ */
 export default function InterviewCourse() {
   const [selectedLesson, setSelectedLesson] = useState(null);
 
@@ -112,8 +116,8 @@ export default function InterviewCourse() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
-      <Header title="Interview Mastery" showBack />
+    <div className="min-h-screen bg-background pb-24">
+      <Header title="Interview Mastery" logo={logo} showBack />
 
       <main className="px-4 py-6 max-w-4xl mx-auto">
         {/* Progress Overview */}
@@ -122,10 +126,10 @@ export default function InterviewCourse() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
+          <Card className="bg-gradient-to-br from-[rgba(var(--color-primary),0.05)] to-[rgba(var(--color-secondary),0.1)] dark:from-[rgba(var(--color-primary),0.1)] dark:to-[rgba(var(--color-secondary),0.2)] border-[rgba(var(--color-primary),0.2)] dark:border-[rgba(var(--color-primary),0.4)]">
             <CardContent className="p-6">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] flex items-center justify-center shadow-lg">
                   <Video className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
@@ -141,16 +145,16 @@ export default function InterviewCourse() {
               <Progress value={(completedLessons / totalLessons) * 100} className="h-3 mb-4" />
 
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center">
+                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center border border-white/40 dark:border-slate-700/40">
                   <p className="text-2xl font-bold text-slate-900 dark:text-white">{courseModules.length}</p>
                   <p className="text-xs text-slate-600 dark:text-slate-400">Modules</p>
                 </div>
-                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center">
-                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">4h+</p>
+                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center border border-white/40 dark:border-slate-700/40">
+                  <p className="text-2xl font-bold text-[rgb(var(--color-primary))]">4h+</p>
                   <p className="text-xs text-slate-600 dark:text-slate-400">Video Content</p>
                 </div>
-                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center">
-                  <p className="text-2xl font-bold text-pink-600 dark:text-pink-400">0h</p>
+                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center border border-white/40 dark:border-slate-700/40">
+                  <p className="text-2xl font-bold text-[rgb(var(--color-secondary))]">0h</p>
                   <p className="text-xs text-slate-600 dark:text-slate-400">Time Spent</p>
                 </div>
               </div>
@@ -170,8 +174,8 @@ export default function InterviewCourse() {
               <Card>
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                      <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                    <div className="w-10 h-10 rounded-lg bg-[rgba(var(--color-primary),0.1)] dark:bg-[rgba(var(--color-primary),0.2)] flex items-center justify-center">
+                      <span className="text-lg font-bold text-[rgb(var(--color-primary))]">
                         {module.id}
                       </span>
                     </div>
@@ -192,11 +196,11 @@ export default function InterviewCourse() {
                       key={lesson.id}
                       className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-[rgba(var(--color-primary),0.1)] dark:group-hover:bg-[rgba(var(--color-primary),0.2)] transition-colors">
                         {lesson.completed ? (
-                          <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                         ) : (
-                          <PlayCircle className="w-5 h-5 text-slate-400 group-hover:text-purple-600 dark:group-hover:text-purple-400" />
+                          <PlayCircle className="w-5 h-5 text-slate-400 group-hover:text-[rgb(var(--color-primary))] transition-colors" />
                         )}
                       </div>
                       <div className="flex-1">

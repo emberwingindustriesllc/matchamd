@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
-import { getStripe } from '@/components/stripe/StripeProvider';
+import logo from '@/assets/logo.png';
+import { purchaseManager } from '@/lib/purchaseManager';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -16,20 +16,13 @@ export default function PremiumGate({ title, description, price, features, conte
 
   const purchaseMutation = useMutation({
     mutationFn: async () => {
-      const { data } = await base44.functions.invoke('stripeOneTimeCheckout', {
-        addOnId: contentId,
-        addOnName: title
-      });
-      const stripe = await getStripe();
-      if (stripe && data.url) {
-        window.location.href = data.url;
-      }
+      await purchaseManager.purchaseAddOn(contentId, title);
     }
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
-      <Header title={title} showBack />
+    <div className="min-h-screen bg-background pb-24">
+      <Header title={title} logo={logo} showBack />
 
       <main className="px-4 py-12 max-w-2xl mx-auto">
         <motion.div
@@ -38,7 +31,7 @@ export default function PremiumGate({ title, description, price, features, conte
           className="text-center"
         >
           {/* Lock Icon */}
-          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-xl">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] flex items-center justify-center shadow-xl">
             <Lock className="w-10 h-10 text-white" />
           </div>
 
@@ -51,8 +44,8 @@ export default function PremiumGate({ title, description, price, features, conte
           </p>
 
           {/* Pricing Card */}
-          <Card className="border-2 border-indigo-200 dark:border-indigo-800 mb-6">
-            <CardHeader className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
+          <Card className="border-2 border-[rgba(var(--color-primary),0.3)] dark:border-[rgba(var(--color-primary),0.5)] mb-6">
+            <CardHeader className="bg-gradient-to-br from-[rgba(var(--color-primary),0.05)] to-[rgba(var(--color-secondary),0.1)] dark:from-[rgba(var(--color-primary),0.1)] dark:to-[rgba(var(--color-secondary),0.2)]">
               <CardTitle className="text-center">
                 <div className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
                   ${price}
@@ -77,7 +70,7 @@ export default function PremiumGate({ title, description, price, features, conte
               <Button
                 onClick={() => purchaseMutation.mutate()}
                 disabled={purchaseMutation.isPending}
-                className="w-full h-12 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold"
+                className="w-full h-12 bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] hover:opacity-90 text-white font-semibold shadow-lg"
               >
                 {purchaseMutation.isPending ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -90,7 +83,7 @@ export default function PremiumGate({ title, description, price, features, conte
               </Button>
 
               <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-4">
-                Secure payment powered by Stripe
+                Secure checkout powered by {purchaseManager.isNative() ? 'Apple Pay' : 'Stripe'}
               </p>
             </CardContent>
           </Card>

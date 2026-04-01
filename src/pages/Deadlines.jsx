@@ -19,13 +19,13 @@ import {
 import { format, differenceInDays, isPast, isFuture } from 'date-fns';
 
 const categoryColors = {
-  ecfmg: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-  usmle: 'bg-blue-100 text-blue-700 border-blue-200',
-  eras: 'bg-purple-100 text-purple-700 border-purple-200',
-  nrmp: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  visa: 'bg-amber-100 text-amber-700 border-amber-200',
-  licensing: 'bg-rose-100 text-rose-700 border-rose-200',
-  other: 'bg-slate-100 text-slate-700 border-slate-200'
+  ecfmg: 'bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))] border-[rgba(var(--color-primary),0.2)]',
+  usmle: 'bg-blue-100/50 text-blue-700 border-blue-200 dark:bg-blue-900/20',
+  eras: 'bg-[rgba(var(--color-secondary),0.1)] text-[rgb(var(--color-secondary))] border-[rgba(var(--color-secondary),0.2)]',
+  nrmp: 'bg-emerald-100/50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20',
+  visa: 'bg-amber-100/50 text-amber-700 border-amber-200 dark:bg-amber-900/20',
+  licensing: 'bg-rose-100/50 text-rose-700 border-rose-200 dark:bg-rose-900/20',
+  other: 'bg-slate-100/50 text-slate-700 border-slate-200 dark:bg-slate-800/50'
 };
 
 const priorityColors = {
@@ -88,7 +88,7 @@ export default function Deadlines() {
   }).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       <Header title="Important Deadlines" />
 
       <main className="px-4 py-6 max-w-2xl mx-auto">
@@ -110,10 +110,10 @@ export default function Deadlines() {
             </div>
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-4 border-[rgba(var(--color-secondary),0.2)] bg-gradient-to-br from-white to-[rgba(var(--color-secondary),0.02)] dark:from-slate-800 dark:to-slate-900 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-indigo-600" />
+              <div className="w-10 h-10 rounded-lg bg-[rgba(var(--color-secondary),0.1)] flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-[rgb(var(--color-secondary))]" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-800 dark:text-white">
@@ -245,7 +245,7 @@ export default function Deadlines() {
                       href={deadline.official_link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm text-indigo-600 hover:underline"
+                      className="inline-flex items-center gap-2 text-sm text-[rgb(var(--color-primary))] font-medium hover:underline"
                     >
                       <ExternalLink className="w-4 h-4" />
                       Official Source

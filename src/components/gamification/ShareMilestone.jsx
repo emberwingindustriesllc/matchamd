@@ -36,7 +36,7 @@ export default function ShareMilestone({
     setIsCapturing(false);
   };
 
-  const shareText = `🎉 Just completed ${completionPercentage}% of "${guideTitle}" on FMG Pathway! 🏆`;
+  const shareText = `🎉 Just completed ${completionPercentage}% of "${guideTitle}" on MatchaMD! 🏆`;
   const shareUrl = window.location.origin;
 
   const handleNativeShare = async () => {
@@ -51,14 +51,14 @@ export default function ShareMilestone({
         const file = new File([blob], 'milestone.png', { type: 'image/png' });
         
         await navigator.share({
-          title: 'My FMG Pathway Progress',
+          title: 'My MatchaMD Progress',
           text: shareText,
           files: [file],
           url: shareUrl
         });
       } else {
         await navigator.share({
-          title: 'My FMG Pathway Progress',
+          title: 'My MatchaMD Progress',
           text: shareText,
           url: shareUrl
         });
@@ -76,7 +76,7 @@ export default function ShareMilestone({
     
     const link = document.createElement('a');
     link.href = capturedImage;
-    link.download = `fmg-pathway-${guideTitle.toLowerCase().replace(/\s/g, '-')}.png`;
+    link.download = `matchamd-${guideTitle.toLowerCase().replace(/\s/g, '-')}.png`;
     link.click();
     toast.success('Image downloaded!');
   };
@@ -106,7 +106,7 @@ export default function ShareMilestone({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Share2 className="w-5 h-5 text-indigo-600" />
+            <Share2 className="w-5 h-5 text-[rgb(var(--color-primary))]" />
             Share Your Progress
           </DialogTitle>
           <DialogDescription>
@@ -146,7 +146,7 @@ export default function ShareMilestone({
             {navigator.share && (
               <Button
                 onClick={handleNativeShare}
-                className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700"
+                className="w-full rounded-xl bg-[rgb(var(--color-primary))] hover:opacity-90"
               >
                 <Share2 className="w-4 h-4 mr-2" />
                 Share with Friends

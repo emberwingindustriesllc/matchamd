@@ -23,6 +23,12 @@ const badgeVariants = cva(
   }
 )
 
+/**
+ * @param {Object} props
+ * @param {string} [props.className]
+ * @param {"default" | "secondary" | "destructive" | "outline"} [props.variant]
+ * @param {React.ReactNode} [props.children]
+ */
 function Badge({
   className,
   variant,

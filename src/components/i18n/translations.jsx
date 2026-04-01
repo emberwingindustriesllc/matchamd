@@ -1,7 +1,7 @@
 export const translations = {
   en: {
     // Common
-    welcome: 'Welcome to FMG Pathway',
+    welcome: 'Welcome to MatchaMD',
     continue: 'Continue',
     back: 'Back',
     save: 'Save',
@@ -11,8 +11,8 @@ export const translations = {
     
     // Onboarding
     onboarding: {
-      welcome: 'Welcome to FMG Pathway',
-      subtitle: 'Your personalized guide to achieving your US medical career goals',
+      welcome: 'Welcome to MatchaMD',
+      subtitle: 'Helping IMGs Match in the U.S.',
       yourName: 'Your name',
       location: 'Where are you located?',
       locationSubtitle: "We'll customize visa and location-specific guidance",
@@ -164,7 +164,7 @@ export const translations = {
   
   es: {
     // Common
-    welcome: 'Bienvenido a FMG Pathway',
+    welcome: 'Bienvenido a MatchaMD',
     continue: 'Continuar',
     back: 'Atrás',
     save: 'Guardar',
@@ -174,8 +174,8 @@ export const translations = {
     
     // Onboarding
     onboarding: {
-      welcome: 'Bienvenido a FMG Pathway',
-      subtitle: 'Tu guía personalizada para alcanzar tus metas médicas en EE.UU.',
+      welcome: 'Bienvenido a MatchaMD',
+      subtitle: 'Ayudando a los IMG a coincidir en los EE. UU.',
       yourName: 'Tu nombre',
       location: '¿Dónde te encuentras?',
       locationSubtitle: "Personalizaremos la orientación sobre visas y ubicación",
@@ -319,7 +319,7 @@ export const translations = {
   
   ar: {
     // Common
-    welcome: 'مرحباً بك في FMG Pathway',
+    welcome: 'مرحباً بك في MatchaMD',
     continue: 'متابعة',
     back: 'رجوع',
     save: 'حفظ',
@@ -329,8 +329,8 @@ export const translations = {
     
     // Onboarding
     onboarding: {
-      welcome: 'مرحباً بك في FMG Pathway',
-      subtitle: 'دليلك الشخصي لتحقيق أهدافك المهنية الطبية في الولايات المتحدة',
+      welcome: 'مرحباً بك في MatchaMD',
+      subtitle: 'مساعدة خريجي الطب الأجانب (IMGs) في الحصول على الإقامة في الولايات المتحدة',
       yourName: 'اسمك',
       location: 'أين أنت الآن؟',
       locationSubtitle: 'سنقوم بتخصيص الإرشادات الخاصة بالتأشيرة والموقع',
@@ -474,7 +474,7 @@ export const translations = {
   
   hi: {
     // Common
-    welcome: 'FMG Pathway में आपका स्वागत है',
+    welcome: 'MatchaMD में आपका स्वागत है',
     continue: 'जारी रखें',
     back: 'वापस',
     save: 'सहेजें',
@@ -483,8 +483,8 @@ export const translations = {
     search: 'खोजें',
     
     onboarding: {
-      welcome: 'FMG Pathway में आपका स्वागत है',
-      subtitle: 'अमेरिका में अपने चिकित्सा करियर लक्ष्यों को प्राप्त करने के लिए आपकी व्यक्तिगत मार्गदर्शिका',
+      welcome: 'MatchaMD में आपका स्वागत है',
+      subtitle: 'IMGs को अमेरिका में मैच करने में मदद करना',
       yourName: 'आपका नाम',
       location: 'आप कहाँ स्थित हैं?',
       locationSubtitle: 'हम वीज़ा और स्थान-विशिष्ट मार्गदर्शन को अनुकूलित करेंगे',
@@ -627,7 +627,7 @@ export const translations = {
   },
   
   zh: {
-    welcome: '欢迎来到 FMG Pathway',
+    welcome: '欢迎来到 MatchaMD',
     continue: '继续',
     back: '返回',
     save: '保存',
@@ -636,8 +636,8 @@ export const translations = {
     search: '搜索',
     
     onboarding: {
-      welcome: '欢迎来到 FMG Pathway',
-      subtitle: '您实现美国医疗职业目标的个性化指南',
+      welcome: '欢迎来到 MatchaMD',
+      subtitle: '助力国际医学毕业生（IMGs）成功匹配美国住院医师项目',
       yourName: '您的姓名',
       location: '您在哪里？',
       locationSubtitle: '我们将定制签证和位置特定的指导',
@@ -780,7 +780,7 @@ export const translations = {
   },
   
   fr: {
-    welcome: 'Bienvenue sur FMG Pathway',
+    welcome: 'Bienvenue sur MatchaMD',
     continue: 'Continuer',
     back: 'Retour',
     save: 'Enregistrer',
@@ -789,8 +789,8 @@ export const translations = {
     search: 'Rechercher',
     
     onboarding: {
-      welcome: 'Bienvenue sur FMG Pathway',
-      subtitle: 'Votre guide personnalisé pour atteindre vos objectifs de carrière médicale aux États-Unis',
+      welcome: 'Bienvenue sur MatchaMD',
+      subtitle: 'Aider les IMG à réussir leur match aux États-Unis',
       yourName: 'Votre nom',
       location: 'Où êtes-vous situé?',
       locationSubtitle: 'Nous personnaliserons les conseils sur les visas et la localisation',
@@ -933,7 +933,7 @@ export const translations = {
   },
   
   pt: {
-    welcome: 'Bem-vindo ao FMG Pathway',
+    welcome: 'Bem-vindo ao MatchaMD',
     continue: 'Continuar',
     back: 'Voltar',
     save: 'Salvar',
@@ -942,8 +942,8 @@ export const translations = {
     search: 'Pesquisar',
     
     onboarding: {
-      welcome: 'Bem-vindo ao FMG Pathway',
-      subtitle: 'Seu guia personalizado para alcançar seus objetivos de carreira médica nos EUA',
+      welcome: 'Bem-vindo ao MatchaMD',
+      subtitle: 'Ajudando IMGs a conquistarem sua vaga nos EUA',
       yourName: 'Seu nome',
       location: 'Onde você está localizado?',
       locationSubtitle: 'Vamos personalizar orientações sobre visto e localização',

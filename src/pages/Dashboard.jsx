@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import logo from '@/assets/logo.png';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -120,7 +121,7 @@ export default function Dashboard() {
     if (profileError) {
       return (
         <>
-          <Header title="FMG Pathway" />
+          <Header logo={logo} />
           <ErrorState 
             title="Unable to Load Profile"
             message="We couldn't load your profile. Please check your connection and try again."
@@ -131,8 +132,8 @@ export default function Dashboard() {
       );
     }
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-3 border-[rgb(var(--color-primary))] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -150,7 +151,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
       <Header 
-        title="FMG Pathway" 
+        title="MatchaMD" 
         rightContent={
           <Button
             variant="ghost"
@@ -171,7 +172,7 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-6 text-white"
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[rgb(var(--color-primary))] via-[rgb(110,135,30)] to-[rgb(80,105,20)] p-6 text-white shadow-lg"
         >
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
@@ -244,7 +245,7 @@ export default function Dashboard() {
             onClick={() => navigate(createPageUrl('Community'))}
             className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all text-left"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center mb-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[rgba(var(--color-primary),0.8)] to-[rgba(var(--color-primary),1)] flex items-center justify-center mb-3">
               <Users className="w-5 h-5 text-white" />
             </div>
             <h3 className="font-semibold text-slate-800 dark:text-white">Community</h3>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import logo from '@/assets/logo.png';
 import { base44 } from '@/api/base44Client';
 import { useTranslation } from '@/components/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -59,7 +60,7 @@ const goals = [
     icon: Stethoscope, 
     title: 'Residency',
     description: 'Apply for US medical residency programs',
-    color: 'from-indigo-500 to-purple-500'
+    color: 'from-[rgb(var(--color-primary))] to-[rgb(110,135,30)]'
   },
   { 
     id: 'fellowship', 
@@ -169,7 +170,8 @@ export default function Onboarding() {
     usmle_step3_result: 'not_applicable',
     ecfmg_certified: false,
     visa_status: 'none',
-    us_clinical_experience: false
+    us_clinical_experience: false,
+    medical_school_custom: ''
   });
 
   useEffect(() => {
@@ -265,8 +267,16 @@ export default function Onboarding() {
       exit={{ opacity: 0, y: -20 }}
       className="text-center px-6"
     >
-      <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl">
-        <Sparkles className="w-10 h-10 text-white" />
+      <div className="w-48 h-48 mx-auto mb-6 flex items-center justify-center p-2">
+        <img 
+          src={logo} 
+          alt="MatchaMD Logo" 
+          className="w-full h-full object-contain drop-shadow-lg"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://img.icons8.com/color/512/matcha.png'; // Fallback
+          }}
+        />
       </div>
       <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-3">
         {t('onboarding.welcome')}
@@ -276,7 +286,7 @@ export default function Onboarding() {
       </p>
       
       {/* Immediate Value Preview */}
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-2xl p-4 mb-6 border border-indigo-200 dark:border-indigo-800 space-y-2 text-left max-w-md mx-auto">
+      <div className="bg-gradient-to-r from-[rgba(var(--color-primary),0.05)] to-[rgba(var(--color-primary),0.1)] dark:from-[rgba(var(--color-primary),0.1)] dark:to-[rgba(var(--color-primary),0.2)] rounded-2xl p-4 mb-6 border border-[rgba(var(--color-primary),0.2)] dark:border-[rgba(var(--color-primary),0.4)] space-y-2 text-left max-w-md mx-auto">
         <h3 className="font-semibold text-slate-900 dark:text-white text-sm">What You'll Get:</h3>
         <ul className="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
           <li className="flex items-start gap-2">
@@ -735,7 +745,7 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 flex flex-col safe-area-top">
       <div className="px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           {steps.map((_, idx) => (
@@ -743,7 +753,7 @@ export default function Onboarding() {
               <motion.div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
                   idx <= step
-                    ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg'
+                    ? 'bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(110,135,30)] text-white shadow-lg'
                     : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
                 }`}
                 initial={{ scale: 0.8 }}
@@ -754,7 +764,7 @@ export default function Onboarding() {
               </motion.div>
               {idx < steps.length - 1 && (
                 <div className={`flex-1 h-1 mx-2 rounded-full transition-all ${
-                  idx < step ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : 'bg-slate-200 dark:bg-slate-700'
+                  idx < step ? 'bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(110,135,30)]' : 'bg-slate-200 dark:bg-slate-700'
                 }`} />
               )}
             </div>
@@ -776,7 +786,7 @@ export default function Onboarding() {
         </AnimatePresence>
       </div>
 
-      <div className="p-6 flex gap-3">
+      <div className="p-6 pb-safe flex gap-3">
         {step > 0 && (
           <Button
             variant="outline"
@@ -790,7 +800,7 @@ export default function Onboarding() {
         <Button
           onClick={() => step === steps.length - 1 ? handleSubmit() : setStep(step + 1)}
           disabled={!canProceed() || isSubmitting}
-          className="flex-1 h-14 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold"
+          className="flex-1 h-14 rounded-xl bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(110,135,30)] hover:opacity-90 text-white font-semibold"
         >
           {isSubmitting ? (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

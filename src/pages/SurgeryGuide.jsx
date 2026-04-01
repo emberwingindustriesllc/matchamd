@@ -221,20 +221,20 @@ export default function SurgeryGuide() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       <Header title="Surgery Specialty Guide" showBack />
 
-      <main className="px-4 py-6 max-w-4xl mx-auto">
+      <main className="px-4 py-6 max-w-4xl mx-auto pb-safe">
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
+          <Card className="bg-gradient-to-br from-[rgba(var(--color-primary),0.05)] to-[rgba(var(--color-secondary),0.1)] dark:from-[rgba(var(--color-primary),0.1)] dark:to-[rgba(var(--color-secondary),0.2)] border-[rgba(var(--color-primary),0.2)] dark:border-[rgba(var(--color-primary),0.4)]">
             <CardContent className="p-6">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] flex items-center justify-center shadow-lg">
                   <Scissors className="w-8 h-8 text-white" />
                 </div>
                 <div>
@@ -278,8 +278,8 @@ export default function SurgeryGuide() {
                   <AccordionItem value={section.id} className="border-none">
                     <AccordionTrigger className="px-6 py-4 hover:no-underline">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                          <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        <div className="w-10 h-10 rounded-lg bg-[rgba(var(--color-primary),0.1)] dark:bg-[rgba(var(--color-primary),0.2)] flex items-center justify-center">
+                          <Icon className="w-5 h-5 text-[rgb(var(--color-primary))]" />
                         </div>
                         <span className="font-semibold text-slate-900 dark:text-white text-left">
                           {section.title}
@@ -296,7 +296,7 @@ export default function SurgeryGuide() {
                             <ul className="space-y-2">
                               {subsection.items.map((item, itemIdx) => (
                                 <li key={itemIdx} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
-                                  <span className="text-indigo-500 mt-1">•</span>
+                                  <span className="text-[rgb(var(--color-primary))] mt-1">•</span>
                                   <span>{item}</span>
                                 </li>
                               ))}
@@ -313,10 +313,10 @@ export default function SurgeryGuide() {
         </Accordion>
 
         {/* Resources */}
-        <Card className="mt-8 bg-slate-50 dark:bg-slate-800/50">
+        <Card className="mt-8 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <BookOpen className="w-5 h-5 text-indigo-500" />
+              <BookOpen className="w-5 h-5 text-[rgb(var(--color-primary))]" />
               Additional Resources
             </CardTitle>
           </CardHeader>

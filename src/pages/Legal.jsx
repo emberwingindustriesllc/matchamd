@@ -20,7 +20,7 @@ export default function Legal() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
             <p>
-              <strong>FMG Pathway is an informational resource only.</strong> We are not affiliated with, endorsed by, or officially connected to ECFMG, USMLE, NRMP, AAMC, or any other official medical licensing or matching organization.
+              <strong>MatchaMD is an informational resource only.</strong> We are not affiliated with, endorsed by, or officially connected to ECFMG, USMLE, NRMP, AAMC, or any other official medical licensing or matching organization.
             </p>
             <p>
               All information provided is for educational purposes. While we strive for accuracy, official policies and requirements change frequently. <strong>Always verify information with official sources</strong> including:
@@ -62,7 +62,7 @@ export default function Legal() {
               <p>Your data is used to:</p>
               <ul className="list-disc ml-6 mt-1 space-y-1">
                 <li>Personalize your experience and recommendations</li>
-                <li>Track your progress through FMG pathways</li>
+                <li>Track your progress through MatchaMD pathways</li>
                 <li>Connect you with mentors and community members</li>
                 <li>Improve our platform and features</li>
               </ul>
@@ -99,7 +99,7 @@ export default function Legal() {
             <div>
               <h3 className="font-semibold mb-2">International Users</h3>
               <p>
-                FMG Pathway is available globally. By using our platform, you consent to data processing in accordance with this privacy policy, regardless of your location. We comply with applicable data protection regulations including GDPR for European users.
+                MatchaMD is available globally. By using our platform, you consent to data processing in accordance with this privacy policy, regardless of your location. We comply with applicable data protection regulations including GDPR for European users.
               </p>
             </div>
           </CardContent>
@@ -126,14 +126,14 @@ export default function Legal() {
             <div>
               <h3 className="font-semibold mb-2">Content Ownership</h3>
               <p>
-                You retain ownership of content you post. By posting, you grant FMG Pathway a non-exclusive license to display, distribute, and moderate your content. We reserve the right to remove content that violates our community guidelines.
+                You retain ownership of content you post. By posting, you grant MatchaMD a non-exclusive license to display, distribute, and moderate your content. We reserve the right to remove content that violates our community guidelines.
               </p>
             </div>
 
             <div>
               <h3 className="font-semibold mb-2">Limitation of Liability</h3>
               <p>
-                FMG Pathway is provided "as is" without warranties. We are not liable for decisions made based on platform information, technical issues, or data loss. Your use of the platform is at your own risk.
+                MatchaMD is provided "as is" without warranties. We are not liable for decisions made based on platform information, technical issues, or data loss. Your use of the platform is at your own risk.
               </p>
             </div>
 
@@ -158,8 +158,8 @@ export default function Legal() {
             <p>For questions about privacy, terms, or data requests:</p>
             <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
               <Mail className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <a href="mailto:support@fmgpathway.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-                support@fmgpathway.com
+              <a href="mailto:support@matchamd.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                support@matchamd.com
               </a>
             </div>
             <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">

@@ -13,7 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import {
   Select,
@@ -122,19 +123,19 @@ export default function Profile() {
 
   if (isLoading || !profile) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-3 border-[rgb(var(--color-primary))] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       <Header 
         title="Profile" 
         rightContent={
-          <Button variant="ghost" size="icon" onClick={handleEditOpen} className="rounded-xl">
-            <Settings className="w-5 h-5" />
+          <Button variant="ghost" size="icon" onClick={handleEditOpen} className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+            <Settings className="w-5 h-5 text-slate-600 dark:text-slate-400" />
           </Button>
         }
       />
@@ -144,9 +145,9 @@ export default function Profile() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-6 text-white"
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[rgb(var(--color-primary))] via-[rgb(var(--color-secondary))] to-[rgb(var(--color-accent))] p-6 text-white shadow-xl"
         >
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           
           <div className="relative flex items-center gap-5">
             <div className="relative">
@@ -157,7 +158,7 @@ export default function Profile() {
                 </AvatarFallback>
               </Avatar>
               <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <Camera className="w-4 h-4 text-indigo-600" />
+                <Camera className="w-4 h-4 text-[rgb(var(--color-primary))]" />
                 <input
                   id="avatar-upload"
                   type="file"
@@ -221,8 +222,8 @@ export default function Profile() {
           
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <div className="w-10 h-10 rounded-xl bg-[rgba(var(--color-primary),0.1)] dark:bg-[rgba(var(--color-primary),0.2)] flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-[rgb(var(--color-primary))]" />
               </div>
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Location</p>
@@ -231,8 +232,8 @@ export default function Profile() {
             </div>
             
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                <Stethoscope className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <div className="w-10 h-10 rounded-xl bg-[rgba(var(--color-secondary),0.1)] dark:bg-[rgba(var(--color-secondary),0.2)] flex items-center justify-center">
+                <Stethoscope className="w-5 h-5 text-[rgb(var(--color-secondary))]" />
               </div>
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Target Specialty</p>
@@ -358,15 +359,15 @@ export default function Profile() {
         )}
 
         {/* Premium */}
-        <Card className="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-800">
+        <Card className="p-4 bg-gradient-to-br from-[rgba(var(--color-primary),0.05)] to-[rgba(var(--color-secondary),0.1)] dark:from-[rgba(var(--color-primary),0.1)] dark:to-[rgba(var(--color-secondary),0.2)] border-[rgba(var(--color-primary),0.20)] dark:border-[rgba(var(--color-primary),0.4)]">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-slate-900 dark:text-white">Upgrade to Premium</h3>
+              <h3 className="font-semibold text-slate-900 dark:text-white">Experience MatchaMD+</h3>
               <p className="text-sm text-slate-600 dark:text-slate-400">Unlock all features & content</p>
             </div>
             <Button 
               onClick={() => navigate(createPageUrl('Subscription'))}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600"
+              className="bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] hover:opacity-90 text-white shadow-lg"
             >
               <Crown className="w-4 h-4 mr-2" />
               Upgrade
