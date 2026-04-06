@@ -40,7 +40,7 @@ To access most features, you must create an account. You agree to:
 - Maintain and promptly update your account information
 - Keep your password confidential
 - Accept responsibility for all activities under your account
-- Notify us immediately of any unauthorized account use at support@matchamd.app
+- Notify us immediately of any unauthorized account use at support@matchamd.com
 
 We reserve the right to suspend or terminate accounts that violate these Terms or that we reasonably believe have been compromised.
 
@@ -165,9 +165,9 @@ Any dispute arising from these Terms or your use of the App shall first be attem
 
 ## 16. Contact
 
-**Email:** legal@matchamd.app  
-**Support:** support@matchamd.app  
-**Website:** https://matchamd.app
+**Email:** legal@matchamd.com  
+**Support:** support@matchamd.com  
+**Website:** https://matchamd.com
 
 ---
 
