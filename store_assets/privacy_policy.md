@@ -20,8 +20,8 @@ If you do not agree with the terms of this Privacy Policy, please do not use the
 MatchaMD is developed and operated by **Paul T. Finch, MD** ("Developer," "we," "us").
 
 **Contact:**  
-Email: support@matchamd.app  
-Website: https://matchamd.app
+Email: support@matchamd.com  
+Website: https://matchamd.com
 
 ---
 
@@ -153,7 +153,7 @@ If you are located in the European Economic Area or the United Kingdom, you also
 - Object to processing based on legitimate interests
 - Request restriction of processing in certain circumstances
 
-**To exercise any of these rights**, please contact us at: **privacy@matchamd.app**
+**To exercise any of these rights**, please contact us at: **privacy@matchamd.com**
 
 We will respond within 30 days. We may need to verify your identity before fulfilling your request.
 
@@ -176,7 +176,7 @@ However, no method of transmission over the Internet or electronic storage is 10
 
 MatchaMD is intended for use by medical professionals and medical graduates aged 18 and older. We do not knowingly collect personal information from anyone under the age of 18.
 
-If you are a parent or guardian and believe your child has provided us with personal information, please contact us at **privacy@matchamd.app** and we will delete that information promptly.
+If you are a parent or guardian and believe your child has provided us with personal information, please contact us at **privacy@matchamd.com** and we will delete that information promptly.
 
 ---
 
@@ -205,7 +205,7 @@ We may send push notifications to your device (e.g., deadline reminders, communi
 We may update this Privacy Policy from time to time. When we do, we will:
 - Update the "Last Updated" date at the top of this policy
 - Notify you via email or in-app notice for material changes
-- Post the updated policy at https://matchamd.app/privacy
+- Post the updated policy at https://matchamd.com/privacy
 
 Your continued use of the App after the effective date of the revised policy constitutes acceptance of the changes.
 
@@ -215,9 +215,9 @@ Your continued use of the App after the effective date of the revised policy con
 
 If you have questions about this Privacy Policy, your data, or how to exercise your rights, please contact us:
 
-**Email:** privacy@matchamd.app  
-**Support:** support@matchamd.app  
-**Website:** https://matchamd.app  
+**Email:** privacy@matchamd.com  
+**Support:** support@matchamd.com  
+**Website:** https://matchamd.com  
 
 ---
 
