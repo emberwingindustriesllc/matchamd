@@ -1,0 +1,15 @@
+include ':app'
+
+def capacitorModules = [':capacitor-android', ':capacitor-cordova-android-plugins']
+
+capacitorModules.each {
+    include it
+    project(it).projectDir = new File('./node_modules/@capacitor/android/capacitor')
+        .exists()
+        ? new File('./node_modules/@capacitor/android/capacitor')
+        : new File("./node_modules/@capacitor/android/${it.replace(':','')}")
+}
+
+// Workaround for Capacitor module location
+project(':capacitor-android').projectDir = new File('./node_modules/@capacitor/android/capacitor')
+project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins')
