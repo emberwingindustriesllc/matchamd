@@ -99,7 +99,7 @@ IMG, FMG, residency match, USMLE, ECFMG, ERAS, NRMP, fellowship, international m
 
 ### Privacy Policy URL
 *(needs to be created — see notes below)*
-`https://matchamd.app/privacy`
+`https://matchamd.com/privacy`
 
 ---
 
@@ -203,13 +203,13 @@ Version 1.0 includes:
 `Free` (with In-App Purchases for Premium)
 
 ### Support URL
-`https://matchamd.app/support`
+`https://matchamd.com/support`
 
 ### Marketing URL *(optional)*
-`https://matchamd.app`
+`https://matchamd.com`
 
 ### Privacy Policy URL
-`https://matchamd.app/privacy`
+`https://matchamd.com/privacy`
 
 ---
 
