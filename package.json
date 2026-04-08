@@ -84,8 +84,8 @@
     "vaul": "^1.1.2",
     "zod": "^3.24.2",
     "@capacitor/splash-screen": "^6.0.0",
-    "@capacitor/status-bar": "^4.0.0",
-    "@capacitor/keyboard": "^4.2.1",
+    "@capacitor/status-bar": "^6.0.0",
+    "@capacitor/keyboard": "^6.0.0",
     "@capacitor/app": "^6.0.0",
     "@capacitor/haptics": "^6.0.0",
     "@capacitor/network": "^6.0.0"
