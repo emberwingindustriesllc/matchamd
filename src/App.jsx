@@ -69,15 +69,15 @@ function App() {
 
   return (
     <AuthProvider>
-      <LanguageProvider>
         <QueryClientProvider client={queryClientInstance}>
           <Router>
-            <NavigationTracker />
-            <AuthenticatedApp />
+            <LanguageProvider>
+              <NavigationTracker />
+              <AuthenticatedApp />
+            </LanguageProvider>
           </Router>
           <Toaster />
         </QueryClientProvider>
-      </LanguageProvider>
     </AuthProvider>
   )
 }
