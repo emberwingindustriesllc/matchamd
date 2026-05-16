@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
@@ -27,26 +28,36 @@ export default function PostDetail() {
   const postId = urlParams.get('id');
   const [newComment, setNewComment] = useState('');
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
+
 
   const { data: profiles } = useQuery({
-    queryKey: ['userProfile'],
-    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id
   });
 
   const { data: posts = [] } = useQuery({
     queryKey: ['post', postId],
-    queryFn: () => base44.entities.ForumPost.filter({ id: postId }),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('forum_posts').select('*').eq('id', postId);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!postId
   });
 
   const { data: comments = [] } = useQuery({
     queryKey: ['comments', postId],
-    queryFn: () => base44.entities.Comment.filter({ post_id: postId }, 'created_date'),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('comments').select('*').eq('post_id', postId).order('created_date', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!postId
   });
 
@@ -54,37 +65,43 @@ export default function PostDetail() {
   const profile = profiles?.[0];
 
   const likePostMutation = useMutation({
-    mutationFn: async () => {
+    /** @param {any} p */
+    mutationFn: async (p) => {
       const isLiked = post.liked_by?.includes(user.id);
       const newLikedBy = isLiked 
         ? post.liked_by.filter(id => id !== user.id)
         : [...(post.liked_by || []), user.id];
       
-      return base44.entities.ForumPost.update(post.id, {
+      const { data, error } = await supabase.from('forum_posts').update({
         liked_by: newLikedBy,
         likes_count: newLikedBy.length
-      });
+      }).eq('id', post.id).select().single();
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['post', postId] })
   });
 
   const addCommentMutation = useMutation({
+    /** @param {string} content */
     mutationFn: async (content) => {
-      await base44.entities.Comment.create({
+      const { error: commentError } = await supabase.from('comments').insert({
         post_id: postId,
         author_id: user.id,
-        author_name: profile?.display_name || user?.full_name,
+        author_name: profile?.display_name || user?.email,
         author_avatar: profile?.avatar_url,
         is_mentor: profile?.mentor_verified || false,
         content,
         likes_count: 0,
         liked_by: []
       });
+      if (commentError) throw commentError;
       
       // Update comment count on post
-      await base44.entities.ForumPost.update(post.id, {
+      const { error: postError } = await supabase.from('forum_posts').update({
         comments_count: (post.comments_count || 0) + 1
-      });
+      }).eq('id', post.id);
+      if (postError) throw postError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
@@ -100,10 +117,12 @@ export default function PostDetail() {
         ? comment.liked_by.filter(id => id !== user.id)
         : [...(comment.liked_by || []), user.id];
       
-      return base44.entities.Comment.update(comment.id, {
+      const { data, error } = await supabase.from('comments').update({
         liked_by: newLikedBy,
         likes_count: newLikedBy.length
-      });
+      }).eq('id', comment.id).select().single();
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['comments', postId] })
   });

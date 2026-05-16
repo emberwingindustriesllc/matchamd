@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import logo from '@/assets/logo.png';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -67,30 +68,40 @@ const getPathwaySteps = (primaryGoal) => {
 export default function Dashboard() {
   const navigate = useNavigate();
   
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
+
 
   const { data: profiles, error: profileError } = useQuery({
-    queryKey: ['userProfile'],
-    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id,
     retry: 2,
     staleTime: 5 * 60 * 1000
   });
 
   const { data: progressList = [] } = useQuery({
-    queryKey: ['progress'],
-    queryFn: () => base44.entities.Progress.filter({ user_id: user?.id }),
+    queryKey: ['progress', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('progress').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id,
     retry: 2,
     staleTime: 2 * 60 * 1000
   });
 
   const { data: notifications = [] } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: () => base44.entities.Notification.filter({ user_id: user?.id, read: false }),
+    queryKey: ['notifications', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('notifications').select('*').eq('user_id', user?.id).eq('read', false);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id,
     retry: 1,
     staleTime: 1 * 60 * 1000
@@ -99,11 +110,14 @@ export default function Dashboard() {
   const { data: guides = [] } = useQuery({
     queryKey: ['guides', profiles?.[0]?.primary_goal],
     queryFn: async () => {
-      const guides = await base44.entities.Guide.filter(
-        { category: profiles?.[0]?.primary_goal, published: true },
-        'order'
-      );
-      return guides;
+      const { data, error } = await supabase
+        .from('guides')
+        .select('*')
+        .eq('category', profiles?.[0]?.primary_goal)
+        .eq('published', true)
+        .order('order', { ascending: true });
+      if (error) throw error;
+      return data || [];
     },
     enabled: !!profiles?.[0],
     staleTime: 10 * 60 * 1000
@@ -121,7 +135,7 @@ export default function Dashboard() {
     if (profileError) {
       return (
         <>
-          <Header logo={logo} />
+          <Header logo={logo} title="Dashboard Error" />
           <ErrorState 
             title="Unable to Load Profile"
             message="We couldn't load your profile. Please check your connection and try again."

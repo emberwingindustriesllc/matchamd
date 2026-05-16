@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import logo from '@/assets/logo.png';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useTranslation } from '@/components/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -145,6 +146,7 @@ const usStates = [
 
 export default function Onboarding() {
   const navigate = useNavigate();
+  const { user, isAuthenticated, navigateToLogin } = useAuth();
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -175,14 +177,10 @@ export default function Onboarding() {
   });
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) {
-        base44.auth.redirectToLogin(window.location.href);
-      }
-    };
-    checkAuth();
-  }, []);
+    if (!isAuthenticated) {
+      navigateToLogin();
+    }
+  }, [isAuthenticated]);
 
   const updateProfile = (field, value) => {
     setProfile(prev => ({ ...prev, [field]: value }));
@@ -200,22 +198,15 @@ export default function Onboarding() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) {
-        base44.auth.redirectToLogin(window.location.href);
+      if (!isAuthenticated || !user) {
+        navigateToLogin();
         return;
-      }
-
-      const user = await base44.auth.me();
-      
-      if (!user || !user.id) {
-        throw new Error('Unable to get user information. Please try logging in again.');
       }
 
       const profileData = {
         user_id: user.id,
         primary_goal: profile.primary_goal,
-        display_name: profile.display_name || user.full_name,
+        display_name: profile.display_name || user.email,
         country: profile.country || '',
         target_city: profile.target_city || '',
         target_state: profile.target_state || '',
@@ -243,16 +234,14 @@ export default function Onboarding() {
         points: 0
       };
 
-      await base44.entities.UserProfile.create(profileData);
+      const { error } = await supabase.from('user_profiles').insert(profileData);
+      if (error) throw error;
+      
+      console.log('Onboarding profile saved:', profileData);
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
       console.error('Onboarding error:', error);
-      if (error.message?.includes('Authentication') || error.status === 401) {
-        alert('Your session has expired. Please log in again.');
-        base44.auth.redirectToLogin(window.location.href);
-      } else {
-        alert(`Setup failed: ${error.message || 'Please try again'}`);
-      }
+      alert(`Setup failed: ${error.message || 'Please try again'}`);
     } finally {
       setIsSubmitting(false);
     }

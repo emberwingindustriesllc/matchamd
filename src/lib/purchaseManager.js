@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { base44 } from '@/api/base44Client';
+import { supabase } from '@/api/supabaseClient';
 import { getStripe } from '@/components/stripe/StripeProvider';
 
 /**
@@ -30,10 +30,10 @@ export const purchaseManager = {
     // Default Web/Stripe flow
     console.log(`[MatchaMD Stripe] Initializing Stripe Checkout for plan: ${planId}`);
     try {
-      const { data } = await base44.functions.invoke('stripeCheckout', { 
-        planId,
-        ...options
+      const { data, error } = await supabase.functions.invoke('stripeCheckout', { 
+        body: { planId, ...options }
       });
+      if (error) throw error;
       
       const stripe = await getStripe();
       if (stripe && data.url) {
@@ -59,12 +59,11 @@ export const purchaseManager = {
       return { success: false, method: 'iap_pending' };
     }
 
-    // Default Web/Stripe flow
     try {
-      const { data } = await base44.functions.invoke('stripeOneTimeCheckout', {
-        addOnId,
-        addOnName
+      const { data, error } = await supabase.functions.invoke('stripeOneTimeCheckout', {
+        body: { addOnId, addOnName }
       });
+      if (error) throw error;
       
       const stripe = await getStripe();
       if (stripe && data.url) {
@@ -89,7 +88,8 @@ export const purchaseManager = {
     }
 
     try {
-      const { data } = await base44.functions.invoke('stripePortal', {});
+      const { data, error } = await supabase.functions.invoke('stripePortal', { body: {} });
+      if (error) throw error;
       if (data.url) {
         window.location.href = data.url;
         return { success: true };

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import logo from '@/assets/logo.png';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { purchaseManager } from '@/lib/purchaseManager';
@@ -110,20 +111,26 @@ export default function Subscription() {
   const queryClient = useQueryClient();
   const [selectedPlan, setSelectedPlan] = useState(null);
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
+
 
   const { data: subscriptions } = useQuery({
     queryKey: ['subscription', user?.id],
-    queryFn: () => base44.entities.Subscription.filter({ user_id: user?.id }),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('subscriptions').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id
   });
 
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', user?.id],
-    queryFn: () => base44.entities.PurchasedContent.filter({ user_id: user?.id }),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('purchased_content').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id
   });
 
@@ -134,10 +141,12 @@ export default function Subscription() {
     mutationFn: async (planId) => {
       if (planId === 'free') {
         if (currentSubscription) {
-          return base44.entities.Subscription.update(currentSubscription.id, {
+          const { data, error } = await supabase.from('subscriptions').update({
             plan: 'free',
             status: 'active'
-          });
+          }).eq('id', currentSubscription.id).select().single();
+          if (error) throw error;
+          return data;
         }
         return;
       }

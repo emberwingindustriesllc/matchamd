@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
@@ -42,14 +43,15 @@ export default function IMGPrograms() {
   const [minIMGScore, setMinIMGScore] = useState(5);
   const [selectedProgram, setSelectedProgram] = useState(null);
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
 
   const { data: programs = [], isLoading } = useQuery({
     queryKey: ['residencyPrograms'],
-    queryFn: () => base44.entities.ResidencyProgram.list()
+    queryFn: async () => {
+      const { data, error } = await supabase.from('residency_programs').select('*');
+      if (error) throw error;
+      return data || [];
+    }
   });
 
   const specialties = [...new Set(programs.map(p => p.specialty))];

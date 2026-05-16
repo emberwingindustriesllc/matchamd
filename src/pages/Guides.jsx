@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -66,14 +67,15 @@ export default function Guides() {
   const [activeTab, setActiveTab] = useState('residency');
   const [viewMode, setViewMode] = useState('accordion');
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
 
   const { data: progressList = [] } = useQuery({
     queryKey: ['progress'],
-    queryFn: () => base44.entities.Progress.filter({ user_id: user?.id }),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('progress').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id,
     retry: 2,
     staleTime: 2 * 60 * 1000
@@ -81,7 +83,11 @@ export default function Guides() {
 
   const { data: profiles, error: profileError } = useQuery({
     queryKey: ['userProfile'],
-    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id,
     retry: 2,
     staleTime: 5 * 60 * 1000
@@ -90,11 +96,14 @@ export default function Guides() {
   const { data: dynamicGuides = [], isLoading: guidesLoading, error: guidesError } = useQuery({
     queryKey: ['guides', profiles?.[0]?.primary_goal],
     queryFn: async () => {
-      const guides = await base44.entities.Guide.filter(
-        { category: profiles?.[0]?.primary_goal, published: true },
-        'order'
-      );
-      return guides;
+      const { data, error } = await supabase
+        .from('guides')
+        .select('*')
+        .eq('category', profiles?.[0]?.primary_goal)
+        .eq('published', true)
+        .order('order', { ascending: true });
+      if (error) throw error;
+      return data || [];
     },
     enabled: !!profiles?.[0],
     staleTime: 10 * 60 * 1000

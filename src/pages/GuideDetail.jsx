@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
@@ -223,14 +224,15 @@ export default function GuideDetail() {
   
   const guide = guideContent[guideId] || guideContent.ecfmg_pathways;
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
 
   const { data: progressList = [] } = useQuery({
     queryKey: ['progress', guideId],
-    queryFn: () => base44.entities.Progress.filter({ user_id: user?.id, module_id: guideId }),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('progress').select('*').eq('user_id', user?.id).eq('module_id', guideId);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id
   });
 
@@ -240,17 +242,21 @@ export default function GuideDetail() {
   );
 
   const updateProgressMutation = useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async (dataToUpdate) => {
       if (progress) {
-        return base44.entities.Progress.update(progress.id, data);
+        const { data, error } = await supabase.from('progress').update(dataToUpdate).eq('id', progress.id).select().single();
+        if (error) throw error;
+        return data;
       } else {
-        return base44.entities.Progress.create({
+        const { data, error } = await supabase.from('progress').insert({
           user_id: user.id,
           pathway,
           module_id: guideId,
           module_name: guide.title,
-          ...data
-        });
+          ...dataToUpdate
+        }).select().single();
+        if (error) throw error;
+        return data;
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['progress'] })

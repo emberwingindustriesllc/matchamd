@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -189,14 +190,16 @@ const surgeryContent = {
 };
 
 export default function SurgeryGuide() {
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
+
 
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', user?.id],
-    queryFn: () => base44.entities.PurchasedContent.filter({ user_id: user?.id }),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('purchased_content').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id
   });
 

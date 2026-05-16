@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { supabase } from '@/api/supabaseClient';
+import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import translations from '@/components/translations';
 
@@ -11,16 +12,16 @@ const LanguageContext = createContext({
 
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState('en');
-
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
-    retry: false
-  });
+  const { user } = useAuth();
 
   const { data: profiles } = useQuery({
-    queryKey: ['userProfile'],
-    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id,
     retry: false
   });

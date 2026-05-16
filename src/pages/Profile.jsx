@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -69,20 +70,26 @@ export default function Profile() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editData, setEditData] = useState(null);
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user, logout } = useAuth();
+
 
   const { data: profiles, isLoading } = useQuery({
-    queryKey: ['userProfile'],
-    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id
   });
 
   const { data: progressList = [] } = useQuery({
-    queryKey: ['progress'],
-    queryFn: () => base44.entities.Progress.filter({ user_id: user?.id }),
+    queryKey: ['progress', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('progress').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id
   });
 
@@ -91,8 +98,11 @@ export default function Profile() {
   const totalModules = 13; // Total steps in residency pathway
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (data) => {
-      return base44.entities.UserProfile.update(profile.id, data);
+    /** @param {any} dataToUpdate */
+    mutationFn: async (dataToUpdate) => {
+      const { data, error } = await supabase.from('user_profiles').update(dataToUpdate).eq('id', profile.id).select().single();
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });
@@ -118,7 +128,7 @@ export default function Profile() {
   };
 
   const handleLogout = () => {
-    base44.auth.logout();
+    logout();
   };
 
   if (isLoading || !profile) {
@@ -168,9 +178,21 @@ export default function Profile() {
                     const file = e.target.files?.[0];
                     if (file) {
                       try {
-                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-                        await base44.entities.UserProfile.update(profile.id, { avatar_url: file_url });
-                        queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+                        const filePath = `${user.id}/${fileName}`;
+                        
+                        const { error: uploadError } = await supabase.storage
+                          .from('avatars')
+                          .upload(filePath, file);
+
+                        if (uploadError) throw uploadError;
+
+                        const { data } = supabase.storage
+                          .from('avatars')
+                          .getPublicUrl(filePath);
+
+                        updateProfileMutation.mutate({ avatar_url: data.publicUrl });
                       } catch (error) {
                         console.error('Error uploading avatar:', error);
                       }

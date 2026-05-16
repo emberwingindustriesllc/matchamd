@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Card } from '@/components/ui/card';
@@ -39,18 +40,25 @@ export default function Deadlines() {
   const [filter, setFilter] = useState('all');
   const [category, setCategory] = useState('all');
 
+  const { user } = useAuth();
+
   const { data: deadlines = [], isLoading } = useQuery({
     queryKey: ['deadlines'],
-    queryFn: () => base44.entities.Deadline.list('date', 100)
+    queryFn: async () => {
+      const { data, error } = await supabase.from('deadlines').select('*').order('date', { ascending: true }).limit(100);
+      if (error) throw error;
+      return data || [];
+    }
   });
 
   const { data: userProfile } = useQuery({
-    queryKey: ['userProfile'],
+    queryKey: ['userProfile', user?.id],
     queryFn: async () => {
-      const user = await base44.auth.me();
-      const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
-      return profiles[0];
-    }
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data?.[0] || null;
+    },
+    enabled: !!user?.id
   });
 
   const filteredDeadlines = useMemo(() => {

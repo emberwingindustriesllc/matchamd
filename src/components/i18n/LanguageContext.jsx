@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { translations } from './translations';
 import { useLocation } from 'react-router-dom';
@@ -15,16 +15,12 @@ export function LanguageProvider({ children }) {
   const [isRTL, setIsRTL] = useState(false);
   const location = useLocation();
   const isOnboarding = location.pathname.includes('Onboarding');
-
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me().catch(() => null),
-    retry: false
-  });
+  const { user } = useAuth();
 
   const { data: profiles } = useQuery({
     queryKey: ['userProfile', user?.id],
-    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
+    // TODO (data migration): replace with supabase.from('user_profiles').select().eq('user_id', user.id)
+    queryFn: () => Promise.resolve([]),
     enabled: !!user?.id && !isOnboarding,
     staleTime: 5 * 60 * 1000
   });

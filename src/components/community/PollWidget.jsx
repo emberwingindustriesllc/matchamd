@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,14 +12,15 @@ export default function PollWidget({ pollId, compact = false }) {
   const queryClient = useQueryClient();
   const [selectedOption, setSelectedOption] = useState(null);
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
 
   const { data: poll, isLoading } = useQuery({
     queryKey: ['poll', pollId],
-    queryFn: () => base44.entities.Poll.filter({ id: pollId }).then(p => p[0]),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('polls').select('*').eq('id', pollId).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
     enabled: !!pollId
   });
 
@@ -32,10 +34,11 @@ export default function PollWidget({ pollId, compact = false }) {
           : opt
       );
 
-      await base44.entities.Poll.update(poll.id, {
+      const { error } = await supabase.from('polls').update({
         options: updatedOptions,
         voted_by: [...(poll.voted_by || []), user.id]
-      });
+      }).eq('id', poll.id);
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['poll', pollId] });

@@ -1,4 +1,5 @@
 import AdminModeration from './pages/AdminModeration';
+import Login from './pages/Login';
 import Community from './pages/Community';
 import Deadlines from './pages/Deadlines';
 import GuideDetail from './pages/GuideDetail';
@@ -20,6 +21,7 @@ import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "Login": Login,
     "AdminModeration": AdminModeration,
     "Community": Community,
     "Deadlines": Deadlines,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -71,22 +72,33 @@ export default function Community() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newPost, setNewPost] = useState({ title: '', content: '', category: 'general' });
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
 
   const { data: profiles } = useQuery({
-    queryKey: ['userProfile'],
-    queryFn: () => base44.entities.UserProfile.filter({ user_id: user?.id }),
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id
   });
 
   const { data: posts = [], isLoading, error: postsError, refetch } = useQuery({
     queryKey: ['posts', activeCategory, sortBy],
     queryFn: async () => {
-      const filter = activeCategory !== 'all' ? { category: activeCategory } : {};
-      return base44.entities.ForumPost.filter(filter, sortBy === 'recent' ? '-created_date' : '-likes_count');
+      let query = supabase.from('forum_posts').select('*');
+      if (activeCategory !== 'all') {
+        query = query.eq('category', activeCategory);
+      }
+      if (sortBy === 'recent') {
+        query = query.order('created_date', { ascending: false });
+      } else {
+        query = query.order('likes_count', { ascending: false });
+      }
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
     },
     retry: 2,
     staleTime: 2 * 60 * 1000
@@ -95,17 +107,19 @@ export default function Community() {
   const profile = profiles?.[0];
 
   const createPostMutation = useMutation({
+    /** @param {any} postData */
     mutationFn: async (postData) => {
-      return base44.entities.ForumPost.create({
+      const { error } = await supabase.from('forum_posts').insert({
         ...postData,
         author_id: user.id,
-        author_name: profile?.display_name || user?.full_name,
+        author_name: profile?.display_name || user?.email,
         author_avatar: profile?.avatar_url,
         is_mentor: profile?.mentor_verified || false,
         likes_count: 0,
         liked_by: [],
         comments_count: 0
       });
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -115,16 +129,18 @@ export default function Community() {
   });
 
   const likePostMutation = useMutation({
+    /** @param {any} post */
     mutationFn: async (post) => {
       const isLiked = post.liked_by?.includes(user.id);
       const newLikedBy = isLiked 
         ? post.liked_by.filter(id => id !== user.id)
         : [...(post.liked_by || []), user.id];
       
-      return base44.entities.ForumPost.update(post.id, {
+      const { error } = await supabase.from('forum_posts').update({
         liked_by: newLikedBy,
         likes_count: newLikedBy.length
-      });
+      }).eq('id', post.id);
+      if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['posts'] })
   });

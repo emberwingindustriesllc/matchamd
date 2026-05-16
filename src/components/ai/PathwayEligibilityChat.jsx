@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { base44 } from '@/api/base44Client';
+import { supabase } from '@/api/supabaseClient';
 import { Bot, Send, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -43,8 +43,9 @@ User Profile Context:
 - Country: ${userProfile.country || 'Not specified'}
 ` : '';
 
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an ECFMG Pathway Eligibility Expert. Help the user determine which ECFMG certification pathway they qualify for.
+      const { data, error } = await supabase.functions.invoke('core_invoke_llm', {
+        body: {
+          prompt: `You are an ECFMG Pathway Eligibility Expert. Help the user determine which ECFMG certification pathway they qualify for.
 
 ECFMG Pathways (as of 2024+):
 1. **Pathway 1**: For physicians with an unrestricted license to practice medicine in the country where their medical school is located
@@ -69,10 +70,14 @@ ${context}
 User Question: ${userMessage}
 
 Provide a clear, concise answer. If determining eligibility, ask clarifying questions. If the user appears eligible for a pathway, clearly state which one and why. Always encourage them to verify on ECFMG.org for official confirmation.`,
-        add_context_from_internet: false
+          add_context_from_internet: false
+        }
       });
+      if (error) throw error;
+      
+      const responseText = data?.result || data?.response || data || 'Sorry, I am unable to process that at the moment.';
 
-      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: responseText }]);
     } catch (error) {
       toast.error('Failed to get response. Please try again.');
       console.error('AI chat error:', error);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -51,34 +52,40 @@ export default function Mentors() {
   const [showFilters, setShowFilters] = useState(false);
   const [videoCallMentor, setVideoCallMentor] = useState(null);
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
 
   const { data: myProfile } = useQuery({
-    queryKey: ['userProfile'],
+    queryKey: ['userProfile', user?.id],
     queryFn: async () => {
-      const profiles = await base44.entities.UserProfile.filter({ user_id: user?.id });
-      return profiles[0];
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data?.[0] || null;
     },
     enabled: !!user?.id
   });
 
   const { data: mentors = [], isLoading } = useQuery({
     queryKey: ['mentors'],
-    queryFn: () => base44.entities.UserProfile.filter({ mentor_verified: true })
+    queryFn: async () => {
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('mentor_verified', true);
+      if (error) throw error;
+      return data || [];
+    }
   });
 
   const { data: myRequests = [] } = useQuery({
     queryKey: ['mentorRequests'],
-    queryFn: () => base44.entities.MentorRequest.filter({ mentee_id: user?.id }),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('mentor_requests').select('*').eq('mentee_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id
   });
 
   const sendRequestMutation = useMutation({
     mutationFn: async () => {
-      return base44.entities.MentorRequest.create({
+      const { data, error } = await supabase.from('mentor_requests').insert({
         mentee_id: user.id,
         mentor_id: selectedMentor.user_id,
         mentee_name: myProfile?.display_name || user?.full_name,
@@ -87,7 +94,9 @@ export default function Mentors() {
         goal: myProfile?.primary_goal,
         specialty_interest: myProfile?.target_specialty,
         status: 'pending'
-      });
+      }).select().single();
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mentorRequests'] });

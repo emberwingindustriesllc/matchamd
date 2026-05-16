@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
@@ -32,14 +33,16 @@ export default function ResearchOpportunities() {
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
+
 
   const { data: opportunities = [], isLoading } = useQuery({
     queryKey: ['researchOpportunities'],
-    queryFn: () => base44.entities.ResearchOpportunity.filter({ status: 'open' })
+    queryFn: async () => {
+      const { data, error } = await supabase.from('research_opportunities').select('*').eq('status', 'open');
+      if (error) throw error;
+      return data || [];
+    }
   });
 
   const specialties = [...new Set(opportunities.map(o => o.specialty))];

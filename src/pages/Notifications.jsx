@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -46,35 +47,42 @@ export default function Notifications() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
-  });
+  const { user } = useAuth();
+
 
   const { data: notifications = [], isLoading } = useQuery({
-    queryKey: ['allNotifications'],
-    queryFn: () => base44.entities.Notification.filter({ user_id: user?.id }, '-created_date'),
+    queryKey: ['allNotifications', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('notifications').select('*').eq('user_id', user?.id).order('created_date', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id
   });
 
   const markReadMutation = useMutation({
     mutationFn: async (id) => {
-      return base44.entities.Notification.update(id, { read: true });
+      const { data, error } = await supabase.from('notifications').update({ read: true }).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['allNotifications'] })
   });
 
   const markAllReadMutation = useMutation({
     mutationFn: async () => {
-      const unread = notifications.filter(n => !n.read);
-      await Promise.all(unread.map(n => base44.entities.Notification.update(n.id, { read: true })));
+      const { data, error } = await supabase.from('notifications').update({ read: true }).eq('user_id', user.id).eq('read', false);
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['allNotifications'] })
   });
 
   const deleteNotificationMutation = useMutation({
     mutationFn: async (id) => {
-      return base44.entities.Notification.delete(id);
+      const { data, error } = await supabase.from('notifications').delete().eq('id', id);
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['allNotifications'] })
   });

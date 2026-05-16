@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/api/supabaseClient';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Card } from '@/components/ui/card';
@@ -30,23 +31,46 @@ export default function AdminModeration() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('posts');
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me()
+  const { user } = useAuth();
+  
+  const { data: profiles } = useQuery({
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user.id);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id
   });
+
+  const profile = profiles?.[0];
 
   const { data: posts = [], isLoading: postsLoading } = useQuery({
     queryKey: ['allPosts'],
-    queryFn: () => base44.entities.ForumPost.list('-created_date', 100)
+    queryFn: async () => {
+      const { data, error } = await supabase.from('forum_posts').select('*').order('created_date', { ascending: false }).limit(100);
+      if (error) throw error;
+      return data || [];
+    }
   });
 
   const { data: comments = [], isLoading: commentsLoading } = useQuery({
     queryKey: ['allComments'],
-    queryFn: () => base44.entities.Comment.list('-created_date', 100)
+    queryFn: async () => {
+      const { data, error } = await supabase.from('comments').select('*').order('created_date', { ascending: false }).limit(100);
+      if (error) throw error;
+      return data || [];
+    }
   });
 
   const updatePostMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.ForumPost.update(id, data),
+    /** @param {any} params */
+    mutationFn: async (params) => {
+      const { id, data } = params;
+      const { error } = await supabase.from('forum_posts').update(data).eq('id', id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allPosts'] });
       toast.success('Post updated');
@@ -54,7 +78,11 @@ export default function AdminModeration() {
   });
 
   const deletePostMutation = useMutation({
-    mutationFn: (id) => base44.entities.ForumPost.delete(id),
+    /** @param {any} id */
+    mutationFn: async (id) => {
+      const { error } = await supabase.from('forum_posts').delete().eq('id', id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allPosts'] });
       toast.success('Post deleted');
@@ -62,14 +90,18 @@ export default function AdminModeration() {
   });
 
   const deleteCommentMutation = useMutation({
-    mutationFn: (id) => base44.entities.Comment.delete(id),
+    /** @param {any} id */
+    mutationFn: async (id) => {
+      const { error } = await supabase.from('comments').delete().eq('id', id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allComments'] });
       toast.success('Comment deleted');
     }
   });
 
-  if (user && user.role !== 'admin') {
+  if (profile && profile.role !== 'admin') {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
         <Card className="p-8 text-center max-w-md">
