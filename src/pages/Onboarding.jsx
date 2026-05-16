@@ -143,6 +143,9 @@ const usStates = [
   'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
 ];
 
+const currentYear = new Date().getFullYear();
+const graduationYears = Array.from({ length: 30 }, (_, i) => currentYear - i);
+
 export default function Onboarding() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -162,6 +165,7 @@ export default function Onboarding() {
     fellowship_type: '',
     target_specialty: '',
     graduation_year: null,
+    graduation_cutoff_aware: false,
     usmle_step1_status: 'not_started',
     usmle_step1_score: '',
     usmle_step2_status: 'not_started',
@@ -169,8 +173,11 @@ export default function Onboarding() {
     usmle_step3_status: 'not_started',
     usmle_step3_result: 'not_applicable',
     ecfmg_certified: false,
+    acgme_waiver: false,
     visa_status: 'none',
     us_clinical_experience: false,
+    previous_training: false,
+    previous_training_details: '',
     medical_school_custom: ''
   });
 
@@ -212,6 +219,10 @@ export default function Onboarding() {
         throw new Error('Unable to get user information. Please try logging in again.');
       }
 
+      const medSchoolFinal = profile.medical_school === 'Other' 
+        ? (profile.medical_school_custom || 'Other') 
+        : (profile.medical_school || '');
+
       const profileData = {
         user_id: user.id,
         primary_goal: profile.primary_goal,
@@ -219,7 +230,7 @@ export default function Onboarding() {
         country: profile.country || '',
         target_city: profile.target_city || '',
         target_state: profile.target_state || '',
-        medical_school: profile.medical_school || '',
+        medical_school: medSchoolFinal,
         medical_school_country: profile.medical_school_country || '',
         undergraduate_college: profile.undergraduate_college || '',
         languages: profile.languages || ['en'],
@@ -227,6 +238,7 @@ export default function Onboarding() {
         fellowship_type: profile.fellowship_type || '',
         target_specialty: profile.target_specialty || '',
         graduation_year: profile.graduation_year || null,
+        graduation_cutoff_aware: profile.graduation_cutoff_aware || false,
         usmle_step1_status: profile.usmle_step1_status || 'not_started',
         usmle_step1_score: profile.usmle_step1_score || '',
         usmle_step2_status: profile.usmle_step2_status || 'not_started',
@@ -234,8 +246,11 @@ export default function Onboarding() {
         usmle_step3_status: profile.usmle_step3_status || 'not_started',
         usmle_step3_result: profile.usmle_step3_result || 'not_applicable',
         ecfmg_certified: profile.ecfmg_certified || false,
+        acgme_waiver: profile.acgme_waiver || false,
         visa_status: profile.visa_status || 'none',
         us_clinical_experience: profile.us_clinical_experience || false,
+        previous_training: profile.previous_training || false,
+        previous_training_details: profile.previous_training_details || '',
         onboarding_complete: true,
         is_mentor: false,
         mentor_verified: false,
@@ -414,7 +429,7 @@ export default function Onboarding() {
       </div>
     </motion.div>,
 
-    // Step 2: Languages
+    // Step 2: Languages (collected but app stays in English)
     <motion.div
       key="languages"
       initial={{ opacity: 0, y: 20 }}
@@ -426,10 +441,13 @@ export default function Onboarding() {
         <Languages className="w-8 h-8 text-white" />
       </div>
       <h2 className="text-2xl font-bold text-center text-slate-800 dark:text-white mb-2">
-        {t('onboarding.languages')}
+        Languages You Speak
       </h2>
-      <p className="text-slate-500 dark:text-slate-400 text-center mb-6">
-        {t('onboarding.languagesSubtitle')}
+      <p className="text-slate-500 dark:text-slate-400 text-center mb-2">
+        Select all languages you speak. This helps us connect you with the right mentors.
+      </p>
+      <p className="text-xs text-slate-400 dark:text-slate-500 text-center mb-6 italic">
+        The app interface is in English only.
       </p>
 
       <div className="grid grid-cols-2 gap-3 mb-6">
@@ -446,20 +464,6 @@ export default function Onboarding() {
             <span className="font-medium text-slate-800 dark:text-white">{lang.name}</span>
           </button>
         ))}
-      </div>
-
-      <div>
-        <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.preferredLanguage')}</Label>
-        <Select value={profile.preferred_language} onValueChange={(v) => updateProfile('preferred_language', v)}>
-          <SelectTrigger className="h-12 rounded-xl mt-1">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {languages.map(l => (
-              <SelectItem key={l.code} value={l.code}>{l.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
     </motion.div>,
 
@@ -515,10 +519,10 @@ export default function Onboarding() {
       className="px-6"
     >
       <h2 className="text-2xl font-bold text-center text-slate-800 dark:text-white mb-2">
-        {t('onboarding.details')}
+        Your Training Details
       </h2>
       <p className="text-slate-500 dark:text-slate-400 text-center mb-6">
-        {t('onboarding.detailsSubtitle')}
+        Help us personalize your pathway guidance
       </p>
 
       <div className="space-y-4">
@@ -633,6 +637,96 @@ export default function Onboarding() {
           </>
         )}
 
+        {/* Graduation Year */}
+        <div>
+          <Label className="text-slate-700 dark:text-slate-300">Medical School Graduation Year</Label>
+          <Select value={profile.graduation_year?.toString() || ''} onValueChange={(v) => updateProfile('graduation_year', parseInt(v))}>
+            <SelectTrigger className="h-12 rounded-xl mt-1">
+              <SelectValue placeholder="Select year" />
+            </SelectTrigger>
+            <SelectContent>
+              {graduationYears.map(y => (
+                <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {profile.graduation_year && (currentYear - profile.graduation_year) >= 10 && (
+            <div className="mt-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+              <p className="text-xs text-amber-800 dark:text-amber-300 font-medium">⚠️ Graduation Cutoff Notice</p>
+              <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
+                Some residency programs have a 10-year graduation cutoff policy. Applicants who graduated over 10 years ago may face additional challenges. Consider programs that explicitly welcome older graduates or look into APPD for unfilled spots.
+              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <Checkbox
+                  checked={profile.graduation_cutoff_aware}
+                  onCheckedChange={(v) => updateProfile('graduation_cutoff_aware', v)}
+                />
+                <span className="text-xs text-amber-700 dark:text-amber-400">I understand this consideration</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Visa Status */}
+        <div>
+          <Label className="text-slate-700 dark:text-slate-300">Current Visa / Immigration Status</Label>
+          <Select value={profile.visa_status} onValueChange={(v) => updateProfile('visa_status', v)}>
+            <SelectTrigger className="h-12 rounded-xl mt-1">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No US visa / Outside US</SelectItem>
+              <SelectItem value="j1">J-1 Exchange Visitor</SelectItem>
+              <SelectItem value="h1b">H-1B Work Visa</SelectItem>
+              <SelectItem value="green_card">Green Card / Permanent Resident</SelectItem>
+              <SelectItem value="citizen">US Citizen</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* ACGME Waiver */}
+        <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+          <div className="flex items-start gap-3">
+            <Checkbox
+              checked={profile.acgme_waiver}
+              onCheckedChange={(v) => updateProfile('acgme_waiver', v)}
+              className="mt-0.5"
+            />
+            <div>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">I have or need an ACGME waiver</span>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                An ACGME waiver (J-1 waiver) typically adds 1 extra year of required service in an underserved area before you can pursue other opportunities. Check this if applicable.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Previous Training */}
+        <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
+          <div className="flex items-start gap-3 mb-3">
+            <Checkbox
+              checked={profile.previous_training}
+              onCheckedChange={(v) => updateProfile('previous_training', v)}
+              className="mt-0.5"
+            />
+            <div>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">I have had previous US residency or fellowship training</span>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                This includes any ACGME-accredited program, even if not completed.
+              </p>
+            </div>
+          </div>
+          {profile.previous_training && (
+            <textarea
+              placeholder="Please describe: specialty, program name, years attended, and reason for leaving (e.g., 'Internal Medicine at X Hospital, 2021-2022, left due to visa issues')"
+              value={profile.previous_training_details}
+              onChange={(e) => updateProfile('previous_training_details', e.target.value)}
+              className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-sm resize-none h-24"
+            />
+          )}
+        </div>
+
         <div>
           <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.step1Status')}</Label>
           <Select value={profile.usmle_step1_status} onValueChange={(v) => updateProfile('usmle_step1_status', v)}>
@@ -725,7 +819,7 @@ export default function Onboarding() {
             checked={profile.ecfmg_certified}
             onCheckedChange={(v) => updateProfile('ecfmg_certified', v)}
           />
-          <span className="text-slate-700 dark:text-slate-300">{t('onboarding.ecfmgCertified')}</span>
+          <span className="text-slate-700 dark:text-slate-300">I am ECFMG certified</span>
         </div>
 
         <div className="flex items-center gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
@@ -733,8 +827,26 @@ export default function Onboarding() {
             checked={profile.us_clinical_experience}
             onCheckedChange={(v) => updateProfile('us_clinical_experience', v)}
           />
-          <span className="text-slate-700 dark:text-slate-300">{t('onboarding.usClinical')}</span>
+          <span className="text-slate-700 dark:text-slate-300">I have US clinical experience (observership/externship/rotation)</span>
         </div>
+
+        {/* Alternative Pathways Notice */}
+        {profile.previous_training && (
+          <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300 mb-1">💡 Alternative Pathway</p>
+            <p className="text-xs text-emerald-700 dark:text-emerald-400">
+              Since you have previous training, consider checking <strong>APPD (appd.org)</strong> for unfilled residency spots. Programs post available positions mid-year — this is a faster route for applicants with prior US training experience.
+            </p>
+          </div>
+        )}
+        {profile.graduation_year && (currentYear - profile.graduation_year) >= 10 && (
+          <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300 mb-1">💡 Alternative Pathway for Your Situation</p>
+            <p className="text-xs text-emerald-700 dark:text-emerald-400">
+              Given your graduation year, also check <strong>APPD (appd.org)</strong> for unfilled residency spots mid-year. Some community programs are more flexible with graduation cutoffs and may have immediate openings.
+            </p>
+          </div>
+        )}
       </div>
     </motion.div>
   ];
@@ -744,7 +856,7 @@ export default function Onboarding() {
       case 0: return profile.display_name.length > 0;
       case 1: return profile.country && profile.medical_school_country && profile.medical_school;
       case 2: return profile.languages.length > 0;
-      case 3: return profile.primary_goal;
+      case 3: return !!profile.primary_goal;
       case 4: return true;
       default: return false;
     }
