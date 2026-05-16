@@ -243,7 +243,13 @@ export default function Onboarding() {
         points: 0
       };
 
-      await base44.entities.UserProfile.create(profileData);
+      // Check if profile already exists to avoid duplicate create
+      const existing = await base44.entities.UserProfile.filter({ user_id: user.id });
+      if (existing && existing.length > 0) {
+        await base44.entities.UserProfile.update(existing[0].id, { ...profileData, onboarding_complete: true });
+      } else {
+        await base44.entities.UserProfile.create(profileData);
+      }
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
       console.error('Onboarding error:', error);
