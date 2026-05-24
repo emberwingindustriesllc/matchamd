@@ -28,18 +28,17 @@ export function LanguageProvider({ children }) {
   const profile = profiles?.[0];
 
   useEffect(() => {
-    const userLang = profile?.preferred_language || 'en';
-    setLanguage(userLang);
-    setIsRTL(userLang === 'ar');
+    setLanguage('en');
+    setIsRTL(false);
     
     // Set HTML dir attribute for RTL languages
-    document.documentElement.dir = userLang === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = userLang;
+    document.documentElement.dir = 'ltr';
+    document.documentElement.lang = 'en';
   }, [profile]);
 
   const t = (key, defaultValue = key) => {
     const keys = key.split('.');
-    let value = translations[language];
+    let value = translations['en'];
     
     for (const k of keys) {
       if (value && typeof value === 'object') {

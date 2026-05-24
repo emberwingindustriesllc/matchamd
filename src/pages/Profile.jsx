@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -29,11 +29,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { 
   Settings, 
-  Edit2, 
   LogOut, 
   Trophy, 
   MapPin, 
@@ -121,7 +119,12 @@ export default function Profile() {
       medical_school: profile?.medical_school || '',
       medical_school_country: profile?.medical_school_country || '',
       undergraduate_college: profile?.undergraduate_college || '',
-      preferred_language: profile?.preferred_language || 'en',
+      visa_status: profile?.visa_status || 'none',
+      acgme_waiver: profile?.acgme_waiver || false,
+      previous_training: profile?.previous_training || '',
+      usmle_step1_score: profile?.usmle_step1_score || '',
+      usmle_step2_score: profile?.usmle_step2_score || '',
+      graduation_year: profile?.graduation_year || '',
       dark_mode: profile?.dark_mode || false
     });
     setIsEditOpen(true);
@@ -351,12 +354,36 @@ export default function Profile() {
                 <Globe className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
               <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Language</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Visa Status</p>
                 <p className="font-medium text-slate-800 dark:text-white">
-                  {languages.find(l => l.code === profile.preferred_language)?.name || 'English'}
+                  {profile.visa_status === 'none' ? 'None / Need Sponsorship' : profile.visa_status}
                 </p>
               </div>
             </div>
+            
+            {profile.acgme_waiver && (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">ACGME Waiver</p>
+                  <p className="font-medium text-slate-800 dark:text-white">Yes</p>
+                </div>
+              </div>
+            )}
+            
+            {profile.previous_training && (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+                  <Stethoscope className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Previous Training</p>
+                  <p className="font-medium text-slate-800 dark:text-white">{profile.previous_training}</p>
+                </div>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -514,20 +541,72 @@ export default function Profile() {
               </div>
               
               <div>
-                <Label>Preferred Language</Label>
+                <Label>Visa Status</Label>
                 <Select 
-                  value={editData.preferred_language} 
-                  onValueChange={(v) => setEditData({ ...editData, preferred_language: v })}
+                  value={editData.visa_status} 
+                  onValueChange={(v) => setEditData({ ...editData, visa_status: v })}
                 >
                   <SelectTrigger className="rounded-xl mt-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {languages.map(l => (
-                      <SelectItem key={l.code} value={l.code}>{l.name}</SelectItem>
-                    ))}
+                    <SelectItem value="none">None / Need Sponsorship</SelectItem>
+                    <SelectItem value="J1">J-1 Visa</SelectItem>
+                    <SelectItem value="H1B">H-1B Visa</SelectItem>
+                    <SelectItem value="Citizen">US Citizen</SelectItem>
+                    <SelectItem value="GreenCard">Permanent Resident (Green Card)</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <Label>Graduation Year</Label>
+                <Input
+                  type="number"
+                  value={editData.graduation_year}
+                  onChange={(e) => setEditData({ ...editData, graduation_year: e.target.value })}
+                  className="rounded-xl mt-1"
+                />
+              </div>
+
+              <div>
+                <Label>Previous Training</Label>
+                <Input
+                  value={editData.previous_training}
+                  onChange={(e) => setEditData({ ...editData, previous_training: e.target.value })}
+                  placeholder="Have you had previous training? If so, what?"
+                  className="rounded-xl mt-1"
+                />
+              </div>
+
+              <div>
+                <Label>USMLE Step 1 Score</Label>
+                <Input
+                  value={editData.usmle_step1_score}
+                  onChange={(e) => setEditData({ ...editData, usmle_step1_score: e.target.value })}
+                  className="rounded-xl mt-1"
+                />
+              </div>
+
+              <div>
+                <Label>USMLE Step 2 CK Score</Label>
+                <Input
+                  value={editData.usmle_step2_score}
+                  onChange={(e) => setEditData({ ...editData, usmle_step2_score: e.target.value })}
+                  className="rounded-xl mt-1"
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                  <span className="text-slate-700 dark:text-slate-300">ACGME Waiver</span>
+                </div>
+                <Switch
+                  checked={editData.acgme_waiver}
+                  onCheckedChange={(v) => setEditData({ ...editData, acgme_waiver: v })}
+                />
               </div>
               
               <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800">

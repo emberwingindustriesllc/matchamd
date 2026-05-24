@@ -59,18 +59,6 @@ export default function Login() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setError('');
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/Dashboard` },
-    });
-    if (error) {
-      setError(error.message);
-      setIsLoading(false);
-    }
-  };
 
   const modeConfig = {
     login:  { title: 'Welcome back',       subtitle: 'Sign in to your FMG Pathway account', cta: 'Sign In' },
@@ -203,28 +191,7 @@ export default function Login() {
             </Button>
           </form>
 
-          {/* Divider */}
-          {mode !== 'reset' && (
-            <>
-              <div className="flex items-center gap-3 my-5">
-                <div className="flex-1 h-px bg-white/10" />
-                <span className="text-xs text-slate-500">or</span>
-                <div className="flex-1 h-px bg-white/10" />
-              </div>
 
-              {/* Google OAuth */}
-              <Button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={isLoading}
-                variant="outline"
-                className="w-full h-12 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
-              >
-                <Chrome className="w-5 h-5" />
-                Continue with Google
-              </Button>
-            </>
-          )}
 
           {/* Mode switcher */}
           <div className="mt-6 text-center text-sm text-slate-400">

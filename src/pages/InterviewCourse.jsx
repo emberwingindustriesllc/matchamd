@@ -5,7 +5,6 @@ import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -13,10 +12,7 @@ import {
   Video,
   CheckCircle2,
   PlayCircle,
-  Lock,
-  MessageSquare,
   Lightbulb,
-  Users,
   FileText,
   Star
 } from 'lucide-react';

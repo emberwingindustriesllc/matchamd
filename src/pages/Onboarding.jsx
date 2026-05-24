@@ -23,8 +23,7 @@ import {
   ChevronLeft,
   Globe,
   Languages,
-  Target,
-  Sparkles
+  Target
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -172,6 +171,8 @@ export default function Onboarding() {
     usmle_step3_result: 'not_applicable',
     ecfmg_certified: false,
     visa_status: 'none',
+    acgme_waiver: false,
+    previous_training: '',
     us_clinical_experience: false,
     medical_school_custom: ''
   });
@@ -226,6 +227,8 @@ export default function Onboarding() {
         usmle_step3_result: profile.usmle_step3_result || 'not_applicable',
         ecfmg_certified: profile.ecfmg_certified || false,
         visa_status: profile.visa_status || 'none',
+        acgme_waiver: profile.acgme_waiver || false,
+        previous_training: profile.previous_training || '',
         us_clinical_experience: profile.us_clinical_experience || false,
         onboarding_complete: true,
         is_mentor: false,
@@ -432,15 +435,18 @@ export default function Onboarding() {
       </div>
 
       <div>
-        <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.preferredLanguage')}</Label>
-        <Select value={profile.preferred_language} onValueChange={(v) => updateProfile('preferred_language', v)}>
+        <Label className="text-slate-700 dark:text-slate-300">Visa Status</Label>
+        <Select value={profile.visa_status} onValueChange={(v) => updateProfile('visa_status', v)}>
           <SelectTrigger className="h-12 rounded-xl mt-1">
-            <SelectValue />
+            <SelectValue placeholder="Select current visa status" />
           </SelectTrigger>
           <SelectContent>
-            {languages.map(l => (
-              <SelectItem key={l.code} value={l.code}>{l.name}</SelectItem>
-            ))}
+            <SelectItem value="none">None / Need Sponsorship</SelectItem>
+            <SelectItem value="J1">J-1 Visa</SelectItem>
+            <SelectItem value="H1B">H-1B Visa</SelectItem>
+            <SelectItem value="Citizen">US Citizen</SelectItem>
+            <SelectItem value="GreenCard">Permanent Resident (Green Card)</SelectItem>
+            <SelectItem value="Other">Other</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -617,6 +623,37 @@ export default function Onboarding() {
         )}
 
         <div>
+          <Label className="text-slate-700 dark:text-slate-300">Graduation Year</Label>
+          <Input
+            type="number"
+            placeholder="e.g., 2021"
+            value={profile.graduation_year || ''}
+            onChange={(e) => updateProfile('graduation_year', e.target.value)}
+            className="h-12 rounded-xl mt-1"
+          />
+          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+            Note: Sometimes there is a graduation date cutoff. Applicants who graduated over ten years ago may have problems matching.
+          </p>
+        </div>
+
+        <div>
+          <Label className="text-slate-700 dark:text-slate-300">Previous Training</Label>
+          <Input
+            placeholder="Have you had previous training? If so, what?"
+            value={profile.previous_training}
+            onChange={(e) => updateProfile('previous_training', e.target.value)}
+            className="h-12 rounded-xl mt-1"
+          />
+        </div>
+
+        <div className="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800">
+          <p className="text-sm text-indigo-800 dark:text-indigo-300 font-medium mb-1">Alternative Pathways</p>
+          <p className="text-xs text-indigo-600 dark:text-indigo-400">
+            Not a fresh graduate? Consider alternative pathways, such as looking at appd.com for unfilled spots in residency.
+          </p>
+        </div>
+
+        <div>
           <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.step1Status')}</Label>
           <Select value={profile.usmle_step1_status} onValueChange={(v) => updateProfile('usmle_step1_status', v)}>
             <SelectTrigger className="h-12 rounded-xl mt-1">
@@ -717,6 +754,18 @@ export default function Onboarding() {
             onCheckedChange={(v) => updateProfile('us_clinical_experience', v)}
           />
           <span className="text-slate-700 dark:text-slate-300">{t('onboarding.usClinical')}</span>
+        </div>
+        
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
+          <Checkbox
+            checked={profile.acgme_waiver}
+            onCheckedChange={(v) => updateProfile('acgme_waiver', v)}
+            className="mt-1"
+          />
+          <div>
+            <span className="text-slate-700 dark:text-slate-300 block">Do you have an ACGME Waiver?</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">An ACGME waiver gives you an extra year.</span>
+          </div>
         </div>
       </div>
     </motion.div>

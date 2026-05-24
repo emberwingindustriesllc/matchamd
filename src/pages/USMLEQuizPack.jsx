@@ -11,10 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   BookOpen, 
-  Trophy, 
-  Clock, 
-  CheckCircle2,
-  XCircle,
+  Clock,
   ChevronRight,
   Brain,
   Award

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import logo from '@/assets/logo.png';
 import { useAuth } from '@/lib/AuthContext';
@@ -28,8 +28,7 @@ import {
   Sparkles,
   Users,
   GraduationCap,
-  Target,
-  Video
+  Target
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 

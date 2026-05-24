@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -19,15 +19,13 @@ import {
 } from '@/components/ui/select';
 import { 
   Search, 
-  MapPin, 
-  TrendingUp, 
-  Users, 
-  Award,
+  MapPin,
   CheckCircle2,
   ExternalLink,
-  Filter,
   GraduationCap,
-  Globe
+  Globe,
+  Heart,
+  Info
 } from 'lucide-react';
 import { 
   Dialog, 
@@ -43,7 +41,40 @@ export default function IMGPrograms() {
   const [minIMGScore, setMinIMGScore] = useState(5);
   const [selectedProgram, setSelectedProgram] = useState(null);
 
+  const [sortBy, setSortBy] = useState('score_desc');
+
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const { data: profiles } = useQuery({
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id
+  });
+  const profile = profiles?.[0];
+
+  const updateFavoritesMutation = useMutation({
+    mutationFn: async (newFavorites) => {
+      const { data, error } = await supabase.from('user_profiles').update({ favorite_programs: newFavorites }).eq('id', profile.id);
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['userProfile'] })
+  });
+
+  const toggleFavorite = (e, progId) => {
+    e.stopPropagation();
+    if (!profile) return;
+    const currentFavs = profile.favorite_programs || [];
+    const newFavs = currentFavs.includes(progId) 
+      ? currentFavs.filter(id => id !== progId)
+      : [...currentFavs, progId];
+    updateFavoritesMutation.mutate(newFavs);
+  };
 
   const { data: programs = [], isLoading } = useQuery({
     queryKey: ['residencyPrograms'],
@@ -57,7 +88,7 @@ export default function IMGPrograms() {
   const specialties = [...new Set(programs.map(p => p.specialty))];
   const states = [...new Set(programs.map(p => p.state))];
 
-  const filteredPrograms = programs.filter(prog => {
+  let filteredPrograms = programs.filter(prog => {
     const matchesSearch = prog.program_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          prog.institution.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSpecialty = selectedSpecialty === 'all' || prog.specialty === selectedSpecialty;
@@ -65,6 +96,12 @@ export default function IMGPrograms() {
     const matchesIMGScore = prog.img_friendly_score >= minIMGScore;
     return matchesSearch && matchesSpecialty && matchesState && matchesIMGScore;
   });
+
+  if (sortBy === 'score_desc') {
+    filteredPrograms.sort((a, b) => b.img_friendly_score - a.img_friendly_score);
+  } else if (sortBy === 'name_asc') {
+    filteredPrograms.sort((a, b) => a.program_name.localeCompare(b.program_name));
+  }
 
   const getIMGFriendlinessColor = (score) => {
     if (score >= 8) return 'text-emerald-600 dark:text-emerald-400';
@@ -90,6 +127,10 @@ export default function IMGPrograms() {
               <p className="text-slate-600 dark:text-slate-400 text-sm">
                 Find programs with high IMG acceptance rates, visa sponsorship, and competitive score requirements. Data includes number of current IMG residents and average scores.
               </p>
+              <div className="flex items-center gap-1 mt-2 text-xs text-emerald-700 dark:text-emerald-300 font-medium">
+                <Info className="w-4 h-4" />
+                <span>Program data is sourced from FRIEDA.</span>
+              </div>
             </div>
           </div>
         </Card>
@@ -128,6 +169,16 @@ export default function IMGPrograms() {
                 {states.sort().map(state => (
                   <SelectItem key={state} value={state}>{state}</SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="rounded-xl">
+                <SelectValue placeholder="Sort By" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="score_desc">IMG Friendliness (High to Low)</SelectItem>
+                <SelectItem value="name_asc">Program Name (A-Z)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -186,11 +237,23 @@ export default function IMGPrograms() {
                         {prog.institution}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <div className={`text-2xl font-bold ${getIMGFriendlinessColor(prog.img_friendly_score)}`}>
-                        {prog.img_friendly_score}/10
+                    <div className="flex flex-col items-end gap-2">
+                      <button 
+                        onClick={(e) => toggleFavorite(e, prog.id)}
+                        className={`p-2 rounded-full transition-colors ${
+                          profile?.favorite_programs?.includes(prog.id) 
+                            ? 'bg-rose-100 text-rose-500' 
+                            : 'bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-400'
+                        }`}
+                      >
+                        <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
+                      </button>
+                      <div className="text-right">
+                        <div className={`text-2xl font-bold ${getIMGFriendlinessColor(prog.img_friendly_score)}`}>
+                          {prog.img_friendly_score}/10
+                        </div>
+                        <p className="text-xs text-slate-500">IMG Score</p>
                       </div>
-                      <p className="text-xs text-slate-500">IMG Score</p>
                     </div>
                   </div>
 
@@ -233,6 +296,11 @@ export default function IMGPrograms() {
                         {prog.step2_score_avg && (
                           <div>
                             <span className="font-medium">Avg:</span> {prog.step2_score_avg}
+                          </div>
+                        )}
+                        {profile?.usmle_step2_score && profile.usmle_step2_score >= prog.step2_score_min && (
+                          <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                            <CheckCircle2 className="w-3 h-3" /> Score Meets Min
                           </div>
                         )}
                       </div>
@@ -295,6 +363,10 @@ export default function IMGPrograms() {
                     <span className={`font-semibold text-lg ${getIMGFriendlinessColor(selectedProgram.img_friendly_score)}`}>
                       {selectedProgram.img_friendly_score}/10
                     </span>
+                  </div>
+                  <div className="flex justify-between mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <span className="text-slate-600 dark:text-slate-400">Graduation Rate:</span>
+                    <span className="font-semibold">{selectedProgram.graduation_rate || 'N/A'}</span>
                   </div>
                 </div>
               </div>

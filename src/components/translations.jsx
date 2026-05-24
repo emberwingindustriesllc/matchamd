@@ -107,7 +107,7 @@ const translations = {
       popular: 'Popular',
       post: 'Post',
       createPost: 'Create Post',
-      title: 'Title',
+      postTitle: 'Title',
       shareQuestion: 'Share your question, tip, or experience...',
       noPosts: 'No posts yet',
       beFirst: 'Be the first to start a discussion!'
@@ -266,7 +266,7 @@ const translations = {
       popular: 'Populares',
       post: 'Publicar',
       createPost: 'Crear Publicación',
-      title: 'Título',
+      postTitle: 'Título',
       shareQuestion: 'Comparte tu pregunta, consejo o experiencia...',
       noPosts: 'No hay publicaciones aún',
       beFirst: '¡Sé el primero en iniciar una discusión!'
@@ -425,7 +425,7 @@ const translations = {
       popular: 'شائع',
       post: 'نشر',
       createPost: 'إنشاء منشور',
-      title: 'العنوان',
+      postTitle: 'العنوان',
       shareQuestion: 'شارك سؤالك أو نصيحتك أو تجربتك...',
       noPosts: 'لا توجد منشورات بعد',
       beFirst: 'كن أول من يبدأ مناقشة!'
@@ -584,7 +584,7 @@ const translations = {
       popular: 'लोकप्रिय',
       post: 'पोस्ट',
       createPost: 'पोस्ट बनाएं',
-      title: 'शीर्षक',
+      postTitle: 'शीर्षक',
       shareQuestion: 'अपना प्रश्न, टिप या अनुभव साझा करें...',
       noPosts: 'अभी तक कोई पोस्ट नहीं',
       beFirst: 'चर्चा शुरू करने वाले पहले व्यक्ति बनें!'

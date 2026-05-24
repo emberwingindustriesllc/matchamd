@@ -14,11 +14,9 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Check, 
   Crown, 
-  Zap, 
   Star,
   Sparkles,
   Trophy,
-  Users,
   BookOpen,
   MessageSquare,
   TrendingUp,

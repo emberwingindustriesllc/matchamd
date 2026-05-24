@@ -5,12 +5,10 @@ import { supabase } from '@/api/supabaseClient';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
   Scissors,
   Users,
-  TrendingUp,
   BookOpen,
   Target,
   FileText,

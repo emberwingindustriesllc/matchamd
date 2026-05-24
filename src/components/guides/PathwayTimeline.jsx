@@ -3,7 +3,6 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   CheckCircle2, 
-  Circle, 
   Calendar,
   FileText,
   GraduationCap,

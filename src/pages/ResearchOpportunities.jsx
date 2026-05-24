@@ -13,13 +13,10 @@ import {
   Search, 
   MapPin, 
   Calendar, 
-  DollarSign, 
   Users, 
   Globe,
   Mail,
-  Filter,
-  Beaker,
-  ExternalLink
+  Beaker
 } from 'lucide-react';
 import { 
   Dialog, 

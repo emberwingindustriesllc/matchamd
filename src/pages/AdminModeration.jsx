@@ -17,8 +17,6 @@ import {
   MessageSquare,
   Search,
   AlertTriangle,
-  CheckCircle2,
-  XCircle,
   Eye
 } from 'lucide-react';
 import { toast } from 'sonner';

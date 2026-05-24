@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Rocket, Star, Sparkles } from 'lucide-react';
+import { Star, Sparkles } from 'lucide-react';
 
 export default function ProgressRocket({ completedCount, totalCount }) {
   const percentage = (completedCount / totalCount) * 100;

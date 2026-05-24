@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/api/supabaseClient';
-import { Bot, Send, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Bot, Send, Sparkles, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function PathwayEligibilityChat({ userProfile }) {

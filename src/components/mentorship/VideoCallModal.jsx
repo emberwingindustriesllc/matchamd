@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Video, VideoOff, Mic, MicOff, PhoneOff, Monitor } from 'lucide-react';
+import { Video, VideoOff, Mic, MicOff, PhoneOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function VideoCallModal({ isOpen, onClose, mentorName }) {

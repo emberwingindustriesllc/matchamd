@@ -26,9 +26,7 @@ import { Card } from '@/components/ui/card';
 import { 
   Check, 
   Clock, 
-  ExternalLink, 
-  BookOpen, 
-  CheckCircle2,
+  ExternalLink,
   AlertCircle,
   Lightbulb,
   FileText,

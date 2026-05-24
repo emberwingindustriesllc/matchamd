@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, Flower } from 'lucide-react';
 
 export default function ProgressTree({ completedCount, totalCount }) {
   const percentage = (completedCount / totalCount) * 100;

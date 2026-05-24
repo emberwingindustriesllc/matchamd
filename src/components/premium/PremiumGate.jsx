@@ -83,7 +83,7 @@ export default function PremiumGate({ title, description, price, features, conte
               </Button>
 
               <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-4">
-                Secure checkout powered by {purchaseManager.isNative() ? 'Apple Pay' : 'Stripe'}
+                Secure checkout powered by {purchaseManager.isNative() ? (purchaseManager.isIOS() ? 'App Store' : 'Google Play') : 'Stripe'}
               </p>
             </CardContent>
           </Card>

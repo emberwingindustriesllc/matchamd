@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from '@/api/supabaseClient';
+import { purchaseManager } from '@/lib/purchaseManager';
 
 const AuthContext = createContext();
 
@@ -16,14 +17,24 @@ export const AuthProvider = ({ children }) => {
       setUser(session?.user ?? null);
       setIsAuthenticated(!!session);
       setIsLoadingAuth(false);
+      
+      // Initialize RevenueCat with user ID if available
+      purchaseManager.initialize(session?.user?.id);
     });
 
     // 2. Listen for auth state changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
       setIsAuthenticated(!!session);
       setIsLoadingAuth(false);
+      
+      if (currentUser) {
+        purchaseManager.logIn(currentUser.id);
+      } else {
+        purchaseManager.logOut();
+      }
     });
 
     return () => subscription.unsubscribe();

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, HelpCircle, Sparkles } from 'lucide-react';
+import { CheckCircle2, HelpCircle, Sparkles } from 'lucide-react';
 
 export default function PathwayEligibilityQuiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
