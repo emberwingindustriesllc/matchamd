@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { WifiOff, Wifi } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslation } from '@/components/ui/LanguageProvider';
+import { useTranslation } from '@/components/i18n/LanguageContext';
 
 export default function OfflineIndicator() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);

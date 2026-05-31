@@ -3,6 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { translations } from './translations';
 import { useLocation } from 'react-router-dom';
+import { supabase } from '@/api/supabaseClient';
 
 const LanguageContext = createContext({ 
   t: (key) => key, 
@@ -19,8 +20,12 @@ export function LanguageProvider({ children }) {
 
   const { data: profiles } = useQuery({
     queryKey: ['userProfile', user?.id],
-    // TODO (data migration): replace with supabase.from('user_profiles').select().eq('user_id', user.id)
-    queryFn: () => Promise.resolve([]),
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user.id);
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!user?.id && !isOnboarding,
     staleTime: 5 * 60 * 1000
   });

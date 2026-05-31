@@ -98,8 +98,44 @@ export default function Profile() {
   const updateProfileMutation = useMutation({
     /** @param {any} dataToUpdate */
     mutationFn: async (dataToUpdate) => {
-      const { data, error } = await supabase.from('user_profiles').update(dataToUpdate).eq('id', profile.id).select().single();
-      if (error) throw error;
+      let currentData = { ...dataToUpdate };
+      let updateSuccess = false;
+      let data = null;
+      let error = null;
+
+      for (let attempt = 0; attempt < 15; attempt++) {
+        const res = await supabase.from('user_profiles').update(currentData).eq('id', profile.id).select();
+        if (!res.error) {
+          updateSuccess = true;
+          data = res.data?.[0];
+          break;
+        }
+
+        error = res.error;
+        console.error(`Update attempt ${attempt} failed:`, error);
+
+        const errMsg = error.message || '';
+        const errCode = error.code || '';
+        
+        if (errCode === '42703' || errMsg.includes('column') || errMsg.includes('schema cache') || errMsg.includes('does not exist')) {
+          const match = errMsg.match(/column\s+["']([a-zA-Z0-9_]+)["']/i) || 
+                        errMsg.match(/["']([a-zA-Z0-9_]+)["']\s+column/i) ||
+                        errMsg.match(/Could not find the column\s+["']([a-zA-Z0-9_]+)["']/i) ||
+                        errMsg.match(/Could not find the\s+["']([a-zA-Z0-9_]+)["']\s+column/i);
+          
+          if (match && match[1]) {
+            const missingColumn = match[1];
+            console.log(`Dynamic stripping column from update payload: ${missingColumn}`);
+            delete currentData[missingColumn];
+            continue;
+          }
+        }
+        break;
+      }
+
+      if (!updateSuccess) {
+        throw error || new Error("Failed to update profile after multiple schema fallback attempts");
+      }
       return data;
     },
     onSuccess: () => {

@@ -63,6 +63,14 @@ const translations = {
       usExperience: 'I have US clinical experience',
       startJourney: 'Start My Journey'
     },
+    goals: {
+      residency: 'Residency',
+      residencyDesc: 'Apply for US medical residency programs',
+      fellowship: 'Fellowship',
+      fellowshipDesc: 'Pursue subspecialty training',
+      med_school: 'Apply to medical school',
+      med_schoolDesc: 'Apply to US medical schools'
+    },
     dashboard: {
       title: 'FMG Pathway',
       welcome: 'Welcome back,',
@@ -221,6 +229,14 @@ const translations = {
       ecfmgCertified: 'Estoy certificado por ECFMG',
       usExperience: 'Tengo experiencia clínica en EE.UU.',
       startJourney: 'Comenzar Mi Viaje'
+    },
+    goals: {
+      residency: 'Residencia',
+      residencyDesc: 'Solicitar programas de residencia médica en EE.UU.',
+      fellowship: 'Fellowship',
+      fellowshipDesc: 'Realizar entrenamiento de subespecialidad',
+      med_school: 'Aplicar a la escuela de medicina',
+      med_schoolDesc: 'Solicitar a escuelas de medicina de EE.UU.'
     },
     dashboard: {
       title: 'FMG Pathway',
@@ -381,6 +397,14 @@ const translations = {
       usExperience: 'لدي خبرة سريرية في الولايات المتحدة',
       startJourney: 'ابدأ رحلتي'
     },
+    goals: {
+      residency: 'الإقامة',
+      residencyDesc: 'التقديم لبرامج الإقامة الطبية في الولايات المتحدة',
+      fellowship: 'الزمالة',
+      fellowshipDesc: 'متابعة التدريب التخصصي الفرعي',
+      med_school: 'التقدم لكلية الطب',
+      med_schoolDesc: 'التقديم لكليات الطب في الولايات المتحدة'
+    },
     dashboard: {
       title: 'FMG Pathway',
       welcome: 'مرحباً بعودتك،',
@@ -539,6 +563,14 @@ const translations = {
       ecfmgCertified: 'मैं ECFMG प्रमाणित हूँ',
       usExperience: 'मेरे पास अमेरिकी नैदानिक अनुभव है',
       startJourney: 'मेरी यात्रा शुरू करें'
+    },
+    goals: {
+      residency: 'रेजिडेंसी',
+      residencyDesc: 'अमेरिकी चिकित्सा रेजिडेंसी कार्यक्रमों के लिए आवेदन करें',
+      fellowship: 'फेलोशिप',
+      fellowshipDesc: 'उप-विशेषता प्रशिक्षण का पीछा करें',
+      med_school: 'मेडिकल स्कूल के लिए आवेदन करें',
+      med_schoolDesc: 'अमेरिकी मेडिकल स्कूलों में आवेदन करें'
     },
     dashboard: {
       title: 'FMG Pathway',

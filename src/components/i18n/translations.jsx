@@ -56,7 +56,9 @@ export const translations = {
       fellowship: 'Fellowship',
       fellowshipDesc: 'Pursue subspecialty training',
       medSchool: 'Med School',
-      medSchoolDesc: 'Apply to US medical schools'
+      medSchoolDesc: 'Apply to US medical schools',
+      med_school: 'Apply to medical school',
+      med_schoolDesc: 'Apply to US medical schools'
     },
     
     // Dashboard
@@ -218,7 +220,9 @@ export const translations = {
       fellowship: 'Fellowship',
       fellowshipDesc: 'Realizar entrenamiento de subespecialidad',
       medSchool: 'Escuela de Medicina',
-      medSchoolDesc: 'Aplicar a escuelas de medicina en EE.UU.'
+      medSchoolDesc: 'Aplicar a escuelas de medicina en EE.UU.',
+      med_school: 'Apply to medical school',
+      med_schoolDesc: 'Apply to US medical schools'
     },
     
     dashboard: {
@@ -373,7 +377,9 @@ export const translations = {
       fellowship: 'الزمالة',
       fellowshipDesc: 'متابعة التدريب التخصصي الفرعي',
       medSchool: 'كلية الطب',
-      medSchoolDesc: 'التقديم لكليات الطب في الولايات المتحدة'
+      medSchoolDesc: 'التقديم لكليات الطب في الولايات المتحدة',
+      med_school: 'Apply to medical school',
+      med_schoolDesc: 'Apply to US medical schools'
     },
     
     dashboard: {
@@ -527,7 +533,9 @@ export const translations = {
       fellowship: 'फ़ेलोशिप',
       fellowshipDesc: 'उप-विशेषता प्रशिक्षण प्राप्त करें',
       medSchool: 'मेडिकल स्कूल',
-      medSchoolDesc: 'अमेरिका में मेडिकल स्कूलों में आवेदन करें'
+      medSchoolDesc: 'अमेरिका में मेडिकल स्कूलों में आवेदन करें',
+      med_school: 'Apply to medical school',
+      med_schoolDesc: 'Apply to US medical schools'
     },
     
     dashboard: {
@@ -680,7 +688,9 @@ export const translations = {
       fellowship: '专科培训',
       fellowshipDesc: '追求亚专科培训',
       medSchool: '医学院',
-      medSchoolDesc: '申请美国医学院'
+      medSchoolDesc: '申请美国医学院',
+      med_school: 'Apply to medical school',
+      med_schoolDesc: 'Apply to US medical schools'
     },
     
     dashboard: {
@@ -833,7 +843,9 @@ export const translations = {
       fellowship: 'Fellowship',
       fellowshipDesc: 'Poursuivre une formation en sous-spécialité',
       medSchool: 'École de médecine',
-      medSchoolDesc: 'Postuler aux écoles de médecine aux États-Unis'
+      medSchoolDesc: 'Postuler aux écoles de médecine aux États-Unis',
+      med_school: 'Apply to medical school',
+      med_schoolDesc: 'Apply to US medical schools'
     },
     
     dashboard: {
@@ -986,7 +998,9 @@ export const translations = {
       fellowship: 'Fellowship',
       fellowshipDesc: 'Buscar treinamento em subespecialidade',
       medSchool: 'Faculdade de medicina',
-      medSchoolDesc: 'Candidatar-se a faculdades de medicina nos EUA'
+      medSchoolDesc: 'Candidatar-se a faculdades de medicina nos EUA',
+      med_school: 'Apply to medical school',
+      med_schoolDesc: 'Apply to US medical schools'
     },
     
     dashboard: {

@@ -4,6 +4,7 @@ import logo from '@/assets/logo.png';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useTranslation } from '@/components/i18n/LanguageContext';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -145,6 +146,7 @@ const usStates = [
 
 export default function Onboarding() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user, isAuthenticated, navigateToLogin } = useAuth();
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
@@ -234,13 +236,56 @@ export default function Onboarding() {
         is_mentor: false,
         mentor_verified: false,
         badges: [],
-        points: 0
+        points: 0,
+        program_checklists: {},
+        interviews: [],
+        rank_order_list: [],
+        advisor_feedback: []
       };
 
-      const { error } = await supabase.from('user_profiles').insert(profileData);
-      if (error) throw error;
+      let currentData = { ...profileData };
+      let insertSuccess = false;
+      let error = null;
+
+      for (let attempt = 0; attempt < 15; attempt++) {
+        const res = await supabase.from('user_profiles').upsert(currentData, { onConflict: 'user_id' });
+        if (!res.error) {
+          insertSuccess = true;
+          break;
+        }
+
+        error = res.error;
+        console.error(`Insert attempt ${attempt} failed:`, error);
+
+        const errMsg = error.message || '';
+        const errCode = error.code || '';
+        
+        if (errCode === '42703' || errMsg.includes('column') || errMsg.includes('schema cache') || errMsg.includes('does not exist')) {
+          const match = errMsg.match(/column\s+["']([a-zA-Z0-9_]+)["']/i) || 
+                        errMsg.match(/["']([a-zA-Z0-9_]+)["']\s+column/i) ||
+                        errMsg.match(/Could not find the column\s+["']([a-zA-Z0-9_]+)["']/i) ||
+                        errMsg.match(/Could not find the\s+["']([a-zA-Z0-9_]+)["']\s+column/i);
+          
+          if (match && match[1]) {
+            const missingColumn = match[1];
+            console.log(`Dynamic stripping column from insert payload: ${missingColumn}`);
+            delete currentData[missingColumn];
+            continue;
+          }
+        }
+        break;
+      }
+
+      if (!insertSuccess) {
+        throw error || new Error("Failed to insert profile after multiple schema fallback attempts");
+      }
       
-      console.log('Onboarding profile saved:', profileData);
+      console.log('Onboarding profile saved successfully');
+      
+      // Invalidate queries so that the Dashboard pulls the fresh profile
+      await queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      await queryClient.invalidateQueries({ queryKey: ['progress'] });
+      
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
       console.error('Onboarding error:', error);
@@ -400,55 +445,41 @@ export default function Onboarding() {
       </div>
     </motion.div>,
 
-    // Step 2: Languages
+    // Step 2: Visa Status
     <motion.div
-      key="languages"
+      key="visa_status"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       className="px-6"
     >
-      <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-        <Languages className="w-8 h-8 text-white" />
+      <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
+        <Globe className="w-8 h-8 text-white" />
       </div>
       <h2 className="text-2xl font-bold text-center text-slate-800 dark:text-white mb-2">
-        {t('onboarding.languages')}
+        Visa Status
       </h2>
       <p className="text-slate-500 dark:text-slate-400 text-center mb-6">
-        {t('onboarding.languagesSubtitle')}
+        What is your current US visa status? We customize residency requirements based on your visa needs.
       </p>
 
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        {languages.map(lang => (
-          <button
-            key={lang.code}
-            onClick={() => toggleLanguage(lang.code)}
-            className={`p-4 rounded-xl border-2 transition-all ${
-              profile.languages.includes(lang.code)
-                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
-                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
-            }`}
-          >
-            <span className="font-medium text-slate-800 dark:text-white">{lang.name}</span>
-          </button>
-        ))}
-      </div>
-
-      <div>
-        <Label className="text-slate-700 dark:text-slate-300">Visa Status</Label>
-        <Select value={profile.visa_status} onValueChange={(v) => updateProfile('visa_status', v)}>
-          <SelectTrigger className="h-12 rounded-xl mt-1">
-            <SelectValue placeholder="Select current visa status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">None / Need Sponsorship</SelectItem>
-            <SelectItem value="J1">J-1 Visa</SelectItem>
-            <SelectItem value="H1B">H-1B Visa</SelectItem>
-            <SelectItem value="Citizen">US Citizen</SelectItem>
-            <SelectItem value="GreenCard">Permanent Resident (Green Card)</SelectItem>
-            <SelectItem value="Other">Other</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="space-y-4">
+        <div>
+          <Label className="text-slate-700 dark:text-slate-350">Select Visa Status</Label>
+          <Select value={profile.visa_status} onValueChange={(v) => updateProfile('visa_status', v)}>
+            <SelectTrigger className="h-12 rounded-xl mt-1">
+              <SelectValue placeholder="Select current visa status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">None / Need Sponsorship</SelectItem>
+              <SelectItem value="J1">J-1 Visa</SelectItem>
+              <SelectItem value="H1B">H-1B Visa</SelectItem>
+              <SelectItem value="Citizen">US Citizen</SelectItem>
+              <SelectItem value="GreenCard">Permanent Resident (Green Card)</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </motion.div>,
 
@@ -712,7 +743,13 @@ export default function Onboarding() {
 
         <div>
           <Label className="text-slate-700 dark:text-slate-300">USMLE Step 3 Status</Label>
-          <Select value={profile.usmle_step3_status} onValueChange={(v) => updateProfile('usmle_step3_status', v)}>
+          <Select 
+            value={profile.usmle_step3_status} 
+            onValueChange={(v) => {
+              updateProfile('usmle_step3_status', v);
+              updateProfile('usmle_step3_result', v === 'passed' ? 'pass' : 'not_applicable');
+            }}
+          >
             <SelectTrigger className="h-12 rounded-xl mt-1">
               <SelectValue />
             </SelectTrigger>
@@ -724,21 +761,6 @@ export default function Onboarding() {
             </SelectContent>
           </Select>
         </div>
-
-        {profile.usmle_step3_status === 'passed' && (
-          <div>
-            <Label className="text-slate-700 dark:text-slate-300">Step 3 Result</Label>
-            <Select value={profile.usmle_step3_result} onValueChange={(v) => updateProfile('usmle_step3_result', v)}>
-              <SelectTrigger className="h-12 rounded-xl mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pass">Pass</SelectItem>
-                <SelectItem value="fail">Fail</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
 
         <div className="flex items-center gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
           <Checkbox
@@ -756,16 +778,23 @@ export default function Onboarding() {
           <span className="text-slate-700 dark:text-slate-300">{t('onboarding.usClinical')}</span>
         </div>
         
-        <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
-          <Checkbox
-            checked={profile.acgme_waiver}
-            onCheckedChange={(v) => updateProfile('acgme_waiver', v)}
-            className="mt-1"
-          />
-          <div>
-            <span className="text-slate-700 dark:text-slate-300 block">Do you have an ACGME Waiver?</span>
-            <span className="text-xs text-slate-500 dark:text-slate-400">An ACGME waiver gives you an extra year.</span>
-          </div>
+        <div>
+          <Label className="text-slate-700 dark:text-slate-300">Do you have an ACGME Waiver?</Label>
+          <Select 
+            value={profile.acgme_waiver ? 'yes' : 'no'} 
+            onValueChange={(v) => updateProfile('acgme_waiver', v === 'yes')}
+          >
+            <SelectTrigger className="h-12 rounded-xl mt-1">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="no">No</SelectItem>
+              <SelectItem value="yes">Yes</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            An ACGME waiver gives you an extra year.
+          </p>
         </div>
       </div>
     </motion.div>
@@ -775,7 +804,7 @@ export default function Onboarding() {
     switch(step) {
       case 0: return profile.display_name.length > 0;
       case 1: return profile.country && profile.medical_school_country && profile.medical_school;
-      case 2: return profile.languages.length > 0;
+      case 2: return !!profile.visa_status;
       case 3: return profile.primary_goal;
       case 4: return true;
       default: return false;

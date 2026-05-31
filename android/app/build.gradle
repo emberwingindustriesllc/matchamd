@@ -16,10 +16,33 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            def localProperties = new Properties()
+            def localPropertiesFile = rootProject.file('local.properties')
+            if (localPropertiesFile.exists()) {
+                localPropertiesFile.withReader('UTF-8') { reader ->
+                    localProperties.load(reader)
+                }
+            }
+            
+            def storeFilePath = localProperties.getProperty('release.storeFile') ?: System.getenv("RELEASE_STORE_FILE")
+            def keystoreFile = storeFilePath ? file(storeFilePath) : null
+            if (keystoreFile && keystoreFile.exists()) {
+                storeFile keystoreFile
+                storePassword localProperties.getProperty('release.storePassword') ?: System.getenv("RELEASE_STORE_PASSWORD")
+                keyAlias localProperties.getProperty('release.keyAlias') ?: System.getenv("RELEASE_KEY_ALIAS")
+                keyPassword localProperties.getProperty('release.keyPassword') ?: System.getenv("RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (signingConfigs.release.storeFile) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
