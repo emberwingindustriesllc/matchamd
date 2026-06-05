@@ -9,11 +9,22 @@
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap:add:android": "cap add android",
+    "cap:sync": "cap sync",
+    "cap:build:android": "npm run build && cap sync android",
+    "cap:build:ios": "npm run build && cap sync ios",
+    "cap:open:android": "cap open android",
+    "cap:open:ios": "cap open ios"
   },
   "dependencies": {
-    "@base44/vite-plugin": "^0.2.14",
-    "@capacitor/android": "^8.3.4",
+    "@base44/vite-plugin": "^1.0.16",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/haptics": "^6.0.0",
+    "@capacitor/keyboard": "^6.0.0",
+    "@capacitor/network": "^6.0.0",
+    "@capacitor/splash-screen": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
     "@hello-pangea/dnd": "^17.0.0",
     "@hookform/resolvers": "^4.1.2",
     "@radix-ui/react-accordion": "^1.2.3",
@@ -81,6 +92,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.3.0",
     "@capacitor/cli": "^8.3.0",
     "@capacitor/core": "^8.3.0",
     "@capacitor/ios": "^8.3.0",

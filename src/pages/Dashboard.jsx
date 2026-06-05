@@ -38,7 +38,7 @@ const getPathwaySteps = (primaryGoal) => {
     residency: [
       { id: 'ecfmg_pathways', title: 'ECFMG Pathways', description: 'Complete certification pathways application', deadline: 'Jan 31, 2026' },
       { id: 'usmle_step1', title: 'USMLE Step 1', description: 'Pass the first licensing exam' },
-      { id: 'usmle_step2', title: 'USMLE Step 2 CK', description: 'Pass Clinical Knowledge exam' },
+      { id: 'usmle_step2', title: 'USMLE Step 2 CK', description: 'Aim for ≥240 for best IMG match chances' },
       { id: 'oet_medicine', title: 'OET Medicine', description: 'English proficiency test for healthcare', deadline: 'Dec 2025' },
       { id: 'eras_registration', title: 'ERAS Registration', description: 'Register for residency application', deadline: 'Sept 2025' },
       { id: 'personal_statement', title: 'Personal Statement', description: 'Write your compelling story' },
@@ -212,6 +212,44 @@ export default function Dashboard() {
             </div>
           </div>
         </motion.div>
+
+        {/* USMLE Status Summary — from saved profile */}
+        {(profile.usmle_step1_status !== 'not_started' || profile.usmle_step2_status !== 'not_started') && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4"
+          >
+            <h3 className="font-semibold text-slate-800 dark:text-white mb-3 text-sm">Your USMLE Status</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: 'Step 1', status: profile.usmle_step1_status, score: profile.usmle_step1_score },
+                { label: 'Step 2 CK', status: profile.usmle_step2_status, score: profile.usmle_step2_score },
+                { label: 'Step 3', status: profile.usmle_step3_status, score: null },
+              ].map(({ label, status, score }) => (
+                <div key={label} className="text-center p-2 rounded-xl bg-slate-50 dark:bg-slate-700/50">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{label}</p>
+                  <Badge
+                    className={`text-xs ${
+                      status === 'passed' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                      status === 'studying' || status === 'scheduled' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                      'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+                    }`}
+                  >
+                    {status === 'not_started' ? 'Pending' : status?.replace('_', ' ')}
+                  </Badge>
+                  {score && <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mt-1">{score}</p>}
+                  {label === 'Step 2 CK' && status === 'passed' && score && parseInt(score) >= 240 && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400">✓ Competitive</p>
+                  )}
+                  {label === 'Step 2 CK' && status === 'passed' && score && parseInt(score) < 240 && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400">Target ≥240</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Location-Aware Tips */}
         <LocationAwareTips compact />
