@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Shield, AlertCircle, Mail, Globe, FileText, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 

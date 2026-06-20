@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
@@ -7,7 +7,7 @@ import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
@@ -49,7 +49,6 @@ import {
   GraduationCap,
   Globe,
   Heart,
-  Info,
   SlidersHorizontal,
   Star,
   Trash2,
@@ -58,9 +57,7 @@ import {
   ArrowDown,
   AlertTriangle,
   UserCheck,
-  Check,
   Share2,
-  DollarSign,
   Calendar,
   Building,
   ClipboardList
@@ -121,6 +118,8 @@ export default function IMGPrograms() {
   const [rankOrderList, setRankOrderList] = useState([]);
   const [advisorFeedback, setAdvisorFeedback] = useState([]);
 
+  const isLoadedRef = useRef(false);
+
   // Load state from profile (Supabase) with local storage fallback
   useEffect(() => {
     if (user?.id) {
@@ -129,12 +128,31 @@ export default function IMGPrograms() {
       const storedRankList = localStorage.getItem(`match_ranklist_${user.id}`);
       const storedFeedback = localStorage.getItem(`match_advisor_feedback_${user.id}`);
 
-      if (profile) {
-        setProgramChecklists(profile.program_checklists || (storedChecklists ? JSON.parse(storedChecklists) : {}));
-        setInterviews(profile.interviews || (storedInterviews ? JSON.parse(storedInterviews) : []));
-        setRankOrderList(profile.rank_order_list || (storedRankList ? JSON.parse(storedRankList) : []));
-        setAdvisorFeedback(profile.advisor_feedback || (storedFeedback ? JSON.parse(storedFeedback) : []));
-      } else {
+      if (profile && !isLoadedRef.current) {
+        isLoadedRef.current = true;
+
+        const dbChecklists = profile.program_checklists || (storedChecklists ? JSON.parse(storedChecklists) : {});
+        const dbInterviews = profile.interviews || (storedInterviews ? JSON.parse(storedInterviews) : []);
+        const dbRankList = profile.rank_order_list || (storedRankList ? JSON.parse(storedRankList) : []);
+        const dbFeedback = profile.advisor_feedback || (storedFeedback ? JSON.parse(storedFeedback) : []);
+
+        setProgramChecklists(dbChecklists);
+        setInterviews(dbInterviews);
+        setAdvisorFeedback(dbFeedback);
+
+        // One-time sync of rank list to favorites on mount/load
+        const favs = profile.favorite_programs || [];
+        const cleanedRankList = dbRankList.filter(id => favs.includes(id));
+        const newItems = favs.filter(id => !cleanedRankList.includes(id));
+        const finalRankList = [...cleanedRankList, ...newItems];
+
+        setRankOrderList(finalRankList);
+
+        // Save back if they were out of sync
+        if (newItems.length > 0 || cleanedRankList.length !== dbRankList.length) {
+          saveRankList(finalRankList);
+        }
+      } else if (!profile && !isLoadedRef.current) {
         if (storedChecklists) setProgramChecklists(JSON.parse(storedChecklists));
         if (storedInterviews) setInterviews(JSON.parse(storedInterviews));
         if (storedRankList) setRankOrderList(JSON.parse(storedRankList));
@@ -392,17 +410,7 @@ export default function IMGPrograms() {
     return programs.filter(p => favs.includes(p.id));
   }, [programs, profile]);
 
-  // Sync Rank list to saved programs list
-  useEffect(() => {
-    const favs = profile?.favorite_programs || [];
-    // If elements inside rankOrderList are no longer in favs, remove them
-    const cleanedRankList = rankOrderList.filter(id => favs.includes(id));
-    // If elements in favs are not in rankOrderList, append them
-    const newItems = favs.filter(id => !cleanedRankList.includes(id));
-    if (newItems.length > 0 || cleanedRankList.length !== rankOrderList.length) {
-      saveRankList([...cleanedRankList, ...newItems]);
-    }
-  }, [profile?.favorite_programs]);
+  // Sync Rank list to saved programs list is handled on initial mount/profile load and during favorite toggles.
 
   // Rank List Programs in order
   const rankedPrograms = useMemo(() => {

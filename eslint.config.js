@@ -6,6 +6,19 @@ import pluginUnusedImports from "eslint-plugin-unused-imports";
 
 export default [
   {
+    ignores: [
+      "android/**/*",
+      "ios/**/*",
+      "dist/**/*",
+      "node_modules/**/*",
+      "capacitor.config.ts",
+      "eslint.config.js",
+      "postcss.config.js",
+      "tailwind.config.js",
+      "vite.config.js",
+    ],
+  },
+  {
     files: [
       "src/components/**/*.{js,mjs,cjs,jsx}",
       "src/pages/**/*.{js,mjs,cjs,jsx}",

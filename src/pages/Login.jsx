@@ -6,7 +6,7 @@ import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight, Chrome } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 import logo from '@/assets/logo.png';
 
 export default function Login() {
