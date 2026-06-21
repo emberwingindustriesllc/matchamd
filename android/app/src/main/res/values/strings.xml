@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">MatchaMD</string>
     <string name="title_activity_main">MatchaMD</string>
-    <string name="package_name">com.emberwingindustriesllc.matchamd</string>
-    <string name="custom_url_scheme">com.emberwingindustriesllc.matchamd</string>
+    <string name="package_name">com.emberwing.matchamd</string>
+    <string name="custom_url_scheme">com.emberwing.matchamd</string>
 </resources>

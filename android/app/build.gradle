@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.emberwingindustriesllc.matchamd"
+    namespace = "com.emberwing.matchamd"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.emberwingindustriesllc.matchamd"
+        applicationId "com.emberwing.matchamd"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

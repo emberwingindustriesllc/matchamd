@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.emberwingindustriesllc.matchamd',
+  appId: 'com.emberwing.matchamd',
   appName: 'MatchaMD',
   webDir: 'dist'
 };

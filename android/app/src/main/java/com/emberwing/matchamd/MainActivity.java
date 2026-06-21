@@ -1,4 +1,4 @@
-package com.emberwingindustriesllc.matchamd;
+package com.emberwing.matchamd;
 
 import android.os.Bundle;
 import androidx.core.splashscreen.SplashScreen;

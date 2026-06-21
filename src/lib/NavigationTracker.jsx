@@ -30,9 +30,8 @@ export default function NavigationTracker() {
             pageName = matchedKey || null;
         }
 
-        if (isAuthenticated && pageName) {
-            // base44.appLogs removed
-        }
+        // Analytics hook: react here when page-view tracking is wired up.
+        // (Previously called a third-party appLogs API; intentionally left empty.)
     }, [location, isAuthenticated, Pages, mainPageKey]);
 
     return null;

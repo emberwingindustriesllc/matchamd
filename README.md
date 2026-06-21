@@ -1,39 +1,61 @@
-**Welcome to your Base44 project** 
+# MatchaMD
 
-**About**
+A community and pathway app for foreign medical graduates (FMGs/IMGs) pursuing
+US residency and fellowship positions — connect, share resources, and track the
+match journey together.
 
-View and Edit  your app on [Base44.com](http://Base44.com) 
+> Owned and operated by **EmberWing LLC**.
 
-This project contains everything you need to run your app locally.
+## Tech stack
 
-**Edit the code in your local development environment**
+- **Frontend:** React + Vite, Tailwind CSS, shadcn/ui (Radix primitives)
+- **Backend / Auth / DB:** Supabase
+- **Mobile:** Capacitor (Android & iOS)
+- **Payments:** Stripe (web) + RevenueCat (in-app purchases)
+- **Hosting:** Vercel
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+## Getting started
 
-**Prerequisites:** 
+### Prerequisites
 
-1. Clone the repository using the project's Git URL 
-2. Navigate to the project directory
-3. Install dependencies: `npm install`
-4. Create an `.env.local` file and set the right environment variables
+- Node.js 18+
+- npm
 
+### Install & run
+
+```bash
+npm install
+cp .env.example .env.local   # then fill in your Supabase keys
+npm run dev
 ```
-VITE_BASE44_APP_ID=your_app_id
-VITE_BASE44_APP_BASE_URL=your_backend_url
 
-e.g.
-VITE_BASE44_APP_ID=cbef744a8545c389ef439ea6
-VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
+### Environment variables
+
+See [`.env.example`](./.env.example) for the full list. The essentials:
+
+| Variable | Purpose |
+|---|---|
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anon/public key |
+
+### Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the Vite dev server |
+| `npm run build` | Production build to `dist/` |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run the TypeScript checker |
+
+### Mobile (Android via Capacitor)
+
+```bash
+npm run build
+npx cap sync android
+npx cap open android
 ```
 
-Run the app: `npm run dev`
+## License & ownership
 
-**Publish your changes**
-
-Open [Base44.com](http://Base44.com) and click on Publish.
-
-**Docs & Support**
-
-Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
-
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+Proprietary. © EmberWing LLC. All rights reserved.
