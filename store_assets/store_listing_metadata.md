@@ -220,7 +220,7 @@ Both stores **require** a privacy policy URL before submission. It needs to cove
 - What user data is collected (email, profile info, usage data)
 - How it's used (app functionality, analytics)
 - Stripe payment data handling
-- Third-party services (Base44, Stripe)
+- Third-party services (Supabase, Stripe)
 - User rights (data deletion request)
 
 I can generate a full privacy policy document — just confirm the contact email and website domain.

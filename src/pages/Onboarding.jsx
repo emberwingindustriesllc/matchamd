@@ -28,120 +28,25 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
-const countries = [
-  'India', 'Pakistan', 'Nigeria', 'Philippines', 'Egypt', 'Mexico', 'Brazil', 
-  'Colombia', 'China', 'Bangladesh', 'Iran', 'Iraq', 'Syria', 'Lebanon',
-  'Jordan', 'Saudi Arabia', 'UAE', 'United Kingdom', 'Canada', 'Other'
-];
+import { 
+  countries, 
+  commonMedSchools, 
+  languages, 
+  goals, 
+  residencySpecialties,
+  pediatricFellowships,
+  internalMedicineFellowships,
+  combinedMedPedsFellowships,
+  usStates,
+  canProceed
+} from '@/data/onboarding';
+import { prepareProfileForUpsert } from '@/lib/validation/profileSchema';
 
-const commonMedSchools = {
-  'India': ['AIIMS', 'JIPMER', 'CMC Vellore', 'Armed Forces Medical College', 'Maulana Azad Medical College', 'Other'],
-  'Pakistan': ['Aga Khan University', 'King Edward Medical University', 'Dow Medical College', 'Allama Iqbal Medical College', 'Other'],
-  'Nigeria': ['University of Ibadan', 'University of Lagos', 'Obafemi Awolowo University', 'University of Nigeria', 'Other'],
-  'Philippines': ['University of the Philippines', 'University of Santo Tomas', 'Far Eastern University', 'Other'],
-  'Egypt': ['Cairo University', 'Ain Shams University', 'Alexandria University', 'Other'],
-  'Mexico': ['UNAM', 'IPN', 'UAG', 'TEC de Monterrey', 'Other'],
-  'Other': ['Other']
+const goalIcons = {
+  Stethoscope,
+  GraduationCap,
+  BookOpen
 };
-
-const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Español' },
-  { code: 'ar', name: 'العربية' },
-  { code: 'hi', name: 'हिन्दी' },
-  { code: 'zh', name: '中文' },
-  { code: 'fr', name: 'Français' },
-  { code: 'pt', name: 'Português' }
-];
-
-const goals = [
-  { 
-    id: 'residency', 
-    icon: Stethoscope, 
-    title: 'Residency',
-    description: 'Apply for US medical residency programs',
-    color: 'from-[rgb(var(--color-primary))] to-[rgb(110,135,30)]'
-  },
-  { 
-    id: 'fellowship', 
-    icon: GraduationCap, 
-    title: 'Fellowship',
-    description: 'Pursue subspecialty training',
-    color: 'from-emerald-500 to-teal-500'
-  },
-  { 
-    id: 'med_school', 
-    icon: BookOpen, 
-    title: 'Med School',
-    description: 'Apply to US medical schools',
-    color: 'from-amber-500 to-orange-500'
-  }
-];
-
-const residencySpecialties = [
-  'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery', 
-  'Emergency Medicine', 'Psychiatry', 'OB/GYN', 'Neurology',
-  'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology', 'Other'
-];
-
-const pediatricFellowships = [
-  'Adolescent Medicine',
-  'Allergy and Immunology',
-  'Cardiology',
-  'Child Abuse Pediatrics',
-  'Child and Adolescent Psychiatry',
-  'Critical Care Medicine',
-  'Developmental-Behavioral Pediatrics',
-  'Emergency Medicine',
-  'Endocrinology',
-  'Gastroenterology',
-  'Hematology-Oncology',
-  'Hospital Medicine',
-  'Infectious Disease',
-  'Neonatal-Perinatal Medicine',
-  'Nephrology',
-  'Neurology',
-  'Pulmonology',
-  'Rheumatology',
-  'Sports Medicine',
-  'Transplant Hepatology'
-];
-
-const internalMedicineFellowships = [
-  'Adolescent Medicine',
-  'Adult Congenital Heart Disease',
-  'Advanced Heart Failure and Transplant Cardiology',
-  'Cardiovascular Disease',
-  'Clinical Cardiac Electrophysiology',
-  'Critical Care Medicine',
-  'Endocrinology, Diabetes and Metabolism',
-  'Gastroenterology',
-  'Geriatric Medicine',
-  'Hematology',
-  'Hospice and Palliative Medicine',
-  'Infectious Disease',
-  'Interventional Cardiology',
-  'Medical Oncology',
-  'Nephrology',
-  'Neurocritical Care',
-  'Pulmonary Disease',
-  'Rheumatology',
-  'Sleep Medicine',
-  'Sports Medicine',
-  'Transplant Hepatology'
-];
-
-const combinedMedPedsFellowships = [
-  ...new Set([...pediatricFellowships, ...internalMedicineFellowships])
-].sort();
-
-const usStates = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 
-  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 
-  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 
-  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 
-  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
-];
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -205,78 +110,18 @@ export default function Onboarding() {
         return;
       }
 
-      const profileData = {
-        user_id: user.id,
-        primary_goal: profile.primary_goal,
-        display_name: profile.display_name || user.email,
-        country: profile.country || '',
-        target_city: profile.target_city || '',
-        target_state: profile.target_state || '',
-        medical_school: profile.medical_school || '',
-        medical_school_country: profile.medical_school_country || '',
-        undergraduate_college: profile.undergraduate_college || '',
-        languages: profile.languages || ['en'],
-        preferred_language: profile.preferred_language || 'en',
-        fellowship_type: profile.fellowship_type || '',
-        target_specialty: profile.target_specialty || '',
-        graduation_year: profile.graduation_year || null,
-        usmle_step1_status: profile.usmle_step1_status || 'not_started',
-        usmle_step1_score: profile.usmle_step1_score || '',
-        usmle_step2_status: profile.usmle_step2_status || 'not_started',
-        usmle_step2_score: profile.usmle_step2_score || '',
-        usmle_step3_status: profile.usmle_step3_status || 'not_started',
-        usmle_step3_result: profile.usmle_step3_result || 'not_applicable',
-        ecfmg_certified: profile.ecfmg_certified || false,
-        visa_status: profile.visa_status || 'none',
-        acgme_waiver: profile.acgme_waiver || false,
-        previous_training: profile.previous_training || '',
-        us_clinical_experience: profile.us_clinical_experience || false,
-        onboarding_complete: true,
-        is_mentor: false,
-        mentor_verified: false,
-        badges: [],
-        points: 0,
-        program_checklists: {},
-        interviews: [],
-        rank_order_list: [],
-        advisor_feedback: []
+      // Convert empty numeric strings to numbers before passing to Zod validator
+      const cleanedProfile = {
+        ...profile,
+        graduation_year: profile.graduation_year ? parseInt(profile.graduation_year, 10) : null,
       };
 
-      let currentData = { ...profileData };
-      let insertSuccess = false;
-      let error = null;
+      const profileData = prepareProfileForUpsert(cleanedProfile, user.id);
 
-      for (let attempt = 0; attempt < 15; attempt++) {
-        const res = await supabase.from('user_profiles').upsert(currentData, { onConflict: 'user_id' });
-        if (!res.error) {
-          insertSuccess = true;
-          break;
-        }
+      const { error } = await supabase.from('user_profiles').upsert(profileData, { onConflict: 'user_id' });
 
-        error = res.error;
-        console.error(`Insert attempt ${attempt} failed:`, error);
-
-        const errMsg = error.message || '';
-        const errCode = error.code || '';
-        
-        if (errCode === '42703' || errMsg.includes('column') || errMsg.includes('schema cache') || errMsg.includes('does not exist')) {
-          const match = errMsg.match(/column\s+["']([a-zA-Z0-9_]+)["']/i) || 
-                        errMsg.match(/["']([a-zA-Z0-9_]+)["']\s+column/i) ||
-                        errMsg.match(/Could not find the column\s+["']([a-zA-Z0-9_]+)["']/i) ||
-                        errMsg.match(/Could not find the\s+["']([a-zA-Z0-9_]+)["']\s+column/i);
-          
-          if (match && match[1]) {
-            const missingColumn = match[1];
-            console.log(`Dynamic stripping column from insert payload: ${missingColumn}`);
-            delete currentData[missingColumn];
-            continue;
-          }
-        }
-        break;
-      }
-
-      if (!insertSuccess) {
-        throw error || new Error("Failed to insert profile after multiple schema fallback attempts");
+      if (error) {
+        throw error;
       }
       
       console.log('Onboarding profile saved successfully');
@@ -501,27 +346,30 @@ export default function Onboarding() {
       </p>
 
       <div className="space-y-3">
-        {goals.map(goal => (
-          <button
-            key={goal.id}
-            onClick={() => updateProfile('primary_goal', goal.id)}
-            className={`w-full p-5 rounded-2xl border-2 text-left transition-all ${
-              profile.primary_goal === goal.id
-                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
-                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${goal.color} flex items-center justify-center`}>
-                <goal.icon className="w-6 h-6 text-white" />
+        {goals.map(goal => {
+          const GoalIcon = goalIcons[goal.icon];
+          return (
+            <button
+              key={goal.id}
+              onClick={() => updateProfile('primary_goal', goal.id)}
+              className={`w-full p-5 rounded-2xl border-2 text-left transition-all ${
+                profile.primary_goal === goal.id
+                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
+                  : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${goal.color} flex items-center justify-center`}>
+                  {GoalIcon && <GoalIcon className="w-6 h-6 text-white" />}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-800 dark:text-white">{t(`goals.${goal.id}`)}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{t(`goals.${goal.id}Desc`)}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-slate-800 dark:text-white">{t(`goals.${goal.id}`)}</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{t(`goals.${goal.id}Desc`)}</p>
-              </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
     </motion.div>,
 
@@ -799,17 +647,6 @@ export default function Onboarding() {
     </motion.div>
   ];
 
-  const canProceed = () => {
-    switch(step) {
-      case 0: return profile.display_name.length > 0;
-      case 1: return profile.country && profile.medical_school_country && profile.medical_school;
-      case 2: return !!profile.visa_status;
-      case 3: return profile.primary_goal;
-      case 4: return true;
-      default: return false;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 flex flex-col safe-area-top">
       <div className="px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
@@ -865,7 +702,7 @@ export default function Onboarding() {
         
         <Button
           onClick={() => step === steps.length - 1 ? handleSubmit() : setStep(step + 1)}
-          disabled={!canProceed() || isSubmitting}
+          disabled={!canProceed(step, profile) || isSubmitting}
           className="flex-1 h-14 rounded-xl bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(110,135,30)] hover:opacity-90 text-white font-semibold"
         >
           {isSubmitting ? (

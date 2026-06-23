@@ -50,7 +50,7 @@ Then in Xcode: Product → Archive
 - **TanStack Query** — data fetching
 - **Framer Motion** — animations
 - **Stripe** — premium subscriptions
-- **Base44 SDK** — backend, auth, database
+- **Supabase** — backend, auth, database
 
 ## 📁 Project Structure
 
@@ -59,17 +59,17 @@ src/
   pages/          # All app screens
   components/     # Reusable UI components
   lib/            # Utilities and hooks
-  api/            # Base44 SDK client
+  api/            # Supabase Client
 ios/              # iOS Capacitor platform
 android/          # Android Capacitor platform
-functions/        # Stripe backend functions
+supabase/         # Supabase Edge Functions (Stripe)
 ```
 
 ## 🔑 Environment
 
-The app uses Base44 for backend services. Configure via the Base44 dashboard.
+The app uses Supabase for backend services. Configure via the Supabase dashboard.
 
-Stripe keys are set as environment variables in the Base44 function deployment.
+Stripe keys are set as environment variables in the Supabase Edge Function deployment.
 
 ---
 

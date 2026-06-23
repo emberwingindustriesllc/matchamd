@@ -5,6 +5,7 @@ import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { validateProfile } from '@/lib/validation/profileSchema';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import ProgressRing from '@/components/common/ProgressRing';
@@ -98,45 +99,24 @@ export default function Profile() {
   const updateProfileMutation = useMutation({
     /** @param {any} dataToUpdate */
     mutationFn: async (dataToUpdate) => {
-      let currentData = { ...dataToUpdate };
-      let updateSuccess = false;
-      let data = null;
-      let error = null;
-
-      for (let attempt = 0; attempt < 15; attempt++) {
-        const res = await supabase.from('user_profiles').update(currentData).eq('id', profile.id).select();
-        if (!res.error) {
-          updateSuccess = true;
-          data = res.data?.[0];
-          break;
-        }
-
-        error = res.error;
-        console.error(`Update attempt ${attempt} failed:`, error);
-
-        const errMsg = error.message || '';
-        const errCode = error.code || '';
-        
-        if (errCode === '42703' || errMsg.includes('column') || errMsg.includes('schema cache') || errMsg.includes('does not exist')) {
-          const match = errMsg.match(/column\s+["']([a-zA-Z0-9_]+)["']/i) || 
-                        errMsg.match(/["']([a-zA-Z0-9_]+)["']\s+column/i) ||
-                        errMsg.match(/Could not find the column\s+["']([a-zA-Z0-9_]+)["']/i) ||
-                        errMsg.match(/Could not find the\s+["']([a-zA-Z0-9_]+)["']\s+column/i);
-          
-          if (match && match[1]) {
-            const missingColumn = match[1];
-            console.log(`Dynamic stripping column from update payload: ${missingColumn}`);
-            delete currentData[missingColumn];
-            continue;
-          }
-        }
-        break;
+      // Validate the update data against ProfileEditSchema (partial schema)
+      const validated = validateProfile(dataToUpdate, true);
+      if (!validated.success) {
+        throw new Error(`Validation failed: ${validated.errors.map(e => `${e.field}: ${e.message}`).join('; ')}`);
       }
 
-      if (!updateSuccess) {
-        throw error || new Error("Failed to update profile after multiple schema fallback attempts");
+      // Clean/sanitize fields for database
+      const cleanedData = { ...validated.data };
+      if (cleanedData.graduation_year !== undefined) {
+        cleanedData.graduation_year = cleanedData.graduation_year ? parseInt(cleanedData.graduation_year, 10) : null;
       }
-      return data;
+
+      const { data, error } = await supabase.from('user_profiles').update(cleanedData).eq('id', profile.id).select();
+
+      if (error) {
+        throw error;
+      }
+      return data?.[0];
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });

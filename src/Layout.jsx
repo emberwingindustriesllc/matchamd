@@ -1,5 +1,6 @@
 import React from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClientInstance } from '@/lib/query-client';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { LanguageProvider } from '@/components/i18n/LanguageContext';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
@@ -7,18 +8,9 @@ import OfflineIndicator from '@/components/common/OfflineIndicator';
 import DisclaimerBanner from '@/components/common/DisclaimerBanner';
 import ServiceWorkerRegistration from '@/components/common/ServiceWorkerRegistration';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      retry: 1
-    }
-  }
-});
-
 export default function Layout({ children, currentPageName }) {
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClientInstance}>
       <LanguageProvider>
         <ThemeProvider>
           <ErrorBoundary>

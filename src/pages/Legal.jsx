@@ -24,7 +24,7 @@ const PRIVACY_SECTIONS = [
   {
     title: 'Information Sharing',
     content: [
-      { subtitle: 'Service providers (under contract)', items: ['Base44 — app infrastructure and database', 'Stripe — payment processing', 'Apple App Store / Google Play — distribution'] },
+      { subtitle: 'Service providers (under contract)', items: ['Supabase — app infrastructure and database', 'Stripe — payment processing', 'Apple App Store / Google Play — distribution'] },
       { subtitle: 'Other cases', items: ['Community posts are visible to other registered users', 'Legal requirements or court orders', 'Business transfer (with advance notice to you)'] },
     ]
   },

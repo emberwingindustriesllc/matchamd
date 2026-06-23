@@ -89,7 +89,7 @@ We do not sell, trade, or rent your personal information to third parties. We ma
 
 We work with trusted third-party service providers who assist in operating the App. These providers are contractually obligated to protect your data and may only process it as directed by us:
 
-- **Base44** — App infrastructure, authentication, and database services
+- **Supabase** — App infrastructure, authentication, and database services
 - **Stripe, Inc.** — Payment processing
 - **Apple Inc.** — iOS App Store distribution and in-app purchase validation
 - **Google LLC** — Google Play distribution and in-app purchase validation

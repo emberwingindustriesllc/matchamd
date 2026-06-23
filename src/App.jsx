@@ -1,6 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
-import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
@@ -65,21 +64,19 @@ const AuthenticatedRoutes = () => (
 function App() {
   return (
     <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        {/* Router must wrap LanguageProvider because it uses useLocation() */}
-        <Router>
-          <LanguageProvider>
-            <NavigationTracker />
-            <Routes>
-              {/* Public route — no auth required */}
-              <Route path="/Login" element={<Login />} />
-              {/* All other routes require auth */}
-              <Route path="/*" element={<AuthenticatedRoutes />} />
-            </Routes>
-            <Toaster />
-          </LanguageProvider>
-        </Router>
-      </QueryClientProvider>
+      {/* Router must wrap LanguageProvider because it uses useLocation() */}
+      <Router>
+        <LanguageProvider>
+          <NavigationTracker />
+          <Routes>
+            {/* Public route — no auth required */}
+            <Route path="/Login" element={<Login />} />
+            {/* All other routes require auth */}
+            <Route path="/*" element={<AuthenticatedRoutes />} />
+          </Routes>
+          <Toaster />
+        </LanguageProvider>
+      </Router>
     </AuthProvider>
   )
 }
