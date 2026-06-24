@@ -10,6 +10,8 @@ import Mentors from './pages/Mentors';
 import Notifications from './pages/Notifications';
 import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
+import ProgramDetail from './pages/ProgramDetail';
+import ProgramsList from './pages/ProgramsList';
 import ResearchOpportunities from './pages/ResearchOpportunities';
 import USMLEQuizPack from './pages/USMLEQuizPack';
 import Dashboard from './pages/Dashboard';
@@ -33,6 +35,8 @@ export const PAGES = {
     "Notifications": Notifications,
     "PostDetail": PostDetail,
     "Profile": Profile,
+    "ProgramDetail": ProgramDetail,
+    "ProgramsList": ProgramsList,
     "ResearchOpportunities": ResearchOpportunities,
     "USMLEQuizPack": USMLEQuizPack,
     "Dashboard": Dashboard,
