@@ -118,9 +118,6 @@ CLASSPATH="\\\"\\\""
 
 
 # Determine the Java command to use to start the JVM.
-if [ -z "$JAVA_HOME" ] ; then
-    JAVA_HOME="C:/Users/paulf/AppData/Local/Android/java-1.8.0-openjdk-1.8.0.492.b09-1.win.jdk.x86_64"
-fi
 if [ -n "$JAVA_HOME" ] ; then
     if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
         # IBM's JDK on AIX uses strange locations for the executables

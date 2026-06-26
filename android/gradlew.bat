@@ -26,10 +26,6 @@
 @rem Set local scope for the variables with windows NT shell
 if "%OS%"=="Windows_NT" setlocal
 
-if not defined JAVA_HOME (
-    set "JAVA_HOME=C:\Users\paulf\AppData\Local\Android\java-1.8.0-openjdk-1.8.0.492.b09-1.win.jdk.x86_64"
-)
-
 set DIRNAME=%~dp0
 if "%DIRNAME%"=="" set DIRNAME=.
 @rem This is normally unused
