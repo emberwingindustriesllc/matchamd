@@ -29,7 +29,9 @@ import {
   Users,
   GraduationCap,
   Target,
-  Stethoscope
+  Stethoscope,
+  Coins,
+  Calculator
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -318,6 +320,42 @@ export default function Dashboard() {
               <span className="flex-1 flex items-center gap-1 bg-white/20 rounded-full px-3 py-1">
                 <Calendar className="w-3 h-3" />
                 Track Interviews & ROL
+              </span>
+              <ChevronRight className="w-5 h-5 ml-auto" />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Match Cost & Budget Calculator */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.09 }}
+          onClick={() => navigate(createPageUrl('MatchCostCalculator'))}
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 p-6 text-white shadow-lg cursor-pointer hover:shadow-xl transition-all"
+        >
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                <Coins className="w-5 h-5 text-white" />
+              </div>
+              <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                New Tool
+              </Badge>
+            </div>
+            <h3 className="text-xl font-bold mb-1">Match Budget & Cost Planner</h3>
+            <p className="text-white/95 text-sm mb-3">
+              Estimate USMLE, ECFMG, rotation, travel, and ERAS costs. Convert to your local currency and see strategies to save.
+            </p>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="flex-1 flex items-center gap-1 bg-white/20 rounded-full px-3 py-1">
+                <Calculator className="w-3 h-3" />
+                Budget Estimator
+              </span>
+              <span className="flex-1 flex items-center gap-1 bg-white/20 rounded-full px-3 py-1">
+                <Globe className="w-3 h-3" />
+                Local Currency Conversion
               </span>
               <ChevronRight className="w-5 h-5 ml-auto" />
             </div>

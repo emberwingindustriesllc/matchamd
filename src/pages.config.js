@@ -19,6 +19,7 @@ import InterviewCourse from './pages/InterviewCourse';
 import Onboarding from './pages/Onboarding';
 import Subscription from './pages/Subscription';
 import SurgeryGuide from './pages/SurgeryGuide';
+import MatchCostCalculator from './pages/MatchCostCalculator';
 import __Layout from './Layout.jsx';
 
 
@@ -44,6 +45,7 @@ export const PAGES = {
     "Onboarding": Onboarding,
     "Subscription": Subscription,
     "SurgeryGuide": SurgeryGuide,
+    "MatchCostCalculator": MatchCostCalculator,
 }
 
 export const pagesConfig = {

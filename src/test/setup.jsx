@@ -75,7 +75,7 @@ vi.mock('sonner', () => ({
 
 // Mock lucide-react icons
 vi.mock('lucide-react', () => {
-  const icons = ['Bell', 'ChevronRight', 'Calendar', 'Trophy', 'Flame', 'Sparkles', 'Users', 'GraduationCap', 'Target', 'Stethoscope', 'Bot', 'Send', 'AlertCircle', 'Globe', 'CheckCircle2', 'Camera', 'Moon', 'BookOpen', 'Crown', 'Shield', 'MapPin', 'Settings', 'LogOut', 'ChevronLeft', 'GraduationCap', 'Shield'];
+  const icons = ['Bell', 'ChevronRight', 'Calendar', 'Trophy', 'Flame', 'Sparkles', 'Users', 'GraduationCap', 'Target', 'Stethoscope', 'Bot', 'Send', 'AlertCircle', 'Globe', 'CheckCircle2', 'Camera', 'Moon', 'BookOpen', 'Crown', 'Shield', 'MapPin', 'Settings', 'LogOut', 'ChevronLeft', 'GraduationCap', 'Shield', 'Home', 'User', 'Coins', 'Calculator', 'Plane', 'DollarSign', 'ShieldCheck', 'HelpCircle', 'Briefcase', 'Building2', 'FileText', 'ArrowLeft', 'Percent', 'AlertTriangle'];
   const mockIcon = ({ children, ...props }) => <svg data-testid="icon" {...props} />;
   const mocked = {};
   icons.forEach(name => { mocked[name] = mockIcon; });
