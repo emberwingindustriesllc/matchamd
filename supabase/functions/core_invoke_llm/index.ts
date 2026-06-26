@@ -46,26 +46,72 @@ Deno.serve(async (req) => {
       const result = await response.json();
       responseText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
     } else if (openAiApiKey) {
-      // Call OpenAI API
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openAiApiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: prompt }],
-        }),
-      });
+      try {
+        // Try calling the new v1/responses endpoint
+        const response = await fetch('https://api.openai.com/v1/responses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${openAiApiKey}`,
+          },
+          body: JSON.stringify({
+            model: 'gpt-5.4-mini',
+            input: prompt,
+            store: true,
+          }),
+        });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`OpenAI API error: ${response.status} - ${errText}`);
+        if (response.ok) {
+          const result = await response.json();
+          let text = '';
+          if (result.output && Array.isArray(result.output)) {
+            for (const item of result.output) {
+              if (item.content && Array.isArray(item.content)) {
+                for (const contentPart of item.content) {
+                  if (contentPart.text) {
+                    text += contentPart.text;
+                  } else if (typeof contentPart === 'string') {
+                    text += contentPart;
+                  }
+                }
+              } else if (item.text) {
+                text += item.text;
+              }
+            }
+          }
+          
+          if (text) {
+            responseText = text;
+          } else {
+            throw new Error('Empty text from responses endpoint');
+          }
+        } else {
+          const errText = await response.text();
+          console.warn(`OpenAI v1/responses failed: ${response.status} - ${errText}. Falling back to chat/completions.`);
+          throw new Error('Fallback to chat completions');
+        }
+      } catch (err) {
+        // Fallback to standard chat completions
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${openAiApiKey}`,
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [{ role: 'user', content: prompt }],
+          }),
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(`OpenAI API error: ${response.status} - ${errText}`);
+        }
+
+        const result = await response.json();
+        responseText = result.choices?.[0]?.message?.content || '';
       }
-
-      const result = await response.json();
-      responseText = result.choices?.[0]?.message?.content || '';
     } else {
       // Fallback/Mock Response if no keys are configured
       console.warn('Neither GEMINI_API_KEY nor OPENAI_API_KEY is configured in Supabase Secrets.');
