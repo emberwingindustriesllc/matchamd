@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/components/ui/use-toast';
 import logo from '@/assets/logo.png';
 import { purchaseManager } from '@/lib/purchaseManager';
 import Header from '@/components/navigation/Header';
@@ -13,10 +14,26 @@ import { createPageUrl } from '@/utils';
 
 export default function PremiumGate({ title, description, price, features, contentId }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const purchaseMutation = useMutation({
     mutationFn: async () => {
-      await purchaseManager.purchaseAddOn(contentId, title);
+      return await purchaseManager.purchaseAddOn(contentId, title);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
+      toast({
+        title: 'Content Unlocked!',
+        description: `You now have full access to ${title}.`
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Purchase Failed',
+        description: error.message || 'Could not process purchase.',
+        variant: 'destructive'
+      });
     }
   });
 

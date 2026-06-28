@@ -1,1 +1,6 @@
-declare module '*.png' { const value: any; export default value; }
+/// <reference types="vite/client" />
+
+declare module '*.png' {
+  const value: string;
+  export default value;
+}

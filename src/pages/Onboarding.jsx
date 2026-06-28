@@ -4,7 +4,7 @@ import logo from '@/assets/logo.png';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useTranslation } from '@/components/i18n/LanguageContext';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -80,7 +80,55 @@ export default function Onboarding() {
     acgme_waiver: false,
     previous_training: '',
     us_clinical_experience: false,
-    medical_school_custom: ''
+    medical_school_custom: '',
+    target_specialty_custom: '',
+    fellowship_type_custom: ''
+  });
+
+  const { data: dbMedSchools = [] } = useQuery({
+    queryKey: ['dbMedSchools', profile.medical_school_country],
+    queryFn: async () => {
+      if (!profile.medical_school_country) return [];
+      try {
+        const { data } = await supabase
+          .from('user_profiles')
+          .select('medical_school')
+          .eq('medical_school_country', profile.medical_school_country);
+        if (data) {
+          return Array.from(new Set(data.map(d => d.medical_school).filter(Boolean)));
+        }
+      } catch (e) {
+        console.warn('Failed to fetch DB medical schools', e);
+      }
+      return [];
+    },
+    enabled: !!profile.medical_school_country
+  });
+
+  const { data: dbSpecialties = [] } = useQuery({
+    queryKey: ['dbSpecialties'],
+    queryFn: async () => {
+      try {
+        const { data } = await supabase.from('user_profiles').select('target_specialty');
+        if (data) {
+          return Array.from(new Set(data.map(d => d.target_specialty).filter(Boolean)));
+        }
+      } catch (e) {}
+      return [];
+    }
+  });
+
+  const { data: dbFellowships = [] } = useQuery({
+    queryKey: ['dbFellowships'],
+    queryFn: async () => {
+      try {
+        const { data } = await supabase.from('user_profiles').select('fellowship_type');
+        if (data) {
+          return Array.from(new Set(data.map(d => d.fellowship_type).filter(Boolean)));
+        }
+      } catch (e) {}
+      return [];
+    }
   });
 
   useEffect(() => {
@@ -154,8 +202,9 @@ export default function Onboarding() {
           alt="MatchaMD Logo" 
           className="w-full h-full object-contain drop-shadow-lg"
           onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = 'https://img.icons8.com/color/512/matcha.png'; // Fallback
+            const img = e.currentTarget;
+            img.onerror = null;
+            img.src = 'https://img.icons8.com/color/512/matcha.png';
           }}
         />
       </div>
@@ -261,7 +310,11 @@ export default function Onboarding() {
                 <SelectValue placeholder={t('onboarding.selectMedSchool')} />
               </SelectTrigger>
               <SelectContent>
-                {(commonMedSchools[profile.medical_school_country] || commonMedSchools['Other']).map(school => (
+                {Array.from(new Set([
+                  ...(commonMedSchools[profile.medical_school_country] || commonMedSchools['Other'] || []).filter(s => s !== 'Other'),
+                  ...dbMedSchools,
+                  'Other'
+                ])).map(school => (
                   <SelectItem key={school} value={school}>{school}</SelectItem>
                 ))}
               </SelectContent>
@@ -400,11 +453,27 @@ export default function Onboarding() {
                 <SelectValue placeholder="Select fellowship type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pediatrics">Pediatrics</SelectItem>
-                <SelectItem value="internal_medicine_pediatrics">Internal Medicine-Pediatrics</SelectItem>
-                <SelectItem value="internal_medicine">Internal Medicine</SelectItem>
+                {Array.from(new Set([
+                  'pediatrics',
+                  'internal_medicine',
+                  'internal_medicine_pediatrics',
+                  ...dbFellowships,
+                  'Other'
+                ])).map(ft => (
+                  <SelectItem key={ft} value={ft}>
+                    {ft === 'pediatrics' ? 'Pediatrics' : ft === 'internal_medicine' ? 'Internal Medicine' : ft === 'internal_medicine_pediatrics' ? 'Internal Medicine-Pediatrics' : ft}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+            {profile.fellowship_type === 'Other' && (
+              <Input
+                placeholder="Enter custom fellowship category..."
+                value={profile.fellowship_type_custom || ''}
+                onChange={(e) => updateProfile('fellowship_type_custom', e.target.value)}
+                className="h-12 rounded-xl mt-2"
+              />
+            )}
           </div>
         )}
 
@@ -416,59 +485,51 @@ export default function Onboarding() {
                 <SelectValue placeholder={t('onboarding.selectSpecialty')} />
               </SelectTrigger>
               <SelectContent>
-                {residencySpecialties.map(s => (
+                {Array.from(new Set([
+                  ...residencySpecialties.filter(s => s !== 'Other'),
+                  ...dbSpecialties,
+                  'Other'
+                ])).map(s => (
                   <SelectItem key={s} value={s}>{s}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {profile.target_specialty === 'Other' && (
+              <Input
+                placeholder="Enter custom residency specialty..."
+                value={profile.target_specialty_custom || ''}
+                onChange={(e) => updateProfile('target_specialty_custom', e.target.value)}
+                className="h-12 rounded-xl mt-2"
+              />
+            )}
           </div>
         )}
 
-        {profile.primary_goal === 'fellowship' && profile.fellowship_type === 'pediatrics' && (
+        {profile.primary_goal === 'fellowship' && (profile.fellowship_type === 'pediatrics' || profile.fellowship_type === 'internal_medicine' || profile.fellowship_type === 'internal_medicine_pediatrics' || profile.fellowship_type === 'Other') && (
           <div>
-            <Label className="text-slate-700 dark:text-slate-300">Pediatric Subspecialty</Label>
+            <Label className="text-slate-700 dark:text-slate-300">Subspecialty / Fellowship Program</Label>
             <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
               <SelectTrigger className="h-12 rounded-xl mt-1">
                 <SelectValue placeholder="Select subspecialty" />
               </SelectTrigger>
               <SelectContent>
-                {pediatricFellowships.map(s => (
+                {Array.from(new Set([
+                  ...(profile.fellowship_type === 'pediatrics' ? pediatricFellowships : profile.fellowship_type === 'internal_medicine' ? internalMedicineFellowships : combinedMedPedsFellowships).filter(s => s !== 'Other'),
+                  ...dbSpecialties,
+                  'Other'
+                ])).map(s => (
                   <SelectItem key={s} value={s}>{s}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          </div>
-        )}
-
-        {profile.primary_goal === 'fellowship' && profile.fellowship_type === 'internal_medicine' && (
-          <div>
-            <Label className="text-slate-700 dark:text-slate-300">Internal Medicine Subspecialty</Label>
-            <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
-              <SelectTrigger className="h-12 rounded-xl mt-1">
-                <SelectValue placeholder="Select subspecialty" />
-              </SelectTrigger>
-              <SelectContent>
-                {internalMedicineFellowships.map(s => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-
-        {profile.primary_goal === 'fellowship' && profile.fellowship_type === 'internal_medicine_pediatrics' && (
-          <div>
-            <Label className="text-slate-700 dark:text-slate-300">Med-Peds Subspecialty</Label>
-            <Select value={profile.target_specialty} onValueChange={(v) => updateProfile('target_specialty', v)}>
-              <SelectTrigger className="h-12 rounded-xl mt-1">
-                <SelectValue placeholder="Select subspecialty" />
-              </SelectTrigger>
-              <SelectContent>
-                {combinedMedPedsFellowships.map(s => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {profile.target_specialty === 'Other' && (
+              <Input
+                placeholder="Enter custom fellowship subspecialty..."
+                value={profile.target_specialty_custom || ''}
+                onChange={(e) => updateProfile('target_specialty_custom', e.target.value)}
+                className="h-12 rounded-xl mt-2"
+              />
+            )}
           </div>
         )}
 

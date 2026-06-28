@@ -77,7 +77,8 @@ export const pediatricFellowships = [
   'Pulmonology',
   'Rheumatology',
   'Sports Medicine',
-  'Transplant Hepatology'
+  'Transplant Hepatology',
+  'Other'
 ];
 
 export const internalMedicineFellowships = [
@@ -101,7 +102,8 @@ export const internalMedicineFellowships = [
   'Rheumatology',
   'Sleep Medicine',
   'Sports Medicine',
-  'Transplant Hepatology'
+  'Transplant Hepatology',
+  'Other'
 ];
 
 export const combinedMedPedsFellowships = [

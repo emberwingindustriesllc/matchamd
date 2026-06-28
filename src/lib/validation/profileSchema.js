@@ -27,8 +27,10 @@ export const BaseOnboardingProfileSchema = z.object({
   languages: z.array(LanguageCodeEnum).default(['en']),
   preferred_language: LanguageCodeEnum.default('en'),
   primary_goal: PrimaryGoalEnum,
-  fellowship_type: FellowshipTypeEnum.optional(),
+  fellowship_type: z.preprocess((val) => (val === '' ? null : val), z.string().optional().nullable()),
   target_specialty: z.string().optional(),
+  target_specialty_custom: z.string().optional(),
+  fellowship_type_custom: z.string().optional(),
   graduation_year: z.number().int().min(1950).max(new Date().getFullYear() + 5).nullable().optional(),
   usmle_step1_status: USMLEStatusEnum.default('not_started'),
   usmle_step1_score: z.string().optional(),
@@ -120,8 +122,12 @@ export const UserProfileSchema = BaseOnboardingProfileSchema.extend({
  * Returns { success: true, data } or { success: false, errors }
  */
 export function validateProfile(data, isEdit = false) {
+  const sanitizedData = { ...data };
+  if (sanitizedData.fellowship_type === '') sanitizedData.fellowship_type = null;
+  if (sanitizedData.graduation_year === '' || Number.isNaN(sanitizedData.graduation_year)) sanitizedData.graduation_year = null;
+
   const schema = isEdit ? ProfileEditSchema : OnboardingProfileSchema;
-  const result = schema.safeParse(data);
+  const result = schema.safeParse(sanitizedData);
   
   if (result.success) {
     return { success: true, data: result.data };
@@ -147,9 +153,24 @@ export function prepareProfileForUpsert(data, userId) {
     throw new Error(`Validation failed: ${validated.errors.map(e => `${e.field}: ${e.message}`).join('; ')}`);
   }
   
-  return {
+  const finalMedicalSchool = (validated.data.medical_school === 'Other' && validated.data.medical_school_custom)
+    ? validated.data.medical_school_custom
+    : validated.data.medical_school;
+
+  const finalSpecialty = (validated.data.target_specialty === 'Other' && validated.data.target_specialty_custom)
+    ? validated.data.target_specialty_custom
+    : validated.data.target_specialty;
+
+  const finalFellowshipType = (validated.data.fellowship_type === 'Other' && validated.data.fellowship_type_custom)
+    ? validated.data.fellowship_type_custom
+    : validated.data.fellowship_type;
+
+  const payload = {
     user_id: userId,
     ...validated.data,
+    medical_school: finalMedicalSchool,
+    target_specialty: finalSpecialty || null,
+    fellowship_type: finalFellowshipType || null,
     onboarding_complete: true,
     // Ensure arrays are never undefined
     languages: validated.data.languages || ['en'],
@@ -161,12 +182,14 @@ export function prepareProfileForUpsert(data, userId) {
     target_city: validated.data.target_city || null,
     target_state: validated.data.target_state || null,
     undergraduate_college: validated.data.undergraduate_college || null,
-    fellowship_type: validated.data.fellowship_type || null,
-    target_specialty: validated.data.target_specialty || null,
     graduation_year: validated.data.graduation_year ?? null,
     usmle_step1_score: validated.data.usmle_step1_score || null,
     usmle_step2_score: validated.data.usmle_step2_score || null,
     previous_training: validated.data.previous_training || null,
-    medical_school_custom: validated.data.medical_school_custom || null,
   };
+
+  delete payload.medical_school_custom;
+  delete payload.target_specialty_custom;
+  delete payload.fellowship_type_custom;
+  return payload;
 }

@@ -3,13 +3,15 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import PathwayAccordion from '@/components/guides/PathwayAccordion';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { Search, Stethoscope, GraduationCap, BookOpen } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Search, Stethoscope, GraduationCap, BookOpen, Brain, Trophy, MessageSquare, ChevronRight } from 'lucide-react';
 
 const pathways = {
   residency: {
@@ -62,11 +64,31 @@ const pathways = {
 };
 
 export default function Guides() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('residency');
-  const [viewMode, setViewMode] = useState('accordion');
 
   const { user } = useAuth();
+
+  const { data: purchases = [] } = useQuery({
+    queryKey: ['purchases', user?.id],
+    queryFn: async () => {
+      let dbPurchases = [];
+      if (user?.id) {
+        try {
+          const { data } = await supabase.from('purchased_content').select('*').eq('user_id', user?.id);
+          if (data) dbPurchases = data;
+        } catch (e) {
+          console.warn('Failed to fetch purchases from DB', e);
+        }
+      }
+      let localPurchases = [];
+      try {
+        localPurchases = JSON.parse(localStorage.getItem('matchamd_purchased_content') || '[]');
+      } catch (e) {}
+      return [...dbPurchases, ...localPurchases];
+    }
+  });
 
   const { data: progressList = [] } = useQuery({
     queryKey: ['progress'],
@@ -147,6 +169,69 @@ export default function Guides() {
             className="pl-12 h-12 rounded-2xl border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm focus:ring-[rgb(var(--color-primary))]"
           />
         </div>
+
+        {/* Specialty Courses & Practice Modules */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 space-y-3"
+        >
+          <h2 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+            <span>Specialty Courses & Practice Modules</span>
+          </h2>
+          <div className="grid gap-3">
+            {[
+              {
+                id: 'quiz_usmle',
+                title: 'USMLE Quiz Pack',
+                description: '500+ high-yield practice questions for Step 1 & 2 CK',
+                icon: Brain,
+                color: 'from-indigo-500 to-purple-500',
+                route: 'USMLEQuizPack'
+              },
+              {
+                id: 'specialty_surgery',
+                title: 'Surgery Specialty Guide',
+                description: 'Deep dive strategies into surgical residency applications',
+                icon: Trophy,
+                color: 'from-emerald-500 to-teal-500',
+                route: 'SurgeryGuide'
+              },
+              {
+                id: 'interview_premium',
+                title: 'Interview Mastery Course',
+                description: '20+ video lessons & expert practice questions',
+                icon: MessageSquare,
+                color: 'from-amber-500 to-orange-500',
+                route: 'InterviewCourse'
+              }
+            ].map((course) => {
+              const Icon = course.icon;
+              const isUnlocked = purchases.some(p => p.content_id === course.id);
+              return (
+                <button
+                  key={course.id}
+                  onClick={() => navigate(createPageUrl(course.route))}
+                  className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all text-left flex items-center gap-4 group"
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${course.color} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform`}>
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-slate-800 dark:text-white text-sm">{course.title}</h3>
+                      <Badge variant={isUnlocked ? "secondary" : "outline"} className={`text-[10px] px-2 py-0.5 ${isUnlocked ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-300' : 'text-amber-600 border-amber-300'}`}>
+                        {isUnlocked ? 'Unlocked' : 'Premium'}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">{course.description}</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
 
         {/* Dynamic Guides from Database */}
         {dynamicGuides.length > 0 && (

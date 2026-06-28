@@ -31,7 +31,9 @@ import {
   Target,
   Stethoscope,
   Coins,
-  Calculator
+  Calculator,
+  Brain,
+  Globe
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -363,19 +365,19 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             onClick={() => navigate(createPageUrl('Community'))}
-            className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all text-left"
+            className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all text-left"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[rgba(var(--color-primary),0.8)] to-[rgba(var(--color-primary),1)] flex items-center justify-center mb-3">
-              <Users className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[rgba(var(--color-primary),0.8)] to-[rgba(var(--color-primary),1)] flex items-center justify-center mb-2">
+              <Users className="w-4 h-4 text-white" />
             </div>
-            <h3 className="font-semibold text-slate-800 dark:text-white">Community</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Connect with peers</p>
+            <h3 className="font-semibold text-slate-800 dark:text-white text-xs">Community</h3>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Peers</p>
           </motion.button>
 
           <motion.button
@@ -383,13 +385,27 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
             onClick={() => navigate(createPageUrl('Mentors'))}
-            className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all text-left"
+            className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all text-left"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mb-3">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mb-2">
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <h3 className="font-semibold text-slate-800 dark:text-white">Find Mentor</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Get guidance</p>
+            <h3 className="font-semibold text-slate-800 dark:text-white text-xs">Find Mentor</h3>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Guidance</p>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            onClick={() => navigate(createPageUrl('USMLEQuizPack'))}
+            className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all text-left"
+          >
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mb-2">
+              <Brain className="w-4 h-4 text-white" />
+            </div>
+            <h3 className="font-semibold text-slate-800 dark:text-white text-xs">Quiz Pack</h3>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">500+ Qs</p>
           </motion.button>
         </div>
 

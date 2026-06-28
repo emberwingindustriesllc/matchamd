@@ -5,6 +5,8 @@ import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { useToast } from '@/components/ui/use-toast';
 import { purchaseManager } from '@/lib/purchaseManager';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
@@ -20,7 +22,9 @@ import {
   BookOpen,
   MessageSquare,
   TrendingUp,
-  Lock
+  Lock,
+  Eye,
+  Loader2
 } from 'lucide-react';
 import BenefitComparison from '@/components/subscription/BenefitComparison';
 
@@ -86,50 +90,75 @@ const addOns = [
     name: 'USMLE Quiz Pack',
     price: 4.99,
     icon: BookOpen,
-    description: '500+ practice questions for Step 1 & 2'
+    description: '500+ practice questions for Step 1 & 2',
+    route: 'USMLEQuizPack'
   },
   {
     id: 'specialty_surgery',
     name: 'Surgery Specialty Guide',
     price: 3.99,
     icon: Trophy,
-    description: 'Deep dive into surgical residency applications'
+    description: 'Deep dive into surgical residency applications',
+    route: 'SurgeryGuide'
   },
   {
     id: 'interview_premium',
     name: 'Interview Mastery Course',
     price: 9.99,
     icon: MessageSquare,
-    description: '20+ video lessons + practice questions'
+    description: '20+ video lessons + practice questions',
+    route: 'InterviewCourse'
   }
 ];
 
 export default function Subscription() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const { toast } = useToast();
+  const [purchasingPlanId, setPurchasingPlanId] = useState(null);
+  const [purchasingAddOnId, setPurchasingAddOnId] = useState(null);
 
   const { user } = useAuth();
 
-
-  const { data: subscriptions } = useQuery({
+  const { data: subscriptions = [] } = useQuery({
     queryKey: ['subscription', user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('subscriptions').select('*').eq('user_id', user?.id);
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!user?.id
+      let dbSub = [];
+      if (user?.id) {
+        try {
+          const { data } = await supabase.from('subscriptions').select('*').eq('user_id', user?.id);
+          if (data) dbSub = data;
+        } catch (e) {
+          console.warn('Failed to fetch subscription from DB', e);
+        }
+      }
+      let localSub = null;
+      try {
+        localSub = JSON.parse(localStorage.getItem('matchamd_active_subscription'));
+      } catch (e) {}
+      if (localSub) return [localSub, ...dbSub];
+      return dbSub;
+    }
   });
 
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('purchased_content').select('*').eq('user_id', user?.id);
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!user?.id
+      let dbPurchases = [];
+      if (user?.id) {
+        try {
+          const { data } = await supabase.from('purchased_content').select('*').eq('user_id', user?.id);
+          if (data) dbPurchases = data;
+        } catch (e) {
+          console.warn('Failed to fetch purchases from DB', e);
+        }
+      }
+      let localPurchases = [];
+      try {
+        localPurchases = JSON.parse(localStorage.getItem('matchamd_purchased_content') || '[]');
+      } catch (e) {}
+      return [...dbPurchases, ...localPurchases];
+    }
   });
 
   const currentSubscription = subscriptions?.[0];
@@ -137,6 +166,7 @@ export default function Subscription() {
   const purchaseMutation = useMutation({
     /** @param {string} planId */
     mutationFn: async (planId) => {
+      setPurchasingPlanId(planId);
       if (planId === 'free') {
         if (currentSubscription) {
           const { data, error } = await supabase.from('subscriptions').update({
@@ -148,15 +178,49 @@ export default function Subscription() {
         }
         return;
       }
-      
-      await purchaseManager.purchasePlan(planId);
+      return await purchaseManager.purchasePlan(planId);
+    },
+    onSuccess: (res, planId) => {
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+      toast({
+        title: planId === 'free' ? 'Plan updated' : 'Subscription activated!',
+        description: planId === 'free' ? 'Switched to Free plan.' : 'Thank you for subscribing to MatchaMD!'
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Subscription Error',
+        description: error.message || 'Could not process subscription.',
+        variant: 'destructive'
+      });
+    },
+    onSettled: () => {
+      setPurchasingPlanId(null);
     }
   });
 
   const purchaseAddOnMutation = useMutation({
     /** @param {{id: string, name: string}} addOn */
     mutationFn: async (addOn) => {
-      await purchaseManager.purchaseAddOn(addOn.id, addOn.name);
+      setPurchasingAddOnId(addOn.id);
+      return await purchaseManager.purchaseAddOn(addOn.id, addOn.name);
+    },
+    onSuccess: (res, addOn) => {
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
+      toast({
+        title: 'Content Unlocked!',
+        description: `Successfully unlocked ${addOn.name}.`
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Purchase Error',
+        description: error.message || 'Could not process purchase.',
+        variant: 'destructive'
+      });
+    },
+    onSettled: () => {
+      setPurchasingAddOnId(null);
     }
   });
 
@@ -283,12 +347,29 @@ export default function Subscription() {
                     </ul>
                     
                     <Button
-                      onClick={() => purchaseMutation.mutate(plan.id)}
-                      disabled={isCurrentPlan}
+                      onClick={() => {
+                        if (isCurrentPlan) {
+                          toast({ title: 'Current Active Plan', description: `You are currently subscribed to the ${plan.name} plan.` });
+                        } else {
+                          purchaseMutation.mutate(plan.id);
+                        }
+                      }}
+                      disabled={purchasingPlanId === plan.id}
                       className={`w-full ${plan.popular ? 'bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] text-white' : ''}`}
                       variant={isCurrentPlan ? 'outline' : 'default'}
                     >
-                      {isCurrentPlan ? 'Current Plan' : plan.price === 0 ? 'Downgrade to Free' : 'Subscribe'}
+                      {purchasingPlanId === plan.id ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Processing...</span>
+                        </div>
+                      ) : isCurrentPlan ? (
+                        'Active Plan'
+                      ) : plan.price === 0 ? (
+                        'Downgrade to Free'
+                      ) : (
+                        'Subscribe'
+                      )}
                     </Button>
                   </Card>
                 </motion.div>
@@ -313,32 +394,61 @@ export default function Subscription() {
               const purchased = hasPurchased(addOn.id);
               
               return (
-                <Card key={addOn.id} className="p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <Card key={addOn.id} className="p-5 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                        <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-slate-900 dark:text-white text-sm">
+                          {addOn.name}
+                        </h3>
+                        <p className="text-xs text-slate-500">${addOn.price}</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-slate-900 dark:text-white text-sm">
-                        {addOn.name}
-                      </h3>
-                      <p className="text-xs text-slate-500">${addOn.price}</p>
-                    </div>
+                    
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-4">
+                      {addOn.description}
+                    </p>
                   </div>
                   
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mb-4">
-                    {addOn.description}
-                  </p>
-                  
-                  <Button
-                    onClick={() => purchaseAddOnMutation.mutate(addOn)}
-                    disabled={purchased}
-                    size="sm"
-                    className="w-full"
-                    variant={purchased ? 'outline' : 'default'}
-                  >
-                    {purchased ? 'Purchased' : 'Buy Now'}
-                  </Button>
+                  <div className="space-y-2">
+                    <Button
+                      onClick={() => navigate(createPageUrl(addOn.route))}
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-xs"
+                    >
+                      <Eye className="w-3.5 h-3.5 mr-1.5" />
+                      {purchased ? 'Open Course / Guide' : 'Preview Content'}
+                    </Button>
+                    
+                    <Button
+                      onClick={() => {
+                        if (purchased) {
+                          navigate(createPageUrl(addOn.route));
+                        } else {
+                          purchaseAddOnMutation.mutate(addOn);
+                        }
+                      }}
+                      disabled={purchasingAddOnId === addOn.id}
+                      size="sm"
+                      className="w-full text-xs"
+                      variant={purchased ? 'outline' : 'default'}
+                    >
+                      {purchasingAddOnId === addOn.id ? (
+                        <div className="flex items-center gap-1.5">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          <span>Processing...</span>
+                        </div>
+                      ) : purchased ? (
+                        'Unlocked (Click to Open)'
+                      ) : (
+                        'Buy Now'
+                      )}
+                    </Button>
+                  </div>
                 </Card>
               );
             })}

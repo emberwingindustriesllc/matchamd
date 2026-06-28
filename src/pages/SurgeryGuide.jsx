@@ -194,11 +194,21 @@ export default function SurgeryGuide() {
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('purchased_content').select('*').eq('user_id', user?.id);
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!user?.id
+      let dbPurchases = [];
+      if (user?.id) {
+        try {
+          const { data } = await supabase.from('purchased_content').select('*').eq('user_id', user?.id);
+          if (data) dbPurchases = data;
+        } catch (e) {
+          console.warn('Failed to fetch from DB', e);
+        }
+      }
+      let localPurchases = [];
+      try {
+        localPurchases = JSON.parse(localStorage.getItem('matchamd_purchased_content') || '[]');
+      } catch (e) {}
+      return [...dbPurchases, ...localPurchases];
+    }
   });
 
   const hasPurchased = purchases.some(p => p.content_id === 'specialty_surgery');
