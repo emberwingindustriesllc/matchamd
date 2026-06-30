@@ -32,20 +32,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { 
   Search, 
   MapPin,
   CheckCircle2,
   Circle,
-  ExternalLink,
   GraduationCap,
   Globe,
   Heart,
@@ -63,6 +54,7 @@ import {
   ClipboardList
 } from 'lucide-react';
 import { mockResidencyPrograms } from '@/data/mockResidencyPrograms';
+import ProgramDetailsModal from '@/components/community/ProgramDetailsModal';
 
 export default function IMGPrograms() {
   const [activeTab, setActiveTab] = useState('search');
@@ -77,7 +69,6 @@ export default function IMGPrograms() {
   
   // Detail dialog state
   const [selectedProgram, setSelectedProgram] = useState(null);
-  const [detailTab, setDetailTab] = useState('overview');
 
   // Interview state
   const [isLogInterviewOpen, setIsLogInterviewOpen] = useState(false);
@@ -1298,251 +1289,13 @@ export default function IMGPrograms() {
         </Tabs>
       </main>
 
-      {/* Detail Dialog */}
-      <Dialog open={!!selectedProgram} onOpenChange={() => setSelectedProgram(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 bg-white dark:bg-slate-900">
-          {selectedProgram && (
-            <div className="space-y-4">
-              <DialogHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
-                <DialogTitle className="text-xl font-bold text-slate-950 dark:text-white">
-                  {selectedProgram.program_name}
-                </DialogTitle>
-                <p className="text-slate-500 text-sm">
-                  {selectedProgram.institution} — {selectedProgram.city}, {selectedProgram.state}
-                </p>
-              </DialogHeader>
-
-              <Tabs value={detailTab} onValueChange={setDetailTab} className="w-full">
-                <TabsList className="grid grid-cols-5 w-full bg-slate-105 dark:bg-slate-850 p-1 mb-4 rounded-xl">
-                  <TabsTrigger value="overview" className="text-xs">Info</TabsTrigger>
-                  <TabsTrigger value="fit" className="text-xs">Fit & Visa</TabsTrigger>
-                  <TabsTrigger value="reqs" className="text-xs">Reqs & Cost</TabsTrigger>
-                  <TabsTrigger value="benefits" className="text-xs">Stipends</TabsTrigger>
-                  <TabsTrigger value="soap" className="text-xs">SOAP</TabsTrigger>
-                </TabsList>
-
-                {/* Tab Content: Overview */}
-                <TabsContent value="overview" className="space-y-4 pt-1">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <span className="text-xs text-slate-450 block">Specialty</span>
-                      <span className="font-semibold text-sm">{selectedProgram.specialty}</span>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-xs text-slate-450 block">Subspecialty</span>
-                      <span className="font-semibold text-sm">{selectedProgram.subspecialty || 'General'}</span>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-xs text-slate-450 block">Program Type</span>
-                      <span className="font-semibold text-sm">
-                        {selectedProgram.community_program ? 'Community Program' : 'University Hospital'}
-                      </span>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-xs text-slate-450 block">Interview Format</span>
-                      <span className="font-semibold text-sm">{selectedProgram.interview_format}</span>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl text-xs space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-slate-450">NRMP Match Code:</span>
-                      <span className="font-bold text-slate-700 dark:text-slate-350">{selectedProgram.nrmp_code || 'N/A'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-450">Total Residents:</span>
-                      <span className="font-bold text-slate-700 dark:text-slate-350">{selectedProgram.program_size}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-450">Annual Intake Slots:</span>
-                      <span className="font-bold text-slate-700 dark:text-slate-350">{selectedProgram.annual_intake || 'N/A'}</span>
-                    </div>
-                  </div>
-
-                  {selectedProgram.website && (
-                    <Button asChild className="w-full bg-indigo-600 hover:bg-indigo-700 rounded-xl mt-2 text-white">
-                      <a href={selectedProgram.website} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Visit Official Website
-                      </a>
-                    </Button>
-                  )}
-                </TabsContent>
-
-                {/* Tab Content: Fit */}
-                <TabsContent value="fit" className="space-y-4 pt-1">
-                  <div className="space-y-3">
-                    <h4 className="font-bold text-sm">Personal Match Compatibility</h4>
-                    
-                    {/* User Vs Program Data comparison */}
-                    <div className="space-y-2 text-xs">
-                      {/* Step 2 CK */}
-                      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-850">
-                        <span>Step 2 CK Score</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-slate-400">Min: {selectedProgram.step2_score_min} (Avg: {selectedProgram.step2_score_avg})</span>
-                          <Badge className="font-bold bg-indigo-50 text-indigo-700 border-indigo-200">
-                            You: {profile?.usmle_step2_score || "N/A"}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      {/* Visa */}
-                      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-850">
-                        <span>Visa Sponsorship</span>
-                        <div className="flex items-center gap-1.5">
-                          {selectedProgram.visa_j1 && <Badge variant="outline">J-1</Badge>}
-                          {selectedProgram.visa_h1b && <Badge variant="outline">H-1B</Badge>}
-                          <Badge className="font-bold bg-indigo-50 text-indigo-700 border-indigo-200">
-                            You: {profile?.visa_status === 'none' ? 'Needs Visa' : profile?.visa_status}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      {/* USCE */}
-                      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-850">
-                        <span>US Clinical Experience (USCE)</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-slate-400">Preferred: {selectedProgram.min_usce_months || 0} mos</span>
-                          <Badge className="font-bold bg-indigo-50 text-indigo-700 border-indigo-200">
-                            You: {profile?.us_clinical_experience ? "Yes" : "No"}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      {/* Grad year */}
-                      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-850">
-                        <span>Graduation Year Cutoff</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-slate-400">Cutoff: {selectedProgram.grad_year_cutoff ? `${selectedProgram.grad_year_cutoff} yrs` : 'None'}</span>
-                          <Badge className="font-bold bg-indigo-50 text-indigo-700 border-indigo-200">
-                            You: {profile?.graduation_year || "N/A"}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Breakdown Reasons */}
-                    <div className="p-4 bg-indigo-50/40 dark:bg-indigo-950/15 border border-indigo-100 dark:border-indigo-900 rounded-2xl text-xs space-y-2 mt-2">
-                      <span className="font-bold text-indigo-900 dark:text-indigo-400 block mb-1">Fit Analysis Breakdown:</span>
-                      {calculateFitScore(selectedProgram).reasons.map((r, i) => (
-                        <div key={i} className="flex items-start gap-1.5 text-indigo-950 dark:text-indigo-300">
-                          <span className="text-emerald-500 font-bold">•</span>
-                          <span>{r}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </TabsContent>
-
-                {/* Tab Content: Requirements & Costs */}
-                <TabsContent value="reqs" className="space-y-4 pt-1">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <span className="text-xs text-slate-450 block">LoR Requirements</span>
-                      <span className="font-semibold text-sm">{selectedProgram.lor_required || 3} letters</span>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-xs text-slate-450 block">Step 3 Required?</span>
-                      <span className="font-semibold text-sm">{selectedProgram.step3_required ? 'Yes' : 'No'}</span>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-xs text-slate-450 block">Application Deadline</span>
-                      <span className="font-semibold text-sm text-amber-600">{selectedProgram.application_deadline}</span>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-xs text-slate-450 block">Graduation Rate</span>
-                      <span className="font-semibold text-sm">{selectedProgram.graduation_rate || 'N/A'}</span>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-2xl text-xs space-y-3">
-                    <h4 className="font-bold text-slate-850 dark:text-white border-b pb-1.5">Estimated ERAS & Interview Cost</h4>
-                    <div className="flex justify-between">
-                      <span className="text-slate-450">ERAS Base Application Fee:</span>
-                      <span className="font-bold text-slate-850 dark:text-white">${selectedProgram.estimated_cost?.application_fee || 26}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-450">Interview Format Travel Estimate:</span>
-                      <span className="font-bold text-slate-850 dark:text-white">${selectedProgram.estimated_cost?.travel_cost || 0}</span>
-                    </div>
-                    <div className="flex justify-between border-t pt-1.5 font-bold">
-                      <span className="text-indigo-650 dark:text-indigo-400">Total Program Cost Estimate:</span>
-                      <span className="text-indigo-650 dark:text-indigo-400">${(selectedProgram.estimated_cost?.application_fee || 26) + (selectedProgram.estimated_cost?.travel_cost || 0)}</span>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                {/* Tab Content: Stipends & Benefits */}
-                <TabsContent value="benefits" className="space-y-4 pt-1">
-                  <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-2xl text-xs space-y-3">
-                    <h4 className="font-bold text-slate-800 dark:text-white border-b pb-1.5">Financial package (Stipends & Perks)</h4>
-                    <div className="flex justify-between">
-                      <span className="text-slate-450">Annual PGY-1 Stipend:</span>
-                      <span className="font-bold text-slate-800 dark:text-white">
-                        ${selectedProgram.stipends_benefits?.annual_stipend?.toLocaleString() || "65,000"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-450">Health Insurance:</span>
-                      <span className="font-bold text-slate-805 dark:text-white">
-                        {selectedProgram.stipends_benefits?.health_insurance ? "Included (Full Coverage)" : "Co-pay required"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-450">CME / Book Allowance:</span>
-                      <span className="font-bold text-slate-800 dark:text-white">
-                        ${selectedProgram.stipends_benefits?.cme_allowance?.toLocaleString() || "1,000"} / year
-                      </span>
-                    </div>
-                    {selectedProgram.stipends_benefits?.housing_stipend > 0 && (
-                      <div className="flex justify-between text-emerald-600 font-semibold">
-                        <span className="text-slate-450">Housing Stipend Add-on:</span>
-                        <span>${selectedProgram.stipends_benefits.housing_stipend.toLocaleString()} / year</span>
-                      </div>
-                    )}
-                  </div>
-                </TabsContent>
-
-                {/* Tab Content: SOAP History */}
-                <TabsContent value="soap" className="space-y-4 pt-1">
-                  <h4 className="font-bold text-sm">Historical Open Positions (SOAP History)</h4>
-                  <p className="text-xs text-slate-500">
-                    Review unfilled program positions entered into the SOAP (Post-Match Supplemental Offer and Acceptance Program) in previous Match years.
-                  </p>
-
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Year</TableHead>
-                        <TableHead className="text-right">Unfilled SOAP Spots</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {selectedProgram.historical_open_spots?.map((row, idx) => (
-                        <TableRow key={idx}>
-                          <TableCell>{row.year}</TableCell>
-                          <TableCell className="text-right font-semibold">
-                            {row.spots === 0 ? (
-                              <Badge className="bg-emerald-50 text-emerald-700 border-emerald-250" variant="outline">0 spots</Badge>
-                            ) : (
-                              <Badge className="bg-amber-50 text-amber-700 border-amber-250" variant="outline">{row.spots} spots</Badge>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      )) || (
-                        <TableRow>
-                          <TableCell colSpan={2} className="text-center text-slate-400">No historical SOAP data available.</TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TabsContent>
-              </Tabs>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ProgramDetailsModal
+        open={!!selectedProgram}
+        onClose={() => setSelectedProgram(null)}
+        program={selectedProgram}
+        profile={profile}
+        calculateFitScore={calculateFitScore}
+      />
 
       {/* Log Interview Dialog */}
       <Dialog open={isLogInterviewOpen} onOpenChange={setIsLogInterviewOpen}>
