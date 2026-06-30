@@ -186,6 +186,9 @@ export default function Subscription() {
         title: planId === 'free' ? 'Plan updated' : 'Subscription activated!',
         description: planId === 'free' ? 'Switched to Free plan.' : 'Thank you for subscribing to MatchaMD!'
       });
+      if (planId !== 'free') {
+        navigate(createPageUrl('Profile'), { replace: true });
+      }
     },
     onError: (error) => {
       toast({
@@ -211,6 +214,9 @@ export default function Subscription() {
         title: 'Content Unlocked!',
         description: `Successfully unlocked ${addOn.name}.`
       });
+      if (addOn.route) {
+        navigate(createPageUrl(addOn.route));
+      }
     },
     onError: (error) => {
       toast({
