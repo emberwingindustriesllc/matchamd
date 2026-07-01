@@ -353,12 +353,20 @@ export default function InterviewCourse() {
               {/* Simulated Video Screen */}
               <div className="relative aspect-video rounded-2xl bg-slate-950 flex items-center justify-center mb-6 overflow-hidden border border-slate-800 shadow-inner">
                 {isPlaying ? (
+                  /* 
+                    MatchaMD Course Video Player:
+                    To use your own videos, upload your MP4 files to Supabase Storage, YouTube, or Vimeo,
+                    and update the videoUrl fields inside courseModules.
+                  */
                   <video
-                    className="w-full h-full absolute inset-0"
-                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                    className="w-full h-full absolute inset-0 bg-black"
+                    src={activeLesson.videoUrl || "https://www.w3schools.com/html/mov_bbb.mp4"}
                     controls
+                    playsInline
                     autoPlay
-                  ></video>
+                  >
+                    Your browser does not support the video tag.
+                  </video>
                 ) : (
                   <>
                     <div className="absolute inset-0 bg-gradient-to-tr from-[rgba(var(--color-primary),0.2)] to-purple-900/30 opacity-70" />

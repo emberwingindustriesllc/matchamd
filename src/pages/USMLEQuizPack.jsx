@@ -344,6 +344,172 @@ const sampleQuestions = {
   ]
 };
 
+
+// Templates for the 40-question Specialty generator
+const categoryTemplates = {
+  step1_anatomy: [
+    {
+      question: "A {age}-year-old {gender} is involved in a motor vehicle accident and suffers a humerus fracture. Physical exam reveals inability to extend the wrist (wrist drop). Which nerve is injured?",
+      options: ["Ulnar nerve", "Median nerve", "Radial nerve", "Axillary nerve"],
+      correct: 2,
+      explanation: "The radial nerve runs in the spiral groove of the humerus. Midshaft humerus fractures frequently damage this nerve, leading to wrist drop (loss of wrist extension) and sensory loss on the dorsal hand."
+    },
+    {
+      question: "A {age}-year-old {gender} presents with progressive numbness in the lateral 3 and a half digits of {possessive} hand. Tapping on the volar aspect of the wrist reproduces the symptoms. Which nerve is compressed?",
+      options: ["Ulnar nerve", "Median nerve", "Radial nerve", "Musculocutaneous nerve"],
+      correct: 1,
+      explanation: "Carpal tunnel syndrome involves compression of the median nerve as it passes under the flexor retinaculum, causing paresthesias in the thumb, index, middle, and radial side of the ring fingers."
+    }
+  ],
+  step1_physiology: [
+    {
+      question: "A {age}-year-old {gender} is found to have a plasma aldosterone concentration of 40 ng/dL (elevated). Which of the following renal physiological changes is expected in this patient?",
+      options: [
+        "Decreased potassium excretion",
+        "Increased sodium reabsorption in the collecting duct",
+        "Decreased bicarbonate reabsorption",
+        "Increased renin secretion"
+      ],
+      correct: 1,
+      explanation: "Aldosterone acts on the principal cells of the collecting duct to increase sodium reabsorption and potassium secretion, leading to expansion of extracellular fluid volume and hypertension."
+    },
+    {
+      question: "A {age}-year-old {gender} is breathing 100% oxygen. Which of the following vascular changes will occur in the pulmonary vasculature?",
+      options: ["Vasodilation", "Vasoconstriction", "No change", "Shunting of blood to lower-perfused zones"],
+      correct: 0,
+      explanation: "Pulmonary vessels dilate in response to high alveolar oxygen tension (reducing pulmonary vascular resistance), in contrast to systemic vessels which constrict."
+    }
+  ],
+  step1_pathology: [
+    {
+      question: "A {age}-year-old {gender} presents with progressive muscle weakness and dark urine. Serum creatine kinase is markedly elevated. Biopsy reveals muscle fiber necrosis. What is the most likely diagnosis?",
+      options: ["Rhabdomyolysis", "Polymyositis", "Duchenne muscular dystrophy", "Myasthenia gravis"],
+      correct: 0,
+      explanation: "Markedly elevated CK and myoglobinuria (dark urine) point to rhabdomyolysis. It can be triggered by extreme exercise, trauma, or drugs."
+    },
+    {
+      question: "A {age}-year-old {gender} is diagnosed with a genetic disease. Genetic analysis reveals a mutation causing defective fibrillin-1. Which of the following cardiovascular complications is this patient at highest risk of developing?",
+      options: ["Mitral stenosis", "Aortic aneurysm or dissection", "Coarctation of the aorta", "Coronary artery disease"],
+      correct: 1,
+      explanation: "Marfan syndrome is caused by an autosomal dominant mutation in the FBN1 gene encoding fibrillin-1, predisposing patients to cystic medial necrosis and aortic root dilation or dissection."
+    }
+  ],
+  step2_internal_medicine: [
+    {
+      question: "A {age}-year-old {gender} with a history of heart failure presents with worsening shortness of breath and pedal edema. What is the most appropriate initial intravenous medication to administer?",
+      options: ["Furosemide", "Metoprolol", "Lisinopril", "Amlodipine"],
+      correct: 0,
+      explanation: "Intravenous loop diuretics (like furosemide) are the mainstay of initial therapy for acute decompensated heart failure to reduce volume overload."
+    },
+    {
+      question: "A {age}-year-old {gender} presents with joint pain, dry eyes, and dry mouth. Laboratory testing is positive for anti-SSA (Ro) and anti-SSB (La) antibodies. What is the most likely diagnosis?",
+      options: ["Systemic lupus erythematosus", "Rheumatoid arthritis", "Sjögren syndrome", "Systemic sclerosis"],
+      correct: 2,
+      explanation: "Sjögren syndrome is an autoimmune disease targeting exocrine glands, presenting with dry eyes (keratoconjunctivitis sicca) and dry mouth (xerostomia), associated with anti-SSA and anti-SSB antibodies."
+    }
+  ],
+  step2_surgery: [
+    {
+      question: "A {age}-year-old {gender} presents to the emergency department with abdominal pain, distension, and high-pitched bowel sounds. Abdominal X-ray shows dilated loops of small bowel with air-fluid levels. What is the most likely etiology?",
+      options: ["Adhesions from prior surgery", "Hernia", "Volvulus", "Colon cancer"],
+      correct: 0,
+      explanation: "Small bowel obstruction is most commonly caused by post-surgical adhesions, followed by hernias."
+    },
+    {
+      question: "A {age}-year-old {gender} is brought to the trauma bay after a motorcycle crash. {pronoun} is hypotensive and tachycardic. Trachea is deviated to the left, and breath sounds are absent on the right. Next step?",
+      options: ["Obtain chest CT", "Perform needle decompression of the right chest", "Perform endotracheal intubation", "Obtain urgent chest X-ray"],
+      correct: 1,
+      explanation: "Tension pneumothorax is a clinical diagnosis requiring immediate needle decompression (followed by chest tube insertion) to restore venous return and cardiac output."
+    }
+  ],
+  step2_pediatrics: [
+    {
+      question: "A {age}-week-old infant is brought in due to projectile, non-bilious vomiting after feeding. On exam, a small, olive-shaped mass is felt in the epigastrium. What is the diagnostic test of choice?",
+      options: ["Abdominal ultrasound", "Barium swallow", "Upper endoscopy", "Abdominal X-ray"],
+      correct: 0,
+      explanation: "Pyloric stenosis is diagnosed via abdominal ultrasound, showing thickening and elongation of the pyloric muscle."
+    },
+    {
+      question: "A {age}-year-old boy presents with a 2-day history of intermittent severe abdominal pain. During pain episodes, he draws his knees to his chest. Ultrasound shows a target sign in the right upper quadrant. What is the first-line treatment?",
+      options: ["Surgical resection", "Air or contrast enema", "Intravenous antibiotics", "Observation"],
+      correct: 1,
+      explanation: "Intussusception is diagnosed and treated initially with an air or pneumatic/contrast enema under fluoroscopic/ultrasonographic guidance."
+    }
+  ],
+  step2_obgyn: [
+    {
+      question: "A {age}-year-old G1P0 at 36 weeks gestation presents with a blood pressure of 165/105 mmHg and severe headache. Urinalysis shows 3+ protein. What is the most appropriate management to prevent seizures?",
+      options: ["Intravenous magnesium sulfate", "Oral labetalol", "Intravenous hydralazine", "Phenytoin"],
+      correct: 0,
+      explanation: "Intravenous magnesium sulfate is the first-line agent for seizure prophylaxis in patients with preeclampsia with severe features."
+    },
+    {
+      question: "A {age}-year-old female presents with acute-onset severe unilateral pelvic pain and nausea. Ultrasound shows an enlarged ovary with decreased blood flow. What is the most likely diagnosis?",
+      options: ["Ruptured ovarian cyst", "Ectopic pregnancy", "Ovarian torsion", "Endometriosis"],
+      correct: 2,
+      explanation: "Ovarian torsion is caused by partial or complete rotation of the ovary on its ligamentous supports, causing ischemia. Urgent laparoscopy is required."
+    }
+  ],
+  step2_psychiatry: [
+    {
+      question: "A {age}-year-old {gender} is brought to the clinic because of sudden episodes of intense fear, sweating, palpitations, and shortness of breath. The episodes occur randomly. What is the first-line long-term pharmacotherapy?",
+      options: ["Alprazolam", "Sertraline (SSRI)", "Propranolol", "Buspirone"],
+      correct: 1,
+      explanation: "Panic disorder is treated long-term with selective serotonin reuptake inhibitors (SSRIs like sertraline) combined with cognitive behavioral therapy."
+    },
+    {
+      question: "A {age}-year-old {gender} is evaluated for a 1-year history of checking the stove 15 times before leaving the house, which causes severe distress and makes {objective} late for work. First-line therapy?",
+      options: ["Exposure and response prevention (CBT)", "Atypical antipsychotics", "Diazepam", "Electroconvulsive therapy"],
+      correct: 0,
+      explanation: "Obsessive-compulsive disorder is treated with cognitive behavioral therapy focusing on exposure and response prevention, along with SSRIs."
+    }
+  ],
+  default: [
+    {
+      question: "A {age}-year-old G1P0 at 28 weeks gestation presents with gestational diabetes. What is the primary fetal complication associated with uncontrolled maternal hyperglycemia?",
+      options: ["Fetal macrosomia", "Intrauterine growth restriction", "Congenital heart blocks", "Microcephaly"],
+      correct: 0,
+      explanation: "Maternal hyperglycemia leads to fetal hyperglycemia and hyperinsulinemia. Since insulin is an anabolic growth factor, this results in fetal macrosomia."
+    }
+  ]
+};
+
+// Generates 40 questions deterministically per category
+const generateCategoryQuestions = (categoryId, baseQuestions) => {
+  const generated = [...baseQuestions];
+  const templates = categoryTemplates[categoryId] || categoryTemplates.default;
+  
+  // Fill the list up to 40 questions
+  for (let i = baseQuestions.length; generated.length < 40; i++) {
+    const template = templates[i % templates.length];
+    
+    // Deterministic parameters based on index
+    const ages = [28, 35, 42, 54, 61, 72];
+    const age = ages[i % ages.length];
+    const gender = (i % 2 === 0) ? 'male' : 'female';
+    const pronoun = gender === 'male' ? 'He' : 'She';
+    const possessive = gender === 'male' ? 'his' : 'her';
+    const objective = gender === 'male' ? 'him' : 'her';
+    
+    const questionText = template.question
+      .replaceAll('{age}', age.toString())
+      .replaceAll('{gender}', gender)
+      .replaceAll('{pronoun}', pronoun)
+      .replaceAll('{possessive}', possessive)
+      .replaceAll('{objective}', objective);
+      
+    generated.push({
+      id: 1000 + i + (categoryId.charCodeAt(3) * 7),
+      question: `[Practice Q] ${questionText}`,
+      options: template.options,
+      correct: template.correct,
+      explanation: template.explanation
+    });
+  }
+  
+  return generated;
+};
+
 const quizCategories = [
   {
     id: 'step1_anatomy',
@@ -413,6 +579,7 @@ export default function USMLEQuizPack() {
 
   const { user } = useAuth();
 
+  // Load user's purchases
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', user?.id],
     queryFn: async () => {
@@ -433,6 +600,26 @@ export default function USMLEQuizPack() {
     }
   });
 
+  // Query category progress statistics
+  const { data: progressList = [], refetch: refetchProgress } = useQuery({
+    queryKey: ['quiz_progress', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      try {
+        const { data, error } = await supabase
+          .from('quiz_progress')
+          .select('*')
+          .eq('user_id', user.id);
+        if (error) throw error;
+        return data || [];
+      } catch (err) {
+        console.warn('Could not load quiz progress from DB', err);
+        return [];
+      }
+    },
+    enabled: !!user?.id
+  });
+
   const hasPurchased = purchases.some(p => p.content_id === 'quiz_usmle');
 
   const difficultyColors = {
@@ -447,6 +634,41 @@ export default function USMLEQuizPack() {
     setSelectedOption(null);
     setIsSubmitted(false);
     setScore(0);
+  };
+
+  // Sync completed quiz score to DB
+  const handleFinishQuiz = async () => {
+    if (user?.id && activeCategory) {
+      try {
+        const correctAnswers = score;
+        const totalQs = activeQuestions.length;
+        const existing = progressList.find(p => p.category_id === activeCategory.id);
+        
+        if (existing) {
+          await supabase
+            .from('quiz_progress')
+            .update({
+              questions_answered: existing.questions_answered + totalQs,
+              questions_correct: existing.questions_correct + correctAnswers,
+              last_updated: new Date().toISOString()
+            })
+            .eq('id', existing.id);
+        } else {
+          await supabase
+            .from('quiz_progress')
+            .insert({
+              user_id: user.id,
+              category_id: activeCategory.id,
+              questions_answered: totalQs,
+              questions_correct: correctAnswers
+            });
+        }
+        refetchProgress();
+      } catch (err) {
+        console.error('Error saving quiz progress:', err);
+      }
+    }
+    setActiveCategory(null);
   };
 
   if (!hasPurchased) {
@@ -467,15 +689,24 @@ export default function USMLEQuizPack() {
     );
   }
 
-  const activeQuestions = activeCategory ? (sampleQuestions[activeCategory.id] || sampleQuestions.default) : [];
+  // Generate 40 questions dynamically based on the specialty category
+  const activeQuestions = activeCategory 
+    ? generateCategoryQuestions(activeCategory.id, sampleQuestions[activeCategory.id] || sampleQuestions.default)
+    : [];
+
   const currentQ = activeQuestions[currentQIndex];
+
+  // Helper stats aggregates
+  const totalAnswered = progressList.reduce((acc, curr) => acc + curr.questions_answered, 0);
+  const totalCorrect = progressList.reduce((acc, curr) => acc + curr.questions_correct, 0);
+  const overallAccuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
       <Header title="USMLE Quiz Pack" showBack />
 
       <main className="px-4 py-6 max-w-4xl mx-auto">
-        {/* Hero Section */}
+        {/* Progress & Strengths Dashboard */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -489,82 +720,128 @@ export default function USMLEQuizPack() {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
-                    Your Progress
+                    Strengths & Weaknesses
                   </h2>
                   <p className="text-slate-600 dark:text-slate-400 text-sm">
-                    500+ practice questions available
+                    Specialty progress is tracked in real-time
                   </p>
                 </div>
               </div>
               
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center">
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{score}</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">Questions Answered</p>
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center border border-indigo-100 dark:border-indigo-900/30">
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{totalAnswered}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">Total Answered</p>
                 </div>
-                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center">
-                  <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">100%</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">Accuracy</p>
+                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center border border-indigo-100 dark:border-indigo-900/30">
+                  <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{overallAccuracy}%</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">Overall Accuracy</p>
                 </div>
-                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center">
-                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">Streak</p>
+                <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3 text-center border border-indigo-100 dark:border-indigo-900/30">
+                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {progressList.filter(p => p.questions_answered > 0).length} / 8
+                  </p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">Specialties Started</p>
                 </div>
               </div>
+
+              {/* Strengths List */}
+              {progressList.length > 0 && (
+                <div className="space-y-2 text-left">
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Category Performance</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {progressList.map((prog) => {
+                      const catName = quizCategories.find(c => c.id === prog.category_id)?.title || prog.category_id;
+                      const accuracy = prog.questions_answered > 0 ? Math.round((prog.questions_correct / prog.questions_answered) * 100) : 0;
+                      let badgeColor = "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+                      let badgeText = "Needs Focus";
+                      if (accuracy >= 80) {
+                        badgeColor = "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
+                        badgeText = "Strength";
+                      } else if (accuracy >= 60) {
+                        badgeColor = "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400";
+                        badgeText = "Proficient";
+                      }
+                      
+                      return (
+                        <div key={prog.category_id} className="flex items-center justify-between text-xs p-2 rounded-lg bg-white/40 dark:bg-slate-800/40">
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">{catName.replace('Step 1: ', '').replace('Step 2 CK: ', '')}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-slate-500">{accuracy}%</span>
+                            <Badge className={`${badgeColor} text-[10px] px-1.5 py-0.5`}>{badgeText}</Badge>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>
 
         {/* Quiz Categories */}
         <div className="space-y-4">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white">Practice by Category</h3>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white">Practice by Category (40 Qs each)</h3>
           
-          {quizCategories.map((category, idx) => (
-            <motion.div
-              key={category.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-            >
-              <Card 
-                onClick={() => startQuiz(category)}
-                className="hover:shadow-lg transition-shadow cursor-pointer group"
+          {quizCategories.map((category, idx) => {
+            const progress = progressList.find(p => p.category_id === category.id);
+            const accuracy = progress && progress.questions_answered > 0 
+              ? Math.round((progress.questions_correct / progress.questions_answered) * 100)
+              : 0;
+
+            return (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
               >
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                        <h4 className="font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">
-                          {category.title}
-                        </h4>
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        <Badge variant="outline" className="text-xs">
-                          {category.questions} questions
-                        </Badge>
-                        <Badge className={difficultyColors[category.difficulty]}>
-                          {category.difficulty}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {category.timeEstimate}
-                        </Badge>
+                <Card 
+                  onClick={() => startQuiz(category)}
+                  className="hover:shadow-lg transition-shadow cursor-pointer group"
+                >
+                  <CardContent className="p-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                          <h4 className="font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">
+                            {category.title}
+                          </h4>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <Badge variant="outline" className="text-xs">
+                            40 questions block
+                          </Badge>
+                          <Badge className={difficultyColors[category.difficulty]}>
+                            {category.difficulty}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {category.timeEstimate}
+                          </Badge>
+                          {progress && (
+                            <Badge variant="outline" className="bg-indigo-50/50 text-indigo-600 border-indigo-200">
+                              Accuracy: {accuracy}%
+                            </Badge>
+                          )}
+                        </div>
+
+                        <Progress value={accuracy} className="h-2" />
                       </div>
 
-                      <Progress value={category.id === 'step1_anatomy' && score > 0 ? 50 : 0} className="h-2" />
+                      <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">
+                        Start Quiz
+                        <ChevronRight className="w-4 h-4 ml-1" />
+                      </Button>
                     </div>
-
-                    <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">
-                      Start Quiz
-                      <ChevronRight className="w-4 h-4 ml-1" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
       </main>
 
@@ -643,7 +920,9 @@ export default function USMLEQuizPack() {
                     disabled={selectedOption === null}
                     onClick={() => {
                       setIsSubmitted(true);
-                      setScore(s => s + 1);
+                      if (selectedOption === currentQ.correct) {
+                        setScore(s => s + 1);
+                      }
                     }}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white"
                   >
@@ -664,7 +943,7 @@ export default function USMLEQuizPack() {
                     </Button>
                   ) : (
                     <Button
-                      onClick={() => setActiveCategory(null)}
+                      onClick={handleFinishQuiz}
                       className="bg-emerald-600 hover:bg-emerald-700 text-white"
                     >
                       Finish Quiz

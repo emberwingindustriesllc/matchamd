@@ -115,3 +115,37 @@ CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_stripe_sub_id ON subscriptions(stripe_subscription_id);
 CREATE INDEX IF NOT EXISTS idx_purchased_content_user_id ON purchased_content(user_id);
 CREATE INDEX IF NOT EXISTS idx_purchased_content_content_id ON purchased_content(content_id);
+
+-- 6. QUIZ_PROGRESS TABLE
+CREATE TABLE IF NOT EXISTS quiz_progress (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  category_id text NOT NULL,
+  questions_answered int DEFAULT 0,
+  questions_correct int DEFAULT 0,
+  last_updated timestamptz DEFAULT now(),
+  CONSTRAINT unique_user_category UNIQUE (user_id, category_id)
+);
+
+-- Enable RLS
+ALTER TABLE quiz_progress ENABLE ROW LEVEL SECURITY;
+
+-- Quiz progress policies
+DO $$
+BEGIN
+  DROP POLICY IF EXISTS "Users can view own quiz progress" ON quiz_progress;
+  DROP POLICY IF EXISTS "Users can insert own quiz progress" ON quiz_progress;
+  DROP POLICY IF EXISTS "Users can update own quiz progress" ON quiz_progress;
+
+  CREATE POLICY "Users can view own quiz progress" ON quiz_progress
+    FOR SELECT TO authenticated USING (auth.uid() = user_id);
+
+  CREATE POLICY "Users can insert own quiz progress" ON quiz_progress
+    FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+
+  CREATE POLICY "Users can update own quiz progress" ON quiz_progress
+    FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+END $$;
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_quiz_progress_user_id ON quiz_progress(user_id);
