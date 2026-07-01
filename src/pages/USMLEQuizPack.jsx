@@ -48,6 +48,284 @@ const sampleQuestions = {
       ],
       correct: 1,
       explanation: "The anterior cruciate ligament (ACL) prevents anterior translation of the tibia on the femur. A positive anterior drawer or Lachman test confirms an ACL tear."
+    },
+    {
+      id: 201,
+      question: "A 55-year-old female presents with acute pain in her right upper quadrant after eating a fatty meal. Ultrasound shows gallstones. Which nerve fibers transmit the visceral pain associated with acute cholecystitis?",
+      options: [
+        "Vagus nerve (CN X) fibers",
+        "Celiac plexus sympathetic afferents",
+        "Right phrenic nerve somatic afferents",
+        "Greater splanchnic nerve sympathetic afferents"
+      ],
+      correct: 3,
+      explanation: "Visceral pain from the gallbladder and biliary tree is carried by sympathetic afferent fibers traveling via the greater splanchnic nerve to the celiac plexus."
+    }
+  ],
+  step1_physiology: [
+    {
+      id: 3,
+      question: "A 23-year-old male runs a marathon on a hot day. He becomes severely dehydrated. Which of the following physiological changes is most likely present in this patient?",
+      options: [
+        "Decreased plasma osmolarity",
+        "Increased secretion of atrial natriuretic peptide (ANP)",
+        "Increased sympathetic nerve activity to the kidneys",
+        "Decreased urine osmolarity"
+      ],
+      correct: 2,
+      explanation: "Severe dehydration causes a decrease in blood volume and pressure, stimulating baroreceptors and the renin-angiotensin-aldosterone system. This increases sympathetic nerve activity to the kidneys, prompting vasoconstriction and sodium/water retention."
+    },
+    {
+      id: 301,
+      question: "A 65-year-old male with a history of chronic obstructive pulmonary disease (COPD) has arterial blood gas values showing pH 7.35, PaCO2 50 mmHg, and HCO3- 27 mEq/L. What is the acid-base status?",
+      options: [
+        "Acute respiratory acidosis",
+        "Compensated respiratory acidosis",
+        "Metabolic acidosis",
+        "Mixed metabolic and respiratory acidosis"
+      ],
+      correct: 1,
+      explanation: "A PaCO2 of 50 mmHg suggests respiratory acidosis. Since the pH is in the normal range (compensated) and HCO3- is elevated to compensate, this indicates compensated respiratory acidosis."
+    },
+    {
+      id: 302,
+      question: "During skeletal muscle contraction, calcium ions bind to which of the following proteins to initiate cross-bridge cycling?",
+      options: [
+        "Tropomyosin",
+        "Troponin C",
+        "Actin",
+        "Myosin light chain kinase"
+      ],
+      correct: 1,
+      explanation: "Calcium ions bind to Troponin C, which causes a conformational change in tropomyosin, exposing the active myosin-binding sites on actin."
+    }
+  ],
+  step1_pathology: [
+    {
+      id: 4,
+      question: "A 60-year-old male smoker presents with cough and hemoptysis. Chest X-ray reveals a central lung mass. Biopsy shows nests of polygonal cells with keratin pearls and intercellular bridges. What is the most likely diagnosis?",
+      options: [
+        "Adenocarcinoma",
+        "Squamous cell carcinoma",
+        "Small cell carcinoma",
+        "Large cell carcinoma"
+      ],
+      correct: 1,
+      explanation: "Squamous cell carcinoma is centrally located, strongly associated with smoking, and histologically characterized by keratin pearls and intercellular bridges."
+    },
+    {
+      id: 401,
+      question: "A 9-month-old infant is brought to the pediatrician due to developmental regression and an exaggerated startle response to loud noises. Fundoscopic exam reveals a cherry-red spot on the macula. Which enzyme is deficient?",
+      options: [
+        "Hexosaminidase A",
+        "Sphingomyelinase",
+        "Galactocerebrosidase",
+        "Glucocerebrosidase"
+      ],
+      correct: 0,
+      explanation: "Tay-Sachs disease is caused by Hexosaminidase A deficiency, leading to GM2 ganglioside accumulation. It presents with developmental regression, startle response, and a cherry-red spot, without hepatosplenomegaly."
+    },
+    {
+      id: 402,
+      question: "A 35-year-old female presents with fatigue, cold intolerance, and weight gain. Physical exam reveals a diffuse, painless goiter. Biopsy shows dense lymphocytic infiltrate with germinal centers and Hurthle cells. Diagnosis?",
+      options: [
+        "Graves' disease",
+        "Hashimoto's thyroiditis",
+        "Subacute thyroiditis",
+        "Riedel's thyroiditis"
+      ],
+      correct: 1,
+      explanation: "Hashimoto's thyroiditis is the most common cause of hypothyroidism in the US. Biopsy features lymphocytic infiltration with germinal centers and Hurthle (oncocytic) cells."
+    }
+  ],
+  step2_internal_medicine: [
+    {
+      id: 5,
+      question: "A 68-year-old male with a history of hypertension presents to the emergency department with acute onset of severe, tearing chest pain radiating to his back. His blood pressure is 185/110 mmHg. What is the most appropriate next step in management?",
+      options: [
+        "Intravenous thrombolysis",
+        "Emergent coronary angiography",
+        "Intravenous beta-blocker therapy (e.g., esmolol)",
+        "Aspirin and heparin administration"
+      ],
+      correct: 2,
+      explanation: "The clinical presentation of tearing chest pain radiating to the back in a hypertensive male is highly suggestive of an acute aortic dissection. Initial medical management involves heart rate and blood pressure control using IV beta-blockers (like esmolol) to reduce shear stress on the aortic wall."
+    },
+    {
+      id: 501,
+      question: "A 55-year-old diabetic male presents with a painful, swollen left leg. On examination, the leg is erythematous, warm, and tender to touch with poorly demarcated borders. What is the most appropriate empiric antibiotic choice?",
+      options: [
+        "Ceftriaxone",
+        "Cephalexin",
+        "Cefazolin",
+        "Piperacillin-tazobactam"
+      ],
+      correct: 2,
+      explanation: "For non-purulent cellulitis, beta-hemolytic streptococci and MSSA are the primary targets. Intravenous Cefazolin (or oral Cephalexin) is the first-line therapy."
+    },
+    {
+      id: 502,
+      question: "A 42-year-old female presents with progressive fatigue, pruritus, and jaundice. Labs reveal elevated alkaline phosphatase and positive antimitochondrial antibodies (AMA). Diagnosis?",
+      options: [
+        "Primary biliary cholangitis",
+        "Primary sclerosing cholangitis",
+        "Autoimmune hepatitis",
+        "Wilson's disease"
+      ],
+      correct: 0,
+      explanation: "Primary Biliary Cholangitis (PBC) is characterized by autoimmune destruction of intrahepatic bile ducts. AMA is highly specific for PBC, which primarily affects middle-aged women."
+    }
+  ],
+  step2_surgery: [
+    {
+      id: 6,
+      question: "A 24-year-old female presents with acute right lower quadrant abdominal pain, nausea, and low-grade fever. On exam, she has rebound tenderness at McBurney's point. What is the most appropriate initial diagnostic imaging modality?",
+      options: [
+        "Abdominal X-ray",
+        "Ultrasound of the abdomen/pelvis",
+        "CT scan of the abdomen and pelvis",
+        "Magnetic resonance imaging (MRI)"
+      ],
+      correct: 1,
+      explanation: "In young female patients presenting with symptoms of acute appendicitis, pelvic ultrasound is the preferred initial imaging modality to rule out gynecological etiologies (such as ovarian cysts or ectopic pregnancy) and avoid ionizing radiation."
+    },
+    {
+      id: 601,
+      question: "A 50-year-old male is admitted with severe acute pancreatitis. On day 5 of admission, he develops acute shortness of breath. Chest X-ray reveals bilateral diffuse infiltrates, and PaO2/FiO2 ratio is < 200. What is the most likely diagnosis?",
+      options: [
+        "Pulmonary embolism",
+        "Hospital-acquired pneumonia",
+        "Acute respiratory distress syndrome (ARDS)",
+        "Congestive heart failure"
+      ],
+      correct: 2,
+      explanation: "Acute respiratory distress syndrome (ARDS) is a severe complication of acute pancreatitis. Pancreatic enzymes trigger systemic inflammation that damages the alveolar-capillary barrier."
+    },
+    {
+      id: 602,
+      question: "A 72-year-old male presents with abdominal distension, obstipation, and crampy pain. Abdominal plain film shows a massively dilated sigmoid colon with a 'coffee bean' appearance. Initial management?",
+      options: [
+        "Emergent sigmoid resection",
+        "Flexible sigmoidoscopy for decompression",
+        "Barium enema",
+        "Intravenous neostigmine"
+      ],
+      correct: 1,
+      explanation: "The 'coffee bean' sign indicates a sigmoid volvulus. In stable patients without signs of gangrene or perforation, the initial management of choice is flexible sigmoidoscopic decompression."
+    }
+  ],
+  step2_pediatrics: [
+    {
+      id: 7,
+      question: "A 4-year-old boy is brought to the clinic due to a 3-day history of high fever, barking cough, and inspiratory stridor. X-ray of the neck shows subglottic narrowing (steeple sign). What is the most likely causative organism?",
+      options: [
+        "Respiratory syncytial virus (RSV)",
+        "Parainfluenza virus",
+        "Haemophilus influenzae type b",
+        "Corynebacterium diphtheriae"
+      ],
+      correct: 1,
+      explanation: "Laryngotracheobronchitis (croup) is characterized by a barking cough, inspiratory stridor, and the subglottic 'steeple sign' on neck X-ray. It is most commonly caused by the Parainfluenza virus."
+    },
+    {
+      id: 701,
+      question: "A 6-year-old girl presents with a 2-day history of low-grade fever, joint pain, and a rash. On exam, she has palpable purpura on her lower extremities, abdominal tenderness, and microscopic hematuria. Diagnosis?",
+      options: [
+        "Henoch-Schönlein purpura (IgA vasculitis)",
+        "Kawasaki disease",
+        "Idiopathic thrombocytopenic purpura",
+        "Post-streptococcal glomerulonephritis"
+      ],
+      correct: 0,
+      explanation: "Henoch-Schönlein purpura is an IgA-mediated vasculitis characterized by the tetrad of palpable purpura, arthralgias, abdominal pain, and renal involvement (glomerulonephritis)."
+    },
+    {
+      id: 702,
+      question: "A 12-hour-old newborn is noted to be visibly jaundiced. Mother's blood type is O positive, and the baby is A positive with a positive direct Coombs test. What is the mechanism of this jaundice?",
+      options: [
+        "Biliary atresia",
+        "Breast milk jaundice",
+        "Immune-mediated hemolysis",
+        "Physiological jaundice"
+      ],
+      correct: 2,
+      explanation: "ABO incompatibility (maternal O, infant A/B) causes immune-mediated hemolysis leading to hyperbilirubinemia. It presents in the first 24 hours of life with a positive Coombs test."
+    }
+  ],
+  step2_obgyn: [
+    {
+      id: 8,
+      question: "A 32-year-old pregnant woman at 34 weeks gestation presents with sudden-onset painless vaginal bleeding. Ultrasound reveals the placenta is completely covering the internal cervical os. What is the most appropriate route of delivery?",
+      options: [
+        "Vaginal delivery",
+        "Induction of labor",
+        "Cesarean delivery",
+        "Vacuum-assisted delivery"
+      ],
+      correct: 2,
+      explanation: "A placenta covering the cervical os is placenta previa. Painless vaginal bleeding in the third trimester is a hallmark. To prevent catastrophic maternal/fetal hemorrhage during labor, delivery must be via Cesarean section."
+    },
+    {
+      id: 801,
+      question: "A 26-year-old female presents with severe pelvic pain and vaginal bleeding. Her last menstrual period was 7 weeks ago. Beta-hCG is 2,500 mIU/mL. Transvaginal ultrasound shows an empty uterus and a 3 cm adnexal mass. Next step?",
+      options: [
+        "Laparoscopic salpingectomy",
+        "Intramuscular methotrexate",
+        "Expectant management",
+        "Repeat ultrasound in 48 hours"
+      ],
+      correct: 1,
+      explanation: "In a hemodynamically stable patient with an ectopic pregnancy (hCG < 5,000, mass < 4 cm, no fetal heart rate), medical management with intramuscular Methotrexate is indicated."
+    },
+    {
+      id: 802,
+      question: "A 28-year-old G1P0 at 38 weeks gestation is in active labor. She is 6 cm dilated. Over the next 5 hours, there is no cervical change despite strong, regular uterine contractions every 2-3 minutes. Diagnosis?",
+      options: [
+        "Protracted active phase",
+        "Active phase arrest",
+        "Normal latent phase",
+        "Secondary arrest of dilation"
+      ],
+      correct: 1,
+      explanation: "Active phase arrest is defined as no cervical progression for 4 hours or more in the setting of adequate contractions (or 6 hours of inadequate contractions) during the active phase."
+    }
+  ],
+  step2_psychiatry: [
+    {
+      id: 9,
+      question: "A 19-year-old college student is brought to the clinic by his roommate. The roommate reports that the patient has been hearing voices whispering to him for the past 7 months, has become socially isolated, and believes the government is tracking him through his computer. What is the most likely diagnosis?",
+      options: [
+        "Schizophreniform disorder",
+        "Schizophrenia",
+        "Brief psychotic disorder",
+        "Delusional disorder"
+      ],
+      correct: 1,
+      explanation: "Schizophrenia is diagnosed when a patient has active-phase psychotic symptoms (like hallucinations and delusions) along with social/occupational dysfunction persisting for a duration of at least 6 months."
+    },
+    {
+      id: 901,
+      question: "A 28-year-old female presents with a 3-week history of depressed mood, insomnia, weight loss, and feelings of worthlessness. She reports she has had no energy to work. What is the minimum duration of symptoms required to diagnose major depressive disorder?",
+      options: [
+        "1 week",
+        "2 weeks",
+        "1 month",
+        "2 months"
+      ],
+      correct: 1,
+      explanation: "Major Depressive Disorder (MDD) requires a patient to experience 5 or more depressive symptoms (including depressed mood or anhedonia) for a minimum duration of 2 consecutive weeks."
+    },
+    {
+      id: 902,
+      question: "A 34-year-old male with bipolar I disorder is brought to the clinic for a routine visit. He has been taking lithium for 3 years. Which of the following laboratory values should be monitored regularly in this patient?",
+      options: [
+        "Liver function tests",
+        "Serum creatinine and thyroid-stimulating hormone (TSH)",
+        "Serum amylase",
+        "Complete blood count"
+      ],
+      correct: 1,
+      explanation: "Lithium has a narrow therapeutic index and long-term renal and thyroid toxicities. Serum creatinine and TSH must be monitored periodically."
     }
   ],
   default: [

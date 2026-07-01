@@ -79,6 +79,8 @@ const courseModules = [
 export default function InterviewCourse() {
   const [activeLesson, setActiveLesson] = useState(null);
   const [activeResource, setActiveResource] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [viewingDocContent, setViewingDocContent] = useState(null);
 
   const { user } = useAuth();
 
@@ -124,6 +126,60 @@ export default function InterviewCourse() {
       />
     );
   }
+
+  const getDocMarkup = (title) => {
+    if (title.includes('Bank')) {
+      return (
+        <div className="space-y-4 text-left text-slate-700 dark:text-slate-300 text-sm">
+          <div>
+            <h4 className="font-bold text-slate-900 dark:text-white border-b pb-1 mb-2">1. Behavioral Questions (STAR Method)</h4>
+            <p className="font-semibold text-slate-800 dark:text-slate-200">Q: "Tell me about a time you had a conflict with a team member."</p>
+            <p className="italic text-xs text-slate-500 mb-1">Strategy: Focus on patient safety, active listening, and collaborative resolution.</p>
+            <ul className="list-disc pl-5 space-y-1 text-xs">
+              <li><strong>Situation:</strong> "During my surgery rotation, a nurse and I disagreed on the timing of a sterile dressing change."</li>
+              <li><strong>Task:</strong> "I needed the dressing changed before morning rounds, but the ward was understaffed."</li>
+              <li><strong>Action:</strong> "I discussed her constraints privately and offered to assist with the setup to save time."</li>
+              <li><strong>Result:</strong> "The dressing was replaced cleanly, rounds proceeded on time, and we built strong mutual respect."</li>
+            </ul>
+          </div>
+          <div className="mt-4">
+            <p className="font-semibold text-slate-800 dark:text-slate-200">Q: "Tell me about a mistake you made."</p>
+            <p className="italic text-xs text-slate-500 mb-1">Strategy: Take immediate responsibility, explain the correction, and outline what you learned.</p>
+          </div>
+          <div className="mt-6">
+            <h4 className="font-bold text-slate-900 dark:text-white border-b pb-1 mb-2">2. IMG-Specific Questions</h4>
+            <p className="font-semibold text-slate-800 dark:text-slate-200">Q: "Why do you want to train in the United States?"</p>
+            <p className="italic text-xs text-slate-500 mb-1">Strategy: Emphasize standardized training, structured clinical mentorship, and research opportunities.</p>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="space-y-4 text-left text-slate-700 dark:text-slate-300 text-sm">
+          <div>
+            <h4 className="font-bold text-slate-900 dark:text-white border-b pb-1 mb-2">1. Morning Routine Checklist</h4>
+            <ul className="list-disc pl-5 space-y-1 text-xs">
+              <li>[ ] Test webcam angle (lens at eye level, not looking up).</li>
+              <li>[ ] Double check lighting (soft front light, avoid bright windows behind).</li>
+              <li>[ ] Verify internet speeds and mute phone notifications.</li>
+              <li>[ ] Keep a glass of water nearby.</li>
+            </ul>
+          </div>
+          <div className="mt-4">
+            <h4 className="font-bold text-slate-900 dark:text-white border-b pb-1 mb-2">2. High-Yield Delivery Tips</h4>
+            <p className="text-xs">Keep answers between 90 and 120 seconds. Use active listening cues (smiling, nodding) when the interviewer is speaking.</p>
+          </div>
+          <div className="mt-4">
+            <h4 className="font-bold text-slate-900 dark:text-white border-b pb-1 mb-2">3. Questions to Ask the Program</h4>
+            <ul className="list-disc pl-5 space-y-1 text-xs">
+              <li>"How does the program support residents seeking fellowship placements?"</li>
+              <li>"What pathways or structured tracks (e.g. global health, research) are available?"</li>
+            </ul>
+          </div>
+        </div>
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -285,7 +341,10 @@ export default function InterviewCourse() {
               className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-2xl w-full shadow-2xl relative border border-slate-200 dark:border-slate-800 overflow-hidden"
             >
               <button
-                onClick={() => setActiveLesson(null)}
+                onClick={() => {
+                  setActiveLesson(null);
+                  setIsPlaying(false);
+                }}
                 className="absolute top-5 right-5 z-10 text-slate-400 hover:text-slate-600 dark:hover:text-white"
               >
                 <X className="w-6 h-6" />
@@ -293,14 +352,28 @@ export default function InterviewCourse() {
 
               {/* Simulated Video Screen */}
               <div className="relative aspect-video rounded-2xl bg-slate-950 flex items-center justify-center mb-6 overflow-hidden border border-slate-800 shadow-inner">
-                <div className="absolute inset-0 bg-gradient-to-tr from-[rgba(var(--color-primary),0.2)] to-purple-900/30 opacity-70" />
-                <div className="relative text-center p-6 z-10 flex flex-col items-center">
-                  <div className="w-16 h-16 rounded-full bg-[rgb(var(--color-primary))] flex items-center justify-center shadow-2xl mb-3 cursor-pointer hover:scale-110 transition-transform">
-                    <Play className="w-8 h-8 text-white ml-1 fill-white" />
-                  </div>
-                  <p className="text-white font-medium text-sm">Streaming HD Lesson ({activeLesson.duration})</p>
-                  <p className="text-slate-400 text-xs mt-1">Interactive Video Stream Ready</p>
-                </div>
+                {isPlaying ? (
+                  <video
+                    className="w-full h-full absolute inset-0"
+                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                    controls
+                    autoPlay
+                  ></video>
+                ) : (
+                  <>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-[rgba(var(--color-primary),0.2)] to-purple-900/30 opacity-70" />
+                    <div className="relative text-center p-6 z-10 flex flex-col items-center">
+                      <div 
+                        onClick={() => setIsPlaying(true)}
+                        className="w-16 h-16 rounded-full bg-[rgb(var(--color-primary))] flex items-center justify-center shadow-2xl mb-3 cursor-pointer hover:scale-110 transition-transform"
+                      >
+                        <Play className="w-8 h-8 text-white ml-1 fill-white" />
+                      </div>
+                      <p className="text-white font-medium text-sm">Streaming HD Lesson ({activeLesson.duration})</p>
+                      <p className="text-slate-400 text-xs mt-1">Click to play lesson</p>
+                    </div>
+                  </>
+                )}
               </div>
 
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
@@ -315,7 +388,13 @@ export default function InterviewCourse() {
                 <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40">
                   ✓ Unlocked Course Lesson
                 </Badge>
-                <Button onClick={() => setActiveLesson(null)} className="bg-[rgb(var(--color-primary))] text-white">
+                <Button 
+                  onClick={() => {
+                    setActiveLesson(null);
+                    setIsPlaying(false);
+                  }} 
+                  className="bg-[rgb(var(--color-primary))] text-white"
+                >
                   Close Lesson
                 </Button>
               </div>
@@ -332,34 +411,68 @@ export default function InterviewCourse() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl relative border border-slate-200 dark:border-slate-800"
+              className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl relative border border-slate-200 dark:border-slate-800 max-h-[85vh] flex flex-col"
             >
               <button
-                onClick={() => setActiveResource(null)}
+                onClick={() => {
+                  setActiveResource(null);
+                  setViewingDocContent(null);
+                }}
                 className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 dark:hover:text-white"
               >
                 <X className="w-6 h-6" />
               </button>
 
-              <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4 text-amber-600">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4 text-amber-600 flex-shrink-0">
                 <FileText className="w-6 h-6" />
               </div>
 
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 flex-shrink-0">
                 {activeResource.title}
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
-                {activeResource.desc}
-              </p>
+              
+              <div className="overflow-y-auto pr-2 mb-6 flex-1 max-h-[45vh]">
+                {viewingDocContent ? (
+                  getDocMarkup(activeResource.title)
+                ) : (
+                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    {activeResource.desc}
+                  </p>
+                )}
+              </div>
 
-              <div className="flex gap-3">
-                <Button onClick={() => setActiveResource(null)} variant="outline" className="flex-1">
+              <div className="flex gap-3 mt-auto flex-shrink-0">
+                <Button 
+                  onClick={() => {
+                    setActiveResource(null);
+                    setViewingDocContent(null);
+                  }} 
+                  variant="outline" 
+                  className="flex-1"
+                >
                   Close
                 </Button>
-                <Button onClick={() => setActiveResource(null)} className="flex-1 bg-amber-500 hover:bg-amber-600 text-white">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download PDF
-                </Button>
+                {viewingDocContent ? (
+                  <Button 
+                    onClick={() => {
+                      alert("MATCHAMD: Mock PDF Download Triggered Successfully.");
+                      setActiveResource(null);
+                      setViewingDocContent(null);
+                    }} 
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download File
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={() => setViewingDocContent(true)} 
+                    className="flex-1 bg-amber-500 hover:bg-amber-600 text-white"
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    Open Document
+                  </Button>
+                )}
               </div>
             </motion.div>
           </div>
