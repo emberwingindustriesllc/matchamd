@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
@@ -14,10 +14,8 @@ import {
   Clock,
   ChevronRight,
   Brain,
-  Award,
   CheckCircle,
   XCircle,
-  RotateCcw,
   X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

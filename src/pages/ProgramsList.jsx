@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, Search, Filter, MapPin, BookOpen, Shield, Plus, AlertTriangle, Verified } from 'lucide-react';
 import { fetchPrograms } from '@/api/programs';
 import AddProgramModal from '@/components/community/AddProgramModal';

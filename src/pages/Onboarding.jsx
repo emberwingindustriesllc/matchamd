@@ -31,7 +31,6 @@ import { createPageUrl } from '@/utils';
 import { 
   countries, 
   commonMedSchools, 
-  languages, 
   goals, 
   residencySpecialties,
   pediatricFellowships,
