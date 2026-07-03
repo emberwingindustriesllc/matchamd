@@ -1,0 +1,467 @@
+// International medical schools dataset, keyed by country.
+// Source: World Directory / Wikipedia country medical school lists; curated for deployability.
+// Each entry: { school, city }
+
+export const internationalMedicalSchools = {
+  'India': [
+    { school: 'AIIMS New Delhi', city: 'New Delhi' },
+    { school: 'JIPMER', city: 'Puducherry' },
+    { school: 'CMC Vellore', city: 'Vellore' },
+    { school: 'Armed Forces Medical College', city: 'Bengaluru' },
+    { school: 'Maulana Azad Medical College', city: 'New Delhi' },
+    { school: "King George's Medical University", city: 'Lucknow' },
+    { school: 'Seth Gordhandas Sunderdas Medical College', city: 'Mumbai' },
+    { school: 'Bangalore Medical College & Research Institute', city: 'Bengaluru' },
+    { school: 'Grant Medical College', city: 'Mumbai' },
+    { school: 'Madras Medical College', city: 'Chennai' },
+    { school: 'Postgraduate Institute of Medical Education & Research', city: 'Chandigarh' },
+    { school: 'Sanjay Gandhi Postgraduate Institute', city: 'Lucknow' },
+    { school: 'Kasturba Medical College', city: 'Manipal' },
+    { school: 'Christian Medical College', city: 'Vellore' },
+    { school: 'Government Medical College', city: 'Nagpur' },
+    { school: 'Topiwala National Medical College', city: 'Mumbai' },
+    { school: 'Osmania Medical College', city: 'Hyderabad' },
+    { school: 'Lady Hardinge Medical College', city: 'New Delhi' },
+    { school: 'AIIMS Bhopal', city: 'Bhopal' },
+    { school: 'AIIMS Bhubaneswar', city: 'Bhubaneswar' },
+    { school: 'AIIMS Rishikesh', city: 'Rishikesh' },
+  ],
+  'Pakistan': [
+    { school: 'Aga Khan University', city: 'Karachi' },
+    { school: 'King Edward Medical University', city: 'Lahore' },
+    { school: 'Dow Medical College', city: 'Karachi' },
+    { school: 'Allama Iqbal Medical College', city: 'Lahore' },
+    { school: 'Punjab Medical College', city: 'Faisalabad' },
+    { school: 'Services Institute of Medical Sciences', city: 'Lahore' },
+    { school: 'Baqai Medical University', city: 'Karachi' },
+    { school: 'Ziauddin Medical College', city: 'Karachi' },
+    { school: 'Shifa Tameer-e-Millat University', city: 'Islamabad' },
+    { school: 'Rawalpindi Medical University', city: 'Rawalpindi' },
+    { school: 'Khyber Medical College', city: 'Peshawar' },
+    { school: 'Ayub Medical College', city: 'Abbottabad' },
+    { school: 'Sindh Medical College', city: 'Karachi' },
+  ],
+  'Nigeria': [
+    { school: 'University of Ibadan', city: 'Ibadan' },
+    { school: 'University of Lagos', city: 'Lagos' },
+    { school: 'Obafemi Awolowo University', city: 'Ile-Ife' },
+    { school: 'University of Nigeria', city: 'Enugu' },
+    { school: 'Ahmadu Bello University', city: 'Zaria' },
+    { school: 'University of Jos', city: 'Jos' },
+    { school: 'Lagos State University', city: 'Lagos' },
+    { school: 'Babcock University', city: 'Ilishan-Remo' },
+    { school: 'Igbinedion University', city: 'Benin City' },
+    { school: 'Ambrose Alli University', city: 'Ekpoma' },
+  ],
+  'Philippines': [
+    { school: 'University of the Philippines', city: 'Manila' },
+    { school: 'University of Santo Tomas', city: 'Manila' },
+    { school: 'Far Eastern University', city: 'Quezon City' },
+    { school: 'University of the East', city: 'Manila' },
+    { school: 'De La Salle Medical and Health Sciences Institute', city: 'Cavite' },
+    { school: 'Cebu Institute of Medicine', city: 'Cebu City' },
+    { school: "St Luke's College of Medicine", city: 'Quezon City' },
+    { school: 'Ateneo School of Medicine and Public Health', city: 'Pasig' },
+    { school: 'Davao Medical School Foundation', city: 'Davao City' },
+    { school: 'Our Lady of Fatima University', city: 'Valenzuela' },
+  ],
+  'Egypt': [
+    { school: 'Cairo University', city: 'Cairo' },
+    { school: 'Ain Shams University', city: 'Cairo' },
+    { school: 'Alexandria University', city: 'Alexandria' },
+    { school: 'Mansoura University', city: 'Mansoura' },
+    { school: 'Suez Canal University', city: 'Ismailia' },
+    { school: 'Assiut University', city: 'Assiut' },
+    { school: 'Tanta University', city: 'Tanta' },
+    { school: 'Zagazig University', city: 'Zagazig' },
+    { school: 'Benha University', city: 'Cairo' },
+    { school: 'Helwan University', city: 'Helwan' },
+    { school: 'Fayoum University', city: 'Fayoum' },
+    { school: 'Minia University', city: 'Minya' },
+  ],
+  'Mexico': [
+    { school: 'UNAM', city: 'Mexico City' },
+    { school: 'IPN', city: 'Mexico City' },
+    { school: 'UAG', city: 'Guadalajara' },
+    { school: 'TEC de Monterrey', city: 'Monterrey' },
+    { school: 'Universidad de Guanajuato', city: 'Guanajuato' },
+    { school: 'Universidad Autónoma de San Luis Potosí', city: 'San Luis Potosí' },
+    { school: 'Universidad Michoacana', city: 'Morelia' },
+  ],
+  'Brazil': [
+    { school: 'Universidade de São Paulo', city: 'São Paulo' },
+    { school: 'Universidade Federal do Rio de Janeiro', city: 'Rio de Janeiro' },
+    { school: 'Universidade Federal de Minas Gerais', city: 'Belo Horizonte' },
+    { school: 'Universidade Federal do Rio Grande do Sul', city: 'Porto Alegre' },
+    { school: 'Universidade Estadual de Campinas', city: 'Campinas' },
+    { school: 'Pontifícia Universidade Católica do Rio Grande do Sul', city: 'Porto Alegre' },
+    { school: 'Universidade Federal de Santa Catarina', city: 'Florianópolis' },
+    { school: 'Universidade Federal da Bahia', city: 'Salvador' },
+  ],
+  'Colombia': [
+    { school: 'Universidad Nacional de Colombia', city: 'Bogotá' },
+    { school: 'Universidad de Antioquia', city: 'Medellín' },
+    { school: 'Pontificia Universidad Javeriana', city: 'Bogotá' },
+    { school: 'Universidad del Rosario', city: 'Bogotá' },
+    { school: 'Universidad de Cartagena', city: 'Cartagena' },
+  ],
+  'China': [
+    { school: 'Peking Union Medical College', city: 'Beijing' },
+    { school: 'Peking University Health Science Center', city: 'Beijing' },
+    { school: 'Fudan University Shanghai Medical College', city: 'Shanghai' },
+    { school: 'Shanghai Jiao Tong University School of Medicine', city: 'Shanghai' },
+    { school: 'Zhejiang University School of Medicine', city: 'Hangzhou' },
+    { school: 'Sichuan University West China Medical School', city: 'Chengdu' },
+    { school: 'Sun Yat-sen University', city: 'Guangzhou' },
+    { school: 'Capital Medical University', city: 'Beijing' },
+  ],
+  'Bangladesh': [
+    { school: 'Dhaka Medical College', city: 'Dhaka' },
+    { school: 'Sher-e-Bangla Medical College', city: 'Barisal' },
+    { school: 'Sir Salimullah Medical College', city: 'Dhaka' },
+    { school: 'Rajshahi Medical College', city: 'Rajshahi' },
+    { school: 'Bangabandhu Sheikh Mujib Medical University', city: 'Dhaka' },
+    { school: 'Chittagong Medical College', city: 'Chittagong' },
+  ],
+  'Iran': [
+    { school: 'Tehran University of Medical Sciences', city: 'Tehran' },
+    { school: 'Shahid Beheshti University of Medical Sciences', city: 'Tehran' },
+    { school: 'Mashhad University of Medical Sciences', city: 'Mashhad' },
+    { school: 'Isfahan University of Medical Sciences', city: 'Isfahan' },
+    { school: 'Iran University of Medical Sciences', city: 'Tehran' },
+  ],
+  'Iraq': [
+    { school: 'University of Baghdad College of Medicine', city: 'Baghdad' },
+    { school: 'University of Basrah College of Medicine', city: 'Basra' },
+    { school: 'Kufa University', city: 'Najaf' },
+    { school: 'University of Mosul', city: 'Mosul' },
+  ],
+  'Syria': [
+    { school: 'Damascus University Faculty of Medicine', city: 'Damascus' },
+    { school: 'University of Aleppo', city: 'Aleppo' },
+    { school: 'Tishreen University', city: 'Latakia' },
+  ],
+  'Lebanon': [
+    { school: 'American University of Beirut', city: 'Beirut' },
+    { school: 'Lebanese American University', city: 'Byblos' },
+    { school: 'Saint Joseph University', city: 'Beirut' },
+    { school: 'University of Balamand', city: 'Tripoli' },
+  ],
+  'Jordan': [
+    { school: 'University of Jordan', city: 'Amman' },
+    { school: 'Jordan University of Science & Technology', city: 'Irbid' },
+  ],
+  'Saudi Arabia': [
+    { school: 'King Saud University', city: 'Riyadh' },
+    { school: 'King Abdulaziz University', city: 'Jeddah' },
+    { school: 'King Fahd Medical City', city: 'Riyadh' },
+    { school: 'Imam Abdulrahman Bin Faisal University', city: 'Dammam' },
+  ],
+  'UAE': [
+    { school: 'Mohammed Bin Rashid University', city: 'Dubai' },
+    { school: 'United Arab Emirates University', city: 'Al Ain' },
+    { school: 'Khalifa University', city: 'Abu Dhabi' },
+  ],
+  'United Kingdom': [
+    { school: 'University of Oxford', city: 'Oxford' },
+    { school: 'University of Cambridge', city: 'Cambridge' },
+    { school: 'Imperial College London', city: 'London' },
+    { school: "King's College London", city: 'London' },
+    { school: 'University of Edinburgh', city: 'Edinburgh' },
+    { school: 'University of Glasgow', city: 'Glasgow' },
+    { school: 'University of Manchester', city: 'Manchester' },
+    { school: 'University of Birmingham', city: 'Birmingham' },
+    { school: 'Newcastle University', city: 'Newcastle upon Tyne' },
+    { school: 'University of Liverpool', city: 'Liverpool' },
+    { school: 'University of Sheffield', city: 'Sheffield' },
+    { school: 'University of Leeds', city: 'Leeds' },
+    { school: "St George's University of London", city: 'London' },
+    { school: 'University of Aberdeen', city: 'Aberdeen' },
+    { school: 'University of Southampton', city: 'Southampton' },
+  ],
+  'Canada': [
+    { school: 'University of Toronto', city: 'Toronto' },
+    { school: 'McMaster University', city: 'Hamilton' },
+    { school: 'University of Ottawa', city: 'Ottawa' },
+    { school: 'University of Alberta', city: 'Edmonton' },
+    { school: 'University of Calgary', city: 'Calgary' },
+    { school: 'McGill University', city: 'Montreal' },
+    { school: 'Dalhousie University', city: 'Halifax' },
+    { school: 'Western University', city: 'London, ON' },
+    { school: "Queen's University", city: 'Kingston' },
+    { school: 'University of Manitoba', city: 'Winnipeg' },
+  ],
+  'Germany': [
+    { school: 'Heidelberg University', city: 'Heidelberg' },
+    { school: 'Ludwig Maximilian University of Munich', city: 'Munich' },
+    { school: 'Charité – Universitätsmedizin Berlin', city: 'Berlin' },
+    { school: 'University of Freiburg', city: 'Freiburg' },
+    { school: 'University of Tübingen', city: 'Tübingen' },
+    { school: 'University of Cologne', city: 'Cologne' },
+    { school: 'University of Hamburg-Eppendorf', city: 'Hamburg' },
+    { school: 'University of Bonn', city: 'Bonn' },
+    { school: 'University of Münster', city: 'Münster' },
+    { school: 'University of Frankfurt', city: 'Frankfurt' },
+  ],
+  'France': [
+    { school: 'Sorbonne University', city: 'Paris' },
+    { school: 'Université Paris Cité', city: 'Paris' },
+    { school: 'Sorbonne Paris Nord University', city: 'Paris' },
+    { school: 'Aix-Marseille University', city: 'Marseille' },
+    { school: 'University of Lyon', city: 'Lyon' },
+    { school: 'University of Toulouse', city: 'Toulouse' },
+    { school: 'University of Strasbourg', city: 'Strasbourg' },
+    { school: 'University of Lille', city: 'Lille' },
+    { school: 'University of Bordeaux', city: 'Bordeaux' },
+    { school: 'University of Nantes', city: 'Nantes' },
+  ],
+  'Italy': [
+    { school: 'Sapienza University of Rome', city: 'Rome' },
+    { school: 'University of Bologna', city: 'Bologna' },
+    { school: 'University of Milan', city: 'Milan' },
+    { school: 'University of Padua', city: 'Padua' },
+    { school: 'University of Naples Federico II', city: 'Naples' },
+    { school: 'University of Florence', city: 'Florence' },
+    { school: 'University of Turin', city: 'Turin' },
+    { school: "Sant'Anna School of Advanced Studies", city: 'Pisa' },
+  ],
+  'Spain': [
+    { school: 'University of Barcelona', city: 'Barcelona' },
+    { school: 'Autonomous University of Barcelona', city: 'Barcelona' },
+    { school: 'Complutense University of Madrid', city: 'Madrid' },
+    { school: 'University of Navarra', city: 'Pamplona' },
+    { school: 'University of Valencia', city: 'Valencia' },
+    { school: 'University of Seville', city: 'Seville' },
+    { school: 'University of Granada', city: 'Granada' },
+  ],
+  'Poland': [
+    { school: 'Jagiellonian University Medical College', city: 'Kraków' },
+    { school: 'Medical University of Warsaw', city: 'Warsaw' },
+    { school: 'Poznań University of Medical Sciences', city: 'Poznań' },
+    { school: 'Medical University of Gdańsk', city: 'Gdańsk' },
+    { school: 'Wrocław Medical University', city: 'Wrocław' },
+    { school: 'Ludwik Rydygier Collegium Medicum', city: 'Bydgoszcz' },
+  ],
+  'Ukraine': [
+    { school: 'Bogomolets National Medical University', city: 'Kyiv' },
+    { school: 'Taras Shevchenko National University', city: 'Kyiv' },
+    { school: 'Dnipro State Medical University', city: 'Dnipro' },
+    { school: 'Kharkiv National Medical University', city: 'Kharkiv' },
+    { school: 'Ivano-Frankivsk National Medical University', city: 'Ivano-Frankivsk' },
+    { school: 'Lviv Medical University', city: 'Lviv' },
+  ],
+  'Russia': [
+    { school: 'Moscow State Medical University', city: 'Moscow' },
+    { school: 'First Moscow State Medical University', city: 'Moscow' },
+    { school: 'Saint Petersburg State Medical University', city: 'Saint Petersburg' },
+    { school: 'Sechenov University', city: 'Moscow' },
+    { school: 'Novosibirsk State Medical University', city: 'Novosibirsk' },
+  ],
+  'Romania': [
+    { school: 'University of Medicine and Pharmacy Cluj-Napoca', city: 'Cluj-Napoca' },
+    { school: 'Carol Davila University of Medicine and Pharmacy', city: 'Bucharest' },
+    { school: 'Victor Babeș University', city: 'Timișoara' },
+    { school: 'Oradea Medical School', city: 'Oradea' },
+  ],
+  'Turkey': [
+    { school: 'Istanbul University', city: 'Istanbul' },
+    { school: 'Hacettepe University', city: 'Ankara' },
+    { school: 'Ankara University', city: 'Ankara' },
+    { school: 'Ege University', city: 'Izmir' },
+    { school: 'Uludağ University', city: 'Bursa' },
+  ],
+  'Greece': [
+    { school: 'National and Kapodistrian University of Athens', city: 'Athens' },
+    { school: 'Aristotle University of Thessaloniki', city: 'Thessaloniki' },
+    { school: 'University of Crete', city: 'Crete' },
+    { school: 'University of Patras', city: 'Patras' },
+  ],
+  'Portugal': [
+    { school: 'University of Lisbon', city: 'Lisbon' },
+    { school: 'University of Porto', city: 'Porto' },
+    { school: 'University of Coimbra', city: 'Coimbra' },
+    { school: 'NOVA University of Lisbon', city: 'Lisbon' },
+  ],
+  'Argentina': [
+    { school: 'Universidad de Buenos Aires', city: 'Buenos Aires' },
+    { school: 'Universidad Austral', city: 'Buenos Aires' },
+    { school: 'Universidad Nacional de La Plata', city: 'La Plata' },
+    { school: 'Universidad Católica de Córdoba', city: 'Córdoba' },
+    { school: 'Universidad de Mendoza', city: 'Mendoza' },
+  ],
+  'Chile': [
+    { school: 'Universidad de Chile', city: 'Santiago' },
+    { school: 'Pontificia Universidad Católica de Chile', city: 'Santiago' },
+    { school: 'Universidad de Concepción', city: 'Concepción' },
+    { school: 'Universidad Austral de Chile', city: 'Valdivia' },
+  ],
+  'Peru': [
+    { school: 'Universidad Nacional Mayor de San Marcos', city: 'Lima' },
+    { school: 'Universidad Peruana Cayetano Heredia', city: 'Lima' },
+    { school: 'Universidad Científica del Sur', city: 'Lima' },
+  ],
+  'Venezuela': [
+    { school: 'Central University of Venezuela', city: 'Caracas' },
+    { school: 'Universidad de Los Andes', city: 'Mérida' },
+    { school: 'Universidad del Zulia', city: 'Maracaibo' },
+  ],
+  'Ecuador': [
+    { school: 'Universidad Central del Ecuador', city: 'Quito' },
+    { school: 'Universidad de Guayaquil', city: 'Guayaquil' },
+    { school: 'Universidad San Francisco de Quito', city: 'Quito' },
+  ],
+  'Ethiopia': [
+    { school: 'Addis Ababa University', city: 'Addis Ababa' },
+    { school: 'Jimma University', city: 'Jimma' },
+    { school: 'Hawassa University', city: 'Hawassa' },
+    { school: 'Bahirdar University', city: 'Bahir Dar' },
+    { school: 'Debremarkos University', city: 'Debre Markos' },
+  ],
+  'Ghana': [
+    { school: 'University of Ghana', city: 'Accra' },
+    { school: 'Kwame Nkrumah University of Science and Technology', city: 'Kumasi' },
+    { school: 'University of Cape Coast', city: 'Cape Coast' },
+    { school: 'Accra College of Medicine', city: 'Accra' },
+  ],
+  'Kenya': [
+    { school: 'University of Nairobi', city: 'Nairobi' },
+    { school: 'Moi University', city: 'Eldoret' },
+    { school: 'Kenyatta University', city: 'Nairobi' },
+    { school: 'Aga Khan University', city: 'Nairobi' },
+  ],
+  'South Africa': [
+    { school: 'University of Cape Town', city: 'Cape Town' },
+    { school: 'University of the Witwatersrand', city: 'Johannesburg' },
+    { school: 'University of Pretoria', city: 'Pretoria' },
+    { school: 'Stellenbosch University', city: 'Stellenbosch' },
+    { school: 'University of KwaZulu-Natal', city: 'Durban' },
+  ],
+  'Uganda': [
+    { school: 'Makerere University', city: 'Kampala' },
+    { school: 'Mbarara University of Science and Technology', city: 'Mbarara' },
+    { school: 'Kampala International University', city: 'Kampala' },
+  ],
+  'Tanzania': [
+    { school: 'University of Dar es Salaam', city: 'Dar es Salaam' },
+    { school: 'Muhimbili University of Health and Allied Sciences', city: 'Dar es Salaam' },
+    { school: 'Kilimanjaro Christian Medical University College', city: 'Moshi' },
+  ],
+  'Sudan': [
+    { school: 'University of Khartoum', city: 'Khartoum' },
+    { school: 'Omdurman Islamic University', city: 'Omdurman' },
+    { school: 'Sudan University of Science and Technology', city: 'Khartoum' },
+  ],
+  'Tunisia': [
+    { school: 'University of Tunis El Manar', city: 'Tunis' },
+    { school: 'University of Sfax', city: 'Sfax' },
+    { school: 'University of Sousse', city: 'Sousse' },
+    { school: 'Faculty of Medicine of Monastir', city: 'Monastir' },
+  ],
+  'Australia': [
+    { school: 'University of Sydney', city: 'Sydney' },
+    { school: 'University of Melbourne', city: 'Melbourne' },
+    { school: 'Monash University', city: 'Melbourne' },
+    { school: 'University of Queensland', city: 'Brisbane' },
+    { school: 'University of Western Australia', city: 'Perth' },
+    { school: 'Australian National University', city: 'Canberra' },
+    { school: 'University of Adelaide', city: 'Adelaide' },
+    { school: 'University of Newcastle', city: 'Newcastle' },
+  ],
+  'New Zealand': [
+    { school: 'University of Auckland', city: 'Auckland' },
+    { school: 'University of Otago', city: 'Dunedin' },
+  ],
+  'Japan': [
+    { school: 'University of Tokyo', city: 'Tokyo' },
+    { school: 'Kyoto University', city: 'Kyoto' },
+    { school: 'Osaka University', city: 'Osaka' },
+    { school: 'Hokkaido University', city: 'Sapporo' },
+    { school: 'Tohoku University', city: 'Sendai' },
+    { school: 'Nagoya University', city: 'Nagoya' },
+  ],
+  'South Korea': [
+    { school: 'Seoul National University', city: 'Seoul' },
+    { school: 'Yonsei University', city: 'Seoul' },
+    { school: 'Korea University', city: 'Seoul' },
+    { school: 'Sungkyunkwan University', city: 'Seoul' },
+    { school: 'Pusan National University', city: 'Busan' },
+  ],
+  'Indonesia': [
+    { school: 'University of Indonesia', city: 'Jakarta' },
+    { school: 'Gadjah Mada University', city: 'Yogyakarta' },
+    { school: 'Universitas Airlangga', city: 'Surabaya' },
+    { school: 'Padjadjaran University', city: 'Bandung' },
+  ],
+  'Vietnam': [
+    { school: 'Hanoi Medical University', city: 'Hanoi' },
+    { school: 'Vietnam National University Ho Chi Minh City', city: 'Ho Chi Minh City' },
+    { school: 'University of Medicine and Pharmacy Hue', city: 'Hue' },
+  ],
+  'Thailand': [
+    { school: 'Mahidol University', city: 'Bangkok' },
+    { school: 'Chulalongkorn University', city: 'Bangkok' },
+    { school: 'Prince of Songkla University', city: 'Hat Yai' },
+    { school: 'Khon Kaen University', city: 'Khon Kaen' },
+  ],
+  'Malaysia': [
+    { school: 'University of Malaya', city: 'Kuala Lumpur' },
+    { school: 'Universiti Kebangsaan Malaysia', city: 'Kuala Lumpur' },
+    { school: 'Universiti Sains Malaysia', city: 'Penang' },
+    { school: 'Universiti Putra Malaysia', city: 'Serdang' },
+  ],
+  'Sri Lanka': [
+    { school: 'University of Colombo', city: 'Colombo' },
+    { school: 'University of Peradeniya', city: 'Peradeniya' },
+    { school: 'University of Jaffna', city: 'Jaffna' },
+  ],
+  'Nepal': [
+    { school: 'Tribhuvan University', city: 'Kathmandu' },
+    { school: 'Kathmandu University', city: 'Dhulikhel' },
+    { school: 'BP Koirala Institute of Health Sciences', city: 'Dharan' },
+  ],
+  'Dominican Republic': [
+    { school: 'Universidad Autónoma de Santo Domingo', city: 'Santo Domingo' },
+    { school: 'Universidad Iberoamericana', city: 'Santo Domingo' },
+  ],
+  'Costa Rica': [
+    { school: 'University of Costa Rica', city: 'San José' },
+    { school: 'Universidad Latina de Costa Rica', city: 'San José' },
+  ],
+  'Jamaica': [
+    { school: 'University of the West Indies', city: 'Kingston' },
+  ],
+};
+
+export const countriesWithKnownMedicalSchools = [
+  ...Object.keys(internationalMedicalSchools)
+];
+
+export function medicalSchoolsForCountry(country) {
+  if (!country || country === 'Other') {
+    return [];
+  }
+  const normalized = country.trim();
+  const raw = internationalMedicalSchools[normalized];
+  if (!raw || raw.length === 0) {
+    return [];
+  }
+  return raw.map(entry => entry.school);
+}
+
+export function medicalSchoolCity(country, school) {
+  if (!country || country === 'Other') return '';
+  const raw = internationalMedicalSchools[country.trim()];
+  if (!raw) return '';
+  const found = raw.find(entry => entry.school === school);
+  return found ? found.city : '';
+}
+
+export const commonMedSchools = Object.fromEntries(
+  [
+    ...Object.entries(internationalMedicalSchools).map(([country, entries]) => [
+      country,
+      [...entries.map(entry => entry.school), 'Other'],
+    ]),
+    ['Other', ['Other']],
+  ]
+);
