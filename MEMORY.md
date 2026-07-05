@@ -13,7 +13,7 @@ This file is the project's long-term memory. It is loaded at the start of every 
 - [x] Fix 42 lint errors (addressed by merging `play-store-prep`)
 - [ ] Configure Android release keystore/signing for AAB
 - [ ] Add tablet screenshot to `store_assets/screenshots/`
-- [ ] Host privacy policy + Terms of Service at real URLs
+- [x] Host privacy policy + Terms of Service at real URLs (deployed to Vercel)
 - [ ] Finish Play Console metadata, content rating questionnaire, and Data Safety form
 - [ ] Consider code splitting to reduce main JS chunk size (~1.5MB main chunk)
 - [ ] Add test reviewer account in Play Console "App access"
