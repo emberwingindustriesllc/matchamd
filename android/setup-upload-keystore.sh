@@ -27,18 +27,20 @@ if [ "$STORE_PASSWORD" != "$STORE_PASSWORD2" ] && [ "$KEY_PASSWORD" != "$KEY_PAS
   exit 1
 fi
 
-set -a
-source "$(dirname "$0")/local.properties.env"
-set +a
+if [ -f "$(dirname "$0")/local.properties.env" ]; then
+  set -a
+  source "$(dirname "$0")/local.properties.env"
+  set +a
+fi
 
 LOCAL_PROPS="$(dirname "$0")/local.properties"
 cp "$LOCAL_PROPS" "$LOCAL_PROPS.bak" 2>/dev/null || true
 
 {
-  echo "RELEASE_STORE_FILE=upload-keystore.jks"
-  echo "RELEASE_KEY_ALIAS=EmberWingIndustriesLLC"
-  printf 'RELEASE_STORE_PASSWORD=%s\n' "$STORE_PASSWORD"
-  printf 'RELEASE_KEY_PASSWORD=%s\n' "$KEY_PASSWORD"
+  echo "release.storeFile=upload-keystore.jks"
+  echo "release.keyAlias=EmberWingIndustriesLLC"
+  printf 'release.storePassword=%s\n' "$STORE_PASSWORD"
+  printf 'release.keyPassword=%s\n' "$KEY_PASSWORD"
 } > "$LOCAL_PROPS"
 
 echo "Saved $LOCAL_PROPS from $LOCAL_PROPS.bak if present."
