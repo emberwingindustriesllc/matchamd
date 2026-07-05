@@ -7,17 +7,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  MapPin, Globe, Mail, Phone, Shield, AlertTriangle, 
-  Star, Users, BookOpen, Plus, Loader2, ChevronLeft,
-  Verified, Flag, Share2, Edit
+  MapPin, Globe, Mail, Shield, AlertTriangle, 
+  BookOpen, Plus, Loader2, Verified,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/lib/AuthContext';
-import { fetchProgramById, fetchPrograms, createProgramNote } from '@/api/programs';
+import { fetchProgramById, createProgramNote } from '@/api/programs';
 import ReportScamModal from '@/components/community/ReportScamModal';
 import AddProgramModal from '@/components/community/AddProgramModal';
 import ProgramNoteCard from '@/components/community/ProgramNoteCard';
