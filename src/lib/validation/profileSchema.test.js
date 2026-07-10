@@ -11,6 +11,7 @@ describe('Profile Validation Schemas', () => {
   const validBaseProfile = {
     display_name: 'Dr. Test User',
     country: 'India',
+    country_of_origin: 'India',
     medical_school_country: 'India',
     medical_school: 'AIIMS',
     primary_goal: 'residency',
@@ -21,6 +22,7 @@ describe('Profile Validation Schemas', () => {
     languages: ['en', 'hi'],
     preferred_language: 'en',
     visa_status: 'none',
+    conrad_30_waiver_planned: false,
     graduation_year: 2020,
     usmle_step1_status: 'passed',
     usmle_step1_score: '240',
@@ -104,14 +106,13 @@ describe('Profile Validation Schemas', () => {
       expect(result.success).toBe(false);
     });
 
-    it('requires usmle_step1_score when step1_status is passed', () => {
+    it('does NOT require usmle_step1_score when step1_status is passed', () => {
       const result = OnboardingProfileSchema.safeParse({
         ...validBaseProfile,
         usmle_step1_status: 'passed',
         usmle_step1_score: '',
       });
-      expect(result.success).toBe(false);
-      expect(result.error.flatten().fieldErrors.usmle_step1_score).toBeDefined();
+      expect(result.success).toBe(true);
     });
 
     it('requires usmle_step2_score when step2_status is passed', () => {

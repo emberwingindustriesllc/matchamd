@@ -19,6 +19,7 @@ const LanguageCodeEnum = z.enum(['en', 'es', 'ar', 'hi', 'zh', 'fr', 'pt']);
 export const BaseOnboardingProfileSchema = z.object({
   display_name: z.string().min(1, 'Display name is required').max(100),
   country: z.string().min(1, 'Country is required'),
+  country_of_origin: z.string().min(1, 'Country of origin is required'),
   target_city: z.string().optional(),
   target_state: z.string().optional(),
   medical_school: z.string().min(1, 'Medical school is required'),
@@ -40,6 +41,7 @@ export const BaseOnboardingProfileSchema = z.object({
   usmle_step3_result: USMLEStep3ResultEnum.default('not_applicable'),
   ecfmg_certified: z.boolean().default(false),
   visa_status: VisaStatusEnum.default('none'),
+  conrad_30_waiver_planned: z.boolean().default(false),
   acgme_waiver: z.boolean().default(false),
   previous_training: z.string().optional(),
   us_clinical_experience: z.boolean().default(false),
@@ -50,15 +52,6 @@ export const BaseOnboardingProfileSchema = z.object({
  * Refined onboarding profile schema with conditional validation logic
  */
 export const OnboardingProfileSchema = BaseOnboardingProfileSchema.refine(data => {
-  // Conditional validation: if usmle_step1_status is 'passed', score should be provided
-  if (data.usmle_step1_status === 'passed' && !data.usmle_step1_score) {
-    return false;
-  }
-  return true;
-}, {
-  message: 'Step 1 score is required when status is "passed"',
-  path: ['usmle_step1_score'],
-}).refine(data => {
   if (data.usmle_step2_status === 'passed' && !data.usmle_step2_score) {
     return false;
   }

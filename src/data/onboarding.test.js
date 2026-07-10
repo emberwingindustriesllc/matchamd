@@ -6,6 +6,7 @@ describe('Onboarding Data & Validation', () => {
     const baseProfile = {
       display_name: '',
       country: '',
+      country_of_origin: '',
       medical_school_country: '',
       medical_school: '',
       visa_status: '',
@@ -17,10 +18,11 @@ describe('Onboarding Data & Validation', () => {
       expect(canProceed(0, { ...baseProfile, display_name: 'Dr. Smith' })).toBe(true);
     });
 
-    it('step 1 requires country, medical_school_country, and medical_school', () => {
+    it('step 1 requires country, country_of_origin, medical_school_country, and medical_school', () => {
       expect(canProceed(1, { ...baseProfile, country: 'India' })).toBe(false);
-      expect(canProceed(1, { ...baseProfile, country: 'India', medical_school_country: 'India' })).toBe(false);
-      expect(canProceed(1, { ...baseProfile, country: 'India', medical_school_country: 'India', medical_school: 'AIIMS' })).toBe(true);
+      expect(canProceed(1, { ...baseProfile, country: 'India', country_of_origin: 'India' })).toBe(false);
+      expect(canProceed(1, { ...baseProfile, country: 'India', country_of_origin: 'India', medical_school_country: 'India' })).toBe(false);
+      expect(canProceed(1, { ...baseProfile, country: 'India', country_of_origin: 'India', medical_school_country: 'India', medical_school: 'AIIMS' })).toBe(true);
     });
 
     it('step 2 requires visa_status', () => {

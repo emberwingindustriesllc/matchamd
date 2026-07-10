@@ -57,6 +57,7 @@ export default function Onboarding() {
   const [profile, setProfile] = useState({
     display_name: '',
     country: '',
+    country_of_origin: '',
     target_city: '',
     target_state: '',
     medical_school: '',
@@ -76,6 +77,7 @@ export default function Onboarding() {
     usmle_step3_result: 'not_applicable',
     ecfmg_certified: false,
     visa_status: 'none',
+    conrad_30_waiver_planned: false,
     acgme_waiver: false,
     previous_training: '',
     us_clinical_experience: false,
@@ -285,6 +287,20 @@ export default function Onboarding() {
         </div>
 
         <div>
+          <Label className="text-slate-700 dark:text-slate-300">Country of Origin / Citizenship</Label>
+          <Select value={profile.country_of_origin} onValueChange={(v) => updateProfile('country_of_origin', v)}>
+            <SelectTrigger className="h-12 rounded-xl mt-1">
+              <SelectValue placeholder="Select country of origin" />
+            </SelectTrigger>
+            <SelectContent>
+              {countries.map(c => (
+                <SelectItem key={c} value={c}>{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
           <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.medSchoolCountry')}</Label>
           <Select value={profile.medical_school_country} onValueChange={(v) => {
             updateProfile('medical_school_country', v);
@@ -362,7 +378,12 @@ export default function Onboarding() {
       <div className="space-y-4">
         <div>
           <Label className="text-slate-700 dark:text-slate-350">Select Visa Status</Label>
-          <Select value={profile.visa_status} onValueChange={(v) => updateProfile('visa_status', v)}>
+          <Select value={profile.visa_status} onValueChange={(v) => {
+            updateProfile('visa_status', v);
+            if (v !== 'J1') {
+              updateProfile('conrad_30_waiver_planned', false);
+            }
+          }}>
             <SelectTrigger className="h-12 rounded-xl mt-1">
               <SelectValue placeholder="Select current visa status" />
             </SelectTrigger>
@@ -376,6 +397,24 @@ export default function Onboarding() {
             </SelectContent>
           </Select>
         </div>
+
+        {profile.visa_status === 'J1' && (
+          <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-3">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              <strong>J-1 Visa Note:</strong> J-1 physicians are typically subject to a 2-year home country physical presence requirement (Section 212(e)) after residency. This requirement must be waived (e.g., via a Conrad 30 waiver job in a medically underserved area) to remain in the US.
+            </p>
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="conrad_30_waiver_planned"
+                checked={profile.conrad_30_waiver_planned}
+                onCheckedChange={(v) => updateProfile('conrad_30_waiver_planned', v)}
+              />
+              <Label htmlFor="conrad_30_waiver_planned" className="text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
+                I plan to seek a Conrad 30 / J-1 Waiver after training
+              </Label>
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>,
 
@@ -685,23 +724,20 @@ export default function Onboarding() {
           <span className="text-slate-700 dark:text-slate-300">{t('onboarding.usClinical')}</span>
         </div>
         
-        <div>
-          <Label className="text-slate-700 dark:text-slate-300">Do you have an ACGME Waiver?</Label>
-          <Select 
-            value={profile.acgme_waiver ? 'yes' : 'no'} 
-            onValueChange={(v) => updateProfile('acgme_waiver', v === 'yes')}
-          >
-            <SelectTrigger className="h-12 rounded-xl mt-1">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="no">No</SelectItem>
-              <SelectItem value="yes">Yes</SelectItem>
-            </SelectContent>
-          </Select>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            An ACGME waiver gives you an extra year.
-          </p>
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
+          <Checkbox
+            id="acgme_waiver"
+            checked={profile.acgme_waiver}
+            onCheckedChange={(v) => updateProfile('acgme_waiver', v)}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <Label htmlFor="acgme_waiver" className="text-sm font-medium text-slate-750 dark:text-slate-350 cursor-pointer">
+              I have an ACGME Waiver
+            </Label>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              (Optional) For residency applicants requiring extra training year validation.
+            </p>
+          </div>
         </div>
       </div>
     </motion.div>

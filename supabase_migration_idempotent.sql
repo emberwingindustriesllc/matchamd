@@ -194,3 +194,16 @@ BEGIN
   ON CONFLICT (user_id) DO UPDATE SET
     score = user_reputation.score + EXCLUDED.score;
 END $$;
+
+-- 9. USER_PROFILES TABLE - Add missing columns if table exists
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'user_profiles') THEN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'user_profiles' AND column_name = 'country_of_origin') THEN
+      ALTER TABLE user_profiles ADD COLUMN country_of_origin text;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'user_profiles' AND column_name = 'conrad_30_waiver_planned') THEN
+      ALTER TABLE user_profiles ADD COLUMN conrad_30_waiver_planned boolean DEFAULT false;
+    END IF;
+  END IF;
+END $$;

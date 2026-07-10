@@ -2,7 +2,7 @@
 // This file can be imported by Onboarding.jsx and any tests
 
 export const countries = [
-  'India', 'Pakistan', 'Nigeria', 'Philippines', 'Egypt', 'Mexico', 'Brazil',
+  'United States', 'India', 'Pakistan', 'Nigeria', 'Philippines', 'Egypt', 'Mexico', 'Brazil',
   'Colombia', 'China', 'Bangladesh', 'Iran', 'Iraq', 'Syria', 'Lebanon',
   'Jordan', 'Saudi Arabia', 'UAE', 'United Kingdom', 'Canada', 'Other'
 ];
@@ -145,7 +145,7 @@ export const usmleStep3Options = [
 export const canProceed = (step, profile) => {
   switch(step) {
     case 0: return profile.display_name.length > 0;
-    case 1: return !!(profile.country && profile.medical_school_country && profile.medical_school);
+    case 1: return !!(profile.country && profile.country_of_origin && profile.medical_school_country && profile.medical_school);
     case 2: return !!profile.visa_status;
     case 3: return !!profile.primary_goal;
     case 4: return true;

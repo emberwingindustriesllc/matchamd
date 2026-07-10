@@ -22,9 +22,10 @@ const SPECIALTIES = [
 
 const PROGRAM_TYPES = [
   { value: '', label: 'All Types' },
-  { value: 'residency', label: 'Residency' },
+  { value: 'residency_categorical', label: 'Categorical Residency' },
+  { value: 'residency_preliminary', label: 'Preliminary Residency (Prelim)' },
   { value: 'fellowship', label: 'Fellowship' },
-  { value: 'observership', 'label': 'Observership' },
+  { value: 'observership', label: 'Observership' },
   { value: 'research', label: 'Research' },
   { value: 'elective', label: 'Elective' },
 ];
@@ -59,11 +60,35 @@ export default function ProgramsList() {
   const loadPrograms = async () => {
     setLoading(true);
     try {
+      let dbProgramType = filters.program_type;
+      if (filters.program_type === 'residency_categorical' || filters.program_type === 'residency_preliminary') {
+        dbProgramType = 'residency';
+      }
+
       const data = await fetchPrograms({
         ...filters,
+        program_type: dbProgramType,
         limit: 100,
       });
-      setPrograms(data);
+
+      let processedData = data;
+      if (filters.program_type === 'residency_categorical') {
+        processedData = data.filter(p => {
+          const name = p.name || '';
+          const specialty = Array.isArray(p.specialty) ? p.specialty.join(' ') : (p.specialty || '');
+          const isPrelim = name.toLowerCase().includes('prelim') || name.toLowerCase().includes('transitional') || specialty.toLowerCase().includes('prelim') || specialty.toLowerCase().includes('transitional');
+          return !isPrelim;
+        });
+      } else if (filters.program_type === 'residency_preliminary') {
+        processedData = data.filter(p => {
+          const name = p.name || '';
+          const specialty = Array.isArray(p.specialty) ? p.specialty.join(' ') : (p.specialty || '');
+          const isPrelim = name.toLowerCase().includes('prelim') || name.toLowerCase().includes('transitional') || specialty.toLowerCase().includes('prelim') || specialty.toLowerCase().includes('transitional');
+          return isPrelim;
+        });
+      }
+
+      setPrograms(processedData);
     } catch (error) {
       console.error('Failed to load programs:', error);
       toast.error('Failed to load programs');

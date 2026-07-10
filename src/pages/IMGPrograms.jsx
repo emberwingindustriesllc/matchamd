@@ -64,6 +64,7 @@ export default function IMGPrograms() {
   const [selectedVisa, setSelectedVisa] = useState('all');
   const [selectedSize, setSelectedSize] = useState('all');
   const [selectedFormat, setSelectedFormat] = useState('all');
+  const [selectedProgramType, setSelectedProgramType] = useState('all');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [fitFilter, setFitFilter] = useState(false);
   
@@ -273,17 +274,25 @@ export default function IMGPrograms() {
     }
   };
 
-  // Query Residency Programs
+  // Query Programs
   const { data: dbPrograms = [], isLoading: isProgramsLoading } = useQuery({
-    queryKey: ['residencyPrograms'],
+    queryKey: ['programs'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('residency_programs').select('*');
+      const { data, error } = await supabase.from('programs').select('*');
       if (error) throw error;
       return data || [];
     }
   });
 
-  const programs = dbPrograms.length > 0 ? dbPrograms : mockResidencyPrograms;
+  const programs = useMemo(() => {
+    const rawPrograms = dbPrograms.length > 0 ? dbPrograms : mockResidencyPrograms;
+    return rawPrograms.map(p => ({
+      program_type: 'residency',
+      ...p,
+      program_name: p.program_name || p.name,
+      institution: p.institution || p.description || 'Community Program',
+    }));
+  }, [dbPrograms]);
 
   // Fit Match Calculations
   const calculateFitScore = (prog) => {
@@ -358,42 +367,68 @@ export default function IMGPrograms() {
   };
 
   // Specialties & States lists
-  const specialties = [...new Set(programs.map(p => p.specialty))];
+  const specialties = useMemo(() => {
+    const allSpecs = new Set();
+    programs.forEach(p => {
+      if (Array.isArray(p.specialty)) {
+        p.specialty.forEach(s => allSpecs.add(s));
+      } else if (p.specialty) {
+        allSpecs.add(p.specialty);
+      }
+    });
+    return [...allSpecs];
+  }, [programs]);
   const regions = ["Northeast", "Midwest", "South", "West"];
 
   // Filter programs logic
   const filteredPrograms = useMemo(() => {
     return programs.filter(prog => {
+      const pType = prog.program_type || 'residency';
+      const pName = prog.program_name || '';
+      const pSpecs = Array.isArray(prog.specialty) ? prog.specialty : (prog.specialty ? [prog.specialty] : []);
+
       // 1. Search Query
-      const matchesSearch = prog.program_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      const matchesSearch = pName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            prog.institution.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            prog.city.toLowerCase().includes(searchQuery.toLowerCase());
       
       // 2. Advanced Select Filters
-      const matchesSpecialty = selectedSpecialty === 'all' || prog.specialty === selectedSpecialty;
-      const matchesRegion = selectedRegion === 'all' || prog.region === selectedRegion;
+      const matchesSpecialty = selectedSpecialty === 'all' || pSpecs.includes(selectedSpecialty);
+      const matchesRegion = selectedRegion === 'all' || prog.region === selectedRegion || !prog.region;
       
       const matchesVisa = selectedVisa === 'all' || 
         (selectedVisa === 'j1' && prog.visa_j1) ||
         (selectedVisa === 'h1b' && prog.visa_h1b);
 
       const matchesSize = selectedSize === 'all' ||
-        (selectedSize === 'small' && prog.program_size < 50) ||
+        (selectedSize === 'small' && (prog.program_size < 50 || !prog.program_size)) ||
         (selectedSize === 'medium' && prog.program_size >= 50 && prog.program_size <= 100) ||
         (selectedSize === 'large' && prog.program_size > 100);
 
-      const matchesFormat = selectedFormat === 'all' || prog.interview_format === selectedFormat;
+      const matchesFormat = selectedFormat === 'all' || prog.interview_format === selectedFormat || !prog.interview_format;
 
-      // 3. Personalized Fit Filter
+      // 3. Program Type Filter
+      let matchesProgramType = true;
+      const isPrelim = pName.toLowerCase().includes('prelim') || pName.toLowerCase().includes('transitional') || pSpecs.some(s => s.toLowerCase().includes('prelim') || s.toLowerCase().includes('transitional'));
+      
+      if (selectedProgramType === 'residency_categorical') {
+        matchesProgramType = pType === 'residency' && !isPrelim;
+      } else if (selectedProgramType === 'residency_preliminary') {
+        matchesProgramType = pType === 'residency' && isPrelim;
+      } else if (selectedProgramType !== 'all') {
+        matchesProgramType = pType === selectedProgramType;
+      }
+
+      // 4. Personalized Fit Filter
       let matchesFit = true;
       if (fitFilter) {
         const fit = calculateFitScore(prog);
         matchesFit = fit.meetsAll && !fit.visaIssue;
       }
 
-      return matchesSearch && matchesSpecialty && matchesRegion && matchesVisa && matchesSize && matchesFormat && matchesFit;
+      return matchesSearch && matchesSpecialty && matchesRegion && matchesVisa && matchesSize && matchesFormat && matchesProgramType && matchesFit;
     });
-  }, [programs, searchQuery, selectedSpecialty, selectedRegion, selectedVisa, selectedSize, selectedFormat, fitFilter, profile]);
+  }, [programs, searchQuery, selectedSpecialty, selectedRegion, selectedVisa, selectedSize, selectedFormat, selectedProgramType, fitFilter, profile]);
 
   // Saved Programs Map
   const savedProgramsList = useMemo(() => {
@@ -599,6 +634,24 @@ export default function IMGPrograms() {
                           {specialties.map(spec => (
                             <SelectItem key={spec} value={spec}>{spec}</SelectItem>
                           ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs text-slate-500 font-medium mb-1 block">Program Type</label>
+                      <Select value={selectedProgramType} onValueChange={setSelectedProgramType}>
+                        <SelectTrigger className="rounded-xl">
+                          <SelectValue placeholder="All Types" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Types</SelectItem>
+                          <SelectItem value="residency_categorical">Categorical Residency</SelectItem>
+                          <SelectItem value="residency_preliminary">Preliminary Residency (Prelim)</SelectItem>
+                          <SelectItem value="fellowship">Fellowship</SelectItem>
+                          <SelectItem value="observership">Observership</SelectItem>
+                          <SelectItem value="research">Research</SelectItem>
+                          <SelectItem value="elective">Elective</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

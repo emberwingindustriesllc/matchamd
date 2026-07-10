@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { validateProfile } from '@/lib/validation/profileSchema';
+import { countries } from '@/data/onboarding';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import ProgressRing from '@/components/common/ProgressRing';
@@ -132,10 +133,12 @@ export default function Profile() {
       target_city: profile?.target_city || '',
       target_state: profile?.target_state || '',
       country: profile?.country || '',
+      country_of_origin: profile?.country_of_origin || '',
       medical_school: profile?.medical_school || '',
       medical_school_country: profile?.medical_school_country || '',
       undergraduate_college: profile?.undergraduate_college || '',
       visa_status: profile?.visa_status || 'none',
+      conrad_30_waiver_planned: profile?.conrad_30_waiver_planned || false,
       acgme_waiver: profile?.acgme_waiver || false,
       previous_training: profile?.previous_training || '',
       usmle_step1_score: profile?.usmle_step1_score || '',
@@ -271,6 +274,18 @@ export default function Profile() {
                 <p className="font-medium text-slate-800 dark:text-white">{profile.country || 'Not set'}</p>
               </div>
             </div>
+
+            {profile.country_of_origin && (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[rgba(var(--color-primary),0.1)] dark:bg-[rgba(var(--color-primary),0.2)] flex items-center justify-center">
+                  <Globe className="w-5 h-5 text-[rgb(var(--color-primary))]" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Country of Origin</p>
+                  <p className="font-medium text-slate-800 dark:text-white">{profile.country_of_origin}</p>
+                </div>
+              </div>
+            )}
             
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[rgba(var(--color-secondary),0.1)] dark:bg-[rgba(var(--color-secondary),0.2)] flex items-center justify-center">
@@ -376,6 +391,20 @@ export default function Profile() {
                 </p>
               </div>
             </div>
+
+            {profile.visa_status === 'J1' && (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Conrad 30 Waiver Planned</p>
+                  <p className="font-medium text-slate-800 dark:text-white">
+                    {profile.conrad_30_waiver_planned ? 'Yes' : 'No'}
+                  </p>
+                </div>
+              </div>
+            )}
             
             {profile.acgme_waiver && (
               <div className="flex items-center gap-3">
@@ -527,6 +556,23 @@ export default function Profile() {
               </div>
 
               <div>
+                <Label>Country of Origin / Citizenship</Label>
+                <Select 
+                  value={editData.country_of_origin} 
+                  onValueChange={(v) => setEditData({ ...editData, country_of_origin: v })}
+                >
+                  <SelectTrigger className="rounded-xl mt-1">
+                    <SelectValue placeholder="Select country of origin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map(c => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <Label>Undergraduate College (Optional)</Label>
                 <Input
                   value={editData.undergraduate_college}
@@ -560,7 +606,13 @@ export default function Profile() {
                 <Label>Visa Status</Label>
                 <Select 
                   value={editData.visa_status} 
-                  onValueChange={(v) => setEditData({ ...editData, visa_status: v })}
+                  onValueChange={(v) => {
+                    const updates = { visa_status: v };
+                    if (v !== 'J1') {
+                      updates.conrad_30_waiver_planned = false;
+                    }
+                    setEditData({ ...editData, ...updates });
+                  }}
                 >
                   <SelectTrigger className="rounded-xl mt-1">
                     <SelectValue />
@@ -575,6 +627,22 @@ export default function Profile() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {editData.visa_status === 'J1' && (
+                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                    <div>
+                      <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">Plan Conrad 30 Waiver</span>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-500">Subject to J-1 2-year physical presence</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={editData.conrad_30_waiver_planned}
+                    onCheckedChange={(v) => setEditData({ ...editData, conrad_30_waiver_planned: v })}
+                  />
+                </div>
+              )}
 
               <div>
                 <Label>Graduation Year</Label>
@@ -617,7 +685,10 @@ export default function Profile() {
               <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
                 <div className="flex items-center gap-3">
                   <Shield className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                  <span className="text-slate-700 dark:text-slate-300">ACGME Waiver</span>
+                  <div>
+                    <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">ACGME Waiver</span>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-500">(Optional) Extra training year validation</p>
+                  </div>
                 </div>
                 <Switch
                   checked={editData.acgme_waiver}
