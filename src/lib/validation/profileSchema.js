@@ -18,16 +18,16 @@ const LanguageCodeEnum = z.enum(['en', 'es', 'ar', 'hi', 'zh', 'fr', 'pt']);
  */
 export const BaseOnboardingProfileSchema = z.object({
   display_name: z.string().min(1, 'Display name is required').max(100),
-  country: z.string().min(1, 'Country is required'),
-  country_of_origin: z.string().min(1, 'Country of origin is required'),
+  country: z.string().optional().nullable(),
+  country_of_origin: z.string().optional().nullable(),
   target_city: z.string().optional(),
   target_state: z.string().optional(),
-  medical_school: z.string().min(1, 'Medical school is required'),
-  medical_school_country: z.string().min(1, 'Medical school country is required'),
+  medical_school: z.string().optional().nullable(),
+  medical_school_country: z.string().optional().nullable(),
   undergraduate_college: z.string().optional(),
   languages: z.array(LanguageCodeEnum).default(['en']),
   preferred_language: LanguageCodeEnum.default('en'),
-  primary_goal: PrimaryGoalEnum,
+  primary_goal: PrimaryGoalEnum.optional().nullable(),
   fellowship_type: z.preprocess((val) => (val === '' ? null : val), z.string().optional().nullable()),
   target_specialty: z.string().optional(),
   target_specialty_custom: z.string().optional(),
@@ -51,33 +51,7 @@ export const BaseOnboardingProfileSchema = z.object({
 /**
  * Refined onboarding profile schema with conditional validation logic
  */
-export const OnboardingProfileSchema = BaseOnboardingProfileSchema.refine(data => {
-  if (data.usmle_step2_status === 'passed' && !data.usmle_step2_score) {
-    return false;
-  }
-  return true;
-}, {
-  message: 'Step 2 CK score is required when status is "passed"',
-  path: ['usmle_step2_score'],
-}).refine(data => {
-  // Fellowship type required when primary_goal is fellowship
-  if (data.primary_goal === 'fellowship' && !data.fellowship_type) {
-    return false;
-  }
-  return true;
-}, {
-  message: 'Fellowship type is required when goal is fellowship',
-  path: ['fellowship_type'],
-}).refine(data => {
-  // Target specialty required for residency
-  if (data.primary_goal === 'residency' && !data.target_specialty) {
-    return false;
-  }
-  return true;
-}, {
-  message: 'Target specialty is required for residency goal',
-  path: ['target_specialty'],
-});
+export const OnboardingProfileSchema = BaseOnboardingProfileSchema;
 
 /**
  * Schema for profile edit (allows partial updates)

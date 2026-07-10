@@ -71,39 +71,38 @@ describe('Profile Validation Schemas', () => {
       expect(result.error.flatten().fieldErrors.display_name).toContain('Display name is required');
     });
 
-    it('rejects missing country', () => {
+    it('does NOT reject missing country (optional/nullable)', () => {
       const result = OnboardingProfileSchema.safeParse({
         ...validBaseProfile,
         country: '',
       });
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
 
-    it('rejects missing medical_school', () => {
+    it('does NOT reject missing medical_school (optional/nullable)', () => {
       const result = OnboardingProfileSchema.safeParse({
         ...validBaseProfile,
         medical_school: '',
       });
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
 
-    it('requires fellowship_type when primary_goal is fellowship', () => {
+    it('does NOT require fellowship_type when primary_goal is fellowship', () => {
       const result = OnboardingProfileSchema.safeParse({
         ...validBaseProfile,
         primary_goal: 'fellowship',
         fellowship_type: undefined,
       });
-      expect(result.success).toBe(false);
-      expect(result.error.flatten().fieldErrors.fellowship_type).toBeDefined();
+      expect(result.success).toBe(true);
     });
 
-    it('requires target_specialty when primary_goal is residency', () => {
+    it('does NOT require target_specialty when primary_goal is residency', () => {
       const result = OnboardingProfileSchema.safeParse({
         ...validBaseProfile,
         primary_goal: 'residency',
         target_specialty: undefined,
       });
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
 
     it('does NOT require usmle_step1_score when step1_status is passed', () => {
@@ -115,13 +114,13 @@ describe('Profile Validation Schemas', () => {
       expect(result.success).toBe(true);
     });
 
-    it('requires usmle_step2_score when step2_status is passed', () => {
+    it('does NOT require usmle_step2_score when step2_status is passed', () => {
       const result = OnboardingProfileSchema.safeParse({
         ...validBaseProfile,
         usmle_step2_status: 'passed',
         usmle_step2_score: '',
       });
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
 
     it('validates language codes', () => {

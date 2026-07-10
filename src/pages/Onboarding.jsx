@@ -55,7 +55,7 @@ export default function Onboarding() {
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profile, setProfile] = useState({
-    display_name: '',
+    display_name: 'IMG Doctor',
     country: '',
     country_of_origin: '',
     target_city: '',

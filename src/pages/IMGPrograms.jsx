@@ -388,9 +388,21 @@ export default function IMGPrograms() {
       const pSpecs = Array.isArray(prog.specialty) ? prog.specialty : (prog.specialty ? [prog.specialty] : []);
 
       // 1. Search Query
-      const matchesSearch = pName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           prog.institution.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           prog.city.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = !searchQuery ? true : (() => {
+        const query = searchQuery.toLowerCase();
+        const pName = (prog.program_name || '').toLowerCase();
+        const pInst = (prog.institution || '').toLowerCase();
+        const pCity = (prog.city || '').toLowerCase();
+        const pState = (prog.state || '').toLowerCase();
+        const pSub = (prog.subspecialty || '').toLowerCase();
+        
+        return pName.includes(query) ||
+               pInst.includes(query) ||
+               pCity.includes(query) ||
+               pState.includes(query) ||
+               pSub.includes(query) ||
+               pSpecs.some(s => s.toLowerCase().includes(query));
+      })();
       
       // 2. Advanced Select Filters
       const matchesSpecialty = selectedSpecialty === 'all' || pSpecs.includes(selectedSpecialty);

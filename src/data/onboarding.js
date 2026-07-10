@@ -143,12 +143,5 @@ export const usmleStep3Options = [
 
 // Validation helpers
 export const canProceed = (step, profile) => {
-  switch(step) {
-    case 0: return profile.display_name.length > 0;
-    case 1: return !!(profile.country && profile.country_of_origin && profile.medical_school_country && profile.medical_school);
-    case 2: return !!profile.visa_status;
-    case 3: return !!profile.primary_goal;
-    case 4: return true;
-    default: return false;
-  }
+  return true;
 };

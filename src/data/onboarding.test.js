@@ -13,31 +13,11 @@ describe('Onboarding Data & Validation', () => {
       primary_goal: '',
     };
 
-    it('step 0 requires display_name', () => {
-      expect(canProceed(0, { ...baseProfile, display_name: '' })).toBe(false);
-      expect(canProceed(0, { ...baseProfile, display_name: 'Dr. Smith' })).toBe(true);
-    });
-
-    it('step 1 requires country, country_of_origin, medical_school_country, and medical_school', () => {
-      expect(canProceed(1, { ...baseProfile, country: 'India' })).toBe(false);
-      expect(canProceed(1, { ...baseProfile, country: 'India', country_of_origin: 'India' })).toBe(false);
-      expect(canProceed(1, { ...baseProfile, country: 'India', country_of_origin: 'India', medical_school_country: 'India' })).toBe(false);
-      expect(canProceed(1, { ...baseProfile, country: 'India', country_of_origin: 'India', medical_school_country: 'India', medical_school: 'AIIMS' })).toBe(true);
-    });
-
-    it('step 2 requires visa_status', () => {
-      expect(canProceed(2, { ...baseProfile })).toBe(false);
-      expect(canProceed(2, { ...baseProfile, visa_status: 'none' })).toBe(true);
-      expect(canProceed(2, { ...baseProfile, visa_status: 'J1' })).toBe(true);
-    });
-
-    it('step 3 requires primary_goal', () => {
-      expect(canProceed(3, { ...baseProfile })).toBe(false);
-      expect(canProceed(3, { ...baseProfile, primary_goal: 'residency' })).toBe(true);
-      expect(canProceed(3, { ...baseProfile, primary_goal: 'fellowship' })).toBe(true);
-    });
-
-    it('step 4 always passes', () => {
+    it('allows skipping every step', () => {
+      expect(canProceed(0, baseProfile)).toBe(true);
+      expect(canProceed(1, baseProfile)).toBe(true);
+      expect(canProceed(2, baseProfile)).toBe(true);
+      expect(canProceed(3, baseProfile)).toBe(true);
       expect(canProceed(4, baseProfile)).toBe(true);
     });
   });
