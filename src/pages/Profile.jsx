@@ -141,8 +141,18 @@ export default function Profile() {
       conrad_30_waiver_planned: profile?.conrad_30_waiver_planned || false,
       acgme_waiver: profile?.acgme_waiver || false,
       previous_training: profile?.previous_training || '',
+      primary_goal: profile?.primary_goal || 'residency',
+      fellowship_type: profile?.fellowship_type || '',
+      usmle_step1_status: profile?.usmle_step1_status || 'not_started',
       usmle_step1_score: profile?.usmle_step1_score || '',
+      usmle_step2_status: profile?.usmle_step2_status || 'not_started',
       usmle_step2_score: profile?.usmle_step2_score || '',
+      usmle_step3_status: profile?.usmle_step3_status || 'not_started',
+      usmle_step3_result: profile?.usmle_step3_result || 'not_applicable',
+      ecfmg_certified: profile?.ecfmg_certified || false,
+      us_clinical_experience: profile?.us_clinical_experience || false,
+      preferred_language: profile?.preferred_language || 'en',
+      languages: profile?.languages || ['en'],
       graduation_year: profile?.graduation_year || '',
       dark_mode: profile?.dark_mode || false
     });
@@ -503,10 +513,46 @@ export default function Profile() {
                 <Label>Display Name</Label>
                 <Input
                   value={editData.display_name}
-                  onChange={(e) => setEditData({ ...editData, display_name: e.target.value })}
-                  className="rounded-xl mt-1"
+                  disabled
+                  className="rounded-xl mt-1 bg-slate-100 dark:bg-slate-800 text-slate-500 cursor-not-allowed"
                 />
+                <p className="text-[10px] text-slate-500 mt-1">Display name cannot be changed.</p>
               </div>
+
+              <div>
+                <Label>Primary Goal</Label>
+                <Select 
+                  value={editData.primary_goal} 
+                  onValueChange={(v) => {
+                    const updates = { primary_goal: v };
+                    if (v !== 'fellowship') {
+                      updates.fellowship_type = null;
+                    }
+                    setEditData({ ...editData, ...updates });
+                  }}
+                >
+                  <SelectTrigger className="rounded-xl mt-1">
+                    <SelectValue placeholder="Select primary goal" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="residency">Residency</SelectItem>
+                    <SelectItem value="fellowship">Fellowship</SelectItem>
+                    <SelectItem value="med_school">Medical School</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {editData.primary_goal === 'fellowship' && (
+                <div>
+                  <Label>Fellowship Type</Label>
+                  <Input
+                    value={editData.fellowship_type || ''}
+                    onChange={(e) => setEditData({ ...editData, fellowship_type: e.target.value })}
+                    placeholder="e.g. Cardiology, Gastroenterology"
+                    className="rounded-xl mt-1"
+                  />
+                </div>
+              )}
               
               <div>
                 <Label>Bio</Label>
@@ -563,6 +609,23 @@ export default function Profile() {
                 >
                   <SelectTrigger className="rounded-xl mt-1">
                     <SelectValue placeholder="Select country of origin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map(c => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Current Location (Country)</Label>
+                <Select 
+                  value={editData.country} 
+                  onValueChange={(v) => setEditData({ ...editData, country: v })}
+                >
+                  <SelectTrigger className="rounded-xl mt-1">
+                    <SelectValue placeholder="Select current location" />
                   </SelectTrigger>
                   <SelectContent>
                     {countries.map(c => (
@@ -664,21 +727,140 @@ export default function Profile() {
                 />
               </div>
 
-              <div>
-                <Label>USMLE Step 1 Score</Label>
-                <Input
-                  value={editData.usmle_step1_score}
-                  onChange={(e) => setEditData({ ...editData, usmle_step1_score: e.target.value })}
-                  className="rounded-xl mt-1"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>USMLE Step 1 Status</Label>
+                  <Select 
+                    value={editData.usmle_step1_status || 'not_started'} 
+                    onValueChange={(v) => setEditData({ ...editData, usmle_step1_status: v })}
+                  >
+                    <SelectTrigger className="rounded-xl mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="not_started">Not Started</SelectItem>
+                      <SelectItem value="studying">Studying</SelectItem>
+                      <SelectItem value="scheduled">Scheduled</SelectItem>
+                      <SelectItem value="passed">Passed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>USMLE Step 1 Score (Optional)</Label>
+                  <Input
+                    value={editData.usmle_step1_score || ''}
+                    onChange={(e) => setEditData({ ...editData, usmle_step1_score: e.target.value })}
+                    className="rounded-xl mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>USMLE Step 2 CK Status</Label>
+                  <Select 
+                    value={editData.usmle_step2_status || 'not_started'} 
+                    onValueChange={(v) => setEditData({ ...editData, usmle_step2_status: v })}
+                  >
+                    <SelectTrigger className="rounded-xl mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="not_started">Not Started</SelectItem>
+                      <SelectItem value="studying">Studying</SelectItem>
+                      <SelectItem value="scheduled">Scheduled</SelectItem>
+                      <SelectItem value="passed">Passed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>USMLE Step 2 CK Score (Optional)</Label>
+                  <Input
+                    value={editData.usmle_step2_score || ''}
+                    onChange={(e) => setEditData({ ...editData, usmle_step2_score: e.target.value })}
+                    className="rounded-xl mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>USMLE Step 3 Status</Label>
+                  <Select 
+                    value={editData.usmle_step3_status || 'not_started'} 
+                    onValueChange={(v) => {
+                      setEditData({ 
+                        ...editData, 
+                        usmle_step3_status: v,
+                        usmle_step3_result: v === 'passed' ? 'pass' : 'not_applicable'
+                      });
+                    }}
+                  >
+                    <SelectTrigger className="rounded-xl mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="not_started">Not Started</SelectItem>
+                      <SelectItem value="studying">Studying</SelectItem>
+                      <SelectItem value="scheduled">Scheduled</SelectItem>
+                      <SelectItem value="passed">Passed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>USMLE Step 3 Result</Label>
+                  <Select 
+                    value={editData.usmle_step3_result || 'not_applicable'} 
+                    onValueChange={(v) => setEditData({ ...editData, usmle_step3_result: v })}
+                  >
+                    <SelectTrigger className="rounded-xl mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="not_applicable">N/A</SelectItem>
+                      <SelectItem value="pass">Pass</SelectItem>
+                      <SelectItem value="fail">Fail</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div>
-                <Label>USMLE Step 2 CK Score</Label>
-                <Input
-                  value={editData.usmle_step2_score}
-                  onChange={(e) => setEditData({ ...editData, usmle_step2_score: e.target.value })}
-                  className="rounded-xl mt-1"
+                <Label>Preferred Language</Label>
+                <Select 
+                  value={editData.preferred_language || 'en'} 
+                  onValueChange={(v) => setEditData({ ...editData, preferred_language: v, languages: Array.from(new Set([...(editData.languages || []), v])) })}
+                >
+                  <SelectTrigger className="rounded-xl mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {languages.map(l => (
+                      <SelectItem key={l.code} value={l.code}>{l.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                  <span className="text-slate-700 dark:text-slate-300">ECFMG Certified</span>
+                </div>
+                <Switch
+                  checked={editData.ecfmg_certified}
+                  onCheckedChange={(v) => setEditData({ ...editData, ecfmg_certified: v })}
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
+                <div className="flex items-center gap-3">
+                  <Stethoscope className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                  <span className="text-slate-700 dark:text-slate-300">US Clinical Experience</span>
+                </div>
+                <Switch
+                  checked={editData.us_clinical_experience}
+                  onCheckedChange={(v) => setEditData({ ...editData, us_clinical_experience: v })}
                 />
               </div>
 
