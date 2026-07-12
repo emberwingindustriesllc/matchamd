@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Loader2, Search, Filter, MapPin, BookOpen, Shield, Plus, AlertTriangle, Verified } from 'lucide-react';
+import { Loader2, Search, Filter, MapPin, BookOpen, Shield, Plus, AlertTriangle, Verified, Sparkles } from 'lucide-react';
 import { fetchPrograms } from '@/api/programs';
 import AddProgramModal from '@/components/community/AddProgramModal';
 import { toast } from 'sonner';
@@ -112,24 +113,136 @@ export default function ProgramsList() {
     return true;
   });
 
+  const verifiedCount = programs.filter(p => p.verified).length;
+  const reportedCount = programs.filter(p => p.scam_reports_count > 0).length;
+
+  const renderProgramCards = (list) => (
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {list.map(program => {
+        const specialtyLabel = Array.isArray(program.specialty) ? program.specialty[0] : program.specialty;
+        const typeLabel = (program.program_type || '').replace(/_/g, ' ');
+        const isHighSignal = program.verified || program.scam_reports_count > 0;
+
+        return (
+          <Link key={program.id} to={`/programs/${program.id}`} className="text-inherit no-underline">
+            <motion.div
+              whileHover={{ y: -4, scale: 1.01 }}
+              transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+            >
+              <Card className={`group h-full overflow-hidden border border-slate-200/80 bg-white/95 shadow-sm transition-all duration-200 hover:border-[rgb(var(--color-primary))]/40 hover:shadow-xl ${isHighSignal ? 'ring-1 ring-inset ring-slate-100' : ''}`}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <CardTitle className="text-lg font-semibold leading-tight">{program.name}</CardTitle>
+                        {program.verified && (
+                          <Badge variant="default" className="shrink-0 bg-emerald-600/90 text-white">
+                            <Verified className="mr-1 h-3 w-3" /> Verified
+                          </Badge>
+                        )}
+                        {program.scam_reports_count > 0 && (
+                          <Badge variant="destructive" className="shrink-0">
+                            <AlertTriangle className="mr-1 h-3 w-3" /> {program.scam_reports_count} Reports
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="truncate text-sm text-slate-600">{program.institution}</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 pt-0">
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="capitalize text-slate-700">{typeLabel}</Badge>
+                    {program.is_acgme_accredited && (
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                        <Shield className="mr-1 h-3 w-3" /> ACGME
+                      </Badge>
+                    )}
+                    {program.ecfmg_pathway_eligible && (
+                      <Badge variant="outline" className="bg-violet-50 text-violet-700">
+                        <BookOpen className="mr-1 h-3 w-3" /> ECFMG
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 text-sm text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
+                      <span>{program.city}, {program.state}</span>
+                    </div>
+                    {specialtyLabel && (
+                      <div className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4 shrink-0 text-slate-400" />
+                        <span>{specialtyLabel}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
+                    <span>{program.program_notes_count || 0} notes</span>
+                    <span>{program.scam_reports_count || 0} reports</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </Link>
+        );
+      })}
+    </div>
+  );
+
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-6xl space-y-6 pb-10">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-gradient-to-br from-slate-950 via-slate-900 to-[rgb(var(--color-primary))] p-6 text-white shadow-[0_24px_80px_-24px_rgba(15,23,42,0.7)]"
+      >
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm text-slate-100 backdrop-blur">
+              <Sparkles className="h-4 w-4" />
+              <span>Community-driven program discovery</span>
+            </div>
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">Find the programs that fit your path</h1>
+            <p className="mt-3 max-w-xl text-sm text-slate-200/90 sm:text-base">
+              Browse verified training opportunities, community notes, and scam warnings in one polished place.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur">
+              <p className="text-2xl font-semibold">{programs.length}</p>
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-200/80">Programs</p>
+            </div>
+            <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur">
+              <p className="text-2xl font-semibold">{verifiedCount}</p>
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-200/80">Verified</p>
+            </div>
+            <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur">
+              <p className="text-2xl font-semibold">{reportedCount}</p>
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-200/80">Reports</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      <div className="flex flex-col gap-3 rounded-[24px] border border-slate-200/80 bg-white/80 p-4 shadow-sm backdrop-blur sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Program Directory</h1>
-          <p className="text-muted-foreground">Community-sourced programs, notes, and scam reports for IMGs</p>
+          <h2 className="text-lg font-semibold text-slate-900">Search and filter</h2>
+          <p className="text-sm text-slate-600">Narrow the list by specialty, location, and verification status.</p>
         </div>
         <AddProgramModal open={showAddModal} onOpenChange={setShowAddModal} onSuccess={loadPrograms} />
-        <Button onClick={() => setShowAddModal(true)}><Plus className="h-4 w-4 mr-2" /> Add Program</Button>
+        <Button onClick={() => setShowAddModal(true)} className="rounded-full">
+          <Plus className="mr-2 h-4 w-4" /> Add Program
+        </Button>
       </div>
 
-      {/* Filters */}
-      <Card>
+      <Card className="border-slate-200/80 shadow-sm">
         <CardContent className="pt-6">
-          <div className="flex flex-wrap gap-4 items-end">
-            <div className="relative flex-1 min-w-[250px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="relative min-w-[260px] flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 placeholder="Search programs, institutions..."
                 value={filters.search}
@@ -152,149 +265,48 @@ export default function ProgramsList() {
               <SelectTrigger className="w-[140px]"><SelectValue placeholder="State" /></SelectTrigger>
               <SelectContent>{US_STATES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
             </Select>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={filters.verifiedOnly} onChange={e => handleFilterChange('verifiedOnly', e.target.checked)} className="rounded border" />
-              <span className="text-sm">Verified only</span>
+            <label className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+              <input type="checkbox" checked={filters.verifiedOnly} onChange={e => handleFilterChange('verifiedOnly', e.target.checked)} className="rounded border-slate-300" />
+              <span>Verified only</span>
             </label>
             {(filters.search || filters.specialty || filters.program_type || filters.state || filters.verifiedOnly) && (
-              <Button variant="ghost" size="sm" onClick={clearFilters}><Filter className="h-4 w-4 mr-1" /> Clear</Button>
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="rounded-full">
+                <Filter className="mr-1 h-4 w-4" /> Clear
+              </Button>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="all">All ({programs.length})</TabsTrigger>
-          <TabsTrigger value="verified">Verified ({programs.filter(p => p.verified).length})</TabsTrigger>
-          <TabsTrigger value="unverified">Unverified ({programs.filter(p => !p.verified).length})</TabsTrigger>
-          <TabsTrigger value="scams">⚠️ Reports ({programs.filter(p => p.scam_reports_count > 0).length})</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 rounded-full bg-slate-100 p-1">
+          <TabsTrigger value="all" className="rounded-full">All ({programs.length})</TabsTrigger>
+          <TabsTrigger value="verified" className="rounded-full">Verified ({verifiedCount})</TabsTrigger>
+          <TabsTrigger value="unverified" className="rounded-full">Unverified ({programs.filter(p => !p.verified).length})</TabsTrigger>
+          <TabsTrigger value="scams" className="rounded-full">⚠️ Reports ({reportedCount})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="mt-4">
           {loading ? (
             <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
           ) : filteredPrograms.length === 0 ? (
-            <Card><CardContent className="py-12 text-center text-muted-foreground">No programs found. Try adjusting filters or add one!</CardContent></Card>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredPrograms.map(program => (
-                <Link key={program.id} to={`/programs/${program.id}`} className="text-inherit no-underline">
-                  <Card className={`hover:shadow-lg transition-shadow ${program.verified ? 'border-l-4 border-green-500' : ''} ${program.scam_reports_count > 0 ? 'border-l-4 border-destructive' : ''}`}>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <CardTitle className="text-lg truncate">{program.name}</CardTitle>
-                            {program.verified && <Badge variant="default" className="bg-green-100 text-green-800 shrink-0"><Verified className="h-3 w-3 mr-1" /> Verified</Badge>}
-                            {program.scam_reports_count > 0 && <Badge variant="destructive" className="shrink-0"><AlertTriangle className="h-3 w-3 mr-1" /> {program.scam_reports_count} Reports</Badge>}
-                          </div>
-                          <p className="text-sm text-muted-foreground truncate">{program.institution}</p>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0 space-y-2">
-                      <div className="flex flex-wrap gap-2">
-                        <Badge variant="outline" className="text-capitalize">{program.program_type}</Badge>
-                        {program.is_acgme_accredited && <Badge variant="outline" className="bg-blue-100 text-blue-800"><Shield className="h-3 w-3 mr-1" /> ACGME</Badge>}
-                        {program.ecfmg_pathway_eligible && <Badge variant="outline" className="bg-purple-100 text-purple-800"><BookOpen className="h-3 w-3 mr-1" /> ECFMG</Badge>}
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> {program.city}, {program.state}</span>
-                        {program.specialty?.[0] && <span className="flex items-center gap-1"><BookOpen className="h-4 w-4" /> {program.specialty[0]}</span>}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t">
-                        <span>{program.program_notes_count || 0} notes</span>
-                        <span>·</span>
-                        <span>{program.scam_reports_count || 0} reports</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          )}
+            <Card><CardContent className="py-12 text-center text-muted-foreground">No programs found. Try adjusting filters or add one.</CardContent></Card>
+          ) : renderProgramCards(filteredPrograms)}
         </TabsContent>
 
-        {/* Other tabs reuse same list with different filters */}
-        <TabsContent value="verified">
+        <TabsContent value="verified" className="mt-4">
           {!loading && filteredPrograms.length === 0 && <Card><CardContent className="py-12 text-center text-muted-foreground">No verified programs yet.</CardContent></Card>}
-          {!loading && filteredPrograms.length > 0 && (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredPrograms.map(program => (
-                <Link key={program.id} to={`/programs/${program.id}`} className="text-inherit no-underline">
-                  <Card className="border-l-4 border-green-500 hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg truncate">{program.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{program.institution}</p>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span><MapPin className="h-4 w-4 mr-1" /> {program.city}, {program.state}</span>
-                        <span>·</span>
-                        <Badge variant="outline" className="text-capitalize">{program.program_type}</Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          )}
+          {!loading && filteredPrograms.length > 0 && renderProgramCards(filteredPrograms)}
         </TabsContent>
 
-        <TabsContent value="unverified">
-          {!loading && filteredPrograms.length === 0 && <Card><CardContent className="py-12 text-center text-muted-foreground">All programs are verified!</CardContent></Card>}
-          {!loading && filteredPrograms.length > 0 && (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredPrograms.map(program => (
-                <Link key={program.id} to={`/programs/${program.id}`} className="text-inherit no-underline">
-                  <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-2">
-                        <CardTitle className="text-lg truncate">{program.name}</CardTitle>
-                        <Badge variant="outline" className="bg-amber-100 text-amber-800">Unverified</Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{program.institution}</p>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span><MapPin className="h-4 w-4 mr-1" /> {program.city}, {program.state}</span>
-                        <Badge variant="outline" className="text-capitalize">{program.program_type}</Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          )}
+        <TabsContent value="unverified" className="mt-4">
+          {!loading && filteredPrograms.length === 0 && <Card><CardContent className="py-12 text-center text-muted-foreground">All programs are verified.</CardContent></Card>}
+          {!loading && filteredPrograms.length > 0 && renderProgramCards(filteredPrograms)}
         </TabsContent>
 
-        <TabsContent value="scams">
+        <TabsContent value="scams" className="mt-4">
           {!loading && filteredPrograms.length === 0 && <Card><CardContent className="py-12 text-center text-muted-foreground">No scam reports yet.</CardContent></Card>}
-          {!loading && filteredPrograms.length > 0 && (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredPrograms.map(program => (
-                <Link key={program.id} to={`/programs/${program.id}`} className="text-inherit no-underline">
-                  <Card className="border-l-4 border-destructive hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-2">
-                        <CardTitle className="text-lg truncate">{program.name}</CardTitle>
-                        <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" /> {program.scam_reports_count} Reports</Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{program.institution}</p>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span><MapPin className="h-4 w-4 mr-1" /> {program.city}, {program.state}</span>
-                        <Badge variant="outline" className="text-capitalize">{program.program_type}</Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          )}
+          {!loading && filteredPrograms.length > 0 && renderProgramCards(filteredPrograms)}
         </TabsContent>
       </Tabs>
     </div>
