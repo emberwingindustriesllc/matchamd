@@ -19,7 +19,7 @@ Tell me about:
 • If you're licensed to practice medicine in your country
 • Your country of medical education
 
-Ask me anything about ECFMG pathways!`
+If a Gemini API key is configured, I can use it automatically for richer answers. Ask me anything about ECFMG pathways!`
     }
   ]);
   const [input, setInput] = useState('');
@@ -98,7 +98,7 @@ Provide a clear, concise answer. If determining eligibility, ask clarifying ques
               AI Pathway Assistant
               <Badge variant="secondary" className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
                 <Sparkles className="w-3 h-3 mr-1" />
-                Free
+                Gemini-ready
               </Badge>
             </CardTitle>
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">

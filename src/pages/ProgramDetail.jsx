@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   MapPin, Globe, Mail, Shield, AlertTriangle, 
-  BookOpen, Plus, Loader2, Verified,
+  BookOpen, Plus, Loader2, Verified, Sparkles,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/lib/AuthContext';
@@ -122,53 +123,65 @@ export default function ProgramDetail() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-2xl font-bold">{program.name}</h1>
-            {program.verified && (
-              <Badge variant="default" className="bg-green-100 text-green-800">
-                <Verified className="h-3 w-3 mr-1" /> Verified
+    <div className="mx-auto max-w-4xl space-y-6 pb-10">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-gradient-to-br from-slate-950 via-slate-900 to-[rgb(var(--color-primary))] p-6 text-white shadow-[0_24px_80px_-24px_rgba(15,23,42,0.7)]"
+      >
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm text-slate-100 backdrop-blur">
+              <Sparkles className="h-4 w-4" />
+              <span>Training opportunity snapshot</span>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl font-semibold sm:text-3xl">{program.name}</h1>
+              {program.verified && (
+                <Badge variant="default" className="bg-emerald-500/90 text-white">
+                  <Verified className="mr-1 h-3 w-3" /> Verified
+                </Badge>
+              )}
+              <Badge variant="outline" className="border-white/20 bg-white/10 text-white capitalize">
+                {PROGRAM_TYPE_LABELS[program.program_type] || program.program_type}
               </Badge>
-            )}
-            <Badge variant="outline" className="text-capitalize">
-              {PROGRAM_TYPE_LABELS[program.program_type] || program.program_type}
-            </Badge>
-            {program.is_acgme_accredited && (
-              <Badge variant="outline" className="bg-blue-100 text-blue-800">
-                <Shield className="h-3 w-3 mr-1" /> ACGME
-              </Badge>
-            )}
-            {program.ecfmg_pathway_eligible && (
-              <Badge variant="outline" className="bg-purple-100 text-purple-800">
-                <BookOpen className="h-3 w-3 mr-1" /> ECFMG Pathway
-              </Badge>
-            )}
+              {program.is_acgme_accredited && (
+                <Badge variant="outline" className="border-sky-200/30 bg-sky-500/20 text-sky-100">
+                  <Shield className="mr-1 h-3 w-3" /> ACGME
+                </Badge>
+              )}
+              {program.ecfmg_pathway_eligible && (
+                <Badge variant="outline" className="border-violet-200/30 bg-violet-500/20 text-violet-100">
+                  <BookOpen className="mr-1 h-3 w-3" /> ECFMG Pathway
+                </Badge>
+              )}
+            </div>
+            <p className="mt-3 text-sm text-slate-200/90 sm:text-base">{program.institution}</p>
+            <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-200/90">
+              <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> {program.city}, {program.state}</span>
+              {program.specialty?.length && (
+                <span className="flex items-center gap-1"><BookOpen className="h-4 w-4" /> {program.specialty.join(', ')}</span>
+              )}
+            </div>
           </div>
-          <p className="text-muted-foreground">{program.institution}</p>
-          <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> {program.city}, {program.state}</span>
-            {program.specialty?.length && (
-              <span className="flex items-center gap-1"><BookOpen className="h-4 w-4" /> {program.specialty.join(', ')}</span>
-            )}
+
+          <div className="flex flex-wrap gap-2">
+            <AddProgramModal open={showAddProgramModal} onOpenChange={setShowAddProgramModal} onSuccess={loadProgram} />
+            <Button className="rounded-full border border-white/20 bg-white/10 text-white hover:bg-white/20" onClick={() => setShowAddProgramModal(true)}>
+              <Plus className="mr-2 h-4 w-4" /> Add Program
+            </Button>
+            <ReportScamModal
+              programId={program.id}
+              programName={program.name}
+              open={showReportModal}
+              onOpenChange={setShowReportModal}
+            />
+            <Button className="rounded-full border border-rose-300/40 bg-rose-500/15 text-rose-50 hover:bg-rose-500/25" onClick={() => setShowReportModal(true)}>
+              <AlertTriangle className="mr-2 h-4 w-4" /> Report Scam
+            </Button>
           </div>
         </div>
-        <div className="flex gap-2">
-          <AddProgramModal open={showAddProgramModal} onOpenChange={setShowAddProgramModal} onSuccess={loadProgram} />
-          <Button variant="outline" onClick={() => setShowAddProgramModal(true)}><Plus className="h-4 w-4 mr-2" /> Add Program</Button>
-          <ReportScamModal
-            programId={program.id}
-            programName={program.name}
-            open={showReportModal}
-            onOpenChange={setShowReportModal}
-          />
-          <Button variant="destructive" onClick={() => setShowReportModal(true)}>
-            <AlertTriangle className="h-4 w-4 mr-2" /> Report Scam
-          </Button>
-        </div>
-      </div>
+      </motion.div>
 
       {/* Contact Info */}
       {(program.website || program.contact_email || program.description) && (
