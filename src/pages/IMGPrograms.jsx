@@ -61,6 +61,8 @@ import { buildCustomEntry, getPreferenceSummary, removeCustomEntry, upsertCustom
 export default function IMGPrograms() {
   const [activeTab, setActiveTab] = useState('search');
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchMode, setSearchMode] = useState('programs'); // 'programs' or 'vacancies'
+  const [viewingVacancy, setViewingVacancy] = useState(null); // vacant position details dialog
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [selectedVisa, setSelectedVisa] = useState('all');
@@ -376,14 +378,40 @@ export default function IMGPrograms() {
   });
 
   const programs = useMemo(() => {
-    const rawPrograms = dbPrograms.length > 0 ? dbPrograms : mockResidencyPrograms;
-    return rawPrograms.map(p => ({
-      program_type: 'residency',
+    // Merge database programs and mock programs.
+    // Ensure we don't duplicate by ID.
+    const merged = [...mockResidencyPrograms];
+    
+    dbPrograms.forEach(dbProg => {
+      const exists = merged.some(m => m.id === dbProg.id);
+      if (!exists) {
+        merged.push(dbProg);
+      }
+    });
+
+    return merged.map(p => ({
+      program_type: p.program_type || 'residency',
       ...p,
       program_name: p.program_name || p.name,
       institution: p.institution || p.description || 'Community Program',
     }));
   }, [dbPrograms]);
+
+  // Derive flat list of vacancies
+  const allVacancies = useMemo(() => {
+    const list = [];
+    programs.forEach(prog => {
+      if (prog.vacancies && Array.isArray(prog.vacancies)) {
+        prog.vacancies.forEach(vac => {
+          list.push({
+            ...vac,
+            program: prog
+          });
+        });
+      }
+    });
+    return list;
+  }, [programs]);
 
   // Fit Match Calculations
   const calculateFitScore = (prog) => {
@@ -404,6 +432,46 @@ export default function IMGPrograms() {
     return [...allSpecs];
   }, [programs]);
   const regions = ["Northeast", "Midwest", "South", "West"];
+
+  // Filter vacancies logic
+  const filteredVacancies = useMemo(() => {
+    return allVacancies.filter(vac => {
+      const prog = vac.program;
+      const pSpecs = Array.isArray(prog.specialty) ? prog.specialty : (prog.specialty ? [prog.specialty] : []);
+
+      // 1. Search Query
+      const matchesSearch = !searchQuery ? true : (() => {
+        const query = searchQuery.toLowerCase();
+        const pName = (prog.program_name || '').toLowerCase();
+        const pInst = (prog.institution || '').toLowerCase();
+        const pCity = (prog.city || '').toLowerCase();
+        const pState = (prog.state || '').toLowerCase();
+        const vacPgy = (vac.pgy_level || '').toLowerCase();
+        const vacNotes = (vac.notes || '').toLowerCase();
+        
+        return pName.includes(query) ||
+               pInst.includes(query) ||
+               pCity.includes(query) ||
+               pState.includes(query) ||
+               vacPgy.includes(query) ||
+               vacNotes.includes(query) ||
+               pSpecs.some(s => s.toLowerCase().includes(query));
+      })();
+
+      // 2. Specialty Filter
+      const matchesSpecialty = selectedSpecialty === 'all' || pSpecs.includes(selectedSpecialty);
+
+      // 3. Region Filter
+      const matchesRegion = selectedRegion === 'all' || prog.region === selectedRegion || !prog.region;
+
+      // 4. Visa Filter
+      const matchesVisa = selectedVisa === 'all' || 
+        (selectedVisa === 'j1' && prog.visa_j1) ||
+        (selectedVisa === 'h1b' && prog.visa_h1b);
+
+      return matchesSearch && matchesSpecialty && matchesRegion && matchesVisa;
+    });
+  }, [allVacancies, searchQuery, selectedSpecialty, selectedRegion, selectedVisa]);
 
   // Filter programs logic
   const filteredPrograms = useMemo(() => {
@@ -598,6 +666,13 @@ export default function IMGPrograms() {
     return 'text-rose-600 dark:text-rose-400';
   };
 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:from-slate-900 dark:to-slate-800 pb-24 text-slate-900 dark:text-slate-100">
       <Header title="Match Journey & Programs" showBack={false} />
@@ -629,19 +704,43 @@ export default function IMGPrograms() {
               </div>
             </Card>
 
-            {/* Filters */}
-            <div className="space-y-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            {/* Search Mode Tab-like Switch */}
+            <div className="flex border-b border-slate-200 dark:border-slate-800 mb-2">
+              <button 
+                type="button"
+                onClick={() => setSearchMode('programs')}
+                className={`py-3 px-6 font-semibold text-sm border-b-2 transition-all ${searchMode === 'programs' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}
+              >
+                All Programs
+              </button>
+              <button 
+                type="button"
+                onClick={() => setSearchMode('vacancies')}
+                className={`py-3 px-6 font-semibold text-sm border-b-2 transition-all flex items-center gap-2 ${searchMode === 'vacancies' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}
+              >
+                <span>Vacant Positions</span>
+                <span className="bg-rose-100 text-rose-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full dark:bg-rose-950/40 dark:text-rose-400">Off-Cycle</span>
+              </button>
+            </div>
+
+            {/* Filters Form */}
+            <form onSubmit={handleSearchSubmit} className="space-y-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
               <div className="flex gap-3">
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <Input
-                    placeholder="Search programs, hospitals, or cities..."
+                    type="search"
+                    placeholder={searchMode === 'programs' ? "Search programs, hospitals, or cities..." : "Search vacancies, specialties, or states..."}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 h-12 rounded-xl border-slate-200 dark:border-slate-800"
+                    className="pl-12 h-12 rounded-xl border-slate-200 dark:border-slate-800 text-base"
                   />
                 </div>
+                <Button type="submit" className="h-12 rounded-xl px-5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
+                  Search
+                </Button>
                 <Button 
+                  type="button"
                   variant="outline" 
                   onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                   className={`h-12 rounded-xl px-4 ${showAdvancedFilters ? 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-950/20 dark:border-indigo-800' : 'border-slate-200 dark:border-slate-800'}`}
@@ -675,23 +774,25 @@ export default function IMGPrograms() {
                       </Select>
                     </div>
 
-                    <div>
-                      <label className="text-xs text-slate-500 font-medium mb-1 block">Program Type</label>
-                      <Select value={selectedProgramType} onValueChange={setSelectedProgramType}>
-                        <SelectTrigger className="rounded-xl">
-                          <SelectValue placeholder="All Types" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Types</SelectItem>
-                          <SelectItem value="residency_categorical">Categorical Residency</SelectItem>
-                          <SelectItem value="residency_preliminary">Preliminary Residency (Prelim)</SelectItem>
-                          <SelectItem value="fellowship">Fellowship</SelectItem>
-                          <SelectItem value="observership">Observership</SelectItem>
-                          <SelectItem value="research">Research</SelectItem>
-                          <SelectItem value="elective">Elective</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {searchMode === 'programs' && (
+                      <div>
+                        <label className="text-xs text-slate-500 font-medium mb-1 block">Program Type</label>
+                        <Select value={selectedProgramType} onValueChange={setSelectedProgramType}>
+                          <SelectTrigger className="rounded-xl">
+                            <SelectValue placeholder="All Types" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Types</SelectItem>
+                            <SelectItem value="residency_categorical">Categorical Residency</SelectItem>
+                            <SelectItem value="residency_preliminary">Preliminary Residency (Prelim)</SelectItem>
+                            <SelectItem value="fellowship">Fellowship</SelectItem>
+                            <SelectItem value="observership">Observership</SelectItem>
+                            <SelectItem value="research">Research</SelectItem>
+                            <SelectItem value="elective">Elective</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
 
                     <div>
                       <label className="text-xs text-slate-500 font-medium mb-1 block">US Region</label>
@@ -722,35 +823,39 @@ export default function IMGPrograms() {
                       </Select>
                     </div>
 
-                    <div>
-                      <label className="text-xs text-slate-500 font-medium mb-1 block">Program Size</label>
-                      <Select value={selectedSize} onValueChange={setSelectedSize}>
-                        <SelectTrigger className="rounded-xl">
-                          <SelectValue placeholder="All Sizes" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Sizes</SelectItem>
-                          <SelectItem value="small">Small (&lt;50 residents)</SelectItem>
-                          <SelectItem value="medium">Medium (50-100 residents)</SelectItem>
-                          <SelectItem value="large">Large (&gt;100 residents)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {searchMode === 'programs' && (
+                      <>
+                        <div>
+                          <label className="text-xs text-slate-500 font-medium mb-1 block">Program Size</label>
+                          <Select value={selectedSize} onValueChange={setSelectedSize}>
+                            <SelectTrigger className="rounded-xl">
+                              <SelectValue placeholder="All Sizes" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Sizes</SelectItem>
+                              <SelectItem value="small">Small (&lt;50 residents)</SelectItem>
+                              <SelectItem value="medium">Medium (50-100 residents)</SelectItem>
+                              <SelectItem value="large">Large (&gt;100 residents)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
 
-                    <div>
-                      <label className="text-xs text-slate-500 font-medium mb-1 block">Interview Format</label>
-                      <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-                        <SelectTrigger className="rounded-xl">
-                          <SelectValue placeholder="All Formats" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Formats</SelectItem>
-                          <SelectItem value="Virtual">Virtual Only</SelectItem>
-                          <SelectItem value="In-Person">In-Person Only</SelectItem>
-                          <SelectItem value="Hybrid">Hybrid</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                        <div>
+                          <label className="text-xs text-slate-500 font-medium mb-1 block">Interview Format</label>
+                          <Select value={selectedFormat} onValueChange={setSelectedFormat}>
+                            <SelectTrigger className="rounded-xl">
+                              <SelectValue placeholder="All Formats" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Formats</SelectItem>
+                              <SelectItem value="Virtual">Virtual Only</SelectItem>
+                              <SelectItem value="In-Person">In-Person Only</SelectItem>
+                              <SelectItem value="Hybrid">Hybrid</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -769,121 +874,227 @@ export default function IMGPrograms() {
                   onCheckedChange={setFitFilter}
                 />
               </div>
-            </div>
+            </form>
 
             {/* Results Grid */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-slate-500">
-                  {filteredPrograms.length} programs found
-                </p>
-              </div>
+              {searchMode === 'programs' ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-slate-500">
+                      {filteredPrograms.length} programs found
+                    </p>
+                  </div>
 
-              {isProgramsLoading ? (
-                <div className="text-center py-12">
-                  <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
-                </div>
-              ) : filteredPrograms.length === 0 ? (
-                <Card className="p-12 text-center rounded-3xl border-slate-200">
-                  <GraduationCap className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
-                  <p className="text-slate-500">No programs match your search or fit criteria.</p>
-                </Card>
-              ) : (
-                filteredPrograms.map((prog) => {
-                  const fit = calculateFitScore(prog);
-                  return (
-                    <motion.div
-                      key={prog.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <Card 
-                        className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900"
-                        onClick={() => setSelectedProgram(prog)}
-                      >
-                        <div className="flex items-start justify-between gap-4 mb-3">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
-                              {prog.program_name}
-                            </h3>
-                            <p className="text-sm text-slate-500 flex items-center gap-1">
-                              <Building className="w-4 h-4 flex-shrink-0" />
-                              <span className="truncate">{prog.institution}</span>
-                            </p>
-                          </div>
-                          
-                          <div className="flex flex-col items-end gap-2">
-                            <button 
-                              onClick={(e) => toggleFavorite(e, prog.id)}
-                              className={`p-2 rounded-full transition-colors ${
-                                profile?.favorite_programs?.includes(prog.id) 
-                                  ? 'bg-rose-100 text-rose-500 dark:bg-rose-950/30' 
-                                  : 'bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-400 dark:bg-slate-800'
-                              }`}
-                            >
-                              <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
-                            </button>
+                  {isProgramsLoading ? (
+                    <div className="text-center py-12">
+                      <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                    </div>
+                  ) : filteredPrograms.length === 0 ? (
+                    <Card className="p-12 text-center rounded-3xl border-slate-200">
+                      <GraduationCap className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+                      <p className="text-slate-500">No programs match your search or fit criteria.</p>
+                    </Card>
+                  ) : (
+                    filteredPrograms.map((prog) => {
+                      const fit = calculateFitScore(prog);
+                      return (
+                        <motion.div
+                          key={prog.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                        >
+                          <Card 
+                            className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900"
+                            onClick={() => setSelectedProgram(prog)}
+                          >
+                            <div className="flex items-start justify-between gap-4 mb-3">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
+                                  {prog.program_name}
+                                </h3>
+                                <p className="text-sm text-slate-500 flex items-center gap-1">
+                                  <Building className="w-4 h-4 flex-shrink-0" />
+                                  <span className="truncate">{prog.institution}</span>
+                                </p>
+                              </div>
+                              
+                              <div className="flex flex-col items-end gap-2">
+                                <button 
+                                  type="button"
+                                  onClick={(e) => toggleFavorite(e, prog.id)}
+                                  className={`p-2 rounded-full transition-colors ${
+                                    profile?.favorite_programs?.includes(prog.id) 
+                                      ? 'bg-rose-100 text-rose-500 dark:bg-rose-950/30' 
+                                      : 'bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-400 dark:bg-slate-800'
+                                  }`}
+                                >
+                                  <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
+                                </button>
 
-                            {/* Fit Score Indicator */}
-                            <Badge 
-                              className={`font-bold px-2 py-0.5 text-xs ${
-                                fit.visaIssue 
-                                  ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400' 
-                                  : fit.score >= 90 
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400'
-                                    : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
-                              }`}
-                              variant="outline"
-                            >
-                              {fit.visaIssue ? "Visa Mismatch" : `${fit.score}% Match`}
-                            </Badge>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                            {prog.specialty}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                            <MapPin className="w-3 h-3 mr-1 text-slate-400" />
-                            {prog.city}, {prog.state}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                            Format: {prog.interview_format}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                            Size: {prog.program_size} residents
-                          </Badge>
-                          {prog.visa_j1 && (
-                            <Badge className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400" variant="outline">
-                              Sponsors J-1
-                            </Badge>
-                          )}
-                          {prog.visa_h1b && (
-                            <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-400" variant="outline">
-                              Sponsors H-1B
-                            </Badge>
-                          )}
-                        </div>
-
-                        {/* Quick Data Ribbon */}
-                        <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
-                          <div>
-                            <span className="font-semibold text-slate-700 dark:text-slate-350">IMG Intake:</span> {Math.round(prog.img_percentage)}%
-                          </div>
-                          {prog.step2_score_min && (
-                            <div>
-                              <span className="font-semibold text-slate-700 dark:text-slate-350">Min Step 2 CK:</span> {prog.step2_score_min}
+                                {/* Fit Score Indicator */}
+                                <Badge 
+                                  className={`font-bold px-2 py-0.5 text-xs ${
+                                    fit.visaIssue 
+                                      ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400' 
+                                      : fit.score >= 90 
+                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                        : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
+                                  }`}
+                                  variant="outline"
+                                >
+                                  {fit.visaIssue ? "Visa Mismatch" : `${fit.score}% Match`}
+                                </Badge>
+                              </div>
                             </div>
-                          )}
-                          <div>
-                            <span className="font-semibold text-slate-700 dark:text-slate-350">Deadline:</span> {prog.application_deadline}
-                          </div>
-                        </div>
-                      </Card>
-                    </motion.div>
-                  );
-                })
+
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                                {prog.specialty}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                                <MapPin className="w-3 h-3 mr-1 text-slate-400" />
+                                {prog.city}, {prog.state}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                                Format: {prog.interview_format}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                                Size: {prog.program_size} residents
+                              </Badge>
+                              {prog.visa_j1 && (
+                                <Badge className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400" variant="outline">
+                                  Sponsors J-1
+                                </Badge>
+                              )}
+                              {prog.visa_h1b && (
+                                <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-400" variant="outline">
+                                  Sponsors H-1B
+                                </Badge>
+                              )}
+                            </div>
+
+                            {/* Quick Data Ribbon */}
+                            <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
+                              <div>
+                                <span className="font-semibold text-slate-700 dark:text-slate-350">IMG Intake:</span> {Math.round(prog.img_percentage)}%
+                              </div>
+                              {prog.step2_score_min && (
+                                <div>
+                                  <span className="font-semibold text-slate-700 dark:text-slate-350">Min Step 2 CK:</span> {prog.step2_score_min}
+                                </div>
+                              )}
+                              <div>
+                                <span className="font-semibold text-slate-700 dark:text-slate-350">Deadline:</span> {prog.application_deadline}
+                              </div>
+                            </div>
+                          </Card>
+                        </motion.div>
+                      );
+                    })
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-slate-500">
+                      {filteredVacancies.length} off-cycle vacancies found
+                    </p>
+                  </div>
+
+                  {isProgramsLoading ? (
+                    <div className="text-center py-12">
+                      <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                    </div>
+                  ) : filteredVacancies.length === 0 ? (
+                    <Card className="p-12 text-center rounded-3xl border-slate-200">
+                      <AlertTriangle className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+                      <p className="text-slate-500">No off-cycle vacant positions match your search criteria.</p>
+                    </Card>
+                  ) : (
+                    filteredVacancies.map((vac) => {
+                      const prog = vac.program;
+                      return (
+                        <motion.div
+                          key={vac.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                        >
+                          <Card 
+                            className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border border-rose-100 dark:border-rose-950/40 hover:border-rose-300 dark:hover:border-rose-900 bg-white dark:bg-slate-900"
+                            onClick={() => setViewingVacancy(vac)}
+                          >
+                            <div className="flex items-start justify-between gap-4 mb-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                                  <Badge className="bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 font-bold" variant="outline">
+                                    {vac.pgy_level} Vacancy
+                                  </Badge>
+                                  <span className="text-xs text-rose-500 font-semibold uppercase tracking-wider flex items-center gap-1">
+                                    <Sparkles className="w-3 h-3" /> Off-Cycle
+                                  </span>
+                                </div>
+                                <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
+                                  {prog.program_name}
+                                </h3>
+                                <p className="text-sm text-slate-500 flex items-center gap-1">
+                                  <Building className="w-4 h-4 flex-shrink-0" />
+                                  <span className="truncate">{prog.institution}</span>
+                                </p>
+                              </div>
+                              
+                              <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                                <Badge className="bg-rose-600 hover:bg-rose-700 text-white font-bold px-2.5 py-1 text-xs rounded-full">
+                                  {vac.spots} Spot{vac.spots > 1 ? 's' : ''}
+                                </Badge>
+                                <p className="text-[10px] text-slate-400">Available: {vac.date_available}</p>
+                              </div>
+                            </div>
+
+                            <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl mb-4 border border-slate-100 dark:border-slate-800 leading-relaxed">
+                              {vac.notes}
+                            </p>
+
+                            <div className="flex flex-wrap gap-2 items-center justify-between">
+                              <div className="flex flex-wrap gap-2">
+                                <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                                  {prog.specialty}
+                                </Badge>
+                                <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                                  <MapPin className="w-3 h-3 mr-1 text-slate-400" />
+                                  {prog.city}, {prog.state}
+                                </Badge>
+                                {prog.visa_j1 && (
+                                  <Badge className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400" variant="outline">
+                                    Sponsors J-1
+                                  </Badge>
+                                )}
+                                {prog.visa_h1b && (
+                                  <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-400" variant="outline">
+                                    Sponsors H-1B
+                                  </Badge>
+                                )}
+                              </div>
+
+                              <Button 
+                                size="sm" 
+                                variant="secondary"
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setViewingVacancy(vac);
+                                }}
+                                className="bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 dark:bg-rose-950/20 dark:text-rose-400 rounded-xl font-semibold text-xs py-1 h-8"
+                              >
+                                How to Apply
+                              </Button>
+                            </div>
+                          </Card>
+                        </motion.div>
+                      );
+                    })
+                  )}
+                </>
               )}
             </div>
           </TabsContent>
@@ -1493,6 +1704,107 @@ export default function IMGPrograms() {
         profile={profile}
         calculateFitScore={calculateFitScore}
       />
+
+      {/* Vacancy Details Dialog */}
+      <Dialog open={!!viewingVacancy} onOpenChange={(open) => !open && setViewingVacancy(null)}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto rounded-3xl p-6 bg-white dark:bg-slate-900">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold flex items-center gap-2">
+              <span className="bg-rose-100 text-rose-600 text-xs font-bold px-2.5 py-1 rounded-full dark:bg-rose-950/40 dark:text-rose-400">
+                {viewingVacancy?.pgy_level} Vacancy
+              </span>
+              <span>Off-Cycle Position</span>
+            </DialogTitle>
+          </DialogHeader>
+
+          {viewingVacancy && (
+            <div className="space-y-4 mt-4 text-sm text-slate-700 dark:text-slate-300">
+              <div>
+                <h4 className="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Program</h4>
+                <p className="font-bold text-slate-900 dark:text-white text-base">
+                  {viewingVacancy.program.program_name}
+                </p>
+                <p className="text-slate-600 dark:text-slate-400">
+                  {viewingVacancy.program.institution}
+                </p>
+                <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  {viewingVacancy.program.city}, {viewingVacancy.program.state}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div>
+                  <h4 className="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-0.5">Specialty</h4>
+                  <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 dark:bg-indigo-950/40 dark:text-indigo-400">
+                    {Array.isArray(viewingVacancy.program.specialty) 
+                      ? viewingVacancy.program.specialty.join(', ') 
+                      : viewingVacancy.program.specialty}
+                  </Badge>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-0.5">Spots Available</h4>
+                  <p className="font-bold text-slate-900 dark:text-white">
+                    {viewingVacancy.spots} position{viewingVacancy.spots > 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div>
+                  <h4 className="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-0.5">Date Posted</h4>
+                  <p className="text-slate-800 dark:text-slate-200">{viewingVacancy.date_added}</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-0.5">Availability</h4>
+                  <p className="text-rose-600 dark:text-rose-400 font-semibold">{viewingVacancy.date_available}</p>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                <h4 className="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Position Details</h4>
+                <p className="bg-slate-50 dark:bg-slate-900 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 leading-relaxed">
+                  {viewingVacancy.notes}
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                <h4 className="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">How to Apply</h4>
+                <p className="mb-2">
+                  Please send your application materials (CV, USMLE transcripts, LORs) directly to the coordinator at:
+                </p>
+                <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-3 rounded-2xl border border-indigo-100 dark:border-indigo-950 text-center">
+                  <a 
+                    href={`mailto:${viewingVacancy.contact_email}`} 
+                    className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline break-all"
+                  >
+                    {viewingVacancy.contact_email}
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  onClick={() => {
+                    setViewingVacancy(null);
+                    setSelectedProgram(viewingVacancy.program);
+                  }}
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl"
+                >
+                  View Program Profile
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setViewingVacancy(null)}
+                  className="rounded-xl"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Log Interview Dialog */}
       <Dialog open={isLogInterviewOpen} onOpenChange={setIsLogInterviewOpen}>

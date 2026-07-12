@@ -60,9 +60,9 @@ const languages = [
 
 const specialties = [
   'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery', 'Emergency Medicine', 'Psychiatry', 'OB/GYN',
-  'Neurology', 'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology', 'Pulmonology', 'Rheumatology',
-  'Nephrology', 'Infectious Disease', 'Cardiology', 'Hematology-Oncology', 'Neonatal-Perinatal Medicine',
-  'Pediatric Surgery', 'Spine Surgery', 'Other'
+  'Neurology', 'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology', 'Radiation Oncology', 'Thoracic Surgery',
+  'Urology', 'ENT', 'Medical Genetics', 'Pulmonology', 'Rheumatology', 'Nephrology', 'Infectious Disease',
+  'Cardiology', 'Hematology-Oncology', 'Neonatal-Perinatal Medicine', 'Pediatric Surgery', 'Spine Surgery', 'Other'
 ];
 
 export default function Profile() {

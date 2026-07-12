@@ -54,7 +54,9 @@ export const goals = [
 export const residencySpecialties = [
   'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery',
   'Emergency Medicine', 'Psychiatry', 'OB/GYN', 'Neurology',
-  'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology', 'Other'
+  'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology',
+  'Radiation Oncology', 'Thoracic Surgery', 'Urology', 'ENT',
+  'Medical Genetics', 'Other'
 ];
 
 export const pediatricFellowships = [

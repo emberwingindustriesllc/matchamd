@@ -21,6 +21,7 @@ const SPECIALTIES = [
   'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery',
   'Emergency Medicine', 'Psychiatry', 'OB/GYN', 'Neurology',
   'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology',
+  'Radiation Oncology', 'Thoracic Surgery', 'Medical Genetics',
   'Orthopedic Surgery', 'Urology', 'Ophthalmology', 'ENT',
   'Cardiology', 'Gastroenterology', 'Nephrology', 'Pulmonology',
   'Endocrinology', 'Hematology/Oncology', 'Infectious Disease',
