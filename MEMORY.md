@@ -34,5 +34,6 @@ This file is the project's long-term memory. It is loaded at the start of every 
 - Note: CAPTCHA/TOS/privacy assets exist. Store listing metadata is present.
 
 ## Session Notes
+- 2026-07-11: Fixed checkModerator runtime bug in ProgramDetail.jsx, committed completed program moderation intelligence & verified build health (lint and tests pass).
 - 2026-07-01: Cleaned up lint errors, reset local main, pushed `play-store-prep`, built release AAB, and prepared Play Store checklist.
 - 2026-06-24: User asked to upload conversation and push GitHub updates. Mostly worked in Supabase and the community program intelligence pages.
