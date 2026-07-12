@@ -78,6 +78,10 @@ export const pediatricFellowships = [
   'Rheumatology',
   'Sports Medicine',
   'Transplant Hepatology',
+  'Pediatric Critical Care (PICU)',
+  'Neonatal-Perinatal Medicine (NICU)',
+  'Pediatric Surgery',
+  'Spine Surgery',
   'Other'
 ];
 
@@ -103,6 +107,10 @@ export const internalMedicineFellowships = [
   'Sleep Medicine',
   'Sports Medicine',
   'Transplant Hepatology',
+  'Adult Pulmonology',
+  'Adult Cardiology',
+  'Hematology-Oncology',
+  'Bone Marrow Transplant',
   'Other'
 ];
 

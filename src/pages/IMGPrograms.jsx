@@ -55,6 +55,8 @@ import {
 } from 'lucide-react';
 import { mockResidencyPrograms } from '@/data/mockResidencyPrograms';
 import ProgramDetailsModal from '@/components/community/ProgramDetailsModal';
+import { getProgramFitDetails } from '@/lib/programMatch';
+import { buildCustomEntry, getPreferenceSummary, removeCustomEntry, upsertCustomEntry } from '@/lib/personalJourney';
 
 export default function IMGPrograms() {
   const [activeTab, setActiveTab] = useState('search');
@@ -109,6 +111,16 @@ export default function IMGPrograms() {
   const [interviews, setInterviews] = useState([]);
   const [rankOrderList, setRankOrderList] = useState([]);
   const [advisorFeedback, setAdvisorFeedback] = useState([]);
+  const [customEntries, setCustomEntries] = useState([]);
+  const [customEntryForm, setCustomEntryForm] = useState({
+    entryType: 'program',
+    name: '',
+    category: '',
+    location: '',
+    notes: '',
+    rating: 3,
+  });
+  const [editingEntryId, setEditingEntryId] = useState(null);
 
   const isLoadedRef = useRef(false);
 
@@ -119,6 +131,7 @@ export default function IMGPrograms() {
       const storedInterviews = localStorage.getItem(`match_interviews_${user.id}`);
       const storedRankList = localStorage.getItem(`match_ranklist_${user.id}`);
       const storedFeedback = localStorage.getItem(`match_advisor_feedback_${user.id}`);
+      const storedCustomEntries = localStorage.getItem(`match_custom_entries_${user.id}`);
 
       if (profile && !isLoadedRef.current) {
         isLoadedRef.current = true;
@@ -127,10 +140,12 @@ export default function IMGPrograms() {
         const dbInterviews = profile.interviews || (storedInterviews ? JSON.parse(storedInterviews) : []);
         const dbRankList = profile.rank_order_list || (storedRankList ? JSON.parse(storedRankList) : []);
         const dbFeedback = profile.advisor_feedback || (storedFeedback ? JSON.parse(storedFeedback) : []);
+        const dbCustomEntries = profile.custom_entries || (storedCustomEntries ? JSON.parse(storedCustomEntries) : []);
 
         setProgramChecklists(dbChecklists);
         setInterviews(dbInterviews);
         setAdvisorFeedback(dbFeedback);
+        setCustomEntries(dbCustomEntries);
 
         // One-time sync of rank list to favorites on mount/load
         const favs = profile.favorite_programs || [];
@@ -149,6 +164,7 @@ export default function IMGPrograms() {
         if (storedInterviews) setInterviews(JSON.parse(storedInterviews));
         if (storedRankList) setRankOrderList(JSON.parse(storedRankList));
         if (storedFeedback) setAdvisorFeedback(JSON.parse(storedFeedback));
+        if (storedCustomEntries) setCustomEntries(JSON.parse(storedCustomEntries));
       }
     }
   }, [user?.id, profile]);
@@ -230,6 +246,81 @@ export default function IMGPrograms() {
     }
   };
 
+  const saveCustomEntries = async (newEntries) => {
+    setCustomEntries(newEntries);
+    localStorage.setItem(`match_custom_entries_${user?.id || 'guest'}`, JSON.stringify(newEntries));
+    if (!profile?.id) return;
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ custom_entries: newEntries })
+        .eq('id', profile.id);
+      if (error) {
+        console.warn('Failed to save custom entries to Supabase, fell back to localStorage:', error);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['userProfile', user?.id] });
+      }
+    } catch (err) {
+      console.warn('Failed to save custom entries to Supabase, fell back to localStorage:', err);
+    }
+  };
+
+  const handleCustomEntrySubmit = (e) => {
+    e.preventDefault();
+    const trimmedName = customEntryForm.name.trim();
+    if (!trimmedName) return;
+
+    const entry = buildCustomEntry({
+      ...customEntryForm,
+      id: editingEntryId || undefined,
+      name: trimmedName,
+      category: customEntryForm.category.trim(),
+      location: customEntryForm.location.trim(),
+      notes: customEntryForm.notes.trim(),
+    });
+
+    const nextEntries = upsertCustomEntry(customEntries, entry);
+    saveCustomEntries(nextEntries);
+    setCustomEntryForm({
+      entryType: 'program',
+      name: '',
+      category: '',
+      location: '',
+      notes: '',
+      rating: 3,
+    });
+    setEditingEntryId(null);
+  };
+
+  const handleEditCustomEntry = (entry) => {
+    setEditingEntryId(entry.id);
+    setCustomEntryForm({
+      entryType: entry.entryType || 'program',
+      name: entry.name || '',
+      category: entry.category || '',
+      location: entry.location || '',
+      notes: entry.notes || '',
+      rating: entry.rating || 3,
+    });
+  };
+
+  const handleDeleteCustomEntry = (entryId) => {
+    saveCustomEntries(removeCustomEntry(customEntries, entryId));
+    if (editingEntryId === entryId) {
+      setEditingEntryId(null);
+      setCustomEntryForm({
+        entryType: 'program',
+        name: '',
+        category: '',
+        location: '',
+        notes: '',
+        rating: 3,
+      });
+    }
+  };
+
+  const personalSummary = useMemo(() => getPreferenceSummary(profile || {}), [profile]);
+
   // Toggle favorite programs
   const updateFavoritesMutation = useMutation({
     mutationFn: async (newFavorites) => {
@@ -297,73 +388,7 @@ export default function IMGPrograms() {
   // Fit Match Calculations
   const calculateFitScore = (prog) => {
     if (!profile) return { score: 50, reasons: ["No profile configured"], meetsAll: false, visaIssue: false };
-    
-    let score = 100;
-    const reasons = [];
-    let visaIssue = false;
-    let meetsAll = true;
-
-    // 1. Visa Check
-    const userNeedsVisa = profile.visa_status === 'none' || profile.visa_status === 'J1' || profile.visa_status === 'H1B';
-    if (userNeedsVisa) {
-      const programSponsorsJ1 = prog.visa_j1;
-      const programSponsorsH1B = prog.visa_h1b;
-      if (!programSponsorsJ1 && !programSponsorsH1B) {
-        score -= 40;
-        reasons.push("Does not sponsor J-1 or H-1B visas");
-        visaIssue = true;
-        meetsAll = false;
-      }
-    }
-
-    // 2. Score Check (Step 2 CK)
-    const userScore = profile.usmle_step2_score ? Number(profile.usmle_step2_score) : null;
-    if (userScore) {
-      if (prog.step2_score_min && userScore < prog.step2_score_min) {
-        score -= 25;
-        reasons.push(`Your Step 2 CK (${userScore}) is below program minimum (${prog.step2_score_min})`);
-        meetsAll = false;
-      } else if (prog.step2_score_avg && userScore < prog.step2_score_avg) {
-        score -= 10;
-        reasons.push(`Your Step 2 CK (${userScore}) is below program average (${prog.step2_score_avg})`);
-      } else {
-        reasons.push("Step 2 CK score matches/exceeds average");
-      }
-    } else {
-      score -= 10;
-      reasons.push("Step 2 CK score not provided in profile");
-      meetsAll = false;
-    }
-
-    // 3. USCE Check
-    const userHasUSCE = profile.us_clinical_experience;
-    if (prog.min_usce_months && prog.min_usce_months > 0) {
-      if (!userHasUSCE) {
-        score -= 20;
-        reasons.push(`Requires US Clinical Experience (${prog.min_usce_months} months)`);
-        meetsAll = false;
-      } else {
-        reasons.push("Meets US Clinical Experience preference");
-      }
-    }
-
-    // 4. Graduation Year Check
-    const currentYear = 2026;
-    const userGradYear = profile.graduation_year ? Number(profile.graduation_year) : null;
-    if (userGradYear && prog.grad_year_cutoff) {
-      const yearsSinceGrad = currentYear - userGradYear;
-      if (yearsSinceGrad > prog.grad_year_cutoff) {
-        score -= 15;
-        reasons.push(`Graduation cutoff is ${prog.grad_year_cutoff} years (You: ${yearsSinceGrad} years)`);
-        meetsAll = false;
-      } else {
-        reasons.push("Within graduation year cutoff");
-      }
-    }
-
-    // Minimum floor
-    score = Math.max(10, score);
-    return { score, reasons, meetsAll, visaIssue };
+    return getProgramFitDetails(profile, prog);
   };
 
   // Specialties & States lists
@@ -871,13 +896,120 @@ export default function IMGPrograms() {
                   <ClipboardList className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold mb-2">Program Application Checklists</h2>
+                  <h2 className="text-xl font-bold mb-2">My Journey & Saved Opportunities</h2>
                   <p className="text-slate-600 dark:text-slate-400 text-sm">
-                    Customize and track your application milestones for each saved program. Toggle completion tasks to ensure you submit correctly.
+                    Keep your personal plan organized with saved programs, schools, ratings, notes, and application milestones that match your current profile.
                   </p>
                 </div>
               </div>
             </Card>
+
+            <Card className="p-5 rounded-3xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <div>
+                  <h3 className="font-bold text-base">Current planning focus</h3>
+                  <p className="text-sm text-slate-500">{personalSummary.summary}</p>
+                </div>
+                <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400">
+                  {personalSummary.isInUS ? 'U.S.-based' : personalSummary.isOverseas ? 'Overseas' : 'Location pending'}
+                </Badge>
+              </div>
+
+              <form onSubmit={handleCustomEntrySubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-semibold">Entry type</Label>
+                    <Select value={customEntryForm.entryType} onValueChange={(value) => setCustomEntryForm(prev => ({ ...prev, entryType: value }))}>
+                      <SelectTrigger className="rounded-xl mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="program">Program</SelectItem>
+                        <SelectItem value="school">School</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold">Name</Label>
+                    <Input value={customEntryForm.name} onChange={(e) => setCustomEntryForm(prev => ({ ...prev, name: e.target.value }))} placeholder="e.g. Mayo Clinic" className="rounded-xl mt-1" />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold">Category</Label>
+                    <Input value={customEntryForm.category} onChange={(e) => setCustomEntryForm(prev => ({ ...prev, category: e.target.value }))} placeholder="Cardiology / Research / Hospital" className="rounded-xl mt-1" />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold">Location</Label>
+                    <Input value={customEntryForm.location} onChange={(e) => setCustomEntryForm(prev => ({ ...prev, location: e.target.value }))} placeholder="Boston, MA" className="rounded-xl mt-1" />
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold">Your notes</Label>
+                  <Textarea value={customEntryForm.notes} onChange={(e) => setCustomEntryForm(prev => ({ ...prev, notes: e.target.value }))} placeholder="Why this matters, mentorship, visa fit, or logistics..." className="rounded-2xl mt-1 min-h-[90px]" />
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs font-semibold">My rating</Label>
+                    <Select value={String(customEntryForm.rating)} onValueChange={(value) => setCustomEntryForm(prev => ({ ...prev, rating: Number(value) }))}>
+                      <SelectTrigger className="rounded-xl w-28">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[1,2,3,4,5].map(value => <SelectItem key={value} value={String(value)}>{value}★</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button type="button" variant="ghost" className="rounded-xl" onClick={() => {
+                      setEditingEntryId(null);
+                      setCustomEntryForm({ entryType: 'program', name: '', category: '', location: '', notes: '', rating: 3 });
+                    }}>
+                      Clear
+                    </Button>
+                    <Button type="submit" className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white">
+                      {editingEntryId ? 'Update entry' : 'Save to my journey'}
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            </Card>
+
+            {customEntries.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Saved opportunities</h3>
+                  <span className="text-xs text-slate-500">{customEntries.length} entries</span>
+                </div>
+                {customEntries.map((entry) => (
+                  <Card key={entry.id} className="p-4 rounded-3xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                            {entry.entryType}
+                          </Badge>
+                          <span className="text-sm font-semibold text-slate-900 dark:text-white">{entry.name}</span>
+                        </div>
+                        <p className="text-sm text-slate-500">{entry.category || 'General interest'}{entry.location ? ` • ${entry.location}` : ''}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => handleEditCustomEntry(entry)} className="text-sm text-indigo-600">Edit</button>
+                        <button onClick={() => handleDeleteCustomEntry(entry.id)} className="text-sm text-rose-500">Delete</button>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1 text-amber-500">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <Star key={index} className={`w-4 h-4 ${index < entry.rating ? 'fill-current' : 'text-slate-300'}`} />
+                        ))}
+                      </div>
+                      <span className="text-xs text-slate-400">{new Date(entry.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    {entry.notes && <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">{entry.notes}</p>}
+                  </Card>
+                ))}
+              </div>
+            )}
 
             {savedProgramsList.length === 0 ? (
               <Card className="p-12 text-center rounded-3xl border-slate-200">

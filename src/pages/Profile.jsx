@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { validateProfile } from '@/lib/validation/profileSchema';
-import { countries } from '@/data/onboarding';
+import { countries, pediatricFellowships, internalMedicineFellowships, combinedMedPedsFellowships } from '@/data/onboarding';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import ProgressRing from '@/components/common/ProgressRing';
@@ -59,9 +59,10 @@ const languages = [
 ];
 
 const specialties = [
-  'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery', 
-  'Emergency Medicine', 'Psychiatry', 'OB/GYN', 'Neurology',
-  'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology', 'Other'
+  'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery', 'Emergency Medicine', 'Psychiatry', 'OB/GYN',
+  'Neurology', 'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology', 'Pulmonology', 'Rheumatology',
+  'Nephrology', 'Infectious Disease', 'Cardiology', 'Hematology-Oncology', 'Neonatal-Perinatal Medicine',
+  'Pediatric Surgery', 'Spine Surgery', 'Other'
 ];
 
 export default function Profile() {
@@ -545,12 +546,26 @@ export default function Profile() {
               {editData.primary_goal === 'fellowship' && (
                 <div>
                   <Label>Fellowship Type</Label>
-                  <Input
+                  <Select
                     value={editData.fellowship_type || ''}
-                    onChange={(e) => setEditData({ ...editData, fellowship_type: e.target.value })}
-                    placeholder="e.g. Cardiology, Gastroenterology"
-                    className="rounded-xl mt-1"
-                  />
+                    onValueChange={(v) => setEditData({ ...editData, fellowship_type: v })}
+                  >
+                    <SelectTrigger className="rounded-xl mt-1">
+                      <SelectValue placeholder="Select fellowship subspecialty" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[
+                        ...new Set([
+                          ...pediatricFellowships,
+                          ...internalMedicineFellowships,
+                          ...combinedMedPedsFellowships,
+                        ])
+                      ].sort().map(option => (
+                        <SelectItem key={option} value={option}>{option}</SelectItem>
+                      ))}
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               )}
               
