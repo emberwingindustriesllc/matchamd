@@ -15,12 +15,14 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/lib/AuthContext';
-import { fetchProgramById, createProgramNote } from '@/api/programs';
+import { fetchProgramById, createProgramNote, updateScamReportStatus, fetchScamReports, fetchProgramNotes } from '@/api/programs';
 import ReportScamModal from '@/components/community/ReportScamModal';
 import AddProgramModal from '@/components/community/AddProgramModal';
 import ProgramNoteCard from '@/components/community/ProgramNoteCard';
 import ScamReportCard from '@/components/community/ScamReportCard';
 import { toast } from 'sonner';
+import { canManageModeration } from '@/lib/moderation';
+import { supabase } from '@/api/supabaseClient';
 
 const PROGRAM_TYPE_LABELS = {
   residency: 'Residency',
@@ -56,10 +58,8 @@ export default function ProgramDetail() {
       setLoading(true);
       const [programData, notesData, reportsData] = await Promise.all([
         fetchProgramById(id),
-        // fetchProgramNotes(id), // Would need to add this to api
-        Promise.resolve([]), // placeholder
-        // fetchScamReports(id), // Would need to add this to api
-        Promise.resolve([]), // placeholder
+        fetchProgramNotes(id),
+        fetchScamReports(id),
       ]);
       setProgram(programData);
       setNotes(notesData);
@@ -75,9 +75,18 @@ export default function ProgramDetail() {
 
   const checkModerator = async () => {
     if (!user) return;
-    // In real app, check user_reputation table
-    // For now, mock based on email or role
-    setIsModerator(user.email?.includes('admin') || user.user_metadata?.role === 'moderator');
+
+    try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      setIsModerator(canManageModeration(profile?.role));
+    } catch (error) {
+      console.error('Failed to determine moderator status', error);
+      setIsModerator(false);
+    }
   };
 
   const handleSubmitNote = async (e) => {
@@ -99,9 +108,13 @@ export default function ProgramDetail() {
   };
 
   const handleReportStatusChange = async (reportId, status, moderatorNotes) => {
-    // Would call updateScamReportStatus from api
-    toast.success(`Report marked as ${status}`);
-    loadProgram();
+    try {
+      await updateScamReportStatus(reportId, status, moderatorNotes);
+      toast.success(`Report marked as ${status}`);
+      loadProgram();
+    } catch (error) {
+      toast.error(error.message || 'Unable to update report');
+    }
   };
 
   if (loading) {

@@ -22,6 +22,7 @@ import {
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { canManageModeration, canAssignModeratorRole } from '@/lib/moderation';
 
 export default function AdminModeration() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export default function AdminModeration() {
 
   const { user } = useAuth();
   
-  const { data: profiles } = useQuery({
+  const { data: profiles = [] } = useQuery({
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -43,6 +44,8 @@ export default function AdminModeration() {
   });
 
   const profile = profiles?.[0];
+  const canModerate = canManageModeration(profile?.role);
+  const canPromote = canAssignModeratorRole(profile?.role);
 
   const { data: posts = [], isLoading: postsLoading } = useQuery({
     queryKey: ['allPosts'],
@@ -99,14 +102,14 @@ export default function AdminModeration() {
     }
   });
 
-  if (profile && profile.role !== 'admin') {
+  if (profile && !canModerate) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
         <Card className="p-8 text-center max-w-md">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Admin Access Required</h2>
           <p className="text-slate-600 dark:text-slate-400 mb-4">
-            This page is only accessible to administrators.
+            This page is only accessible to moderators or administrators.
           </p>
           <Button onClick={() => navigate(createPageUrl('Dashboard'))}>
             Back to Dashboard

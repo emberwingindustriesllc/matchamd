@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { canManageModeration } from '@/lib/moderation';
 
 /**
  * Programs API - Community-driven program intelligence
@@ -77,6 +78,20 @@ export async function createProgram(program) {
 }
 
 export async function updateProgram(id, updates) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Must be logged in');
+
+  const { data: profile, error: profileError } = await supabase
+    .from('user_profiles')
+    .select('role')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (profileError) throw profileError;
+  if (!canManageModeration(profile?.role)) {
+    throw new Error('Insufficient permissions');
+  }
+
   const { data, error } = await supabase
     .from('programs')
     .update(updates)
@@ -179,14 +194,14 @@ export async function updateScamReportStatus(id, status, moderatorNotes = '') {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Must be logged in');
 
-  // Check if user is moderator (simplified - add your logic)
-  const { data: profile } = await supabase
-    .from('user_reputation')
-    .select('verified_contributor')
+  const { data: profile, error: profileError } = await supabase
+    .from('user_profiles')
+    .select('role')
     .eq('user_id', user.id)
-    .single();
+    .maybeSingle();
 
-  if (!profile?.verified_contributor) {
+  if (profileError) throw profileError;
+  if (!canManageModeration(profile?.role)) {
     throw new Error('Insufficient permissions');
   }
 
@@ -208,7 +223,7 @@ export async function fetchUserReputation(userId) {
     .from('user_reputation')
     .select('*')
     .eq('user_id', userId)
-    .single();
+    .maybeSingle();
 
   if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
   return data || { score: 0, verified_contributor: false };
