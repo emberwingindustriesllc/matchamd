@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCustomEntry, getPreferenceSummary, removeCustomEntry, upsertCustomEntry } from './personalJourney';
+import { buildCustomEntry, getJourneyHighlights, getNextActionChecklist, getPreferenceSummary, removeCustomEntry, upsertCustomEntry } from './personalJourney';
 
 describe('personalJourney helpers', () => {
   it('summarizes a fellowship-focused profile for the journey view', () => {
@@ -48,5 +48,38 @@ describe('personalJourney helpers', () => {
     const entry = buildCustomEntry({ name: 'UCLA', entryType: 'school' });
     const remaining = removeCustomEntry([entry], entry.id);
     expect(remaining).toHaveLength(0);
+  });
+
+  it('builds dashboard-friendly journey highlights from profile and saved items', () => {
+    const highlights = getJourneyHighlights(
+      {
+        primary_goal: 'fellowship',
+        fellowship_type: 'Cardiology',
+        country: 'United States',
+      },
+      [{ entryType: 'program', name: 'Mayo Clinic' }],
+      4,
+    );
+
+    expect(highlights.summary).toContain('Fellowship');
+    expect(highlights.savedItems).toBe(1);
+    expect(highlights.savedPrograms).toBe(4);
+    expect(highlights.nextAction).toContain('programs');
+  });
+
+  it('creates a short checklist of the next priority actions', () => {
+    const actions = getNextActionChecklist(
+      {
+        primary_goal: 'fellowship',
+        fellowship_type: 'Cardiology',
+        country: 'United States',
+      },
+      [{ entryType: 'program', name: 'Mayo Clinic' }],
+      2,
+    );
+
+    expect(actions).toHaveLength(3);
+    expect(actions[0].title).toContain('Program');
+    expect(actions[1].title).toContain('Notes');
   });
 });

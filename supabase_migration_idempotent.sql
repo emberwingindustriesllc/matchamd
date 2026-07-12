@@ -205,5 +205,8 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'user_profiles' AND column_name = 'conrad_30_waiver_planned') THEN
       ALTER TABLE user_profiles ADD COLUMN conrad_30_waiver_planned boolean DEFAULT false;
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'user_profiles' AND column_name = 'custom_entries') THEN
+      ALTER TABLE user_profiles ADD COLUMN custom_entries jsonb DEFAULT '[]'::jsonb;
+    END IF;
   END IF;
 END $$;

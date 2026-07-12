@@ -36,6 +36,7 @@ import {
   Globe
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { getJourneyHighlights, getNextActionChecklist } from '@/lib/personalJourney';
 
 const getPathwaySteps = (primaryGoal) => {
   const pathwayStepsMap = {
@@ -160,6 +161,8 @@ export default function Dashboard() {
   const completedSteps = progressList.filter(p => p.status === 'completed').length;
   const totalSteps = currentSteps.length;
   const overallProgress = Math.round((completedSteps / totalSteps) * 100);
+  const journeyHighlights = getJourneyHighlights(profile || {}, profile?.custom_entries || [], profile?.favorite_programs?.length || 0);
+  const nextActions = getNextActionChecklist(profile || {}, profile?.custom_entries || [], profile?.favorite_programs?.length || 0);
 
   const getStepStatus = (stepId) => {
     const progress = progressList.find(p => p.module_id === stepId);
@@ -213,6 +216,58 @@ export default function Dashboard() {
                 <Flame className="w-4 h-4" />
                 <span className="text-sm font-medium">3 day streak</span>
               </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_20px_60px_-30px_rgba(15,23,42,0.35)] dark:border-slate-700 dark:bg-slate-900"
+        >
+          <div className="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-500 p-5 text-white">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/70">Your plan today</p>
+                <h3 className="mt-2 text-xl font-semibold">{journeyHighlights.headline}</h3>
+                <p className="mt-2 text-sm text-white/85">{journeyHighlights.summary}</p>
+              </div>
+              <Badge variant="secondary" className="border-white/20 bg-white/15 text-white">
+                {journeyHighlights.isInUS ? 'U.S. based' : journeyHighlights.isOverseas ? 'Overseas' : 'Location pending'}
+              </Badge>
+            </div>
+          </div>
+
+          <div className="grid gap-3 p-4 sm:grid-cols-3">
+            <div className="rounded-2xl bg-slate-50 p-3 dark:bg-slate-800/80">
+              <p className="text-xs text-slate-500">Saved items</p>
+              <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">{journeyHighlights.savedItems}</p>
+            </div>
+            <div className="rounded-2xl bg-slate-50 p-3 dark:bg-slate-800/80">
+              <p className="text-xs text-slate-500">Saved programs</p>
+              <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">{journeyHighlights.savedPrograms}</p>
+            </div>
+            <div className="rounded-2xl bg-slate-50 p-3 dark:bg-slate-800/80">
+              <p className="text-xs text-slate-500">Priority</p>
+              <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{journeyHighlights.nextAction}</p>
+            </div>
+          </div>
+
+          <div className="border-t border-slate-200 px-4 py-4 dark:border-slate-800">
+            <div className="mb-3 flex items-center justify-between">
+              <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Next actions</h4>
+              <span className="text-xs text-slate-500">Keep momentum</span>
+            </div>
+            <div className="space-y-2">
+              {nextActions.map((action) => (
+                <div key={action.id} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/70">
+                  <div className={`mt-0.5 h-8 w-8 rounded-xl bg-gradient-to-br ${action.accent}`} />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{action.title}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{action.description}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </motion.div>
@@ -298,7 +353,7 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08 }}
           onClick={() => navigate(createPageUrl('IMGPrograms'))}
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-6 text-white shadow-lg cursor-pointer hover:shadow-xl transition-all"
+          className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-6 text-white shadow-[0_24px_60px_-24px_rgba(79,70,229,0.7)] cursor-pointer hover:-translate-y-0.5 transition-all"
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
           <div className="relative">
