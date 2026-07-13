@@ -1390,6 +1390,55 @@ export const mockResidencyPrograms = [
         notes: "We have an unexpected PGY-2 residency slot available in Mayo Clinic's Neurology Residency. Requires completion of a certified PGY-1 transitional or preliminary year."
       }
     ]
+  },
+  {
+    id: "upmc_peds_onc",
+    program_name: "Pediatric Hematology-Oncology Fellowship Program",
+    institution: "UPMC Children's Hospital of Pittsburgh",
+    specialty: "Pediatrics",
+    subspecialty: "Pediatric Hematology-Oncology",
+    city: "Pittsburgh",
+    state: "PA",
+    region: "Northeast",
+    visa_j1: true,
+    visa_h1b: true,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 9,
+    annual_intake: 3,
+    interview_format: "Virtual",
+    website: "https://www.chp.edu",
+    nrmp_code: "1652320F0",
+    community_program: false,
+    img_friendly_score: 8.8,
+    img_residents: 4,
+    img_percentage: 44.4,
+    graduation_rate: "100%",
+    step1_score_min: 220,
+    step2_score_min: 230,
+    step2_score_avg: 245,
+    step3_required: true,
+    min_usce_months: 1,
+    grad_year_cutoff: 5,
+    lor_required: 3,
+    application_deadline: "2026-11-01",
+    stipends_benefits: {
+      annual_stipend: 75200,
+      health_insurance: true,
+      cme_allowance: 2000,
+      educational_allowance: 500,
+      housing_stipend: 0,
+    },
+    historical_open_spots: [
+      { year: 2025, spots: 0 }
+    ],
+    estimated_cost: {
+      application_fee: 26,
+      travel_cost: 0,
+      other_expenses: 50
+    },
+    program_type: "fellowship",
+    vacancies: []
   }
 ];
 

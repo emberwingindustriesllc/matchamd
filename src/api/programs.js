@@ -30,7 +30,10 @@ export async function fetchPrograms(filters = {}) {
     query = query.eq('verified', filters.verified);
   }
   if (filters.search) {
-    query = query.or(`name.ilike.%${filters.search}%,institution.ilike.%${filters.search}%,city.ilike.%${filters.search}%,state.ilike.%${filters.search}%`);
+    const keywords = filters.search.trim().split(/\s+/).filter(Boolean);
+    keywords.forEach(kw => {
+      query = query.or(`name.ilike.%${kw}%,institution.ilike.%${kw}%,city.ilike.%${kw}%,state.ilike.%${kw}%`);
+    });
   }
 
   const { data, error } = await query.limit(filters.limit || 50);

@@ -32,10 +32,12 @@ import {
   FileText,
   Zap,
   Share2,
-  HelpCircle
+  HelpCircle,
+  Copy
 } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import confetti from 'canvas-confetti';
+import { toast } from 'sonner';
 
 const guideContent = {
   ecfmg_pathways: {
@@ -205,6 +207,78 @@ const guideContent = {
       { title: 'NRMP Official', url: 'https://www.nrmp.org', type: 'website' },
       { title: 'Match Timeline', url: 'https://www.nrmp.org/match-process', type: 'document' },
       { title: 'Charting Outcomes', url: 'https://www.nrmp.org/main-residency-match-data', type: 'document' }
+    ]
+  },
+  interviews: {
+    title: 'Residency Interview Success',
+    overview: 'The exact formulas and answer frameworks to master common clinical match panel questions like "Tell me about yourself" and "Why our program?".',
+    checklist: [
+      { id: 1, text: 'Master the 3-part formula for "Tell me about yourself" (Past, Present, Future)' },
+      { id: 2, text: 'Research specific program features (advocacy, clinics, research) for "Why Us?"' },
+      { id: 3, text: 'Prepare questions to ask the interviewers' },
+      { id: 4, text: 'Do at least 2 full mock interviews with feedback' },
+      { id: 5, text: 'Draft post-interview thank you notes' }
+    ],
+    tips: [
+      'Keep your "Tell me about yourself" response to exactly 90-120 seconds. Focus on clinical journey and goals, not personal trivia.',
+      'For "Why Us?", never give a generic answer. Mention specific department projects or patient demographic focus areas.',
+      'Always have 3-4 thoughtful questions ready for the program director and coordinators.'
+    ],
+    resources: [
+      { title: 'NRMP Interview Guidelines', url: 'https://www.nrmp.org', type: 'website' }
+    ]
+  },
+  observerships: {
+    title: 'Clinical Observership Blueprint',
+    overview: 'High-yield strategies and pitch templates for international medical graduates (IMGs) to contact faculty and secure observerships.',
+    checklist: [
+      { id: 1, text: 'Identify 10-15 target attending physicians in your specialty' },
+      { id: 2, text: 'Draft a customized warm cold-email pitch' },
+      { id: 3, text: 'Attach clinical CV and score transcripts' },
+      { id: 4, text: 'Send a polite follow-up after 10-14 days if no response' }
+    ],
+    tips: [
+      'Attending physicians receive hundreds of generic emails. Referencing their papers or department highlights increases response rates.',
+      'Explicitly state that you are self-funded and hold a valid visa so they know there is no visa sponsorship cost.',
+      'Use a copyable pitch template in your drafts.'
+    ],
+    resources: [
+      { title: 'AAMC Observership Listings', url: 'https://www.aamc.org', type: 'website' }
+    ],
+    template: `Subject: Inquiry Regarding Clinical Observership Opportunities - Dr. [Your Last Name]
+
+Dear Dr. [Attending Last Name],
+
+I hope this email finds you well.
+
+I am an international medical graduate from [Medical School] with a strong interest in [Specialty, e.g., Pediatrics]. I recently read your publication regarding [insert paper topic] and was deeply impressed by your team's approach to clinical care.
+
+I am writing to inquire if there might be an opportunity for me to participate in a clinical observership under your guidance at [Hospital/Institution Name] for 4 weeks during [Month/Year].
+
+I have passed USMLE Step 1 and scored [Score] on Step 2 CK. I am fully self-funded, carry active health insurance, and hold a valid visa. I would be honored to shadow your team, attend clinical rounds, and contribute to your academic activities.
+
+Attached is my CV for your review. Thank you very much for your time and consideration.
+
+Sincerely,
+
+[Your Name], MD`
+  },
+  pearls: {
+    title: 'Pediatric High-Yield Pearls',
+    overview: 'Essential pediatric clinical findings, differentials, and developmental milestones frequently tested during clinical match interviews and rounds.',
+    checklist: [
+      { id: 1, text: 'Review innocent vs pathologic murmurs features' },
+      { id: 2, text: 'Memorize developmental milestones (2, 4, 6, 9, 12 months)' },
+      { id: 3, text: 'Understand pediatric immunizations schedules' },
+      { id: 4, text: 'Review core neonatal resuscitation guidelines' }
+    ],
+    tips: [
+      'Innocent murmurs are typical systolic, soft (grade 1-2/6), and change intensity with position changes.',
+      'Still\'s murmur is the most common innocent murmur in children - it has a musical or vibratory quality.',
+      'Regression of developmental milestones is ALWAYS pathologic and requires immediate neurological workup.'
+    ],
+    resources: [
+      { title: 'AAP Pediatric Care Online', url: 'https://www.aap.org', type: 'website' }
     ]
   }
 };
@@ -378,6 +452,35 @@ export default function GuideDetail() {
           </h3>
           <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{guide.overview}</p>
         </Card>
+
+        {/* Copyable Template */}
+        {guide.template && (
+          <Card className="p-5 rounded-2xl border-indigo-200 dark:border-indigo-800 bg-indigo-50/20 dark:bg-indigo-950/10 space-y-4">
+            <h3 className="font-semibold text-slate-800 dark:text-white flex items-center justify-between">
+              <span className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                <FileText className="w-5 h-5" />
+                Warm Email Template
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard.writeText(guide.template);
+                  toast.success("Template copied to clipboard!");
+                }}
+                className="rounded-xl flex items-center gap-1.5 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-sm"
+              >
+                <Copy className="w-4 h-4" />
+                Copy
+              </Button>
+            </h3>
+            <div className="relative">
+              <pre className="text-[11px] p-3 rounded-xl bg-slate-950 text-slate-100 font-mono overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[350px]">
+                {guide.template}
+              </pre>
+            </div>
+          </Card>
+        )}
 
         {/* ECFMG-Specific Content */}
         {guideId === 'ecfmg_pathways' && (

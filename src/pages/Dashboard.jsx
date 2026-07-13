@@ -33,7 +33,12 @@ import {
   Coins,
   Calculator,
   Brain,
-  Globe
+  Globe,
+  Star,
+  CheckCircle2,
+  AlertTriangle,
+  TrendingUp,
+  Scale
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { getJourneyHighlights, getNextActionChecklist } from '@/lib/personalJourney';
@@ -164,6 +169,72 @@ export default function Dashboard() {
   const journeyHighlights = getJourneyHighlights(profile || {}, profile?.custom_entries || [], profile?.favorite_programs?.length || 0);
   const nextActions = getNextActionChecklist(profile || {}, profile?.custom_entries || [], profile?.favorite_programs?.length || 0);
 
+  // Dynamic Match Readiness Algorithm for the intelligence dashboard
+  const matchReadinessStats = useMemo(() => {
+    let score = 30; // base score for starting out
+    const strengths = [];
+    const gaps = [];
+    const tasks = [];
+
+    // 1. Exam Score Contribution
+    if (profile?.usmle_step2_status === 'passed') {
+      const s2Score = profile?.usmle_step2_score ? Number(profile.usmle_step2_score) : 230;
+      score += s2Score >= 250 ? 25 : s2Score >= 240 ? 20 : 15;
+      strengths.push({ name: 'Clinical Knowledge Exam', stars: s2Score >= 250 ? 5 : s2Score >= 240 ? 4 : 3 });
+    } else {
+      gaps.push({ name: 'USMLE Step 2 CK Prep', severity: 'high', desc: 'Secure an exam date and aim for a target score of ≥240.' });
+      tasks.push('Plan/schedule your USMLE Step 2 CK exam date.');
+    }
+
+    if (profile?.usmle_step1_status === 'passed') {
+      score += 10;
+      strengths.push({ name: 'Basic Sciences Foundation', stars: 5 });
+    } else {
+      gaps.push({ name: 'USMLE Step 1 Status', severity: 'medium', desc: 'Step 1 is pass/fail but mandatory for residency screening.' });
+    }
+
+    // 2. Clinical Experience Contribution
+    if (profile?.us_clinical_experience) {
+      score += 20;
+      strengths.push({ name: 'US Clinical Exposure (USCE)', stars: 5 });
+    } else {
+      gaps.push({ name: 'US Hands-on Rotations', severity: 'high', desc: 'Obtain 2-3 months of hands-on US clinical experience.' });
+      tasks.push('Inquire about observership/hands-on clinical rotations.');
+    }
+
+    // 3. ECFMG Certification Contribution
+    if (profile?.ecfmg_status === 'certified') {
+      score += 15;
+      strengths.push({ name: 'ECFMG Certification status', stars: 5 });
+    } else if (profile?.ecfmg_status === 'pathway_approved') {
+      score += 10;
+      strengths.push({ name: 'ECFMG Pathway selection', stars: 4 });
+      gaps.push({ name: 'Final Certification Release', severity: 'medium', desc: 'Ensure final medical school diploma is uploaded for ECFMG release.' });
+    } else {
+      gaps.push({ name: 'ECFMG Pathway Verification', severity: 'medium', desc: 'Check eligibility pathways and apply before January.' });
+      tasks.push('Complete OET Medicine and select an ECFMG Pathway.');
+    }
+
+    // 4. Letters of Recommendation and Personal Statement
+    const savedPS = localStorage.getItem(`match_personal_statement_${user?.id}`);
+    if (savedPS && savedPS.trim().length > 200) {
+      score += 10;
+      strengths.push({ name: 'Personal Statement Draft', stars: 4 });
+    } else {
+      gaps.push({ name: 'Personal Statement Review', severity: 'low', desc: 'Craft a compelling narrative explaining your resilience as an IMG.' });
+      tasks.push('Draft your Personal Statement and run our review scan.');
+    }
+
+    score = Math.min(score, 100);
+
+    return {
+      score,
+      strengths: strengths.slice(0, 3),
+      gaps: gaps.slice(0, 2),
+      recommendedActions: tasks.length > 0 ? tasks : ['Target and explore 10 more compatible programs.', 'Schedule a mock interview session.']
+    };
+  }, [profile, user?.id]);
+
   const getStepStatus = (stepId) => {
     const progress = progressList.find(p => p.module_id === stepId);
     return progress?.status || 'not_started';
@@ -216,6 +287,88 @@ export default function Dashboard() {
                 <Flame className="w-4 h-4" />
                 <span className="text-sm font-medium">3 day streak</span>
               </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Applicant Intelligence & Match Readiness Dashboard (Differentiator Card) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-[28px] border border-slate-250 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden"
+        >
+          <div className="p-5 border-b border-slate-100 dark:border-slate-850 bg-gradient-to-br from-indigo-50/50 to-purple-50/20 dark:from-indigo-950/15 dark:to-slate-900/10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Brain className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <h3 className="font-bold text-base text-slate-800 dark:text-white">Applicant Intelligence</h3>
+              </div>
+              <Badge className="bg-indigo-600 text-white font-bold hover:bg-indigo-700">
+                {matchReadinessStats.score}% Match Ready
+              </Badge>
+            </div>
+            <p className="text-xs text-slate-500 mt-1.5">
+              Personalized evaluation based on your international graduate portfolio metrics.
+            </p>
+          </div>
+
+          <div className="p-5 space-y-4">
+            {/* Strengths */}
+            <div>
+              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 block mb-2 uppercase tracking-wider">
+                ✓ Core Strengths
+              </span>
+              {matchReadinessStats.strengths.length === 0 ? (
+                <p className="text-xs text-slate-500 italic">No verified strengths yet. Update your profile to trigger insights.</p>
+              ) : (
+                <div className="space-y-2">
+                  {matchReadinessStats.strengths.map((str, i) => (
+                    <div key={i} className="flex justify-between items-center text-xs p-2 rounded-xl bg-emerald-50/40 dark:bg-emerald-950/10 border border-emerald-100/30 dark:border-emerald-950/20">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">{str.name}</span>
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: 5 }).map((_, idx) => (
+                          <Star key={idx} className={`w-3.5 h-3.5 ${idx < str.stars ? 'text-amber-500 fill-current' : 'text-slate-200 dark:text-slate-800'}`} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Needs Attention */}
+            {matchReadinessStats.gaps.length > 0 && (
+              <div>
+                <span className="text-xs font-bold text-amber-700 dark:text-amber-400 block mb-2 uppercase tracking-wider">
+                  ⚠️ Needs Attention
+                </span>
+                <div className="space-y-2">
+                  {matchReadinessStats.gaps.map((gap, i) => (
+                    <div key={i} className="text-xs p-2.5 rounded-xl bg-amber-50/40 dark:bg-amber-950/10 border border-amber-100/30 dark:border-amber-950/20 flex gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-bold text-slate-800 dark:text-slate-200">{gap.name}</span>
+                        <p className="text-slate-500 dark:text-slate-400 mt-0.5 leading-normal">{gap.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Recommendations */}
+            <div className="border-t border-slate-100 dark:border-slate-850 pt-3.5">
+              <span className="text-xs font-bold text-indigo-700 dark:text-indigo-400 block mb-2 uppercase tracking-wider">
+                💡 Recommended Next Steps
+              </span>
+              <ul className="space-y-1.5 text-xs">
+                {matchReadinessStats.recommendedActions.map((act, i) => (
+                  <li key={i} className="flex items-start gap-2 text-slate-600 dark:text-slate-400 leading-normal">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 mt-0.5 flex-shrink-0" />
+                    <span>{act}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </motion.div>

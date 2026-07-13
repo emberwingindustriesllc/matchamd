@@ -204,10 +204,28 @@ export default function Guides() {
                 icon: MessageSquare,
                 color: 'from-amber-500 to-orange-500',
                 route: 'InterviewCourse'
+              },
+              {
+                id: 'observerships_blueprint',
+                title: 'Clinical Observership Blueprint',
+                description: 'Pitch templates & strategies to secure clinical rotations',
+                icon: BookOpen,
+                color: 'from-sky-500 to-blue-500',
+                route: 'GuideDetail?id=observerships',
+                free: true
+              },
+              {
+                id: 'pediatric_pearls',
+                title: 'Pediatric Board Pearls',
+                description: 'Murmurs cheat sheet, milestones, & high-yield guidelines',
+                icon: Brain,
+                color: 'from-pink-500 to-rose-500',
+                route: 'GuideDetail?id=pearls',
+                free: true
               }
             ].map((course) => {
               const Icon = course.icon;
-              const isUnlocked = purchases.some(p => p.content_id === course.id);
+              const isUnlocked = course.free || purchases.some(p => p.content_id === course.id);
               return (
                 <button
                   key={course.id}

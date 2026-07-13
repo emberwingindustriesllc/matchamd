@@ -51,7 +51,11 @@ import {
   Share2,
   Calendar,
   Building,
-  ClipboardList
+  ClipboardList,
+  GitCompare,
+  ClipboardCheck,
+  Sparkles,
+  Scale
 } from 'lucide-react';
 import { mockResidencyPrograms } from '@/data/mockResidencyPrograms';
 import ProgramDetailsModal from '@/components/community/ProgramDetailsModal';
@@ -74,6 +78,23 @@ export default function IMGPrograms() {
   
   // Detail dialog state
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [comparePrograms, setComparePrograms] = useState([]);
+
+  const toggleCompare = (e, prog) => {
+    e.stopPropagation();
+    setComparePrograms(prev => {
+      const exists = prev.some(p => p.id === prog.id);
+      if (exists) {
+        return prev.filter(p => p.id !== prog.id);
+      } else {
+        if (prev.length >= 3) {
+          toast.error("You can compare up to 3 programs side-by-side.");
+          return prev;
+        }
+        return [...prev, prog];
+      }
+    });
+  };
 
   // Interview state
   const [isLogInterviewOpen, setIsLogInterviewOpen] = useState(false);
@@ -92,6 +113,10 @@ export default function IMGPrograms() {
   // Advisor State
   const [advisorMode, setAdvisorMode] = useState(false);
   const [advisorCommentInput, setAdvisorCommentInput] = useState('');
+
+  // ERAS Personal Statement review state
+  const [personalStatementText, setPersonalStatementText] = useState('');
+  const [psFeedback, setPsFeedback] = useState(null);
 
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -134,6 +159,11 @@ export default function IMGPrograms() {
       const storedRankList = localStorage.getItem(`match_ranklist_${user.id}`);
       const storedFeedback = localStorage.getItem(`match_advisor_feedback_${user.id}`);
       const storedCustomEntries = localStorage.getItem(`match_custom_entries_${user.id}`);
+      const storedPS = localStorage.getItem(`match_personal_statement_${user.id}`);
+
+      if (storedPS) {
+        setPersonalStatementText(storedPS);
+      }
 
       if (profile && !isLoadedRef.current) {
         isLoadedRef.current = true;
@@ -441,7 +471,7 @@ export default function IMGPrograms() {
 
       // 1. Search Query
       const matchesSearch = !searchQuery ? true : (() => {
-        const query = searchQuery.toLowerCase();
+        const keywords = searchQuery.toLowerCase().split(/\s+/).filter(Boolean);
         const pName = (prog.program_name || '').toLowerCase();
         const pInst = (prog.institution || '').toLowerCase();
         const pCity = (prog.city || '').toLowerCase();
@@ -449,13 +479,15 @@ export default function IMGPrograms() {
         const vacPgy = (vac.pgy_level || '').toLowerCase();
         const vacNotes = (vac.notes || '').toLowerCase();
         
-        return pName.includes(query) ||
-               pInst.includes(query) ||
-               pCity.includes(query) ||
-               pState.includes(query) ||
-               vacPgy.includes(query) ||
-               vacNotes.includes(query) ||
-               pSpecs.some(s => s.toLowerCase().includes(query));
+        return keywords.every(kw => 
+          pName.includes(kw) ||
+          pInst.includes(kw) ||
+          pCity.includes(kw) ||
+          pState.includes(kw) ||
+          vacPgy.includes(kw) ||
+          vacNotes.includes(kw) ||
+          pSpecs.some(s => s.toLowerCase().includes(kw))
+        );
       })();
 
       // 2. Specialty Filter
@@ -482,19 +514,21 @@ export default function IMGPrograms() {
 
       // 1. Search Query
       const matchesSearch = !searchQuery ? true : (() => {
-        const query = searchQuery.toLowerCase();
+        const keywords = searchQuery.toLowerCase().split(/\s+/).filter(Boolean);
         const pName = (prog.program_name || '').toLowerCase();
         const pInst = (prog.institution || '').toLowerCase();
         const pCity = (prog.city || '').toLowerCase();
         const pState = (prog.state || '').toLowerCase();
         const pSub = (prog.subspecialty || '').toLowerCase();
         
-        return pName.includes(query) ||
-               pInst.includes(query) ||
-               pCity.includes(query) ||
-               pState.includes(query) ||
-               pSub.includes(query) ||
-               pSpecs.some(s => s.toLowerCase().includes(query));
+        return keywords.every(kw => 
+          pName.includes(kw) ||
+          pInst.includes(kw) ||
+          pCity.includes(kw) ||
+          pState.includes(kw) ||
+          pSub.includes(kw) ||
+          pSpecs.some(s => s.toLowerCase().includes(kw))
+        );
       })();
       
       // 2. Advanced Select Filters
@@ -616,6 +650,108 @@ export default function IMGPrograms() {
     saveRankList(list);
   };
 
+  const runPersonalStatementAudit = () => {
+    if (!personalStatementText.trim()) return;
+    
+    // Save to localStorage
+    if (user?.id) {
+      localStorage.setItem(`match_personal_statement_${user.id}`, personalStatementText);
+    }
+
+    const words = personalStatementText.trim().split(/\s+/).filter(Boolean);
+    const wordCount = words.length;
+    let score = 100;
+    const suggestions = [];
+
+    // Word Count Audit
+    if (wordCount < 500) {
+      score -= 25;
+      suggestions.push({
+        type: 'warning',
+        text: `Word count is too short (${wordCount} words). A standard ERAS Personal Statement should be between 600-800 words (roughly one full page on ERAS).`
+      });
+    } else if (wordCount > 900) {
+      score -= 15;
+      suggestions.push({
+        type: 'warning',
+        text: `Word count is slightly long (${wordCount} words). We recommend keeping it under 850 words so it fits perfectly on a single page in the ERAS layout without spilling over.`
+      });
+    } else {
+      suggestions.push({
+        type: 'success',
+        text: `Ideal word count (${wordCount} words). Perfect length for a single-page transmission on the ERAS PDF.`
+      });
+    }
+
+    // Keyword & Specialty Analysis
+    const textLower = personalStatementText.toLowerCase();
+    const targetSpec = (profile?.target_specialty || profile?.fellowship_type || '').toLowerCase();
+    
+    if (targetSpec && !textLower.includes(targetSpec)) {
+      score -= 15;
+      suggestions.push({
+        type: 'warning',
+        text: `Your stated target specialty (${profile.target_specialty || profile.fellowship_type}) is not mentioned in your personal statement text. Ensure you explicitly name it early on.`
+      });
+    } else if (targetSpec) {
+      suggestions.push({
+        type: 'success',
+        text: `Successfully mentions alignment with your specialty of ${profile.target_specialty || profile.fellowship_type}.`
+      });
+    }
+
+    // Structure Check (Paragraphs)
+    const paragraphs = personalStatementText.split(/\n+/).filter(p => p.trim().length > 0);
+    if (paragraphs.length < 3) {
+      score -= 20;
+      suggestions.push({
+        type: 'warning',
+        text: `Structure Alert: Found only ${paragraphs.length} paragraph(s). A well-structured personal statement needs at least 4 sections: Introduction (The Hook), Clinical/Research Experience, IMG Journey/Resilience, and Future Goals/Conclusion.`
+      });
+    } else {
+      suggestions.push({
+        type: 'success',
+        text: `Good structure with ${paragraphs.length} paragraphs. Ensure transitions between sections flow smoothly.`
+      });
+    }
+
+    // Academic & Clinical Signals
+    const hasResearch = textLower.includes('research') || textLower.includes('publication') || textLower.includes('poster');
+    const hasClinical = textLower.includes('clinical') || textLower.includes('patient') || textLower.includes('hospital') || textLower.includes('rotation') || textLower.includes('usce');
+    const hasResilience = textLower.includes('challenge') || textLower.includes('adapt') || textLower.includes('overcome') || textLower.includes('img') || textLower.includes('fmg') || textLower.includes('country');
+
+    if (!hasClinical) {
+      score -= 10;
+      suggestions.push({
+        type: 'warning',
+        text: "Missing Clinical Core: Consider adding a paragraph highlighting a specific clinical encounter or patient interaction from your rotations to demonstrate your hands-on competencies."
+      });
+    } else {
+      suggestions.push({
+        type: 'success',
+        text: "Demonstrates clinical experience and patient-centered focus."
+      });
+    }
+
+    if (!hasResearch && (profile?.primary_goal === 'fellowship' || profile?.target_specialty === 'Internal Medicine')) {
+      suggestions.push({
+        type: 'warning',
+        text: "Tip: For competitive specialties/fellowships, mention any publications, abstracts, or ongoing research projects you have contributed to."
+      });
+    }
+
+    if (!hasResilience) {
+      suggestions.push({
+        type: 'warning',
+        text: "Tip: As an international graduate, adding an anecdote about adapting to a new system or overcoming cultural barriers shows valuable resilience."
+      });
+    }
+
+    score = Math.max(10, score);
+    setPsFeedback({ score, suggestions });
+    toast.success("Personal Statement scanned successfully!");
+  };
+
   // Cost estimates
   const costSummary = useMemo(() => {
     const count = savedProgramsList.length;
@@ -679,12 +815,14 @@ export default function IMGPrograms() {
 
       <main className="px-4 py-6 max-w-4xl mx-auto space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 w-full bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl p-1 mb-6 border border-slate-200 dark:border-slate-700 shadow-inner">
-            <TabsTrigger value="search" className="rounded-xl py-2.5 font-semibold text-sm">Directory</TabsTrigger>
-            <TabsTrigger value="saved" className="rounded-xl py-2.5 font-semibold text-sm">Checklist</TabsTrigger>
-            <TabsTrigger value="interviews" className="rounded-xl py-2.5 font-semibold text-sm">Interviews</TabsTrigger>
-            <TabsTrigger value="ranklist" className="rounded-xl py-2.5 font-semibold text-sm">Rank List</TabsTrigger>
-            <TabsTrigger value="advisor" className="rounded-xl py-2.5 font-semibold text-sm">Advisors</TabsTrigger>
+          <TabsList className="flex items-center gap-1 overflow-x-auto w-full bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl p-1 mb-6 border border-slate-200 dark:border-slate-700 shadow-inner scrollbar-hide">
+            <TabsTrigger value="search" className="rounded-xl py-2.5 px-4 font-semibold text-sm whitespace-nowrap flex-shrink-0 flex-1 text-center">Directory</TabsTrigger>
+            <TabsTrigger value="saved" className="rounded-xl py-2.5 px-4 font-semibold text-sm whitespace-nowrap flex-shrink-0 flex-1 text-center">Checklist</TabsTrigger>
+            <TabsTrigger value="comparison" className="rounded-xl py-2.5 px-4 font-semibold text-sm whitespace-nowrap flex-shrink-0 flex-1 text-center">Comparison</TabsTrigger>
+            <TabsTrigger value="eras_review" className="rounded-xl py-2.5 px-4 font-semibold text-sm whitespace-nowrap flex-shrink-0 flex-1 text-center">ERAS Review</TabsTrigger>
+            <TabsTrigger value="interviews" className="rounded-xl py-2.5 px-4 font-semibold text-sm whitespace-nowrap flex-shrink-0 flex-1 text-center">Interviews</TabsTrigger>
+            <TabsTrigger value="ranklist" className="rounded-xl py-2.5 px-4 font-semibold text-sm whitespace-nowrap flex-shrink-0 flex-1 text-center">Rank List</TabsTrigger>
+            <TabsTrigger value="advisor" className="rounded-xl py-2.5 px-4 font-semibold text-sm whitespace-nowrap flex-shrink-0 flex-1 text-center">Advisors</TabsTrigger>
           </TabsList>
 
           {/* Directory Tab */}
@@ -920,14 +1058,31 @@ export default function IMGPrograms() {
                               </div>
                               
                               <div className="flex flex-col items-end gap-2">
-                                <button 
-                                  type="button"
-                                  onClick={(e) => toggleFavorite(e, prog.id)}
-                                  className={`p-2 rounded-full transition-colors ${
-                                    profile?.favorite_programs?.includes(prog.id) 
-                                      ? 'bg-rose-100 text-rose-500 dark:bg-rose-950/30' 
-                                      : 'bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-400 dark:bg-slate-800'
-                                  }`}
+                                <div className="flex items-center gap-1.5">
+                                  <button 
+                                    type="button"
+                                    onClick={(e) => toggleCompare(e, prog)}
+                                    className={`p-2 rounded-full transition-colors ${
+                                      comparePrograms.some(p => p.id === prog.id) 
+                                        ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400' 
+                                        : 'bg-slate-100 text-slate-400 hover:bg-indigo-50 hover:text-indigo-500 dark:bg-slate-800'
+                                    }`}
+                                    title="Compare program side-by-side"
+                                  >
+                                    <GitCompare className="w-5 h-5" />
+                                  </button>
+                                  <button 
+                                    type="button"
+                                    onClick={(e) => toggleFavorite(e, prog.id)}
+                                    className={`p-2 rounded-full transition-colors ${
+                                      profile?.favorite_programs?.includes(prog.id) 
+                                        ? 'bg-rose-100 text-rose-500 dark:bg-rose-950/30' 
+                                        : 'bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-400 dark:bg-slate-800'
+                                    }`}
+                                  >
+                                    <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
+                                  </button>
+                                </div>
                                 >
                                   <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
                                 </button>
@@ -1287,6 +1442,315 @@ export default function IMGPrograms() {
                 })}
               </div>
             )}
+          </TabsContent>
+
+          {/* Comparison Tab */}
+          <TabsContent value="comparison" className="space-y-6">
+            <Card className="p-6 bg-gradient-to-br from-indigo-50 via-teal-50 to-white dark:from-indigo-950/20 dark:to-slate-900 border-indigo-200 dark:border-indigo-900/60 rounded-3xl">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-200 dark:shadow-none">
+                  <GitCompare className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold mb-2">Program Comparison</h2>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm">
+                    Compare up to 3 programs side-by-side to analyze visa requirements, minimum test scores, clinical experience requirements, and personalized match probabilities.
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            {comparePrograms.length === 0 ? (
+              <Card className="p-12 text-center rounded-3xl border-slate-200 dark:border-slate-850">
+                <GitCompare className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+                <p className="text-slate-500 mb-2">No programs selected for comparison.</p>
+                <p className="text-xs text-slate-400 max-w-md mx-auto">
+                  Go to the <strong>Directory</strong> tab and click the compare icon ( <GitCompare className="w-3.5 h-3.5 inline mx-0.5 text-slate-400" /> ) on any program card to add it here.
+                </p>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-800/40 p-3 rounded-2xl">
+                  <span className="text-sm text-slate-600 dark:text-slate-300 font-medium">Comparing {comparePrograms.length} of 3 programs</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setComparePrograms([])}
+                    className="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 text-xs rounded-xl"
+                  >
+                    Clear All
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {comparePrograms.map((prog) => {
+                    const fit = calculateFitScore(prog);
+                    return (
+                      <Card key={prog.id} className="p-5 rounded-3xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
+                        <div>
+                          <div className="flex justify-between items-start gap-2 mb-3">
+                            <h3 className="font-bold text-base text-slate-900 dark:text-white line-clamp-2">{prog.program_name}</h3>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={(e) => toggleCompare(e, prog)}
+                              className="rounded-full w-7 h-7 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          <p className="text-xs text-slate-500 font-medium mb-4 flex items-center gap-1">
+                            <Building className="w-3.5 h-3.5 flex-shrink-0" />
+                            <span className="truncate">{prog.institution}</span>
+                          </p>
+
+                          <div className="mb-4">
+                            <div className="flex justify-between items-center p-2.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/10 border border-indigo-100 dark:border-indigo-950">
+                              <span className="text-xs text-indigo-900 dark:text-indigo-400 font-semibold">Match Probability</span>
+                              <Badge 
+                                className={`font-bold px-2 py-0.5 text-xs ${
+                                  fit.visaIssue 
+                                    ? 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400 border-none' 
+                                    : fit.score >= 90 
+                                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 border-none'
+                                      : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400 border-none'
+                                }`}
+                              >
+                                {fit.visaIssue ? "Visa Mismatch" : `${fit.score}%`}
+                              </Badge>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2.5 text-xs border-t border-slate-100 dark:border-slate-800 pt-3">
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Specialty</span>
+                              <span className="font-semibold text-right max-w-[150px] truncate">{prog.specialty}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Location</span>
+                              <span className="font-semibold">{prog.city}, {prog.state}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">J-1 / H-1B Visa</span>
+                              <span className="font-semibold">
+                                {prog.visa_j1 ? 'J-1' : ''}{prog.visa_j1 && prog.visa_h1b ? ' & ' : ''}{prog.visa_h1b ? 'H-1B' : ''}{!prog.visa_j1 && !prog.visa_h1b ? 'None' : ''}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Min Step 2 CK</span>
+                              <span className="font-semibold">{prog.step2_score_min || 'None'}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-medium">Avg Step 2 CK</span>
+                              <span className="font-semibold text-indigo-600 dark:text-indigo-400">{prog.step2_score_avg || 'N/A'}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Min USCE</span>
+                              <span className="font-semibold">{prog.min_usce_months || '0'} months</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Graduation Cutoff</span>
+                              <span className="font-semibold">{prog.grad_year_cutoff ? `${prog.grad_year_cutoff} yrs` : 'None'}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Program Size</span>
+                              <span className="font-semibold">{prog.program_size ? `${prog.program_size} (${prog.annual_intake}/yr)` : 'N/A'}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Interview Format</span>
+                              <span className="font-semibold">{prog.interview_format || 'N/A'}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Application Fee</span>
+                              <span className="font-semibold">${prog.estimated_cost?.application_fee || 26}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {fit.reasons && fit.reasons.length > 0 && (
+                          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] space-y-1 bg-slate-50 dark:bg-slate-950/40 p-2.5 rounded-2xl">
+                            <span className="font-bold text-slate-500 block">Fit Details:</span>
+                            {fit.reasons.map((r, i) => (
+                              <div key={i} className="flex items-start gap-1">
+                                <span className={r.includes('below') || r.includes('Does not') || r.includes('Requires') ? 'text-red-500 font-bold' : 'text-emerald-500 font-bold'}>•</span>
+                                <span className="text-slate-600 dark:text-slate-400 leading-tight">{r}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* ERAS Review Tab */}
+          <TabsContent value="eras_review" className="space-y-6">
+            <Card className="p-6 bg-gradient-to-br from-teal-50 via-indigo-50 to-white dark:from-teal-950/20 dark:to-slate-900 border-teal-200 dark:border-teal-900/60 rounded-3xl">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-teal-200 dark:shadow-none">
+                  <ClipboardCheck className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold mb-2">ERAS Application Review & Audit</h2>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm">
+                    Review your profile readiness for the ERAS application cycle. Run automated audits against your saved programs and get instant feedback on your Personal Statement.
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Profile & Program Audit Card */}
+              <Card className="p-5 rounded-3xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 space-y-4">
+                <h3 className="font-bold text-base flex items-center gap-2">
+                  <Scale className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  ERAS Requirements Audit
+                </h3>
+                <p className="text-xs text-slate-500">
+                  We cross-reference your user profile settings with your saved/favorite programs to find potential eligibility flags.
+                </p>
+
+                <div className="space-y-3.5 pt-2">
+                  {/* Step 2 CK Score Audit */}
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/50">
+                    {profile?.usmle_step2_score ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    )}
+                    <div>
+                      <span className="font-bold text-xs block">USMLE Step 2 CK Score</span>
+                      <p className="text-xs text-slate-500 leading-tight mt-0.5">
+                        {profile?.usmle_step2_score 
+                          ? `Your score of ${profile.usmle_step2_score} is verified. Ready for ERAS transmission.` 
+                          : "No Step 2 CK score found in your profile. Most programs require a score for interview consideration."}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Visa Requirements Audit */}
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/50">
+                    {profile?.visa_status && profile.visa_status !== 'none' ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    ) : (
+                      <CheckCircle2 className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    )}
+                    <div>
+                      <span className="font-bold text-xs block">Visa Sponsorship Match</span>
+                      <p className="text-xs text-slate-500 leading-tight mt-0.5">
+                        {profile?.visa_status === 'none' 
+                          ? "You marked that you do not require visa sponsorship (US Citizen/PR). Access to all programs." 
+                          : `You require ${profile?.visa_status || 'visa'} sponsorship. We check that all your saved programs support this.`}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* USCE Audit */}
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/50">
+                    {profile?.us_clinical_experience ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    )}
+                    <div>
+                      <span className="font-bold text-xs block">US Clinical Experience (USCE)</span>
+                      <p className="text-xs text-slate-500 leading-tight mt-0.5">
+                        {profile?.us_clinical_experience 
+                          ? "US Clinical Experience is completed. Ensures eligibility for community and academic programs." 
+                          : "No US Clinical Experience marked. We recommend obtaining 1-3 months of hands-on US clinical rotations."}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* ECFMG Certification Audit */}
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/50">
+                    {profile?.ecfmg_status === 'certified' ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    )}
+                    <div>
+                      <span className="font-bold text-xs block">ECFMG Certification Status</span>
+                      <p className="text-xs text-slate-500 leading-tight mt-0.5">
+                        {profile?.ecfmg_status === 'certified' 
+                          ? "Certified. Your ECFMG Status is ready for ERAS. High-priority matching signal." 
+                          : "Certification in progress. Ensure Pathways and OET are completed before rank lists are submitted."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-3.5 rounded-2xl border border-indigo-150 dark:border-indigo-900 text-xs text-indigo-900 dark:text-indigo-400 leading-normal">
+                  <span className="font-bold block mb-1">Strategy Recommendation:</span>
+                  Your saved/favorite programs list currently has {savedProgramsList.length} items. We recommend targeting 30-50 highly compatible programs to maximize your match probability while minimizing cost.
+                </div>
+              </Card>
+
+              {/* Personal Statement Reviewer Card */}
+              <Card className="p-5 rounded-3xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 space-y-4">
+                <h3 className="font-bold text-base flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  Personal Statement Scan
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Paste your Personal Statement below to instantly scan it for structural components, word count, specialty matching, and IMG strengths.
+                </p>
+
+                <textarea
+                  className="w-full h-40 p-3 text-xs bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none font-mono"
+                  placeholder="Paste your personal statement here (typically 500 to 900 words)..."
+                  value={personalStatementText || ''}
+                  onChange={(e) => setPersonalStatementText(e.target.value)}
+                />
+
+                <div className="flex justify-between items-center text-xs text-slate-400">
+                  <span>Words: {personalStatementText ? personalStatementText.trim().split(/\s+/).filter(Boolean).length : 0}</span>
+                  <Button
+                    size="sm"
+                    className="rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-1.5 px-3"
+                    onClick={runPersonalStatementAudit}
+                    disabled={!personalStatementText?.trim()}
+                  >
+                    Run PS Review Scan
+                  </Button>
+                </div>
+
+                {psFeedback && (
+                  <div className="border-t border-slate-100 dark:border-slate-800 pt-4 mt-2 space-y-3">
+                    <div className="flex justify-between items-center p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/40">
+                      <span className="text-xs font-bold">Readiness Score</span>
+                      <Badge 
+                        className={`font-bold text-xs ${
+                          psFeedback.score >= 80 
+                            ? 'bg-emerald-100 text-emerald-700 border-none' 
+                            : psFeedback.score >= 60 
+                              ? 'bg-amber-100 text-amber-700 border-none'
+                              : 'bg-red-100 text-red-700 border-none'
+                        }`}
+                      >
+                        {psFeedback.score}/100
+                      </Badge>
+                    </div>
+
+                    <div className="space-y-2 text-xs">
+                      {psFeedback.suggestions.map((suggestion, index) => (
+                        <div key={index} className="flex items-start gap-2 p-2 rounded-xl bg-slate-50/50 dark:bg-slate-950/20">
+                          {suggestion.type === 'success' ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                          ) : (
+                            <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                          )}
+                          <span className="text-slate-700 dark:text-slate-300 leading-tight">{suggestion.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Interviews Tab */}
