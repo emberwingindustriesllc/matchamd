@@ -8,14 +8,10 @@ import {
   ExternalLink, 
   AlertTriangle, 
   MapPin, 
-  Plane, 
+  Plane,
   Home, 
-  DollarSign, 
   GraduationCap, 
-  TrendingUp, 
   Sparkles,
-  Award,
-  Users,
   Moon
 } from 'lucide-react';
 import { fetchProgramNotes, createProgramNote, fetchScamReports, createScamReport } from '@/api/programs';
