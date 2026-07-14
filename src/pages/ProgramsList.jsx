@@ -70,6 +70,7 @@ export default function ProgramsList() {
       const data = await fetchPrograms({
         ...filters,
         program_type: dbProgramType,
+        verified: filters.verifiedOnly ? true : undefined,
         limit: 100,
       });
 

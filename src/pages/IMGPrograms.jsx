@@ -399,9 +399,30 @@ export default function IMGPrograms() {
 
   // Query Programs
   const { data: dbPrograms = [], isLoading: isProgramsLoading } = useQuery({
-    queryKey: ['programs'],
+    queryKey: ['programs', searchQuery, selectedSpecialty, selectedProgramType],
     queryFn: async () => {
-      const { data, error } = await supabase.from('programs').select('*');
+      let query = supabase.from('programs').select('*');
+      
+      if (selectedSpecialty && selectedSpecialty !== 'all') {
+        query = query.contains('specialty', [selectedSpecialty]);
+      }
+      
+      if (selectedProgramType && selectedProgramType !== 'all') {
+        let dbProgramType = selectedProgramType;
+        if (selectedProgramType === 'residency_categorical' || selectedProgramType === 'residency_preliminary') {
+          dbProgramType = 'residency';
+        }
+        query = query.eq('program_type', dbProgramType);
+      }
+      
+      if (searchQuery) {
+        const keywords = searchQuery.trim().split(/\s+/).filter(Boolean);
+        keywords.forEach(kw => {
+          query = query.or(`name.ilike.%${kw}%,institution.ilike.%${kw}%,city.ilike.%${kw}%,state.ilike.%${kw}%`);
+        });
+      }
+      
+      const { data, error } = await query.limit(200);
       if (error) throw error;
       return data || [];
     }
@@ -1083,9 +1104,6 @@ export default function IMGPrograms() {
                                     <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
                                   </button>
                                 </div>
-                                >
-                                  <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
-                                </button>
 
                                 {/* Fit Score Indicator */}
                                 <Badge 

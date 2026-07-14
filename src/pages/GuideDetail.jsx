@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import ResourceLink from '@/components/common/ResourceLink';
@@ -280,14 +281,128 @@ Sincerely,
     resources: [
       { title: 'AAP Pediatric Care Online', url: 'https://www.aap.org', type: 'website' }
     ]
+  },
+  oet_medicine: {
+    title: 'OET Medicine (Occupational English Test)',
+    overview: 'The Occupational English Test (OET) is an English language test designed specifically for healthcare professionals. For IMGs, passing OET Medicine is required to satisfy the communication and English proficiency requirement for ECFMG Certification. You must score a minimum of 350 (Grade B) in each of the four sub-tests (Listening, Reading, Writing, Speaking) in a single test administration.',
+    checklist: [
+      { id: 1, text: 'Register for the OET Medicine exam (ensure it is the Medicine version).' },
+      { id: 2, text: 'Study OET exam format (specifically the Speaking and Writing criteria).' },
+      { id: 3, text: 'Complete official OET practice tests (Listening and Reading).' },
+      { id: 4, text: 'Practice Speaking role-plays with a partner or tutor.' },
+      { id: 5, text: 'Submit Writing letters for feedback based on medical templates.' },
+      { id: 6, text: 'Take the OET exam and achieve a score of 350+ in all sections.' },
+      { id: 7, text: 'Release OET scores to ECFMG via your OET portal.' }
+    ],
+    tips: [
+      'The Writing section is the most common reason for failure. Focus on formatting, layout, and selectiveness of case notes.',
+      'Ensure you register for OET Medicine, NOT OET nursing or any other version.',
+      'Take the computer-based or paper-based test at a test center; OET @ Home is subject to specific ECFMG validation guidelines.',
+      'Practice speaking role-plays under timed conditions (3 minutes prep, 5 minutes speaking).'
+    ],
+    resources: [
+      { title: 'OET Official Website', url: 'https://www.occupationalenglishtest.org', type: 'website' },
+      { title: 'ECFMG English Proficiency Requirements', url: 'https://www.ecfmg.org/certification-pathways/english-proficiency.html', type: 'website' }
+    ]
+  },
+  personal_statement: {
+    title: 'Personal Statement Mastery',
+    overview: 'Your personal statement is your unique opportunity to speak directly to the residency selection committee. It should explain your journey as an IMG, highlight your clinical and research competencies, demonstrate your resilience, and outline your future goals in your chosen specialty. Keep it to one page (roughly 600-800 words).',
+    checklist: [
+      { id: 1, text: 'Brainstorm key themes (e.g., patient encounter, personal story, overcoming obstacles).' },
+      { id: 2, text: 'Outline structure: Introduction (Hook), clinical/research journey, resilience/adaptability, and career goals.' },
+      { id: 3, text: 'Draft the first version focusing on flow and narrative without self-censoring.' },
+      { id: 4, text: 'Refine and edit: reduce wordiness, eliminate clichés, and ensure specialty alignment.' },
+      { id: 5, text: 'Run the personal statement through the MatchApp Audit tool (under IMG Programs).' },
+      { id: 6, text: 'Get feedback from at least 2 mentors, colleagues, or native English speakers.' },
+      { id: 7, text: 'Finalize draft, proofread for grammar, and upload to ERAS.' }
+    ],
+    tips: [
+      'Show, don\'t tell: instead of saying you are hard-working, describe a clinical scenario where you demonstrated dedication.',
+      'Address your IMG status positively by highlighting adaptability, diverse perspectives, and clinical flexibility.',
+      'Keep formatting clean: simple paragraphs, standard font, no bullet points or special characters.',
+      'Ensure the document is under 800 words so it doesn\'t spill onto a second page on the ERAS PDF.'
+    ],
+    resources: [
+      { title: 'AAMC Personal Statement Guide', url: 'https://students-residents.aamc.org/applying-residency/writing-personal-statement', type: 'document' },
+      { title: 'IMG Personal Statement Examples', url: 'https://www.ama-assn.org/education/international-medical-education/writing-successful-eras-personal-statement', type: 'website' }
+    ]
+  },
+  lors: {
+    title: 'Letters of Recommendation (LORs)',
+    overview: 'Letters of Recommendation are critical components of your application. You need 3 to 4 letters, preferably from US physicians who have observed your clinical skills firsthand (US Clinical Experience). A specialty-specific letter is highly recommended for your target field.',
+    checklist: [
+      { id: 1, text: 'Identify potential letter writers (US attendings, clinical supervisors, department chiefs).' },
+      { id: 2, text: 'Request letters early (at least 6-8 weeks before application submission).' },
+      { id: 3, text: 'Provide letter writers with your CV, Personal Statement draft, and USMLE score report.' },
+      { id: 4, text: 'Create Letter Request Forms in ERAS and send them to your writers with instructions.' },
+      { id: 5, text: 'Follow up politely 2-3 weeks before the submission deadline.' },
+      { id: 6, text: 'Verify letters are uploaded and marked as \'Released\' in ERAS.' },
+      { id: 7, text: 'Assign relevant letters to target programs in ERAS.' }
+    ],
+    tips: [
+      'Waive your right to view the letters. Programs heavily discount \'unwaived\' letters because they assume they aren\'t fully candid.',
+      'At least two letters should be from US clinical rotations (hands-on) in your specialty.',
+      'A letter from a Program Director or Division Chief carries the highest weight.',
+      'Confirm details: ensure the writer has your correct name, ERAS ID, and target specialty.'
+    ],
+    resources: [
+      { title: 'AAMC ERAS LOR Portal Guide', url: 'https://students-residents.aamc.org/applying-residency/letters-recommendation-eras', type: 'website' },
+      { title: 'How to Ask for a US LOR', url: 'https://www.ama-assn.org/residents-students/residency/4-tips-securing-strong-letters-recommendation', type: 'document' }
+    ]
+  },
+  program_research: {
+    title: 'Program Research & Targeting',
+    overview: 'Applying to the right programs is crucial to maximize your match chances while controlling costs. Research programs to identify those that are IMG-friendly, sponsor the visa you need, and have historically matched graduates from your region/school.',
+    checklist: [
+      { id: 1, text: 'Identify your key parameters (specialty, visa needs, geographical preference).' },
+      { id: 2, text: 'Compile a list of all accredited programs in your specialty using FREIDA or Residency Explorer.' },
+      { id: 3, text: 'Filter programs based on minimum USMLE score cutoffs and visa sponsorship (J-1/H-1B).' },
+      { id: 4, text: 'Cross-reference program websites to verify current percentage of IMG residents.' },
+      { id: 5, text: 'Connect with current residents or alumni from your medical school at target programs.' },
+      { id: 6, text: 'Classify programs into \'Reach\', \'Target\', and \'Safety\' categories.' },
+      { id: 7, text: 'Finalize a list of 80-150 programs (depending on your competitiveness and specialty).' }
+    ],
+    tips: [
+      'Do not apply to programs that explicitly state they do not accept international graduates or sponsor visas if you need one.',
+      'Geographic filtering is real. Programs often prefer candidates with local connections or rotations in their region.',
+      'Check the resident roster on program websites - if they have zero IMGs, matching there will be extremely difficult.'
+    ],
+    resources: [
+      { title: 'Residency Explorer Tool', url: 'https://www.residencyexplorer.org', type: 'website' },
+      { title: 'FREIDA Database', url: 'https://freida.ama-assn.org', type: 'website' }
+    ]
+  },
+  visa: {
+    title: 'Visa Planning & Requirements',
+    overview: 'Securing the correct visa is the final step in transition to US training. Most IMGs match on either a J-1 (Exchange Visitor) visa sponsored by ECFMG, or an H-1B (Temporary Worker) visa sponsored directly by the matching hospital.',
+    checklist: [
+      { id: 1, text: 'Understand J-1 vs H-1B differences (J-1 requires home residency requirement; H-1B allows dual intent but requires Step 3).' },
+      { id: 2, text: 'Check if target programs sponsor H-1B visas (many only offer J-1).' },
+      { id: 3, text: 'Take USMLE Step 3 early if you are aiming for an H-1B visa (Step 3 must be passed before March).' },
+      { id: 4, text: 'Upon matching, request your visa sponsorship packet from the program coordinator.' },
+      { id: 5, text: '(For J-1) Obtain the Statement of Need from your home country\'s Ministry of Health.' },
+      { id: 6, text: 'Pay the SEVIS fee and complete the DS-160 online visa application.' },
+      { id: 7, text: 'Schedule and attend your visa interview at the US Embassy/Consulate.' }
+    ],
+    tips: [
+      'To qualify for H-1B, you must pass USMLE Step 3 before the rank order list deadline in March so the program can file the petition.',
+      'The J-1 visa carries a two-year home country physical presence requirement (Section 212e). You must return home or get a Conrad 30 waiver after training.',
+      'Ensure all names on your passport, transcripts, and ECFMG certificate match exactly to avoid embassy processing delays.'
+    ],
+    resources: [
+      { title: 'ECFMG EVSP (J-1 Visa Sponsorship)', url: 'https://www.ecfmg.org/evsp', type: 'website' },
+      { title: 'USCIS H-1B Visa Information', url: 'https://www.uscis.gov/working-in-the-united-states/temporary-workers/h-1b-specialty-occupations', type: 'website' },
+      { title: 'State Department Visa Appointments', url: 'https://travel.state.gov', type: 'website' }
+    ]
   }
 };
 
 export default function GuideDetail() {
   const queryClient = useQueryClient();
-  const urlParams = new URLSearchParams(window.location.search);
-  const guideId = urlParams.get('id') || 'ecfmg_pathways';
-  const pathway = urlParams.get('pathway') || 'residency';
+  const [searchParams] = useSearchParams();
+  const guideId = searchParams.get('id') || 'ecfmg_pathways';
+  const pathway = searchParams.get('pathway') || 'residency';
   
   const [notes, setNotes] = useState('');
   const [visualMode, setVisualMode] = useState('mountain'); // 'mountain', 'tree', 'rocket'
@@ -310,8 +425,22 @@ export default function GuideDetail() {
 
   const progress = progressList[0];
   const [localChecklist, setLocalChecklist] = useState(
-    progress?.checklist_items || guide.checklist.map(item => ({ ...item, completed: false }))
+    guide.checklist.map(item => ({ ...item, completed: false }))
   );
+
+  useEffect(() => {
+    if (progress) {
+      if (progress.checklist_items) {
+        setLocalChecklist(progress.checklist_items);
+      } else {
+        setLocalChecklist(guide.checklist.map(item => ({ ...item, completed: false })));
+      }
+      setNotes(progress.notes || '');
+    } else {
+      setLocalChecklist(guide.checklist.map(item => ({ ...item, completed: false })));
+      setNotes('');
+    }
+  }, [progress, guide]);
 
   const updateProgressMutation = useMutation({
     mutationFn: async (dataToUpdate) => {
