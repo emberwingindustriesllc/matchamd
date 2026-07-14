@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import logo from '@/assets/logo.png';
 import { useAuth } from '@/lib/AuthContext';
