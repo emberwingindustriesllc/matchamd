@@ -36,9 +36,7 @@ import {
   Globe,
   Star,
   CheckCircle2,
-  AlertTriangle,
-  TrendingUp,
-  Scale
+  AlertTriangle
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { getJourneyHighlights, getNextActionChecklist } from '@/lib/personalJourney';
@@ -135,42 +133,16 @@ export default function Dashboard() {
 
   const profile = profiles?.[0];
 
-  useEffect(() => {
-    if (user && profiles !== undefined && !profile) {
-      navigate(createPageUrl('Onboarding'));
-    }
-  }, [user, profiles, profile, navigate]);
-
-  if (!profile) {
-    if (profileError) {
-      return (
-        <>
-          <Header logo={logo} title="Dashboard Error" />
-          <ErrorState 
-            title="Unable to Load Profile"
-            message="We couldn't load your profile. Please check your connection and try again."
-            onRetry={() => window.location.reload()}
-          />
-          <BottomNav />
-        </>
-      );
-    }
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-[rgb(var(--color-primary))] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  const currentSteps = getPathwaySteps(profile?.primary_goal);
-  const completedSteps = progressList.filter(p => p.status === 'completed').length;
-  const totalSteps = currentSteps.length;
-  const overallProgress = Math.round((completedSteps / totalSteps) * 100);
-  const journeyHighlights = getJourneyHighlights(profile || {}, profile?.custom_entries || [], profile?.favorite_programs?.length || 0);
-  const nextActions = getNextActionChecklist(profile || {}, profile?.custom_entries || [], profile?.favorite_programs?.length || 0);
-
   // Dynamic Match Readiness Algorithm for the intelligence dashboard
   const matchReadinessStats = useMemo(() => {
+    if (!profile) {
+      return {
+        score: 30,
+        strengths: [],
+        gaps: [],
+        recommendedActions: ['Target and explore 10 more compatible programs.', 'Schedule a mock interview session.']
+      };
+    }
     let score = 30; // base score for starting out
     const strengths = [];
     const gaps = [];
@@ -234,6 +206,42 @@ export default function Dashboard() {
       recommendedActions: tasks.length > 0 ? tasks : ['Target and explore 10 more compatible programs.', 'Schedule a mock interview session.']
     };
   }, [profile, user?.id]);
+
+  useEffect(() => {
+    if (user && profiles !== undefined && !profile) {
+      navigate(createPageUrl('Onboarding'));
+    }
+  }, [user, profiles, profile, navigate]);
+
+  if (!profile) {
+    if (profileError) {
+      return (
+        <>
+          <Header logo={logo} title="Dashboard Error" />
+          <ErrorState 
+            title="Unable to Load Profile"
+            message="We couldn't load your profile. Please check your connection and try again."
+            onRetry={() => window.location.reload()}
+          />
+          <BottomNav />
+        </>
+      );
+    }
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-3 border-[rgb(var(--color-primary))] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const currentSteps = getPathwaySteps(profile?.primary_goal);
+  const completedSteps = progressList.filter(p => p.status === 'completed').length;
+  const totalSteps = currentSteps.length;
+  const overallProgress = Math.round((completedSteps / totalSteps) * 100);
+  const journeyHighlights = getJourneyHighlights(profile || {}, profile?.custom_entries || [], profile?.favorite_programs?.length || 0);
+  const nextActions = getNextActionChecklist(profile || {}, profile?.custom_entries || [], profile?.favorite_programs?.length || 0);
+
+
 
   const getStepStatus = (stepId) => {
     const progress = progressList.find(p => p.module_id === stepId);
