@@ -5,7 +5,15 @@ import { canManageModeration } from '@/lib/moderation';
  * Programs API - Community-driven program intelligence
  */
 
-// --- Programs ---
+const SPECIALTIES = [
+  'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery',
+  'Emergency Medicine', 'Psychiatry', 'OB/GYN', 'Neurology',
+  'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology',
+  'Radiation Oncology', 'Thoracic Surgery', 'Urology', 'ENT',
+  'Medical Genetics', 'Cardiology', 'Gastroenterology', 'Nephrology',
+  'Pulmonology', 'Endocrinology', 'Hematology/Oncology', 'Infectious Disease',
+  'Rheumatology', 'Allergy/Immunology', 'Other',
+];
 
 export async function fetchPrograms(filters = {}) {
   let query = supabase
@@ -30,9 +38,31 @@ export async function fetchPrograms(filters = {}) {
     query = query.eq('verified', filters.verified);
   }
   if (filters.search) {
+    const lowercaseSearch = filters.search.toLowerCase().trim();
+    const matchedSpecs = SPECIALTIES.filter(spec => {
+      const specLower = spec.toLowerCase();
+      return specLower.includes(lowercaseSearch) || lowercaseSearch.includes(specLower);
+    });
+
     const keywords = filters.search.trim().split(/\s+/).filter(Boolean);
     keywords.forEach(kw => {
-      query = query.or(`name.ilike.%${kw}%,institution.ilike.%${kw}%,city.ilike.%${kw}%,state.ilike.%${kw}%`);
+      const kwLower = kw.toLowerCase();
+      SPECIALTIES.forEach(spec => {
+        const specLower = spec.toLowerCase();
+        if (specLower.includes(kwLower) && !matchedSpecs.includes(spec)) {
+          matchedSpecs.push(spec);
+        }
+      });
+    });
+
+    let specialtyFilter = '';
+    if (matchedSpecs.length > 0) {
+      const formattedSpecs = matchedSpecs.map(s => `"${s}"`).join(',');
+      specialtyFilter = `,specialty.ov.{${formattedSpecs}}`;
+    }
+
+    keywords.forEach(kw => {
+      query = query.or(`name.ilike.%${kw}%,institution.ilike.%${kw}%,city.ilike.%${kw}%,state.ilike.%${kw}%${specialtyFilter}`);
     });
   }
 

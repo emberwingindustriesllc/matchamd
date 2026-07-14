@@ -243,15 +243,28 @@ export default function ProgramsList() {
       <Card className="border-slate-200/80 shadow-sm">
         <CardContent className="pt-6">
           <div className="flex flex-wrap items-end gap-3">
-            <div className="relative min-w-[260px] flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <Input
-                placeholder="Search programs, institutions..."
-                value={filters.search}
-                onChange={e => handleFilterChange('search', e.target.value)}
-                className="pl-10"
-              />
-            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (document.activeElement instanceof HTMLElement) {
+                  document.activeElement.blur();
+                }
+              }}
+              className="flex flex-1 min-w-[280px] gap-2 items-center"
+            >
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
+                  placeholder="Search programs, institutions..."
+                  value={filters.search}
+                  onChange={e => handleFilterChange('search', e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
+                Search
+              </Button>
+            </form>
             <Select value={filters.specialty} onValueChange={v => handleFilterChange('specialty', v)}>
               <SelectTrigger className="w-[200px]"><SelectValue placeholder="Specialty" /></SelectTrigger>
               <SelectContent>

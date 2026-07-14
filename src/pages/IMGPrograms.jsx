@@ -62,6 +62,16 @@ import ProgramDetailsModal from '@/components/community/ProgramDetailsModal';
 import { getProgramFitDetails } from '@/lib/programMatch';
 import { buildCustomEntry, getPreferenceSummary, removeCustomEntry, upsertCustomEntry } from '@/lib/personalJourney';
 
+const SPECIALTIES = [
+  'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery',
+  'Emergency Medicine', 'Psychiatry', 'OB/GYN', 'Neurology',
+  'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology',
+  'Radiation Oncology', 'Thoracic Surgery', 'Urology', 'ENT',
+  'Medical Genetics', 'Cardiology', 'Gastroenterology', 'Nephrology',
+  'Pulmonology', 'Endocrinology', 'Hematology/Oncology', 'Infectious Disease',
+  'Rheumatology', 'Allergy/Immunology', 'Other',
+];
+
 export default function IMGPrograms() {
   const [activeTab, setActiveTab] = useState('search');
   const [searchQuery, setSearchQuery] = useState('');
@@ -416,9 +426,31 @@ export default function IMGPrograms() {
       }
       
       if (searchQuery) {
+        const lowercaseSearch = searchQuery.toLowerCase().trim();
+        const matchedSpecs = SPECIALTIES.filter(spec => {
+          const specLower = spec.toLowerCase();
+          return specLower.includes(lowercaseSearch) || lowercaseSearch.includes(specLower);
+        });
+
         const keywords = searchQuery.trim().split(/\s+/).filter(Boolean);
         keywords.forEach(kw => {
-          query = query.or(`name.ilike.%${kw}%,institution.ilike.%${kw}%,city.ilike.%${kw}%,state.ilike.%${kw}%`);
+          const kwLower = kw.toLowerCase();
+          SPECIALTIES.forEach(spec => {
+            const specLower = spec.toLowerCase();
+            if (specLower.includes(kwLower) && !matchedSpecs.includes(spec)) {
+              matchedSpecs.push(spec);
+            }
+          });
+        });
+
+        let specialtyFilter = '';
+        if (matchedSpecs.length > 0) {
+          const formattedSpecs = matchedSpecs.map(s => `"${s}"`).join(',');
+          specialtyFilter = `,specialty.ov.{${formattedSpecs}}`;
+        }
+
+        keywords.forEach(kw => {
+          query = query.or(`name.ilike.%${kw}%,institution.ilike.%${kw}%,city.ilike.%${kw}%,state.ilike.%${kw}%${specialtyFilter}`);
         });
       }
       
