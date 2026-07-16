@@ -21,8 +21,8 @@ export function getProgramFitDetails(profile = {}, program = {}) {
 
   const userNeedsVisa = profile.visa_status === 'none' || profile.visa_status === 'J1' || profile.visa_status === 'H1B';
   if (userNeedsVisa) {
-    const programSponsorsJ1 = Boolean(program.visa_j1);
-    const programSponsorsH1B = Boolean(program.visa_h1b);
+    const programSponsorsJ1 = program.visa_j1 === true || String(program.visa_j1).toLowerCase() === 'yes';
+    const programSponsorsH1B = program.visa_h1b === true || String(program.visa_h1b).toLowerCase() === 'yes';
     if (!programSponsorsJ1 && !programSponsorsH1B) {
       score -= 40;
       reasons.push('Does not sponsor J-1 or H-1B visas');

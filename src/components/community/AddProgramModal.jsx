@@ -34,6 +34,7 @@ const PROGRAM_TYPES = [
   { value: 'observership', label: 'Observership / Clinical Observer' },
   { value: 'research', label: 'Research Position' },
   { value: 'elective', label: 'Clinical Elective (Medical Student)' },
+  { value: 'med_school', label: 'Medical School' },
 ];
 
 const US_STATES = [
@@ -58,6 +59,16 @@ export default function AddProgramModal({ open, onOpenChange, onSuccess }) {
     website: '',
     contact_email: '',
     description: '',
+    acgme_program_number: '',
+    zip: '',
+    street_address: '',
+    eras_participating: 'yes',
+    nrmp_participating: 'yes',
+    program_director: '',
+    visa_j1: 'yes',
+    visa_h1b: 'no',
+    program_status: 'Participating',
+    country: 'United States',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -98,6 +109,10 @@ export default function AddProgramModal({ open, onOpenChange, onSuccess }) {
         name: '', institution: '', specialty: [], program_type: 'residency',
         city: '', state: '', is_acgme_accredited: false, ecfmg_pathway_eligible: false,
         website: '', contact_email: '', description: '',
+        acgme_program_number: '', zip: '', street_address: '',
+        eras_participating: 'yes', nrmp_participating: 'yes',
+        program_director: '', visa_j1: 'yes', visa_h1b: 'no',
+        program_status: 'Participating', country: 'United States',
       });
       setStep(1);
     } catch (error) {
@@ -233,6 +248,88 @@ export default function AddProgramModal({ open, onOpenChange, onSuccess }) {
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea id="description" rows={3} placeholder="Key features, strengths, IMG-friendly policies, etc." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="program_director">Program Director</Label>
+                  <Input id="program_director" placeholder="e.g., Dr. Jane Smith" value={formData.program_director} onChange={e => setFormData({...formData, program_director: e.target.value})} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="acgme_program_number">ACGME Program #</Label>
+                  <Input id="acgme_program_number" placeholder="e.g., 1400300006" value={formData.acgme_program_number} onChange={e => setFormData({...formData, acgme_program_number: e.target.value})} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="street_address">Street Address</Label>
+                  <Input id="street_address" placeholder="e.g., 1400 S Dobson Rd" value={formData.street_address} onChange={e => setFormData({...formData, street_address: e.target.value})} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="zip">Zip Code</Label>
+                  <Input id="zip" placeholder="e.g., 85202" value={formData.zip} onChange={e => setFormData({...formData, zip: e.target.value})} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="country">Country</Label>
+                  <Input id="country" placeholder="e.g., United States" value={formData.country} onChange={e => setFormData({...formData, country: e.target.value})} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="program_status">Program Status</Label>
+                  <Input id="program_status" placeholder="e.g., Participating" value={formData.program_status} onChange={e => setFormData({...formData, program_status: e.target.value})} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="eras_participating">ERAS Participating</Label>
+                  <Select value={formData.eras_participating} onValueChange={v => setFormData({...formData, eras_participating: v})}>
+                    <SelectTrigger id="eras_participating">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="nrmp_participating">NRMP Participating</Label>
+                  <Select value={formData.nrmp_participating} onValueChange={v => setFormData({...formData, nrmp_participating: v})}>
+                    <SelectTrigger id="nrmp_participating">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="visa_j1">J-1 Visa Support</Label>
+                  <Select value={formData.visa_j1} onValueChange={v => setFormData({...formData, visa_j1: v})}>
+                    <SelectTrigger id="visa_j1">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="visa_h1b">H-1B Visa Support</Label>
+                  <Select value={formData.visa_h1b} onValueChange={v => setFormData({...formData, visa_h1b: v})}>
+                    <SelectTrigger id="visa_h1b">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">

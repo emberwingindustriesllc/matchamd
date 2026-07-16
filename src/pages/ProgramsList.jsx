@@ -30,6 +30,7 @@ const PROGRAM_TYPES = [
   { value: 'observership', label: 'Observership' },
   { value: 'research', label: 'Research' },
   { value: 'elective', label: 'Elective' },
+  { value: 'med_school', label: 'Medical School' },
 ];
 
 const US_STATES = [

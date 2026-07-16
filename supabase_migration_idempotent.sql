@@ -20,7 +20,7 @@ BEGIN
   END IF;
   
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'programs' AND column_name = 'program_type') THEN
-    ALTER TABLE programs ADD COLUMN program_type text CHECK (program_type IN ('residency','fellowship','observership','research','elective'));
+    ALTER TABLE programs ADD COLUMN program_type text CHECK (program_type IN ('residency','fellowship','observership','research','elective','med_school'));
   END IF;
   
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'programs' AND column_name = 'is_acgme_accredited') THEN

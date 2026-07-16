@@ -203,7 +203,7 @@ export default function Subscription() {
   });
 
   const purchaseAddOnMutation = useMutation({
-    /** @param {{id: string, name: string}} addOn */
+    /** @param {{id: string, name: string, route?: string}} addOn */
     mutationFn: async (addOn) => {
       setPurchasingAddOnId(addOn.id);
       return await purchaseManager.purchaseAddOn(addOn.id, addOn.name);

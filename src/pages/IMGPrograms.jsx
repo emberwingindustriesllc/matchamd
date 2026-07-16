@@ -57,6 +57,7 @@ import {
   Sparkles,
   Scale
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { mockResidencyPrograms } from '@/data/mockResidencyPrograms';
 import ProgramDetailsModal from '@/components/community/ProgramDetailsModal';
 import { getProgramFitDetails } from '@/lib/programMatch';
@@ -550,9 +551,11 @@ export default function IMGPrograms() {
       const matchesRegion = selectedRegion === 'all' || prog.region === selectedRegion || !prog.region;
 
       // 4. Visa Filter
+      const sponsorsJ1 = prog.visa_j1 === true || String(prog.visa_j1).toLowerCase() === 'yes';
+      const sponsorsH1B = prog.visa_h1b === true || String(prog.visa_h1b).toLowerCase() === 'yes';
       const matchesVisa = selectedVisa === 'all' || 
-        (selectedVisa === 'j1' && prog.visa_j1) ||
-        (selectedVisa === 'h1b' && prog.visa_h1b);
+        (selectedVisa === 'j1' && sponsorsJ1) ||
+        (selectedVisa === 'h1b' && sponsorsH1B);
 
       return matchesSearch && matchesSpecialty && matchesRegion && matchesVisa;
     });
@@ -588,9 +591,11 @@ export default function IMGPrograms() {
       const matchesSpecialty = selectedSpecialty === 'all' || pSpecs.includes(selectedSpecialty);
       const matchesRegion = selectedRegion === 'all' || prog.region === selectedRegion || !prog.region;
       
+      const sponsorsJ1 = prog.visa_j1 === true || String(prog.visa_j1).toLowerCase() === 'yes';
+      const sponsorsH1B = prog.visa_h1b === true || String(prog.visa_h1b).toLowerCase() === 'yes';
       const matchesVisa = selectedVisa === 'all' || 
-        (selectedVisa === 'j1' && prog.visa_j1) ||
-        (selectedVisa === 'h1b' && prog.visa_h1b);
+        (selectedVisa === 'j1' && sponsorsJ1) ||
+        (selectedVisa === 'h1b' && sponsorsH1B);
 
       const matchesSize = selectedSize === 'all' ||
         (selectedSize === 'small' && (prog.program_size < 50 || !prog.program_size)) ||
@@ -857,7 +862,7 @@ export default function IMGPrograms() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (document.activeElement) {
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
       document.activeElement.blur();
     }
   };
@@ -980,6 +985,7 @@ export default function IMGPrograms() {
                             <SelectItem value="observership">Observership</SelectItem>
                             <SelectItem value="research">Research</SelectItem>
                             <SelectItem value="elective">Elective</SelectItem>
+                            <SelectItem value="med_school">Medical School</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

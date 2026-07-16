@@ -34,6 +34,7 @@ const PROGRAM_TYPE_LABELS = {
   observership: 'Observership',
   research: 'Research',
   elective: 'Elective',
+  med_school: 'Medical School',
 };
 
 export default function ProgramDetail() {
@@ -437,10 +438,22 @@ ${user?.email || ''}`;
                 <div><span className="text-muted-foreground">Type:</span> <span className="ml-2 capitalize">{PROGRAM_TYPE_LABELS[program.program_type]}</span></div>
                 <div><span className="text-muted-foreground">Location:</span> <span className="ml-2">{program.city}, {program.state}</span></div>
                 <div><span className="text-muted-foreground">Specialties:</span> <span className="ml-2">{program.specialty?.join(', ') || '—'}</span></div>
+                {program.program_director && <div><span className="text-muted-foreground">Program Director:</span> <span className="ml-2">{program.program_director}</span></div>}
+                {program.acgme_program_number && <div><span className="text-muted-foreground">ACGME Program #:</span> <span className="ml-2">{program.acgme_program_number}</span></div>}
+                {program.eras_participating && <div><span className="text-muted-foreground">ERAS Participating:</span> <span className="ml-2 capitalize">{program.eras_participating}</span></div>}
+                {program.nrmp_participating && <div><span className="text-muted-foreground">NRMP Participating:</span> <span className="ml-2 capitalize">{program.nrmp_participating}</span></div>}
+                {program.program_status && <div><span className="text-muted-foreground">Program Status:</span> <span className="ml-2">{program.program_status}</span></div>}
+                {program.street_address && <div><span className="text-muted-foreground">Street Address:</span> <span className="ml-2">{program.street_address}</span></div>}
+                {program.zip && <div><span className="text-muted-foreground">Zip Code:</span> <span className="ml-2">{program.zip}</span></div>}
+                {program.country && <div><span className="text-muted-foreground">Country:</span> <span className="ml-2">{program.country}</span></div>}
+                {program.visa_j1 && <div><span className="text-muted-foreground">J-1 Visa Support:</span> <span className="ml-2 capitalize">{program.visa_j1}</span></div>}
+                {program.visa_h1b && <div><span className="text-muted-foreground">H-1B Visa Support:</span> <span className="ml-2 capitalize">{program.visa_h1b}</span></div>}
                 <div><span className="text-muted-foreground">ACGME Accredited:</span> <span className="ml-2">{program.is_acgme_accredited ? 'Yes' : 'No'}</span></div>
                 <div><span className="text-muted-foreground">ECFMG Pathway:</span> <span className="ml-2">{program.ecfmg_pathway_eligible ? 'Yes' : 'No'}</span></div>
                 <div><span className="text-muted-foreground">Verified:</span> <span className="ml-2">{program.verified ? 'Yes' : 'Pending'}</span></div>
-                <div><span className="text-muted-foreground">Submitted:</span> <span className="ml-2">{formatDistanceToNow(new Date(program.created_at), { addSuffix: true })}</span></div>
+                {program.created_at && (
+                  <div><span className="text-muted-foreground">Submitted:</span> <span className="ml-2">{formatDistanceToNow(new Date(program.created_at), { addSuffix: true })}</span></div>
+                )}
               </div>
             </CardContent>
           </Card>

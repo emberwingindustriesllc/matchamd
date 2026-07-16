@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { 
   ExternalLink, 
@@ -144,9 +145,47 @@ export default function ProgramDetailsModal({ open, onClose, program, profile, c
                   <span className="text-xs text-slate-455 block">Interview Format</span>
                   <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">{program.interview_format}</span>
                 </div>
+                {program.program_director && (
+                  <div className="space-y-1">
+                    <span className="text-xs text-slate-455 block">Program Director</span>
+                    <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">{program.program_director}</span>
+                  </div>
+                )}
+                {program.acgme_program_number && (
+                  <div className="space-y-1">
+                    <span className="text-xs text-slate-455 block">ACGME Program #</span>
+                    <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">{program.acgme_program_number}</span>
+                  </div>
+                )}
+                {program.program_status && (
+                  <div className="space-y-1">
+                    <span className="text-xs text-slate-455 block">Program Status</span>
+                    <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">{program.program_status}</span>
+                  </div>
+                )}
+                {program.street_address && (
+                  <div className="space-y-1 col-span-2">
+                    <span className="text-xs text-slate-455 block">Street Address</span>
+                    <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">
+                      {program.street_address}{program.zip && `, ${program.zip}`}{program.country && ` (${program.country})`}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl text-xs space-y-2">
+                {program.eras_participating && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-450">ERAS Participating:</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300 capitalize">{program.eras_participating}</span>
+                  </div>
+                )}
+                {program.nrmp_participating && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-450">NRMP Participating:</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300 capitalize">{program.nrmp_participating}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-slate-450">NRMP Match Code:</span>
                   <span className="font-bold text-slate-700 dark:text-slate-300">{program.nrmp_code || 'N/A'}</span>

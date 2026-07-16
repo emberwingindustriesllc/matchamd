@@ -16,7 +16,7 @@ const NOTE_TYPE_COLORS = {
   culture: 'bg-teal-100 text-teal-800',
 };
 
-export default function ProgramNoteCard({ note, currentUserId, onVote }) {
+export default function ProgramNoteCard({ note, currentUserId, onVote = undefined }) {
   const isAuthor = note.user_id === currentUserId;
   const [voted, setVoted] = React.useState(false);
   const [helpfulCount, setHelpfulCount] = React.useState(note.helpful_count || 0);
