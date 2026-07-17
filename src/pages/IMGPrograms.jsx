@@ -55,7 +55,7 @@ import {
   X,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { mockResidencyPrograms } from '@/data/mockResidencyPrograms';
+import { localPrograms } from '@/api/programs.local';
 import ProgramDetailsModal from '@/components/community/ProgramDetailsModal';
 import {
   calculateFitScore,
@@ -317,7 +317,7 @@ export default function IMGPrograms() {
     }
   });
 
-  const programs = dbPrograms.length > 0 ? dbPrograms : mockResidencyPrograms;
+  const programs = dbPrograms.length > 0 ? dbPrograms : localPrograms;
 
   const getFit = (prog) => calculateFitScore(prog, profile);
 

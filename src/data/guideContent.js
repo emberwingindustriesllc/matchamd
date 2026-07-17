@@ -649,15 +649,83 @@ export const guideContent = {
   },
 };
 
-/**
- * @param {string} guideId
- * @returns {object|null}
- */
+const RICH_GUIDE_IDS = [
+  'ecfmg-certification',
+  'usmle-step-1',
+  'usmle-step-2-ck',
+  'research',
+  'eras-application',
+  'residency-application',
+];
+
+const RICH_GUIDE_ALIASES = {
+  ecfmg_certification: 'ecfmg-certification',
+  ecfmg_pathways: 'ecfmg-certification',
+  usmle_step1: 'usmle-step-1',
+  usmle_step_1: 'usmle-step-1',
+  step1: 'usmle-step-1',
+  usmle_step2_ck: 'usmle-step-2-ck',
+  usmle_step2: 'usmle-step-2-ck',
+  step2: 'usmle-step-2-ck',
+  step_2_ck: 'usmle-step-2-ck',
+  program_research: 'research',
+  research: 'research',
+  eras_registration: 'eras-application',
+  eras: 'eras-application',
+  eras_application: 'eras-application',
+  residency_application: 'residency-application',
+  match_guide: 'residency-application',
+};
+
+let richGuidesData = null;
+
+function getRichGuidesData() {
+  if (richGuidesData) return richGuidesData;
+  try {
+    richGuidesData = require('@/guides/guidesData').guidesData || {};
+  } catch (e) {
+    console.warn('Rich guide data unavailable:', e);
+    richGuidesData = {};
+  }
+  return richGuidesData;
+}
+
 export function getGuideContent(guideId) {
   if (!guideId) return null;
-  return guideContent[guideId] || null;
+  if (guideContent[guideId]) return guideContent[guideId];
+  const richId = RICH_GUIDE_ALIASES[guideId];
+  if (richId) {
+    const rich = getRichGuidesData()[richId];
+    if (rich) {
+      const overview = rich.subtitle
+        ? `${rich.title}\n\n${rich.subtitle}`
+        : rich.title || 'Guide content.';
+      const checklist = (rich.sections || [])
+        .slice(0, 6)
+        .map((section, idx) => ({
+          id: idx + 1,
+          text: section.heading || `Section ${idx + 1}`,
+          completed: false,
+        }));
+      const tips = (rich.sections || [])
+        .slice(0, 5)
+        .map(section => `${section.heading}: ${section.content}`)
+        .filter(Boolean);
+      const resources = (rich.sections || [])
+        .slice(-4)
+        .map(section => ({
+          title: section.heading,
+          url: '',
+          type: 'guide-section',
+        }));
+      return { title: rich.title, overview, checklist, tips, resources };
+    }
+  }
+  return null;
 }
 
 export function hasGuideContent(guideId) {
-  return Boolean(guideContent[guideId]);
+  if (!guideId) return false;
+  if (guideContent[guideId]) return true;
+  return Boolean(RICH_GUIDE_ALIASES[guideId]);
 }
