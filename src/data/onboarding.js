@@ -7,15 +7,7 @@ export const countries = [
   'Jordan', 'Saudi Arabia', 'UAE', 'United Kingdom', 'Canada', 'Other'
 ];
 
-export const commonMedSchools = {
-  'India': ['AIIMS', 'JIPMER', 'CMC Vellore', 'Armed Forces Medical College', 'Maulana Azad Medical College', 'Other'],
-  'Pakistan': ['Aga Khan University', 'King Edward Medical University', 'Dow Medical College', 'Allama Iqbal Medical College', 'Other'],
-  'Nigeria': ['University of Ibadan', 'University of Lagos', 'Obafemi Awolowo University', 'University of Nigeria', 'Other'],
-  'Philippines': ['University of the Philippines', 'University of Santo Tomas', 'Far Eastern University', 'Other'],
-  'Egypt': ['Cairo University', 'Ain Shams University', 'Alexandria University', 'Other'],
-  'Mexico': ['UNAM', 'IPN', 'UAG', 'TEC de Monterrey', 'Other'],
-  'Other': ['Other']
-};
+export { commonMedSchools } from './international-medical-schools';
 
 export const languages = [
   { code: 'en', name: 'English' },

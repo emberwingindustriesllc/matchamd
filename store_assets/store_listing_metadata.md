@@ -98,8 +98,37 @@ IMG, FMG, residency match, USMLE, ECFMG, ERAS, NRMP, fellowship, international m
 `Everyone` (no mature content)
 
 ### Privacy Policy URL
-*(needs to be created — see notes below)*
 `https://matchamd.com/privacy`
+
+### Developer / Contact
+- Developer name: EmberWing Industries LLC
+- Support email: support@matchamd.app
+- Privacy email: privacy@matchamd.app
+- Website: https://matchamd.com
+
+### Test Reviewer Account
+- Email: `[pending]`
+- Password: `[pending]`
+
+## APP STORE ASSETS CHECKLIST
+- [x] Privacy policy HTML: `store_assets/privacy_policy.html`
+- [x] Terms of service HTML: `store_assets/terms_of_service.html`
+- [x] Feature graphic: `store_assets/play_feature_graphic_1024x500.png`
+- [x] Store icon: `store_assets/play_store_icon_512x512.png`
+- [x] Phone screenshots: `store_assets/screenshots/screenshot_01-05_*.png`
+- [ ] Tablet screenshot: 1 screenshot for 7"+ tablet
+
+## PLAY CONSOLE COPY-PASTE READY
+### Data Safety Form
+- Data collected: Email address, Name, App activity/usage
+- Data shared: Payment info, processed by Stripe
+- Security: Encrypted in transit: yes, Encrypted at rest: yes
+- Deletion: Users can request data deletion: yes
+- Data not collected/sold: Audio/video/precise location/personal communications not collected for core functionality; health/fitness data not collected
+
+### Content Rating
+- Everyone
+- Age rating questionnaire: answer No to mature content questions
 
 ---
 

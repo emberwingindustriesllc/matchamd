@@ -56,7 +56,7 @@ describe('Onboarding Data & Validation', () => {
 
   describe('commonMedSchools', () => {
     it('has schools for India', () => {
-      expect(commonMedSchools['India']).toContain('AIIMS');
+      expect(commonMedSchools['India']).toContain('AIIMS New Delhi');
       expect(commonMedSchools['India']).toContain('Other');
     });
 

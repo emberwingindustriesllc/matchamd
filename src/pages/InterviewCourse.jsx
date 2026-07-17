@@ -17,7 +17,7 @@ import {
   FileText,
   Star,
   X,
-  Play,
+  Eye,
   Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -350,23 +350,15 @@ export default function InterviewCourse() {
                 <X className="w-6 h-6" />
               </button>
 
-              {/* Simulated Video Screen */}
+              {/* Lesson Viewer */}
               <div className="relative aspect-video rounded-2xl bg-slate-950 flex items-center justify-center mb-6 overflow-hidden border border-slate-800 shadow-inner">
                 {isPlaying ? (
-                  /* 
-                    MatchaMD Course Video Player:
-                    To use your own videos, upload your MP4 files to Supabase Storage, YouTube, or Vimeo,
-                    and update the videoUrl fields inside courseModules.
-                  */
-                  <video
-                    className="w-full h-full absolute inset-0 bg-black"
-                    src={activeLesson.videoUrl || "https://www.w3schools.com/html/mov_bbb.mp4"}
-                    controls
-                    playsInline
-                    autoPlay
-                  >
-                    Your browser does not support the video tag.
-                  </video>
+                  <div className="w-full h-full flex items-center justify-center text-slate-300 text-sm">
+                    <div className="text-center">
+                      <p className="font-semibold mb-1">Lesson Playback</p>
+                      <p>Connect real media to this lesson to enable playback.</p>
+                    </div>
+                  </div>
                 ) : (
                   <>
                     <div className="absolute inset-0 bg-gradient-to-tr from-[rgba(var(--color-primary),0.2)] to-purple-900/30 opacity-70" />

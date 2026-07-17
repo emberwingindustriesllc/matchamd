@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-07-14T00:35:09.609294Z",
+  "program_source_scope": "public representative set only; not a full 13k FREIDA dataset",
+  "counts": {
+    "programs": 21
+  },
+  "source_notes": [
+    "NRMP directory is the best starting point for ~6,000+ ACGME-accredited residency programs.",
+    "FREIDA total ~13,000 includes fellowships; bulk export is restricted, so full compilation requires program-by-program collection.",
+    "Additional columns such as PD/coordinator/contact should come from individual program websites when available."
+  ],
+  "files": [
+    "programs_seed.csv",
+    "programs_seed.sql"
+  ]
+}

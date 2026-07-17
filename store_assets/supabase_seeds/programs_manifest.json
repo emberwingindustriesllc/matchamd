@@ -1,0 +1,8 @@
+{
+  "tag": "programs",
+  "count": 9,
+  "files": {
+    "csv": "C:\\Users\\paulf\\matchamd\\store_assets\\supabase_seeds\\programs_compiled.csv",
+    "sql": "C:\\Users\\paulf\\matchamd\\store_assets\\supabase_seeds\\programs_compiled.sql"
+  }
+}

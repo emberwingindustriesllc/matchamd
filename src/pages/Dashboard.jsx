@@ -37,37 +37,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
-const getPathwaySteps = (primaryGoal) => {
-  const pathwayStepsMap = {
-    residency: [
-      { id: 'ecfmg_pathways', title: 'ECFMG Pathways', description: 'Complete certification pathways application', deadline: 'Jan 31, 2026' },
-      { id: 'usmle_step1', title: 'USMLE Step 1', description: 'Pass the first licensing exam' },
-      { id: 'usmle_step2', title: 'USMLE Step 2 CK', description: 'Aim for ≥240 for best IMG match chances' },
-      { id: 'oet_medicine', title: 'OET Medicine', description: 'English proficiency test for healthcare', deadline: 'Dec 2025' },
-      { id: 'eras_registration', title: 'ERAS Registration', description: 'Register for residency application', deadline: 'Sept 2025' },
-      { id: 'personal_statement', title: 'Personal Statement', description: 'Write your compelling story' },
-      { id: 'lors', title: 'Letters of Recommendation', description: 'Secure strong recommendation letters' },
-      { id: 'nrmp_match', title: 'NRMP Match', description: 'Register for the matching program', deadline: 'March 2026' }
-    ],
-    fellowship: [
-      { id: 'ecfmg_certification', title: 'ECFMG Certification', description: 'Required for fellowship training' },
-      { id: 'residency_completion', title: 'Residency Completion', description: 'Complete accredited residency program' },
-      { id: 'board_eligibility', title: 'Board Eligibility', description: 'Meet specialty board requirements' },
-      { id: 'fellowship_eras', title: 'Fellowship Application', description: 'ERAS or Fellowship Council' },
-      { id: 'fellowship_interview', title: 'Fellowship Interviews', description: 'Interview at subspecialty programs' },
-      { id: 'fellowship_match', title: 'Fellowship Match', description: 'NRMP SMS or other matching systems' }
-    ],
-    med_school: [
-      { id: 'prerequisites', title: 'Prerequisites', description: 'US coursework and requirements' },
-      { id: 'mcat', title: 'MCAT Exam', description: 'Medical College Admission Test' },
-      { id: 'amcas', title: 'AMCAS Application', description: 'Primary application process' },
-      { id: 'secondaries', title: 'Secondary Applications', description: 'School-specific applications' },
-      { id: 'med_interviews', title: 'Interviews', description: 'MMI and traditional interviews' },
-      { id: 'financial_proof', title: 'Financial Documentation', description: 'Proof of funding for 4 years' }
-    ]
-  };
-  return pathwayStepsMap[primaryGoal] || pathwayStepsMap.residency;
-};
+import { getPathwaySteps } from '@/data/pathways';
 
 export default function Dashboard() {
   const navigate = useNavigate();

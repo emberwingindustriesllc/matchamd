@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { normalizeProgramCounts, sanitizeIlikeTerm } from '@/lib/programSearch';
 
 /**
  * Programs API - Community-driven program intelligence
@@ -6,41 +7,72 @@ import { supabase } from './supabaseClient';
 
 // --- Programs ---
 
+/**
+ * Build filters for community programs list.
+ * Maps UI-friendly keys (verifiedOnly, search) to Supabase query options.
+ */
+export function buildProgramFetchOptions(filters = {}) {
+  const options = {
+    specialty: filters.specialty && filters.specialty !== 'all' ? filters.specialty : undefined,
+    program_type:
+      filters.program_type && filters.program_type !== 'all' ? filters.program_type : undefined,
+    state: filters.state && filters.state !== 'all' ? filters.state : undefined,
+    limit: filters.limit || 50,
+  };
+
+  if (filters.verified !== undefined) {
+    options.verified = filters.verified;
+  } else if (filters.verifiedOnly) {
+    options.verified = true;
+  }
+
+  if (filters.search) {
+    options.search = sanitizeIlikeTerm(filters.search);
+  }
+
+  return options;
+}
+
 export async function fetchPrograms(filters = {}) {
+  const opts = buildProgramFetchOptions(filters);
+
   let query = supabase
     .from('programs')
-    .select(`
+    .select(
+      `
       *,
       program_notes(count),
       scam_reports(count)
-    `)
+    `
+    )
     .order('created_at', { ascending: false });
 
-  if (filters.specialty) {
-    query = query.contains('specialty', [filters.specialty]);
+  if (opts.specialty) {
+    query = query.contains('specialty', [opts.specialty]);
   }
-  if (filters.program_type) {
-    query = query.eq('program_type', filters.program_type);
+  if (opts.program_type) {
+    query = query.eq('program_type', opts.program_type);
   }
-  if (filters.state) {
-    query = query.eq('state', filters.state);
+  if (opts.state) {
+    query = query.eq('state', opts.state);
   }
-  if (filters.verified !== undefined) {
-    query = query.eq('verified', filters.verified);
+  if (opts.verified !== undefined) {
+    query = query.eq('verified', opts.verified);
   }
-  if (filters.search) {
-    query = query.or(`name.ilike.%${filters.search}%,institution.ilike.%${filters.search}%`);
+  if (opts.search) {
+    query = query.or(`name.ilike.%${opts.search}%,institution.ilike.%${opts.search}%`);
   }
 
-  const { data, error } = await query.limit(filters.limit || 50);
+  const { data, error } = await query.limit(opts.limit || 50);
   if (error) throw error;
-  return data;
+  return (data || []).map(normalizeProgramCounts);
 }
 
 export async function fetchProgramById(id) {
   const { data, error } = await supabase
     .from('programs')
-    .select(`
+    .select(
+      `
       *,
       program_notes (
         *,
@@ -50,16 +82,19 @@ export async function fetchProgramById(id) {
         *,
         user:auth.users(email, user_metadata)
       )
-    `)
+    `
+    )
     .eq('id', id)
     .single();
 
   if (error) throw error;
-  return data;
+  return normalizeProgramCounts(data);
 }
 
 export async function createProgram(program) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Must be logged in');
 
   const { data, error } = await supabase
@@ -93,19 +128,23 @@ export async function updateProgram(id, updates) {
 export async function fetchProgramNotes(programId) {
   const { data, error } = await supabase
     .from('program_notes')
-    .select(`
+    .select(
+      `
       *,
       user:auth.users(email, user_metadata)
-    `)
+    `
+    )
     .eq('program_id', programId)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return data || [];
 }
 
 export async function createProgramNote(programId, note) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Must be logged in');
 
   const { data, error } = await supabase
@@ -123,10 +162,11 @@ export async function createProgramNote(programId, note) {
 }
 
 export async function voteNoteHelpful(noteId) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Must be logged in');
 
-  // Use RPC for atomic increment + prevent duplicate votes
   const { data, error } = await supabase.rpc('vote_note_helpful', {
     note_id: noteId,
     voter_id: user.id,
@@ -141,10 +181,12 @@ export async function voteNoteHelpful(noteId) {
 export async function fetchScamReports(programId = null) {
   let query = supabase
     .from('scam_reports')
-    .select(`
+    .select(
+      `
       *,
       user:auth.users(email, user_metadata)
-    `)
+    `
+    )
     .order('created_at', { ascending: false });
 
   if (programId) {
@@ -153,11 +195,13 @@ export async function fetchScamReports(programId = null) {
 
   const { data, error } = await query.limit(50);
   if (error) throw error;
-  return data;
+  return data || [];
 }
 
 export async function createScamReport(report) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Must be logged in');
 
   const { data, error } = await supabase
@@ -165,7 +209,7 @@ export async function createScamReport(report) {
     .insert({
       ...report,
       reporter_id: user.id,
-      is_anonymous: true, // Always anonymous for safety
+      is_anonymous: true,
       status: 'pending',
     })
     .select()
@@ -176,10 +220,11 @@ export async function createScamReport(report) {
 }
 
 export async function updateScamReportStatus(id, status, moderatorNotes = '') {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Must be logged in');
 
-  // Check if user is moderator (simplified - add your logic)
   const { data: profile } = await supabase
     .from('user_reputation')
     .select('verified_contributor')
@@ -210,7 +255,7 @@ export async function fetchUserReputation(userId) {
     .eq('user_id', userId)
     .single();
 
-  if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
+  if (error && error.code !== 'PGRST116') throw error;
   return data || { score: 0, verified_contributor: false };
 }
 

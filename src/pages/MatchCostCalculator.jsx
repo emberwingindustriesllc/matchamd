@@ -9,14 +9,11 @@ import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ArrowLeft, 
@@ -25,14 +22,9 @@ import {
   AlertTriangle, 
   Globe, 
   Plane, 
-  Home as HomeIcon, 
-  DollarSign, 
-  CheckCircle2, 
   ShieldCheck, 
-  HelpCircle, 
   Briefcase, 
   GraduationCap, 
-  Users, 
   Sparkles,
   Building2,
   Calendar,

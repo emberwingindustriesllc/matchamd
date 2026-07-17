@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, FileText, Video, BookOpen } from 'lucide-react';
+import { ExternalLink, FileText, BookOpen } from 'lucide-react';
 
 export default function OfficialReferences() {
   const references = [
@@ -79,20 +79,27 @@ export default function OfficialReferences() {
       ]
     },
     {
-      category: 'Educational Resources',
-      icon: Video,
+      category: 'Study Guides & References',
+      icon: BookOpen,
       color: 'purple',
       sources: [
         {
-          title: '2026 Pathways for ECFMG Certification | How to Become ECFMG Certified?',
-          url: 'https://www.youtube.com/watch?v=ecfmg2026pathways',
-          type: 'YouTube Video',
-          description: 'Official video guide'
+          title: 'ECFIMG Certification Pathways Overview',
+          url: 'https://www.ecfmg.org/certification-pathways/',
+          type: 'Official Guide',
+          description: 'Start here for pathway requirements, OET, and how to apply.'
         },
         {
-          title: 'The Pathways for ECFMG Certification for MATCH 2026',
-          url: 'https://www.ecfmg.org/certification-pathways/match-2026.html',
-          type: 'Match Guide'
+          title: '2026 Pathways Requirements Details',
+          url: 'https://www.ecfmg.org/certification-pathways/requirements.html',
+          type: 'Official Documentation',
+          description: 'Clinical/communication skills requirements for 2026 Pathways.'
+        },
+        {
+          title: 'Pathways FAQs',
+          url: 'https://www.ecfmg.org/certification-pathways/faqs.html',
+          type: 'Official FAQ',
+          description: 'Common questions about pathways, OET, expiration, and certification.'
         }
       ]
     },

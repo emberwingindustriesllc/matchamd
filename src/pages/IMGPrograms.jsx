@@ -51,14 +51,26 @@ import {
   Share2,
   Calendar,
   Building,
-  ClipboardList
+  ClipboardList,
+  X,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { mockResidencyPrograms } from '@/data/mockResidencyPrograms';
 import ProgramDetailsModal from '@/components/community/ProgramDetailsModal';
+import {
+  calculateFitScore,
+  filterIMGPrograms,
+  buildFitScoreMap,
+  sortPrograms,
+  hasActiveIMGFilters,
+} from '@/lib/programSearch';
+import { createPageUrl } from '@/utils';
+import { toast } from 'sonner';
 
 export default function IMGPrograms() {
   const [activeTab, setActiveTab] = useState('search');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [selectedVisa, setSelectedVisa] = useState('all');
@@ -66,6 +78,7 @@ export default function IMGPrograms() {
   const [selectedFormat, setSelectedFormat] = useState('all');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [fitFilter, setFitFilter] = useState(false);
+  const [sortBy, setSortBy] = useState('fit');
   
   // Detail dialog state
   const [selectedProgram, setSelectedProgram] = useState(null);
@@ -239,9 +252,30 @@ export default function IMGPrograms() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['userProfile'] })
   });
 
+  // Debounce search text for smoother filtering
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setDebouncedSearch('');
+    setSelectedSpecialty('all');
+    setSelectedRegion('all');
+    setSelectedVisa('all');
+    setSelectedSize('all');
+    setSelectedFormat('all');
+    setFitFilter(false);
+    setSortBy('fit');
+  };
+
   const toggleFavorite = (e, progId) => {
     e.stopPropagation();
-    if (!profile) return;
+    if (!profile) {
+      toast.error('Complete your profile to save programs');
+      return;
+    }
     const currentFavs = profile.favorite_programs || [];
     const newFavs = currentFavs.includes(progId) 
       ? currentFavs.filter(id => id !== progId)
@@ -285,115 +319,33 @@ export default function IMGPrograms() {
 
   const programs = dbPrograms.length > 0 ? dbPrograms : mockResidencyPrograms;
 
-  // Fit Match Calculations
-  const calculateFitScore = (prog) => {
-    if (!profile) return { score: 50, reasons: ["No profile configured"], meetsAll: false, visaIssue: false };
-    
-    let score = 100;
-    const reasons = [];
-    let visaIssue = false;
-    let meetsAll = true;
-
-    // 1. Visa Check
-    const userNeedsVisa = profile.visa_status === 'none' || profile.visa_status === 'J1' || profile.visa_status === 'H1B';
-    if (userNeedsVisa) {
-      const programSponsorsJ1 = prog.visa_j1;
-      const programSponsorsH1B = prog.visa_h1b;
-      if (!programSponsorsJ1 && !programSponsorsH1B) {
-        score -= 40;
-        reasons.push("Does not sponsor J-1 or H-1B visas");
-        visaIssue = true;
-        meetsAll = false;
-      }
-    }
-
-    // 2. Score Check (Step 2 CK)
-    const userScore = profile.usmle_step2_score ? Number(profile.usmle_step2_score) : null;
-    if (userScore) {
-      if (prog.step2_score_min && userScore < prog.step2_score_min) {
-        score -= 25;
-        reasons.push(`Your Step 2 CK (${userScore}) is below program minimum (${prog.step2_score_min})`);
-        meetsAll = false;
-      } else if (prog.step2_score_avg && userScore < prog.step2_score_avg) {
-        score -= 10;
-        reasons.push(`Your Step 2 CK (${userScore}) is below program average (${prog.step2_score_avg})`);
-      } else {
-        reasons.push("Step 2 CK score matches/exceeds average");
-      }
-    } else {
-      score -= 10;
-      reasons.push("Step 2 CK score not provided in profile");
-      meetsAll = false;
-    }
-
-    // 3. USCE Check
-    const userHasUSCE = profile.us_clinical_experience;
-    if (prog.min_usce_months && prog.min_usce_months > 0) {
-      if (!userHasUSCE) {
-        score -= 20;
-        reasons.push(`Requires US Clinical Experience (${prog.min_usce_months} months)`);
-        meetsAll = false;
-      } else {
-        reasons.push("Meets US Clinical Experience preference");
-      }
-    }
-
-    // 4. Graduation Year Check
-    const currentYear = 2026;
-    const userGradYear = profile.graduation_year ? Number(profile.graduation_year) : null;
-    if (userGradYear && prog.grad_year_cutoff) {
-      const yearsSinceGrad = currentYear - userGradYear;
-      if (yearsSinceGrad > prog.grad_year_cutoff) {
-        score -= 15;
-        reasons.push(`Graduation cutoff is ${prog.grad_year_cutoff} years (You: ${yearsSinceGrad} years)`);
-        meetsAll = false;
-      } else {
-        reasons.push("Within graduation year cutoff");
-      }
-    }
-
-    // Minimum floor
-    score = Math.max(10, score);
-    return { score, reasons, meetsAll, visaIssue };
-  };
+  const getFit = (prog) => calculateFitScore(prog, profile);
 
   // Specialties & States lists
-  const specialties = [...new Set(programs.map(p => p.specialty))];
+  const specialties = [...new Set(programs.map(p => p.specialty).filter(Boolean))];
   const regions = ["Northeast", "Midwest", "South", "West"];
 
-  // Filter programs logic
+  const searchFilters = useMemo(
+    () => ({
+      searchQuery: debouncedSearch,
+      specialty: selectedSpecialty,
+      region: selectedRegion,
+      visa: selectedVisa,
+      size: selectedSize,
+      format: selectedFormat,
+      fitOnly: fitFilter,
+    }),
+    [debouncedSearch, selectedSpecialty, selectedRegion, selectedVisa, selectedSize, selectedFormat, fitFilter]
+  );
+
+  const fitMap = useMemo(() => buildFitScoreMap(programs, profile), [programs, profile]);
+
   const filteredPrograms = useMemo(() => {
-    return programs.filter(prog => {
-      // 1. Search Query
-      const matchesSearch = prog.program_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           prog.institution.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           prog.city.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      // 2. Advanced Select Filters
-      const matchesSpecialty = selectedSpecialty === 'all' || prog.specialty === selectedSpecialty;
-      const matchesRegion = selectedRegion === 'all' || prog.region === selectedRegion;
-      
-      const matchesVisa = selectedVisa === 'all' || 
-        (selectedVisa === 'j1' && prog.visa_j1) ||
-        (selectedVisa === 'h1b' && prog.visa_h1b);
+    const filtered = filterIMGPrograms(programs, searchFilters, profile);
+    return sortPrograms(filtered, sortBy, fitMap);
+  }, [programs, searchFilters, profile, sortBy, fitMap]);
 
-      const matchesSize = selectedSize === 'all' ||
-        (selectedSize === 'small' && prog.program_size < 50) ||
-        (selectedSize === 'medium' && prog.program_size >= 50 && prog.program_size <= 100) ||
-        (selectedSize === 'large' && prog.program_size > 100);
-
-      const matchesFormat = selectedFormat === 'all' || prog.interview_format === selectedFormat;
-
-      // 3. Personalized Fit Filter
-      let matchesFit = true;
-      if (fitFilter) {
-        const fit = calculateFitScore(prog);
-        matchesFit = fit.meetsAll && !fit.visaIssue;
-      }
-
-      return matchesSearch && matchesSpecialty && matchesRegion && matchesVisa && matchesSize && matchesFormat && matchesFit;
-    });
-  }, [programs, searchQuery, selectedSpecialty, selectedRegion, selectedVisa, selectedSize, selectedFormat, fitFilter, profile]);
+  const filtersActive = hasActiveIMGFilters(searchFilters) || sortBy !== 'fit';
 
   // Saved Programs Map
   const savedProgramsList = useMemo(() => {
@@ -679,13 +631,42 @@ export default function IMGPrograms() {
                   onCheckedChange={setFitFilter}
                 />
               </div>
+
+              {/* Sort + clear */}
+              <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex-1 min-w-[160px]">
+                  <label className="text-xs text-slate-500 font-medium mb-1 block">Sort by</label>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="rounded-xl h-10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fit">Best fit</SelectItem>
+                      <SelectItem value="img_friendly">IMG-friendly score</SelectItem>
+                      <SelectItem value="deadline">Application deadline</SelectItem>
+                      <SelectItem value="name">Program name</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {filtersActive && (
+                  <Button variant="ghost" size="sm" onClick={clearAllFilters} className="rounded-xl mt-5">
+                    <X className="w-4 h-4 mr-1" /> Clear filters
+                  </Button>
+                )}
+                <Link
+                  to={createPageUrl('ProgramsList')}
+                  className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mt-5 ml-auto"
+                >
+                  Community notes &amp; scam reports →
+                </Link>
+              </div>
             </div>
 
             {/* Results Grid */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-slate-500">
-                  {filteredPrograms.length} programs found
+                  {filteredPrograms.length} program{filteredPrograms.length === 1 ? '' : 's'} found
                 </p>
               </div>
 
@@ -694,13 +675,21 @@ export default function IMGPrograms() {
                   <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
                 </div>
               ) : filteredPrograms.length === 0 ? (
-                <Card className="p-12 text-center rounded-3xl border-slate-200">
+                <Card className="p-12 text-center rounded-3xl border-slate-200 dark:border-slate-700">
                   <GraduationCap className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
-                  <p className="text-slate-500">No programs match your search or fit criteria.</p>
+                  <p className="text-slate-700 dark:text-slate-300 font-medium mb-1">No programs match</p>
+                  <p className="text-slate-500 text-sm mb-4">
+                    Try a broader search, turn off the fit filter, or clear all filters.
+                  </p>
+                  {filtersActive && (
+                    <Button onClick={clearAllFilters} className="rounded-xl">
+                      Clear all filters
+                    </Button>
+                  )}
                 </Card>
               ) : (
                 filteredPrograms.map((prog) => {
-                  const fit = calculateFitScore(prog);
+                  const fit = fitMap[prog.id] || getFit(prog);
                   return (
                     <motion.div
                       key={prog.id}
@@ -1036,7 +1025,7 @@ export default function IMGPrograms() {
             {rankedPrograms.length > 0 && (
               <div className="space-y-2">
                 {rankedPrograms.map((prog) => {
-                  const fit = calculateFitScore(prog);
+                  const fit = getFit(prog);
                   const warnings = [];
                   
                   if (fit.visaIssue) {
@@ -1111,7 +1100,7 @@ export default function IMGPrograms() {
             ) : (
               <div className="space-y-3">
                 {rankedPrograms.map((prog, index) => {
-                  const fit = calculateFitScore(prog);
+                  const fit = getFit(prog);
                   const interviewLogs = interviews.filter(i => i.programId === prog.id);
                   const isSaved = profile?.favorite_programs?.includes(prog.id);
 
@@ -1252,7 +1241,7 @@ export default function IMGPrograms() {
                     ) : (
                       <div className="space-y-2">
                         {rankedPrograms.map((prog, index) => {
-                          const fit = calculateFitScore(prog);
+                          const fit = getFit(prog);
                           return (
                             <div key={`advisor-rank-${prog.id}`} className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-100 text-xs">
                               <span className="font-semibold text-slate-700 dark:text-slate-350">
@@ -1294,7 +1283,7 @@ export default function IMGPrograms() {
         onClose={() => setSelectedProgram(null)}
         program={selectedProgram}
         profile={profile}
-        calculateFitScore={calculateFitScore}
+        calculateFitScore={getFit}
       />
 
       {/* Log Interview Dialog */}

@@ -1,12 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { ThumbsUp, Flag, Share2, MoreVertical, Verified, Shield, AlertTriangle } from 'lucide-react';
+import { ThumbsUp, Flag, Share2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { voteNoteHelpful } from '@/api/programs';
 

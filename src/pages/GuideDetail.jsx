@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
@@ -23,276 +23,154 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { 
-  Check, 
-  Clock, 
+import {
+  Check,
+  Clock,
   ExternalLink,
   AlertCircle,
   Lightbulb,
   FileText,
   Zap,
   Share2,
-  HelpCircle
+  HelpCircle,
 } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import confetti from 'canvas-confetti';
-
-const guideContent = {
-  ecfmg_pathways: {
-    title: 'ECFMG Certification Pathways',
-    overview: 'ECFMG certification is REQUIRED for IMGs to enter US residency programs. The 2026 Pathways fulfill the clinical/communication skills component of certification. IMPORTANT: You MUST also pass USMLE Step 1 and Step 2 CK - pathways do NOT substitute for these exams. Apply via MyIntealth portal (launched Aug 2025).',
-    deadline: 'January 31, 2026 (Certification Deadline)',
-    checklist: [
-      { id: 1, text: '✅ Pass USMLE Step 1 (REQUIRED - not part of pathways)' },
-      { id: 2, text: '✅ Pass USMLE Step 2 CK (REQUIRED - not part of pathways)' },
-      { id: 3, text: 'Pass OET Medicine (min. 350 ALL skills, test Jan 1, 2024+)' },
-      { id: 4, text: 'Complete ONE of the 6 Pathways (clinical/communication skills)' },
-      { id: 5, text: 'Submit application via MyIntealth portal' },
-      { id: 6, text: 'Receive ECFMG certification by Jan 31, 2026 for Match' }
-    ],
-    tips: [
-      'CRITICAL: USMLE Step 1 & Step 2 CK are SEPARATE requirements - must pass both',
-      'Pathways only fulfill clinical/communication component - not full certification',
-      'OET test date MUST be Jan 1, 2024 or later (older scores not accepted)',
-      'Apply early via MyIntealth - verification can take weeks',
-      'For 2026 Match: ERAS opens Sept 24, 2025; certification due Jan 31, 2026',
-      '2026 Pathways expire Dec 31, 2028 - revalidation needed beyond this date',
-      'Pathway 6 is fallback option for those who failed Step 2 CS or ineligible for others'
-    ],
-    resources: [
-      { title: 'ECFMG Official - Pathways Info', url: 'https://www.ecfmg.org/certification-pathways', type: 'website' },
-      { title: 'MyIntealth Application Portal', url: 'https://www.ecfmg.org/certification-pathways/myintealth.html', type: 'website' },
-      { title: 'OET Medicine Registration', url: 'https://www.occupationalenglishtest.org', type: 'website' },
-      { title: 'USMLE Step 1 Info', url: 'https://www.usmle.org/step-1', type: 'website' },
-      { title: 'USMLE Step 2 CK Info', url: 'https://www.usmle.org/step-2-ck', type: 'website' }
-    ]
-  },
-  usmle_step1: {
-    title: 'USMLE Step 1',
-    overview: 'Step 1 assesses whether you understand and can apply important concepts of the basic sciences to the practice of medicine. Now reported as Pass/Fail.',
-    checklist: [
-      { id: 1, text: 'Create USMLE account' },
-      { id: 2, text: 'Get ECFMG ID' },
-      { id: 3, text: 'Complete study resources (First Aid, UWorld, Pathoma)' },
-      { id: 4, text: 'Take practice exams (NBME, UWorld Self-Assessments)' },
-      { id: 5, text: 'Schedule exam date' },
-      { id: 6, text: 'Pass Step 1' }
-    ],
-    tips: [
-      'Dedicated study period of 2-3 months recommended',
-      'First Aid + UWorld is the gold standard combo',
-      'Practice with timed blocks to build stamina',
-      'Join study groups for accountability'
-    ],
-    resources: [
-      { title: 'USMLE Official', url: 'https://www.usmle.org', type: 'website' },
-      { title: 'First Aid Book', url: 'https://www.firstaidteam.com', type: 'document' },
-      { title: 'UWorld Qbank', url: 'https://www.uworld.com', type: 'website' }
-    ]
-  },
-  clinical_experience: {
-    title: 'US Clinical Experience',
-    overview: 'US Clinical Experience (USCE) is crucial for competitive specialties like Surgery. It demonstrates your ability to work in the US healthcare system and provides valuable letters of recommendation.',
-    checklist: [
-      { id: 1, text: 'Research observership vs externship programs' },
-      { id: 2, text: 'Apply to multiple programs (start 6-12 months early)' },
-      { id: 3, text: 'Secure at least 2-3 rotations in your specialty' },
-      { id: 4, text: 'Focus on programs that write strong LORs' },
-      { id: 5, text: 'Network with attending physicians' },
-      { id: 6, text: 'Document all experiences for ERAS' }
-    ],
-    tips: [
-      'FOR SURGERY: Aim for at least one rotation at a university program',
-      'Hands-on externships are valued more than observerships',
-      'Target programs in your desired geographic location',
-      'Be proactive - volunteer for cases and research opportunities',
-      'Ask for letters from program directors or division chiefs'
-    ],
-    resources: [
-      { title: 'AMOpportunities', url: 'https://www.amopportunities.org', type: 'website' },
-      { title: 'VSLO (AAMC)', url: 'https://students-residents.aamc.org/vslo', type: 'website' },
-      { title: 'IMG Clinical Experience Guide', url: 'https://www.ama-assn.org/education/international-medical-education', type: 'document' }
-    ]
-  },
-  research: {
-    title: 'Research Experience',
-    overview: 'Research experience is especially important for competitive specialties like Surgery. Publications and presentations strengthen your application significantly.',
-    checklist: [
-      { id: 1, text: 'Identify research opportunities in your target specialty' },
-      { id: 2, text: 'Join research projects remotely if needed' },
-      { id: 3, text: 'Aim for at least 1-2 publications' },
-      { id: 4, text: 'Present at conferences if possible' },
-      { id: 5, text: 'List all research on ERAS with proper citations' }
-    ],
-    tips: [
-      'FOR SURGERY: Research is highly valued - aim for surgical outcomes or education research',
-      'Quality over quantity - one first-author paper is better than multiple abstracts',
-      'Network with researchers at programs you want to match at',
-      'Case reports and systematic reviews are good starting points',
-      'Join surgical societies (e.g., SAGES, ACS) for networking'
-    ],
-    resources: [
-      { title: 'Research Match', url: 'https://www.researchmatch.org', type: 'website' },
-      { title: 'ACS Research Resources', url: 'https://www.facs.org', type: 'website' },
-      { title: 'PubMed', url: 'https://pubmed.ncbi.nlm.nih.gov', type: 'website' }
-    ]
-  },
-  usmle_step2: {
-    title: 'USMLE Step 2 CK',
-    overview: 'Step 2 CK assesses clinical knowledge through multiple-choice questions. A high score is crucial for competitive specialties.',
-    checklist: [
-      { id: 1, text: 'Complete Step 2 CK study resources' },
-      { id: 2, text: 'Master clinical algorithms' },
-      { id: 3, text: 'Complete UWorld Step 2' },
-      { id: 4, text: 'Take self-assessments' },
-      { id: 5, text: 'Schedule and pass exam' }
-    ],
-    tips: [
-      'Many find Step 2 easier than Step 1',
-      'Clinical rotations help significantly',
-      'Focus on IM, Surgery, OB, Peds, Psych',
-      'Aim for the highest score possible - it matters!'
-    ],
-    resources: [
-      { title: 'USMLE Step 2 CK', url: 'https://www.usmle.org/step-2-ck', type: 'website' },
-      { title: 'UWorld Step 2', url: 'https://www.uworld.com', type: 'website' },
-      { title: 'Amboss', url: 'https://www.amboss.com', type: 'website' }
-    ]
-  },
-  eras_registration: {
-    title: 'ERAS Application',
-    overview: 'The Electronic Residency Application Service (ERAS) is the centralized application system for residency programs. Your application opens to programs in September.',
-    deadline: 'September 2025',
-    checklist: [
-      { id: 1, text: 'Create ERAS account through ECFMG' },
-      { id: 2, text: 'Complete MyERAS application' },
-      { id: 3, text: 'Upload personal statement' },
-      { id: 4, text: 'Request letters of recommendation' },
-      { id: 5, text: 'Upload USMLE transcript' },
-      { id: 6, text: 'Certify and submit application' },
-      { id: 7, text: 'Assign programs to documents' }
-    ],
-    tips: [
-      'Apply broadly - 100+ programs for competitive specialties',
-      'Apply early on September 3rd when applications open',
-      'Have 3-4 strong letters of recommendation',
-      'Research IMG-friendly programs'
-    ],
-    resources: [
-      { title: 'ERAS for IMGs', url: 'https://students-residents.aamc.org/eras', type: 'website' },
-      { title: 'Residency Explorer', url: 'https://www.residencyexplorer.org', type: 'website' },
-      { title: 'FREIDA', url: 'https://freida.ama-assn.org', type: 'website' }
-    ]
-  },
-  nrmp_match: {
-    title: 'NRMP Match',
-    overview: 'The National Resident Matching Program pairs applicants with residency programs through a computerized algorithm based on ranked lists.',
-    deadline: 'March 2026',
-    checklist: [
-      { id: 1, text: 'Register for NRMP Main Match' },
-      { id: 2, text: 'Complete interview season' },
-      { id: 3, text: 'Create rank order list' },
-      { id: 4, text: 'Certify rank list by deadline' },
-      { id: 5, text: 'Match Day!' }
-    ],
-    tips: [
-      'Rank programs by your TRUE preference order',
-      'The algorithm favors applicants - be honest',
-      'Have a SOAP backup plan',
-      'Join Match support groups for the wait'
-    ],
-    resources: [
-      { title: 'NRMP Official', url: 'https://www.nrmp.org', type: 'website' },
-      { title: 'Match Timeline', url: 'https://www.nrmp.org/match-process', type: 'document' },
-      { title: 'Charting Outcomes', url: 'https://www.nrmp.org/main-residency-match-data', type: 'document' }
-    ]
-  }
-};
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { getGuideContent } from '@/data/guideContent';
+import { normalizePathwayKey } from '@/data/pathways';
 
 export default function GuideDetail() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const guideId = urlParams.get('id') || 'ecfmg_pathways';
-  const pathway = urlParams.get('pathway') || 'residency';
-  
-  const [notes, setNotes] = useState('');
-  const [visualMode, setVisualMode] = useState('mountain'); // 'mountain', 'tree', 'rocket'
-  const [showShareDialog, setShowShareDialog] = useState(false);
-  const visualRef = React.useRef(null);
-  
-  const guide = guideContent[guideId] || guideContent.ecfmg_pathways;
+  const pathway = normalizePathwayKey(urlParams.get('pathway') || 'residency');
 
+  const [notes, setNotes] = useState('');
+  const [visualMode, setVisualMode] = useState('mountain');
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [localChecklist, setLocalChecklist] = useState([]);
+  const visualRef = React.useRef(null);
+
+  const guide = getGuideContent(guideId);
   const { user } = useAuth();
 
-  const { data: progressList = [] } = useQuery({
+  const { data: progressList = [], isLoading: progressLoading } = useQuery({
     queryKey: ['progress', guideId],
     queryFn: async () => {
-      const { data, error } = await supabase.from('progress').select('*').eq('user_id', user?.id).eq('module_id', guideId);
+      const { data, error } = await supabase
+        .from('progress')
+        .select('*')
+        .eq('user_id', user?.id)
+        .eq('module_id', guideId);
       if (error) throw error;
       return data || [];
     },
-    enabled: !!user?.id
+    enabled: !!user?.id && !!guide,
   });
 
   const progress = progressList[0];
-  const [localChecklist, setLocalChecklist] = useState(
-    progress?.checklist_items || guide.checklist.map(item => ({ ...item, completed: false }))
-  );
+
+  useEffect(() => {
+    if (!guide) return;
+    if (user?.id && progressLoading) return;
+
+    if (progress?.checklist_items?.length) {
+      setLocalChecklist(progress.checklist_items);
+    } else {
+      setLocalChecklist(guide.checklist.map((item) => ({ ...item, completed: false })));
+    }
+    setNotes(progress?.notes || '');
+  }, [guide, progress, progressLoading, user?.id, guideId]);
 
   const updateProgressMutation = useMutation({
     mutationFn: async (dataToUpdate) => {
+      if (!user?.id) throw new Error('Please log in to save progress');
+      if (!guide) throw new Error('Guide not found');
       if (progress) {
-        const { data, error } = await supabase.from('progress').update(dataToUpdate).eq('id', progress.id).select().single();
+        const { data, error } = await supabase
+          .from('progress')
+          .update(dataToUpdate)
+          .eq('id', progress.id)
+          .select()
+          .single();
         if (error) throw error;
         return data;
-      } else {
-        const { data, error } = await supabase.from('progress').insert({
+      }
+      const { data, error } = await supabase
+        .from('progress')
+        .insert({
           user_id: user.id,
           pathway,
           module_id: guideId,
           module_name: guide.title,
-          ...dataToUpdate
-        }).select().single();
-        if (error) throw error;
-        return data;
-      }
+          ...dataToUpdate,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['progress'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['progress'] }),
+    onError: (err) => toast.error(err?.message || 'Failed to save progress'),
   });
 
   const toggleChecklistItem = (itemId) => {
-    const newChecklist = localChecklist.map(item =>
+    if (!guide) return;
+    if (!user?.id) {
+      toast.error('Please log in to track progress');
+      return;
+    }
+    const newChecklist = localChecklist.map((item) =>
       item.id === itemId ? { ...item, completed: !item.completed } : item
     );
     setLocalChecklist(newChecklist);
-    
-    const completedCount = newChecklist.filter(i => i.completed).length;
+
+    const completedCount = newChecklist.filter((i) => i.completed).length;
     const total = newChecklist.length;
-    const percentage = Math.round((completedCount / total) * 100);
-    const wasComplete = localChecklist.filter(i => i.completed).length === total;
-    
-    // Celebration for completion
+    const percentage = total ? Math.round((completedCount / total) * 100) : 0;
+    const wasComplete = localChecklist.filter((i) => i.completed).length === total;
+
     if (percentage === 100 && !wasComplete) {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
-    
+
     updateProgressMutation.mutate({
       checklist_items: newChecklist,
       completion_percentage: percentage,
-      status: percentage === 100 ? 'completed' : percentage > 0 ? 'in_progress' : 'not_started'
+      status: percentage === 100 ? 'completed' : percentage > 0 ? 'in_progress' : 'not_started',
     });
   };
 
-  const completedCount = localChecklist.filter(i => i.completed).length;
-  const progressPercentage = Math.round((completedCount / localChecklist.length) * 100);
+  if (!guide) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
+        <Header title="Guide not found" showBack />
+        <main className="px-4 py-12 max-w-lg mx-auto text-center space-y-4">
+          <AlertCircle className="w-12 h-12 text-amber-500 mx-auto" />
+          <h2 className="text-xl font-semibold text-slate-800 dark:text-white">Guide not found</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
+            We could not find a guide for <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1 rounded">{guideId}</code>.
+          </p>
+          <Button onClick={() => navigate(createPageUrl('Guides'))} className="rounded-xl">
+            Back to Guides
+          </Button>
+        </main>
+        <BottomNav />
+      </div>
+    );
+  }
+
+  const completedCount = localChecklist.filter((i) => i.completed).length;
+  const progressPercentage = localChecklist.length
+    ? Math.round((completedCount / localChecklist.length) * 100)
+    : 0;
 
   const breadcrumbItems = [
     { label: 'Guides', href: createPageUrl('Guides') },
-    { label: guide.title }
+    { label: guide.title },
   ];
 
   return (
@@ -380,6 +258,21 @@ export default function GuideDetail() {
         </Card>
 
         {/* ECFMG-Specific Content */}
+        {guideId === 'oet_medicine' && (
+          <OETRequirements />
+        )}
+
+        {guideId === 'program_research' && (
+          <Card className="p-4 rounded-2xl border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/20">
+            <p className="text-sm text-slate-700 dark:text-slate-300 mb-3">
+              Ready to find programs? Use MatchaMD's IMG-friendly directory with fit scoring.
+            </p>
+            <Button onClick={() => navigate(createPageUrl('IMGPrograms'))} className="rounded-xl w-full">
+              Open program search
+            </Button>
+          </Card>
+        )}
+
         {guideId === 'ecfmg_pathways' && (
           <>
             {/* Disclaimer */}
