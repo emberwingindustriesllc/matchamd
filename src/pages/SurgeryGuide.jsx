@@ -20,13 +20,13 @@ import PremiumGate from '@/components/premium/PremiumGate';
 
 const surgeryContent = {
   overview: {
-    title: 'Surgery Residency Overview',
-    content: 'General surgery is one of the most competitive specialties for IMGs. Understanding the application process, program expectations, and IMG-friendly strategies is crucial for success.',
+    title: 'General Surgery Residency IMG Roadmap',
+    content: 'General surgery is one of the most rigorous and rewarding paths for International Medical Graduates. To stand out, applicants need a strategic mix of high Step 2 CK scores, hands-on surgical USCE, strong letters of recommendation from US surgeons, and a clear understanding of Categorical vs. Preliminary positions.',
     stats: [
-      { label: 'IMG Match Rate', value: '42%', trend: 'down' },
-      { label: 'Avg Step 2 CK', value: '245', trend: 'up' },
-      { label: 'Positions', value: '1,200+', trend: 'neutral' },
-      { label: 'Programs', value: '270+', trend: 'neutral' }
+      { label: 'Categorical IMG Match', value: '38%', trend: 'down' },
+      { label: 'Target Step 2 CK', value: '248+', trend: 'up' },
+      { label: 'Positions (Cat + Prelim)', value: '1,600+', trend: 'neutral' },
+      { label: 'Surgical Programs', value: '290+', trend: 'neutral' }
     ]
   },
   sections: [
@@ -36,150 +36,92 @@ const surgeryContent = {
       icon: Target,
       content: [
         {
-          subtitle: 'USMLE Score Targets',
+          subtitle: 'USMLE Score Targets & Thresholds',
           items: [
-            'Step 1: Pass (if scored: 230+)',
-            'Step 2 CK: 245+ highly recommended for IMGs',
-            'Step 3: Not required for application, helpful if passed'
+            'Step 2 CK Target: 248+ is strongly recommended for Categorical General Surgery. Scores below 240 often require applying to Preliminary PGY-1 positions or completing a surgical research fellowship.',
+            'Step 1: Pass on first attempt is mandatory. Multiple attempts on Step 1 or Step 2 CK are significant red flags for surgical program directors.',
+            'Step 3 Advantage: Passing Step 3 before September 15 is a major asset—it proves clinical readiness and qualifies you for H-1B visa sponsorship at participating programs.'
           ]
         },
         {
-          subtitle: 'Clinical Experience',
+          subtitle: 'Categorical vs. Preliminary General Surgery Strategy',
           items: [
-            'US clinical experience (USCE) - minimum 3 months strongly recommended',
-            'Surgery observerships or externships',
-            'Letters of recommendation from US surgeons (3-4 required)',
-            'Research experience beneficial but not required'
+            'Categorical Positions: Full 5-year residency leading directly to board eligibility. Highly competitive for IMGs, requiring 245+ Step 2 CK and strong US surgeon LORs.',
+            'Preliminary PGY-1 Positions: 1-year non-renewable positions. Prelim spots give IMGs valuable US surgical experience, operating room exposure, and an opportunity to prove clinical excellence.',
+            'Prelim-to-Categorical Transition: Over 40% of dedicated preliminary PGY-1 surgery residents successfully transition into open Categorical PGY-2 or PGY-1 spots by demonstrating exceptional work ethic, scrub skills, and team leadership during their prelim year.'
           ]
         },
         {
-          subtitle: 'Red Flags to Avoid',
+          subtitle: 'Operating Room (OR) Etiquette & USCE Protocol for IMGs',
           items: [
-            'Multiple Step exam attempts',
-            'Long gaps in training',
-            'Lack of US clinical experience',
-            'Weak letters of recommendation'
+            'Scrub Nurse Rapport: Introduce yourself to the scrub nurse and circulator BEFORE scrubbing in. Offer your glove size and write your name clearly on the board.',
+            'Sterility Standards: Keep hands above waist level and below chest at all times after scrubbing. Never reach across a sterile field without permission.',
+            'Pre-Op Patient Preparation: Know your patient inside out—read the pre-op note, imaging findings, lab results (labs, coagulation panel), and indication for surgery before entering the OR.',
+            'Knot Tying & Suture Mastery: Practice two-handed, one-handed, and instrument ties until seamless before starting your surgical rotation.'
           ]
         }
       ]
     },
     {
       id: 'application',
-      title: 'Application Strategy',
+      title: 'Application & Personal Statement Strategy',
       icon: FileText,
       content: [
         {
-          subtitle: 'Program Selection',
+          subtitle: 'Program Selection & Broad Applying',
           items: [
-            'Apply broadly: 80-120 programs recommended for IMGs',
-            'Target community programs - often more IMG-friendly',
-            'Research visa sponsorship (J-1 vs H-1B)',
-            'Consider geographic preferences carefully',
-            'Mix of reach, target, and safety programs'
+            'Targeting Strategy: Apply to 90–130 programs. Focus on community hospital programs and university-affiliated community centers that historically sponsor J-1 or H-1B visas.',
+            'Geographic Flexibility: Be willing to train anywhere in the US. Midwestern, Southern, and Upstate New York programs frequently offer strong preliminary and categorical IMG opportunities.',
+            'Letters of Recommendation (LORs): Secure 3-4 letters from US board-certified general surgeons who can attest to your technical aptitude, clinical judgment, and stamina in the OR.'
           ]
         },
         {
-          subtitle: 'ERAS Application Timeline',
+          subtitle: 'Surgical Personal Statement Framework',
           items: [
-            'June-July: Finalize USCE, request letters',
-            'September 15: ERAS opens for submission',
-            'October: Interview invitations begin',
-            'November-January: Interview season',
-            'February: Rank order list submission',
-            'March: Match Day'
-          ]
-        },
-        {
-          subtitle: 'Personal Statement Tips',
-          items: [
-            'Explain your journey to surgery clearly',
-            'Highlight unique experiences and strengths',
-            'Address any gaps or concerns proactively',
-            'Show commitment to underserved communities',
-            'Keep it concise: 1 page maximum'
+            'The Hook: Begin with a vivid, specific clinical case in the OR that sparked your passion for general surgery—focus on surgical decision-making rather than simple fascination with procedures.',
+            'Demonstrating Stamina & Teamwork: Highlight experiences that prove physical endurance, emotional resilience, and effective communication with nurses, anesthesiologists, and floor teams.',
+            'Addressing Setbacks: If you have graduation gaps or non-traditional training paths, frame them around continuous learning, surgical research, or volunteer emergency medicine work.',
+            'Exemplar Opening Paragraph: "Standing at the operating table during an emergency laparotomy for a ruptured appendicitis, I witnessed the immediate, transformative power of surgical intervention. As the attending guided my hands to achieve suction and exposure, I realized general surgery demands both technical precision and calm composure under extreme pressure."'
           ]
         }
       ]
     },
     {
       id: 'interviews',
-      title: 'Interview Preparation',
+      title: 'Surgical Interview Scenarios & M&M',
       icon: Users,
       content: [
         {
-          subtitle: 'Common Interview Questions',
+          subtitle: 'High-Yield Surgical Interview Questions',
           items: [
-            '"Why surgery?" - Have a compelling story',
-            '"Why our program?" - Research thoroughly',
-            '"Tell me about yourself" - 2-minute elevator pitch',
-            '"Describe a challenging patient case"',
-            '"What are your career goals?"',
-            '"How do you handle stress?"'
+            '"Why General Surgery instead of a surgical subspecialty?" - Focus on broad abdominal pathology, emergency general surgery, and comprehensive perioperative care.',
+            '"How do you handle high mortality or surgical complications?" - Discuss Morbidity & Mortality (M&M) principles: objective case analysis, root-cause identification, and zero personal defensive bias.',
+            '"Describe a time when an intraoperative complication occurred." - Highlight immediate calm communication with attending, patient stabilization, and post-op transparent disclosure.'
           ]
         },
         {
-          subtitle: 'Virtual Interview Tips',
+          subtitle: 'Post-Op Fever Triage Scenario (The 5 Ws)',
           items: [
-            'Test technology 30 minutes before',
-            'Professional background and lighting',
-            'Business professional attire',
-            'Have questions prepared for the program',
-            'Send thank-you emails within 24 hours'
+            'Wind (Day 1-2): Atelectasis / pneumonia — encourage incentive spirometry and chest physiotherapy.',
+            'Water (Day 3-5): Urinary tract infection (UTI) — check Foley catheter, urinalysis, and urine culture.',
+            'Wound (Day 5-7): Surgical site infection — inspect wound site, check for erythema, purulence, or dehiscence.',
+            'Walking (Day 7+): Deep vein thrombosis (DVT) / PE — evaluate lower extremity edema, ultrasound, start anticoagulation.',
+            'Wonder Drugs (Anytime): Drug fever, IV line infection, or transfusion reaction.'
           ]
         }
       ]
     },
     {
       id: 'img-friendly',
-      title: 'IMG-Friendly Programs',
+      title: 'Surgical Research & Academic Growth',
       icon: Award,
       content: [
         {
-          subtitle: 'Characteristics to Look For',
+          subtitle: 'Publishing Surgical Research as an IMG',
           items: [
-            'High percentage of IMG residents (>50%)',
-            'History of matching IMGs',
-            'J-1 and H-1B visa sponsorship',
-            'Community-based programs',
-            'Programs in underserved areas',
-            'Newer or expanding programs'
-          ]
-        },
-        {
-          subtitle: 'Research Resources',
-          items: [
-            'FREIDA database (AMA)',
-            'Program websites - resident roster',
-            'IMG-friendly program lists (Reddit, SDN)',
-            'Match data from NRMP',
-            'Network with current IMG residents'
-          ]
-        }
-      ]
-    },
-    {
-      id: 'backup',
-      title: 'Backup Plans & Alternative Pathways',
-      icon: AlertCircle,
-      content: [
-        {
-          subtitle: 'If You Don\'t Match',
-          items: [
-            'SOAP (Supplemental Offer and Acceptance Program)',
-            'Consider preliminary surgery positions',
-            'Research positions to strengthen application',
-            'Additional USCE in surgery',
-            'Retake Step exams if needed for higher scores',
-            'Apply to less competitive specialties as backup'
-          ]
-        },
-        {
-          subtitle: 'Alternative Surgical Specialties',
-          items: [
-            'Preliminary Surgery (1 year) → Reapply',
-            'General Surgery residency → Fellowship',
-            'Consider: Urology, Orthopedics, ENT (all very competitive)',
-            'Less competitive: Physical Medicine & Rehabilitation'
+            'Case Reports & Case Series: Partner with US attending surgeons to write up rare surgical presentations, innovative operative techniques, or unusual post-op complications.',
+            'Surgical Conferences: Submit abstracts to major surgical meetings including the American College of Surgeons (ACS Clinical Congress), SAGES, and regional surgical societies.',
+            'Systematic Reviews & Meta-Analyses: Conduct high-yield reviews on surgical outcomes, minimally invasive laparoscopic vs robotic techniques, or perioperative bundle interventions.'
           ]
         }
       ]

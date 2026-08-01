@@ -11,23 +11,23 @@ export default function OfficialReferences() {
       color: 'indigo',
       sources: [
         {
-          title: 'Requirements for 2026 Pathways for ECFMG Certification',
-          url: 'https://www.ecfmg.org/certification-pathways/requirements.html',
+          title: 'Requirements for Pathways for ECFMG Certification',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'Official Documentation'
         },
         {
           title: 'Certification Pathways - Main Page',
-          url: 'https://www.ecfmg.org/certification/',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'Official Page'
         },
         {
-          title: 'Detailed Information and Online Application for 2026 Pathways',
-          url: 'https://www.ecfmg.org/news/2025/08/01/detailed-information-online-application-2026-pathways-now-available/',
+          title: 'Detailed Information & Online Application Pathways',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'ECFMG News'
         },
         {
-          title: 'ECFMG 2026 Information Booklet',
-          url: 'https://www.ecfmg.org/certification-pathways/booklet.html',
+          title: 'ECFMG Information Booklet',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'Official Booklet',
           description: 'Clinical Skills Requirement and Communication Skills Requirement'
         }
@@ -40,17 +40,17 @@ export default function OfficialReferences() {
       sources: [
         {
           title: 'Pathway 1: Already Licensed to Practice Medicine',
-          url: 'https://www.ecfmg.org/certification-pathways/pathway-1.html',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'Official Guide'
         },
         {
-          title: '2026 Pathways | Pathways 3, 4, and 5',
-          url: 'https://www.ecfmg.org/certification-pathways/pathways-3-4-5.html',
+          title: 'Pathways | Pathways 3, 4, and 5',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'Official Guide'
         },
         {
-          title: '2026 Pathways | Assessment of Communication Skills',
-          url: 'https://www.ecfmg.org/certification-pathways/communication-skills.html',
+          title: 'Pathways | Assessment of Communication Skills',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'Official Guide',
           description: 'Including English Language Proficiency (OET)'
         }
@@ -62,18 +62,18 @@ export default function OfficialReferences() {
       color: 'blue',
       sources: [
         {
-          title: 'Important Information on 2026 Pathways; Application Opens August 2025',
-          url: 'https://www.ecfmg.org/news/2025/06/15/important-information-2026-pathways-application-open-august/',
+          title: 'Important Information on ECFMG Pathways',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'ECFMG News'
         },
         {
           title: 'Information on Expiration of Pathways and ECFMG Certificate',
-          url: 'https://www.ecfmg.org/certification-pathways/expiration.html',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'Official Policy'
         },
         {
-          title: '2026 Pathways | FAQs',
-          url: 'https://www.ecfmg.org/certification-pathways/faqs.html',
+          title: 'Pathways | FAQs',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'Official FAQ'
         }
       ]
@@ -84,20 +84,20 @@ export default function OfficialReferences() {
       color: 'purple',
       sources: [
         {
-          title: 'ECFIMG Certification Pathways Overview',
+          title: 'ECFMG Certification Pathways Overview',
           url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'Official Guide',
           description: 'Start here for pathway requirements, OET, and how to apply.'
         },
         {
-          title: '2026 Pathways Requirements Details',
-          url: 'https://www.ecfmg.org/certification-pathways/requirements.html',
+          title: 'Pathways Requirements Details',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'Official Documentation',
-          description: 'Clinical/communication skills requirements for 2026 Pathways.'
+          description: 'Clinical/communication skills requirements for Pathways.'
         },
         {
           title: 'Pathways FAQs',
-          url: 'https://www.ecfmg.org/certification-pathways/faqs.html',
+          url: 'https://www.ecfmg.org/certification-pathways/',
           type: 'Official FAQ',
           description: 'Common questions about pathways, OET, expiration, and certification.'
         }

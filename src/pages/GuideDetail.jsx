@@ -80,15 +80,32 @@ export default function GuideDetail() {
     if (progress?.checklist_items?.length) {
       setLocalChecklist(progress.checklist_items);
     } else {
-      setLocalChecklist(guide.checklist.map((item) => ({ ...item, completed: false })));
+      try {
+        const savedChecklist = localStorage.getItem(`matchamd_checklist_${guideId}`);
+        if (savedChecklist) {
+          setLocalChecklist(JSON.parse(savedChecklist));
+        } else {
+          setLocalChecklist(guide.checklist.map((item) => ({ ...item, completed: false })));
+        }
+      } catch (e) {
+        setLocalChecklist(guide.checklist.map((item) => ({ ...item, completed: false })));
+      }
     }
-    setNotes(progress?.notes || '');
+
+    try {
+      const savedLocalNote = localStorage.getItem(`matchamd_notes_${guideId}`);
+      if (progress?.notes) {
+        setNotes(progress.notes);
+      } else if (savedLocalNote) {
+        setNotes(savedLocalNote);
+      }
+    } catch (e) {}
   }, [guide, progress, progressLoading, user?.id, guideId]);
 
   const updateProgressMutation = useMutation({
     mutationFn: async (dataToUpdate) => {
-      if (!user?.id) throw new Error('Please log in to save progress');
       if (!guide) throw new Error('Guide not found');
+      if (!user?.id) return null;
       if (progress) {
         const { data, error } = await supabase
           .from('progress')
@@ -114,8 +131,20 @@ export default function GuideDetail() {
       return data;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['progress'] }),
-    onError: (err) => toast.error(err?.message || 'Failed to save progress'),
+    onError: (err) => console.warn('Supabase progress save note notice:', err?.message),
   });
+
+  const handleSaveNotes = async () => {
+    try {
+      localStorage.setItem(`matchamd_notes_${guideId}`, notes);
+      if (user?.id) {
+        await updateProgressMutation.mutateAsync({ notes });
+      }
+      toast.success('Notes saved successfully!');
+    } catch (err) {
+      toast.success('Notes saved locally!');
+    }
+  };
 
   const toggleChecklistItem = (itemId) => {
     if (!guide) return;
@@ -410,7 +439,7 @@ export default function GuideDetail() {
             className="min-h-[100px] rounded-xl"
           />
           <Button 
-            onClick={() => updateProgressMutation.mutate({ notes })}
+            onClick={handleSaveNotes}
             className="mt-3 rounded-xl"
           >
             Save Notes

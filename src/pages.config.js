@@ -19,6 +19,7 @@ import InterviewCourse from './pages/InterviewCourse';
 import Onboarding from './pages/Onboarding';
 import Subscription from './pages/Subscription';
 import SurgeryGuide from './pages/SurgeryGuide';
+import AnkiGuide from './pages/AnkiGuide';
 import MatchCostCalculator from './pages/MatchCostCalculator';
 import __Layout from './Layout.jsx';
 
@@ -26,6 +27,7 @@ import __Layout from './Layout.jsx';
 export const PAGES = {
     "Login": Login,
     "AdminModeration": AdminModeration,
+    "AnkiGuide": AnkiGuide,
     "Community": Community,
     "Deadlines": Deadlines,
     "GuideDetail": GuideDetail,
