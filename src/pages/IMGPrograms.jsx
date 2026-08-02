@@ -56,6 +56,9 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { localPrograms } from '@/api/programs.local';
+import { mockFellowships } from '@/data/mockFellowships';
+import { mockObserverships } from '@/data/mockObserverships';
+import { mockMedicalSchools } from '@/data/mockMedicalSchools';
 import ProgramDetailsModal from '@/components/community/ProgramDetailsModal';
 import {
   calculateFitScore,
@@ -69,7 +72,9 @@ import { toast } from 'sonner';
 
 export default function IMGPrograms() {
   const [activeTab, setActiveTab] = useState('search');
+  const [categoryTab, setCategoryTab] = useState('residencies'); // 'residencies' | 'fellowships' | 'observerships' | 'medschools'
   const [searchQuery, setSearchQuery] = useState('');
+
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState('all');
@@ -345,7 +350,53 @@ export default function IMGPrograms() {
     return sortPrograms(filtered, sortBy, fitMap);
   }, [programs, searchFilters, profile, sortBy, fitMap]);
 
+  // Fellowships Filtered
+  const filteredFellowships = useMemo(() => {
+    return mockFellowships.filter(item => {
+      const q = debouncedSearch.toLowerCase();
+      const matchesSearch = !q || 
+        item.program_name.toLowerCase().includes(q) ||
+        item.institution.toLowerCase().includes(q) ||
+        item.specialty.toLowerCase().includes(q) ||
+        item.city.toLowerCase().includes(q) ||
+        item.state.toLowerCase().includes(q);
+      const matchesSpecialty = selectedSpecialty === 'all' || item.specialty === selectedSpecialty;
+      const matchesRegion = selectedRegion === 'all' || item.region === selectedRegion;
+      const matchesVisa = selectedVisa === 'all' || 
+        (selectedVisa === 'j1' && item.visa_j1) || 
+        (selectedVisa === 'h1b' && item.visa_h1b);
+      return matchesSearch && matchesSpecialty && matchesRegion && matchesVisa;
+    });
+  }, [debouncedSearch, selectedSpecialty, selectedRegion, selectedVisa]);
+
+  // Observerships Filtered
+  const filteredObserverships = useMemo(() => {
+    return mockObserverships.filter(item => {
+      const q = debouncedSearch.toLowerCase();
+      const matchesSearch = !q || 
+        item.title.toLowerCase().includes(q) ||
+        item.institution.toLowerCase().includes(q) ||
+        item.specialty.toLowerCase().includes(q) ||
+        item.city.toLowerCase().includes(q) ||
+        item.state.toLowerCase().includes(q);
+      const matchesSpecialty = selectedSpecialty === 'all' || item.specialty === selectedSpecialty;
+      return matchesSearch && matchesSpecialty;
+    });
+  }, [debouncedSearch, selectedSpecialty]);
+
+  // Medical Schools Filtered
+  const filteredMedicalSchools = useMemo(() => {
+    return mockMedicalSchools.filter(item => {
+      const q = debouncedSearch.toLowerCase();
+      return !q || 
+        item.school_name.toLowerCase().includes(q) ||
+        item.city.toLowerCase().includes(q) ||
+        item.country.toLowerCase().includes(q);
+    });
+  }, [debouncedSearch]);
+
   const filtersActive = hasActiveIMGFilters(searchFilters) || sortBy !== 'fit';
+
 
   // Saved Programs Map
   const savedProgramsList = useMemo(() => {
@@ -494,46 +545,123 @@ export default function IMGPrograms() {
 
           {/* Directory Tab */}
           <TabsContent value="search" className="space-y-6">
-            {/* Intro */}
+            {/* Intro Header */}
             <Card className="p-6 bg-gradient-to-br from-indigo-50 via-purple-50 to-white dark:from-indigo-950/20 dark:to-slate-900 border-indigo-200 dark:border-indigo-900/60 rounded-3xl">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-200 dark:shadow-none">
                   <Globe className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold mb-2">Residency Directory & Advanced Fit</h2>
+                  <h2 className="text-xl font-bold mb-1">Global Medical Opportunities Directory</h2>
                   <p className="text-slate-600 dark:text-slate-400 text-sm">
-                    Search authentic, IMG-friendly US programs. We match requirements to your profile, estimating your fit compatibility instantly.
+                    Explore US Residencies, Fellowships, Clinical Observerships/Rotations, and International Medical Schools.
                   </p>
                 </div>
               </div>
             </Card>
 
+            {/* Category Selector Tabs */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl">
+              <button
+                type="button"
+                onClick={() => setCategoryTab('residencies')}
+                className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                  categoryTab === 'residencies'
+                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Building className="w-4 h-4" />
+                <span>Residencies</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setCategoryTab('fellowships')}
+                className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                  categoryTab === 'fellowships'
+                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Stethoscope className="w-4 h-4" />
+                <span>Fellowships</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setCategoryTab('observerships')}
+                className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                  categoryTab === 'observerships'
+                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <ClipboardList className="w-4 h-4" />
+                <span>Observerships</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setCategoryTab('medschools')}
+                className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                  categoryTab === 'medschools'
+                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <GraduationCap className="w-4 h-4" />
+                <span>Med Schools</span>
+              </button>
+            </div>
+
             {/* Filters */}
             <div className="space-y-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <Input
-                    placeholder="Search programs, hospitals, or cities..."
+                    placeholder={
+                      categoryTab === 'residencies'
+                        ? "Search residency programs, hospitals, or cities..."
+                        : categoryTab === 'fellowships'
+                        ? "Search fellowships, subspecialties, or institutions..."
+                        : categoryTab === 'observerships'
+                        ? "Search clinical rotations, observerships, or cities..."
+                        : "Search international medical schools or countries..."
+                    }
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') setDebouncedSearch(searchQuery);
+                    }}
                     className="pl-12 h-12 rounded-xl border-slate-200 dark:border-slate-800"
                   />
                 </div>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                  className={`h-12 rounded-xl px-4 ${showAdvancedFilters ? 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-950/20 dark:border-indigo-800' : 'border-slate-200 dark:border-slate-800'}`}
+
+                <Button
+                  onClick={() => setDebouncedSearch(searchQuery)}
+                  className="h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-5 shadow-sm font-semibold"
                 >
-                  <SlidersHorizontal className="w-5 h-5" />
-                  <span className="ml-2 hidden sm:inline">Filters</span>
+                  <Search className="w-4 h-4 mr-1.5" />
+                  Search
                 </Button>
+
+                {categoryTab !== 'medschools' && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                    className={`h-12 rounded-xl px-4 ${showAdvancedFilters ? 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-950/20 dark:border-indigo-800' : 'border-slate-200 dark:border-slate-800'}`}
+                  >
+                    <SlidersHorizontal className="w-5 h-5" />
+                    <span className="ml-2 hidden sm:inline">Filters</span>
+                  </Button>
+                )}
               </div>
 
               {/* Advanced Filter Panel */}
               <AnimatePresence>
-                {showAdvancedFilters && (
+                {showAdvancedFilters && categoryTab !== 'medschools' && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
@@ -584,78 +712,86 @@ export default function IMGPrograms() {
                       </Select>
                     </div>
 
-                    <div>
-                      <label className="text-xs text-slate-500 font-medium mb-1 block">Program Size</label>
-                      <Select value={selectedSize} onValueChange={setSelectedSize}>
-                        <SelectTrigger className="rounded-xl">
-                          <SelectValue placeholder="All Sizes" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Sizes</SelectItem>
-                          <SelectItem value="small">Small (&lt;50 residents)</SelectItem>
-                          <SelectItem value="medium">Medium (50-100 residents)</SelectItem>
-                          <SelectItem value="large">Large (&gt;100 residents)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {categoryTab === 'residencies' && (
+                      <>
+                        <div>
+                          <label className="text-xs text-slate-500 font-medium mb-1 block">Program Size</label>
+                          <Select value={selectedSize} onValueChange={setSelectedSize}>
+                            <SelectTrigger className="rounded-xl">
+                              <SelectValue placeholder="All Sizes" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Sizes</SelectItem>
+                              <SelectItem value="small">Small (&lt;50 residents)</SelectItem>
+                              <SelectItem value="medium">Medium (50-100 residents)</SelectItem>
+                              <SelectItem value="large">Large (&gt;100 residents)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
 
-                    <div>
-                      <label className="text-xs text-slate-500 font-medium mb-1 block">Interview Format</label>
-                      <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-                        <SelectTrigger className="rounded-xl">
-                          <SelectValue placeholder="All Formats" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Formats</SelectItem>
-                          <SelectItem value="Virtual">Virtual Only</SelectItem>
-                          <SelectItem value="In-Person">In-Person Only</SelectItem>
-                          <SelectItem value="Hybrid">Hybrid</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                        <div>
+                          <label className="text-xs text-slate-500 font-medium mb-1 block">Interview Format</label>
+                          <Select value={selectedFormat} onValueChange={setSelectedFormat}>
+                            <SelectTrigger className="rounded-xl">
+                              <SelectValue placeholder="All Formats" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Formats</SelectItem>
+                              <SelectItem value="Virtual">Virtual Only</SelectItem>
+                              <SelectItem value="In-Person">In-Person Only</SelectItem>
+                              <SelectItem value="Hybrid">Hybrid</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* Personalized Profile Fit Switch */}
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-indigo-500" />
-                  <div>
-                    <span className="text-sm font-semibold">Personalized Fit Filter</span>
-                    <p className="text-xs text-slate-500">Only show programs matching my visa, scores, and graduation profile</p>
+              {/* Personalized Profile Fit Switch (for Residencies) */}
+              {categoryTab === 'residencies' && (
+                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <UserCheck className="w-5 h-5 text-indigo-500" />
+                    <div>
+                      <span className="text-sm font-semibold">Personalized Fit Filter</span>
+                      <p className="text-xs text-slate-500">Only show programs matching my visa, scores, and graduation profile</p>
+                    </div>
                   </div>
+                  <Switch 
+                    checked={fitFilter}
+                    onCheckedChange={setFitFilter}
+                  />
                 </div>
-                <Switch 
-                  checked={fitFilter}
-                  onCheckedChange={setFitFilter}
-                />
-              </div>
+              )}
 
               {/* Sort + clear */}
               <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                <div className="flex-1 min-w-[160px]">
-                  <label className="text-xs text-slate-500 font-medium mb-1 block">Sort by</label>
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="rounded-xl h-10">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="fit">Best fit</SelectItem>
-                      <SelectItem value="img_friendly">IMG-friendly score</SelectItem>
-                      <SelectItem value="deadline">Application deadline</SelectItem>
-                      <SelectItem value="name">Program name</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {categoryTab === 'residencies' && (
+                  <div className="flex-1 min-w-[160px]">
+                    <label className="text-xs text-slate-500 font-medium mb-1 block">Sort by</label>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="rounded-xl h-10">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="fit">Best fit</SelectItem>
+                        <SelectItem value="img_friendly">IMG-friendly score</SelectItem>
+                        <SelectItem value="deadline">Application deadline</SelectItem>
+                        <SelectItem value="name">Program name</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 {filtersActive && (
-                  <Button variant="ghost" size="sm" onClick={clearAllFilters} className="rounded-xl mt-5">
+                  <Button variant="ghost" size="sm" onClick={clearAllFilters} className="rounded-xl mt-1">
                     <X className="w-4 h-4 mr-1" /> Clear filters
                   </Button>
                 )}
                 <Link
                   to={createPageUrl('ProgramsList')}
-                  className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mt-5 ml-auto"
+                  className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mt-1 ml-auto"
                 >
                   Community notes &amp; scam reports →
                 </Link>
@@ -665,105 +801,42 @@ export default function IMGPrograms() {
             {/* Results Grid */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-slate-500">
-                  {filteredPrograms.length} program{filteredPrograms.length === 1 ? '' : 's'} found
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                  {categoryTab === 'residencies' && `${filteredPrograms.length} residency programs found`}
+                  {categoryTab === 'fellowships' && `${filteredFellowships.length} fellowship programs found`}
+                  {categoryTab === 'observerships' && `${filteredObserverships.length} observerships & clinical rotations found`}
+                  {categoryTab === 'medschools' && `${filteredMedicalSchools.length} international medical schools found`}
                 </p>
               </div>
 
-              {isProgramsLoading ? (
-                <div className="text-center py-12">
-                  <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
-                </div>
-              ) : filteredPrograms.length === 0 ? (
-                <Card className="p-12 text-center rounded-3xl border-slate-200 dark:border-slate-700">
-                  <GraduationCap className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
-                  <p className="text-slate-700 dark:text-slate-300 font-medium mb-1">No programs match</p>
-                  <p className="text-slate-500 text-sm mb-4">
-                    Try a broader search, turn off the fit filter, or clear all filters.
-                  </p>
-                  {filtersActive && (
-                    <Button onClick={clearAllFilters} className="rounded-xl">
-                      Clear all filters
-                    </Button>
-                  )}
-                </Card>
-              ) : (
-                filteredPrograms.map((prog) => {
-                  const fit = fitMap[prog.id] || getFit(prog);
-                  return (
-                    <motion.div
-                      key={prog.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <Card 
-                        className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900"
-                        onClick={() => setSelectedProgram(prog)}
+              {/* CATEGORY 1: RESIDENCIES */}
+              {categoryTab === 'residencies' && (
+                isProgramsLoading ? (
+                  <div className="text-center py-12">
+                    <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                  </div>
+                ) : filteredPrograms.length === 0 ? (
+                  <Card className="p-12 text-center rounded-3xl border-slate-200 dark:border-slate-700">
+                    <GraduationCap className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+                    <p className="text-slate-700 dark:text-slate-300 font-medium mb-1">No residency programs match</p>
+                    <p className="text-slate-500 text-sm mb-4">
+                      Try a broader search, turn off the fit filter, or clear all filters.
+                    </p>
+                    {filtersActive && (
+                      <Button onClick={clearAllFilters} className="rounded-xl">
+                        Clear all filters
+                      </Button>
+                    )}
+                  </Card>
+                ) : (
+                  filteredPrograms.map((prog) => {
+                    const fit = fitMap[prog.id] || getFit(prog);
+                    return (
+                      <motion.div
+                        key={prog.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
                       >
-                        <div className="flex items-start justify-between gap-4 mb-3">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
-                              {prog.program_name}
-                            </h3>
-                            <p className="text-sm text-slate-500 flex items-center gap-1">
-                              <Building className="w-4 h-4 flex-shrink-0" />
-                              <span className="truncate">{prog.institution}</span>
-                            </p>
-                          </div>
-                          
-                          <div className="flex flex-col items-end gap-2">
-                            <button 
-                              onClick={(e) => toggleFavorite(e, prog.id)}
-                              className={`p-2 rounded-full transition-colors ${
-                                profile?.favorite_programs?.includes(prog.id) 
-                                  ? 'bg-rose-100 text-rose-500 dark:bg-rose-950/30' 
-                                  : 'bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-400 dark:bg-slate-800'
-                              }`}
-                            >
-                              <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
-                            </button>
-
-                            {/* Fit Score Indicator */}
-                            <Badge 
-                              className={`font-bold px-2 py-0.5 text-xs ${
-                                fit.visaIssue 
-                                  ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400' 
-                                  : fit.score >= 90 
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400'
-                                    : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
-                              }`}
-                              variant="outline"
-                            >
-                              {fit.visaIssue ? "Visa Mismatch" : `${fit.score}% Match`}
-                            </Badge>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                            {prog.specialty}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                            <MapPin className="w-3 h-3 mr-1 text-slate-400" />
-                            {prog.city}, {prog.state}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                            Format: {prog.interview_format}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                            Size: {prog.program_size} residents
-                          </Badge>
-                          {prog.visa_j1 && (
-                            <Badge className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400" variant="outline">
-                              Sponsors J-1
-                            </Badge>
-                          )}
-                          {prog.visa_h1b && (
-                            <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-400" variant="outline">
-                              Sponsors H-1B
-                            </Badge>
-                          )}
-                        </div>
 
                         {/* Quick Data Ribbon */}
                         <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">

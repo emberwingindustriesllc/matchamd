@@ -283,8 +283,26 @@ export default function GuideDetail() {
             <FileText className="w-5 h-5 text-indigo-500" />
             Overview
           </h3>
-          <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{guide.overview}</p>
+          <p className="text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-line">{guide.overview}</p>
         </Card>
+
+        {/* Detailed Sections */}
+        {guide.sections && guide.sections.length > 0 && (
+          <div className="space-y-4">
+            {guide.sections.map((sec, idx) => (
+              <Card key={idx} className="p-5 rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+                <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-3 flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-indigo-500" />
+                  {sec.title}
+                </h3>
+                <div className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-line leading-relaxed space-y-2">
+                  {sec.content}
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+
 
         {/* ECFMG-Specific Content */}
         {guideId === 'oet_medicine' && (
@@ -415,6 +433,30 @@ export default function GuideDetail() {
             ))}
           </div>
         </Card>
+
+        {/* FAQ Section */}
+        {guide.faq && guide.faq.length > 0 && (
+          <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+            <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+              <HelpCircle className="w-5 h-5 text-purple-500" />
+              Frequently Asked Questions (FAQ)
+            </h3>
+            <div className="space-y-3">
+              {guide.faq.map((item, idx) => (
+                <div key={idx} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                  <h4 className="font-semibold text-slate-800 dark:text-white text-sm mb-1.5 flex items-start gap-2">
+                    <span className="text-indigo-600 dark:text-indigo-400 font-bold">Q:</span>
+                    <span>{item.question}</span>
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-300 pl-5 leading-relaxed whitespace-pre-line">
+                    {item.answer}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
 
         {/* Resources */}
         <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">

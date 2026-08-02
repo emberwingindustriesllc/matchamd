@@ -6,7 +6,9 @@ import { supabase } from '@/api/supabaseClient';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { sanitizeDisplayName } from '@/lib/utils';
 import Header from '@/components/navigation/Header';
+
 import BottomNav from '@/components/navigation/BottomNav';
 import ProgressRing from '@/components/common/ProgressRing';
 import BadgeIcon from '@/components/common/BadgeIcon';
@@ -169,7 +171,7 @@ export default function Dashboard() {
             <div className="flex items-start justify-between mb-4">
               <div>
                 <p className="text-white/80 text-sm mb-1">Welcome back,</p>
-                <h2 className="text-2xl font-bold">{profile.display_name || user?.full_name}</h2>
+                <h2 className="text-2xl font-bold">{sanitizeDisplayName(profile.display_name) || user?.full_name || 'Dr. Applicant'}</h2>
               </div>
               <ProgressRing progress={overallProgress} size={80} strokeWidth={6} />
             </div>
