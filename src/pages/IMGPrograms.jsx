@@ -837,25 +837,94 @@ export default function IMGPrograms() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                       >
-
-                        {/* Quick Data Ribbon */}
-                        <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
-                          <div>
-                            <span className="font-semibold text-slate-700 dark:text-slate-350">IMG Intake:</span> {Math.round(prog.img_percentage)}%
-                          </div>
-                          {prog.step2_score_min && (
-                            <div>
-                              <span className="font-semibold text-slate-700 dark:text-slate-350">Min Step 2 CK:</span> {prog.step2_score_min}
+                        <Card 
+                          className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 space-y-4"
+                          onClick={() => setSelectedProgram(prog)}
+                        >
+                          <div className="flex items-start justify-between gap-4 mb-3">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
+                                {prog.program_name}
+                              </h3>
+                              <p className="text-sm text-slate-500 flex items-center gap-1">
+                                <Building className="w-4 h-4 flex-shrink-0" />
+                                <span className="truncate">{prog.institution}</span>
+                              </p>
                             </div>
-                          )}
-                          <div>
-                            <span className="font-semibold text-slate-700 dark:text-slate-350">Deadline:</span> {prog.application_deadline}
+                            
+                            <div className="flex flex-col items-end gap-2">
+                              <button 
+                                onClick={(e) => toggleFavorite(e, prog.id)}
+                                className={`p-2 rounded-full transition-colors ${
+                                  profile?.favorite_programs?.includes(prog.id) 
+                                    ? 'bg-rose-100 text-rose-500 dark:bg-rose-950/30' 
+                                    : 'bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-400 dark:bg-slate-800'
+                                }`}
+                              >
+                                <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
+                              </button>
+
+                              {/* Fit Score Indicator */}
+                              <Badge 
+                                className={`font-bold px-2 py-0.5 text-xs ${
+                                  fit.visaIssue 
+                                    ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400' 
+                                    : fit.score >= 90 
+                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                      : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
+                                }`}
+                                variant="outline"
+                              >
+                                {fit.visaIssue ? "Visa Mismatch" : `${fit.score}% Match`}
+                              </Badge>
+                            </div>
                           </div>
-                        </div>
-                      </Card>
-                    </motion.div>
-                  );
-                })
+
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                              {prog.specialty}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                              <MapPin className="w-3 h-3 mr-1 text-slate-400" />
+                              {prog.city}, {prog.state}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                              Format: {prog.interview_format}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                              Size: {prog.program_size} residents
+                            </Badge>
+                            {prog.visa_j1 && (
+                              <Badge className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400" variant="outline">
+                                Sponsors J-1
+                              </Badge>
+                            )}
+                            {prog.visa_h1b && (
+                              <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-400" variant="outline">
+                                Sponsors H-1B
+                              </Badge>
+                            )}
+                          </div>
+
+                          {/* Quick Data Ribbon */}
+                          <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
+                            <div>
+                              <span className="font-semibold text-slate-700 dark:text-slate-350">IMG Intake:</span> {Math.round(prog.img_percentage)}%
+                            </div>
+                            {prog.step2_score_min && (
+                              <div>
+                                <span className="font-semibold text-slate-700 dark:text-slate-350">Min Step 2 CK:</span> {prog.step2_score_min}
+                              </div>
+                            )}
+                            <div>
+                              <span className="font-semibold text-slate-700 dark:text-slate-350">Deadline:</span> {prog.application_deadline}
+                            </div>
+                          </div>
+                        </Card>
+                      </motion.div>
+                    );
+                  })
+                )
               )}
             </div>
           </TabsContent>
