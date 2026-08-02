@@ -5,7 +5,9 @@ import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { sanitizeDisplayName } from '@/lib/utils';
 import { validateProfile } from '@/lib/validation/profileSchema';
+
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import ProgressRing from '@/components/common/ProgressRing';
@@ -222,7 +224,7 @@ export default function Profile() {
             </div>
             
             <div className="flex-1">
-              <h2 className="text-xl font-bold">{profile.display_name || user?.full_name}</h2>
+              <h2 className="text-xl font-bold">{sanitizeDisplayName(profile.display_name) || user?.full_name || 'Dr. Applicant'}</h2>
               <p className="text-white/70 text-sm">{user?.email}</p>
               
               <div className="flex items-center gap-4 mt-3">

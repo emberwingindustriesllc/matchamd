@@ -30,23 +30,7 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 5,
     lor_required: 3,
     application_deadline: "2026-12-01",
-    stipends_benefits: {
-      annual_stipend: 69200,
-      health_insurance: true,
-      cme_allowance: 1500,
-      educational_allowance: 500,
-      housing_stipend: 0,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 0 },
-      { year: 2024, spots: 0 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 0,
-      other_expenses: 50
-    }
+    stipends_benefits: { annual_stipend: 69200, health_insurance: true, cme_allowance: 1500, educational_allowance: 500, housing_stipend: 0 }
   },
   {
     id: "jacobi_im",
@@ -79,23 +63,7 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 3,
     lor_required: 3,
     application_deadline: "2026-11-15",
-    stipends_benefits: {
-      annual_stipend: 73500,
-      health_insurance: true,
-      cme_allowance: 1000,
-      educational_allowance: 300,
-      housing_stipend: 2000,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 0 },
-      { year: 2024, spots: 1 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 0,
-      other_expenses: 50
-    }
+    stipends_benefits: { annual_stipend: 73500, health_insurance: true, cme_allowance: 1000, educational_allowance: 300, housing_stipend: 2000 }
   },
   {
     id: "bronxcare_fm",
@@ -128,23 +96,7 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 5,
     lor_required: 3,
     application_deadline: "2026-11-01",
-    stipends_benefits: {
-      annual_stipend: 72800,
-      health_insurance: true,
-      cme_allowance: 1200,
-      educational_allowance: 400,
-      housing_stipend: 1500,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 0 },
-      { year: 2024, spots: 0 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 250,
-      other_expenses: 100
-    }
+    stipends_benefits: { annual_stipend: 72800, health_insurance: true, cme_allowance: 1200, educational_allowance: 400, housing_stipend: 1500 }
   },
   {
     id: "cleveland_clinic_im",
@@ -177,23 +129,7 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 2,
     lor_required: 3,
     application_deadline: "2026-10-31",
-    stipends_benefits: {
-      annual_stipend: 66900,
-      health_insurance: true,
-      cme_allowance: 2000,
-      educational_allowance: 800,
-      housing_stipend: 0,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 0 },
-      { year: 2024, spots: 0 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 0,
-      other_expenses: 50
-    }
+    stipends_benefits: { annual_stipend: 66900, health_insurance: true, cme_allowance: 2000, educational_allowance: 800, housing_stipend: 0 }
   },
   {
     id: "rutgers_njms_im",
@@ -226,23 +162,7 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 5,
     lor_required: 3,
     application_deadline: "2026-11-30",
-    stipends_benefits: {
-      annual_stipend: 71400,
-      health_insurance: true,
-      cme_allowance: 1000,
-      educational_allowance: 300,
-      housing_stipend: 0,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 0 },
-      { year: 2024, spots: 0 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 0,
-      other_expenses: 50
-    }
+    stipends_benefits: { annual_stipend: 71400, health_insurance: true, cme_allowance: 1000, educational_allowance: 300, housing_stipend: 0 }
   },
   {
     id: "texas_tech_fm",
@@ -275,23 +195,7 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 5,
     lor_required: 3,
     application_deadline: "2026-12-31",
-    stipends_benefits: {
-      annual_stipend: 63000,
-      health_insurance: true,
-      cme_allowance: 1500,
-      educational_allowance: 400,
-      housing_stipend: 0,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 1 },
-      { year: 2024, spots: 2 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 300,
-      other_expenses: 120
-    }
+    stipends_benefits: { annual_stipend: 63000, health_insurance: true, cme_allowance: 1500, educational_allowance: 400, housing_stipend: 0 }
   },
   {
     id: "mgh_peds",
@@ -324,23 +228,7 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 2,
     lor_required: 4,
     application_deadline: "2026-10-15",
-    stipends_benefits: {
-      annual_stipend: 76200,
-      health_insurance: true,
-      cme_allowance: 2500,
-      educational_allowance: 1000,
-      housing_stipend: 3000,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 0 },
-      { year: 2024, spots: 0 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 0,
-      other_expenses: 50
-    }
+    stipends_benefits: { annual_stipend: 76200, health_insurance: true, cme_allowance: 2500, educational_allowance: 1000, housing_stipend: 3000 }
   },
   {
     id: "jackson_memorial_peds",
@@ -373,23 +261,7 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 3,
     lor_required: 3,
     application_deadline: "2026-11-01",
-    stipends_benefits: {
-      annual_stipend: 68000,
-      health_insurance: true,
-      cme_allowance: 1000,
-      educational_allowance: 500,
-      housing_stipend: 1000,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 0 },
-      { year: 2024, spots: 0 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 200,
-      other_expenses: 100
-    }
+    stipends_benefits: { annual_stipend: 68000, health_insurance: true, cme_allowance: 1000, educational_allowance: 500, housing_stipend: 1000 }
   },
   {
     id: "dmc_wayne_im",
@@ -422,23 +294,7 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 5,
     lor_required: 3,
     application_deadline: "2026-12-15",
-    stipends_benefits: {
-      annual_stipend: 67500,
-      health_insurance: true,
-      cme_allowance: 1500,
-      educational_allowance: 300,
-      housing_stipend: 0,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 0 },
-      { year: 2024, spots: 0 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 0,
-      other_expenses: 50
-    }
+    stipends_benefits: { annual_stipend: 67500, health_insurance: true, cme_allowance: 1500, educational_allowance: 300, housing_stipend: 0 }
   },
   {
     id: "houston_methodist_surg",
@@ -471,23 +327,7 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 2,
     lor_required: 4,
     application_deadline: "2026-10-01",
-    stipends_benefits: {
-      annual_stipend: 69800,
-      health_insurance: true,
-      cme_allowance: 2000,
-      educational_allowance: 600,
-      housing_stipend: 0,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 0 },
-      { year: 2024, spots: 0 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 400,
-      other_expenses: 150
-    }
+    stipends_benefits: { annual_stipend: 69800, health_insurance: true, cme_allowance: 2000, educational_allowance: 600, housing_stipend: 0 }
   },
   {
     id: "mayo_surg",
@@ -520,23 +360,7 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 2,
     lor_required: 4,
     application_deadline: "2026-10-15",
-    stipends_benefits: {
-      annual_stipend: 70500,
-      health_insurance: true,
-      cme_allowance: 2500,
-      educational_allowance: 1000,
-      housing_stipend: 0,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 0 },
-      { year: 2024, spots: 0 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 350,
-      other_expenses: 120
-    }
+    stipends_benefits: { annual_stipend: 70500, health_insurance: true, cme_allowance: 2500, educational_allowance: 1000, housing_stipend: 0 }
   },
   {
     id: "suny_downstate_im",
@@ -569,22 +393,138 @@ export const mockResidencyPrograms = [
     grad_year_cutoff: 5,
     lor_required: 3,
     application_deadline: "2026-12-01",
-    stipends_benefits: {
-      annual_stipend: 74000,
-      health_insurance: true,
-      cme_allowance: 1200,
-      educational_allowance: 500,
-      housing_stipend: 0,
-    },
-    historical_open_spots: [
-      { year: 2025, spots: 0 },
-      { year: 2024, spots: 1 },
-      { year: 2023, spots: 0 }
-    ],
-    estimated_cost: {
-      application_fee: 26,
-      travel_cost: 0,
-      other_expenses: 50
-    }
+    stipends_benefits: { annual_stipend: 74000, health_insurance: true, cme_allowance: 1200, educational_allowance: 500, housing_stipend: 0 }
+  },
+  {
+    id: "elmhurst_psych",
+    program_name: "Psychiatry Residency Program",
+    institution: "Icahn School of Medicine at Mount Sinai / Elmhurst Hospital",
+    specialty: "Psychiatry",
+    subspecialty: "General Psychiatry",
+    city: "Elmhurst",
+    state: "NY",
+    region: "Northeast",
+    visa_j1: true,
+    visa_h1b: false,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 32,
+    annual_intake: 8,
+    interview_format: "Virtual",
+    website: "https://www.mountsinai.org/elmhurst-psych",
+    nrmp_code: "1468400C0",
+    community_program: true,
+    img_friendly_score: 9.1,
+    img_residents: 26,
+    img_percentage: 81.2,
+    graduation_rate: "98%",
+    step1_score_min: 215,
+    step2_score_min: 230,
+    step2_score_avg: 245,
+    step3_required: false,
+    min_usce_months: 2,
+    grad_year_cutoff: 5,
+    lor_required: 3,
+    application_deadline: "2026-11-15",
+    stipends_benefits: { annual_stipend: 75000, health_insurance: true, cme_allowance: 1200, educational_allowance: 400, housing_stipend: 1500 }
+  },
+  {
+    id: "creighton_neuro",
+    program_name: "Neurology Residency Program",
+    institution: "Creighton University School of Medicine",
+    specialty: "Neurology",
+    subspecialty: "Adult Neurology",
+    city: "Omaha",
+    state: "NE",
+    region: "Midwest",
+    visa_j1: true,
+    visa_h1b: true,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 24,
+    annual_intake: 6,
+    interview_format: "Virtual",
+    website: "https://medschool.creighton.edu",
+    nrmp_code: "1350180C0",
+    community_program: false,
+    img_friendly_score: 8.6,
+    img_residents: 18,
+    img_percentage: 75.0,
+    graduation_rate: "99%",
+    step1_score_min: 220,
+    step2_score_min: 235,
+    step2_score_avg: 246,
+    step3_required: false,
+    min_usce_months: 1,
+    grad_year_cutoff: 4,
+    lor_required: 3,
+    application_deadline: "2026-11-30",
+    stipends_benefits: { annual_stipend: 64500, health_insurance: true, cme_allowance: 1500, educational_allowance: 500, housing_stipend: 0 }
+  },
+  {
+    id: "st_vincent_path",
+    program_name: "Pathology-Anatomic and Clinical Residency",
+    institution: "St. Vincent Hospital / Allegheny Health Network",
+    specialty: "Pathology",
+    subspecialty: "AP/CP Pathology",
+    city: "Erie",
+    state: "PA",
+    region: "Northeast",
+    visa_j1: true,
+    visa_h1b: true,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 16,
+    annual_intake: 4,
+    interview_format: "Virtual",
+    website: "https://www.ahn.org",
+    nrmp_code: "1620300C0",
+    community_program: true,
+    img_friendly_score: 9.3,
+    img_residents: 14,
+    img_percentage: 87.5,
+    graduation_rate: "100%",
+    step1_score_min: 210,
+    step2_score_min: 225,
+    step2_score_avg: 238,
+    step3_required: false,
+    min_usce_months: 1,
+    grad_year_cutoff: 5,
+    lor_required: 3,
+    application_deadline: "2026-12-01",
+    stipends_benefits: { annual_stipend: 62000, health_insurance: true, cme_allowance: 1500, educational_allowance: 400, housing_stipend: 0 }
+  },
+  {
+    id: "lsu_shreveport_em",
+    program_name: "Emergency Medicine Residency Program",
+    institution: "LSU Health Sciences Center Shreveport",
+    specialty: "Emergency Medicine",
+    subspecialty: "Emergency Medicine",
+    city: "Shreveport",
+    state: "LA",
+    region: "South",
+    visa_j1: true,
+    visa_h1b: false,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 36,
+    annual_intake: 12,
+    interview_format: "Hybrid",
+    website: "https://www.lsuhs.edu",
+    nrmp_code: "1230110C0",
+    community_program: false,
+    img_friendly_score: 7.8,
+    img_residents: 20,
+    img_percentage: 55.5,
+    graduation_rate: "97%",
+    step1_score_min: 215,
+    step2_score_min: 230,
+    step2_score_avg: 242,
+    step3_required: false,
+    min_usce_months: 2,
+    grad_year_cutoff: 4,
+    lor_required: 3,
+    application_deadline: "2026-11-15",
+    stipends_benefits: { annual_stipend: 61500, health_insurance: true, cme_allowance: 1000, educational_allowance: 300, housing_stipend: 0 }
   }
 ];

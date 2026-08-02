@@ -1,731 +1,572 @@
 /**
- * Guide body content for every pathway step id.
- * Shape: { title, overview, deadline?, checklist, tips, resources }
+ * Comprehensive Guide Content Database for MatchaMD
+ * Contains in-depth, structured guides for all USMLE exams and IMG Match steps.
  */
 
 export const guideContent = {
-  // ─── Residency ─────────────────────────────────────────────
-  ecfmg_pathways: {
-    title: 'ECFMG Certification Pathways',
-    overview:
-      'ECFMG certification is REQUIRED for IMGs to enter US residency programs. The 2026 Pathways fulfill the clinical/communication skills component of certification. IMPORTANT: You MUST also pass USMLE Step 1 and Step 2 CK - pathways do NOT substitute for these exams. Apply via MyIntealth portal (launched Aug 2025).',
-    deadline: 'January 31, 2026 (Certification Deadline)',
-    checklist: [
-      { id: 1, text: '✅ Pass USMLE Step 1 (REQUIRED - not part of pathways)' },
-      { id: 2, text: '✅ Pass USMLE Step 2 CK (REQUIRED - not part of pathways)' },
-      { id: 3, text: 'Pass OET Medicine (min. 350 ALL skills, test Jan 1, 2024+)' },
-      { id: 4, text: 'Complete ONE of the 6 Pathways (clinical/communication skills)' },
-      { id: 5, text: 'Submit application via MyIntealth portal' },
-      { id: 6, text: 'Receive ECFMG certification by Jan 31, 2026 for Match' },
-    ],
-    tips: [
-      'CRITICAL: USMLE Step 1 & Step 2 CK are SEPARATE requirements - must pass both',
-      'Pathways only fulfill clinical/communication component - not full certification',
-      'OET test date MUST be Jan 1, 2024 or later (older scores not accepted)',
-      'Apply early via MyIntealth - verification can take weeks',
-      'For 2026 Match: ERAS opens Sept 24, 2025; certification due Jan 31, 2026',
-      '2026 Pathways expire Dec 31, 2028 - revalidation needed beyond this date',
-      'Pathway 6 is fallback option for those who failed Step 2 CS or ineligible for others',
-    ],
-    resources: [
-      { title: 'ECFMG Official - Pathways Info', url: 'https://www.ecfmg.org/certification-pathways', type: 'website' },
-      { title: 'MyIntealth Application Portal', url: 'https://www.ecfmg.org/certification-pathways/myintealth.html', type: 'website' },
-      { title: 'OET Medicine Registration', url: 'https://www.occupationalenglishtest.org', type: 'website' },
-      { title: 'USMLE Step 1 Info', url: 'https://www.usmle.org/step-1', type: 'website' },
-      { title: 'USMLE Step 2 CK Info', url: 'https://www.usmle.org/step-2-ck', type: 'website' },
-    ],
-  },
-
-  usmle_step1: {
-    title: 'USMLE Step 1',
-    overview:
-      'Step 1 assesses whether you understand and can apply important concepts of the basic sciences to the practice of medicine. Now reported as Pass/Fail. IMGs still need a solid foundation because Step 2 CK scores carry more weight in applications.',
-    checklist: [
-      { id: 1, text: 'Create USMLE / ECFMG account and obtain ECFMG ID' },
-      { id: 2, text: 'Complete content review (First Aid, Pathoma, Sketchy as needed)' },
-      { id: 3, text: 'Complete a full Qbank (UWorld or equivalent) with review' },
-      { id: 4, text: 'Take practice exams (NBME, UWorld Self-Assessments)' },
-      { id: 5, text: 'Schedule exam date with adequate buffer before applications' },
-      { id: 6, text: 'Pass Step 1 and save score report' },
-    ],
-    tips: [
-      'Dedicated study period of 2–3 months is common',
-      'First Aid + UWorld remains a high-yield combo for many IMGs',
-      'Practice timed blocks to build exam stamina',
-      'Do not schedule Step 1 so late that a fail blocks Step 2 CK timing',
-      'Join study groups for accountability if self-study stalls',
-    ],
-    resources: [
-      { title: 'USMLE Official', url: 'https://www.usmle.org', type: 'website' },
-      { title: 'First Aid Team', url: 'https://www.firstaidteam.com', type: 'document' },
-      { title: 'UWorld Qbank', url: 'https://www.uworld.com', type: 'website' },
-    ],
-  },
-
+  // ─── USMLE STEP 2 CK ──────────────────────────────────────────────────
   usmle_step2: {
-    title: 'USMLE Step 2 CK',
+    title: 'USMLE Step 2 CK Guide for IMGs',
     overview:
-      'Step 2 CK assesses clinical knowledge through multiple-choice questions. A competitive numeric score is crucial for IMG applications—especially for competitive specialties and university programs.',
+      'The most important scored exam for IMGs in the pass/fail era — everything you need to know to register, prepare, and score competitively.\n\nStep 2 CK is now the single most important numeric metric program directors use to compare applicants. With Step 1 being Pass/Fail, your Step 2 CK score is the primary proof of your clinical knowledge.',
+    deadline: 'Score release before Sept 24 (ERAS submission)',
+    sections: [
+      {
+        title: '1. What is USMLE Step 2 CK?',
+        content:
+          'USMLE Step 2 CK (Clinical Knowledge) is a one-day exam that evaluates your clinical knowledge and ability to apply medical concepts in patient care scenarios. It focuses on what a physician should know to provide safe, competent care under supervision.\n\nStep 2 CK is now the single most important scored exam for IMGs applying to US residency programs. According to the 2024 NRMP Program Director Survey, 83% of program directors consider Step 2 CK scores when evaluating applicants, and roughly 30% of programs use a minimum score for interview screening.\n\nFor IMGs specifically, Step 2 CK carries even more weight. With no Step 1 numeric score to offset concerns about foreign medical education, your Step 2 CK score becomes the primary proof of your clinical knowledge and competitiveness.'
+      },
+      {
+        title: '2. Eligibility and Registration for IMGs',
+        content:
+          'How IMGs Register:\nLike Step 1, IMGs register through FSMB/ECFMG:\n• Log into your ECFMG/MyIntealth account\n• Apply through FSMB at fsmb.org\n• Pay the exam fee — $695 (2026–2027) + $235 region fee if testing outside US/Canada\n• Receive your scheduling permit with a three-month eligibility period\n• Schedule at Prometric via prometric.com\n\nPrerequisites:\n• You must have passed Step 1 before taking Step 2 CK\n• You must be enrolled in or graduated from a WDOMS-listed medical school meeting ECFMG requirements\n\nEligibility Period:\nYou will receive a 3-month window in which you must sit for the exam. A one-time extension is available for a fee.'
+      },
+      {
+        title: '3. Exam Format and Content',
+        content:
+          'Exam Structure:\nStep 2 CK is a one-day examination divided into eight 60-minute blocks, administered in a single 9-hour testing session. Each block contains up to 40 questions, with a maximum of 318 total questions across the exam.\nBreak time: minimum 45 minutes (increased by finishing blocks early), plus a 15-minute optional tutorial.\n\nContent Breakdown:\n• Cardiovascular (14–16%)\n• Respiratory (10–12%)\n• Gastrointestinal (10–12%)\n• Renal/Urinary (7–9%)\n• Nervous/Special Senses (9–11%)\n• Musculoskeletal/Skin (7–9%)\n• Endocrine (7–9%)\n• Reproductive (7–9%)\n• Hematology/Oncology (6–8%)\n• Immune System (4–6%)\n• Behavioral Health (6–8%)\n\nThe content is overwhelmingly clinical vignette-based — you will read a patient scenario and answer questions about diagnosis, next best step, management, or complications.'
+      },
+      {
+        title: '4. Scoring & Percentile Reference (2026)',
+        content:
+          'Three-Digit Score:\nStep 2 CK is scored on a three-digit scale from 1 to 300.\n• Current passing score: 218 (raised from 214, effective July 1, 2025)\n• National mean: ~250 for first-time US MD test-takers\n• Standard error of measurement: ~6 points\n\nScore Percentile Table (2026 Norms):\n• 270+ : 94th Percentile — Elite (top competitive specialties)\n• 265 : 85th Percentile — Excellent (highly competitive)\n• 260 : 74th Percentile — Very strong (competitive for any specialty)\n• 255 : 60th Percentile — Above average (good for most specialties)\n• 250 : 47th Percentile — Near mean (solid baseline)\n• 245 : 34th Percentile — Below mean (review specialty targets)\n• 240 : 24th Percentile — Lower quarter (limited competitive options)\n• 235 : 16th Percentile — Low (strategic planning needed)\n• 230 : 10th Percentile — Very low (broad application required)\n• 218 : 2nd Percentile — Minimum passing score'
+      },
+      {
+        title: '5. What Score Do I Need? (IMG-Specific Targets)',
+        content:
+          'General Rule for IMGs:\nIMGs should target 5–15 points above specialty averages. The IMG gap is real — it reflects higher competition for non-US positions.\n\nIMG Specialty Target Benchmarks:\n• Dermatology: 260+ (US Senior Mean: 258)\n• Orthopedics / Plastics / Neurosurgery: 258+ (US Senior Mean: 256)\n• Otolaryngology (ENT): 255+\n• Radiology: 253+\n• Anesthesiology / General Surgery / EM: 250+\n• Internal Medicine / OB-GYN: 248+\n• Psychiatry / Pediatrics: 245+\n• Family Medicine: 242+\n\nIMG Category Target Minimums:\n• US-citizen IMG (Primary Care): 240–245 (Target: 248+)\n• Non-US-citizen IMG (Primary Care): 245–250 (Target: 252+)\n• Non-US-citizen IMG (Competitive Specialties): 250–255 (Target: 258+)'
+      },
+      {
+        title: '6. Study Strategy and Timeline',
+        content:
+          'Recommended Study Period:\n• 4–8 weeks dedicated for recent clinical graduates\n• 3–6 months for IMGs who have been out of clinical practice\n\nPhases of Study:\nPhase 1: Content Foundation (Weeks 1–3) — 1–2 UWorld blocks/day + Step-Up to Medicine / First Aid CK.\nPhase 2: Intensive QBank (Weeks 4–6) — 3–4 UWorld blocks/day (120-160 questions) + thorough explanation review.\nPhase 3: Self-Assessment (Weeks 7–8) — NBME self-assessments every 3–4 days + target weak areas.\nPhase 4: Final Push (Last Week) — Rapid review of ethics, biostats, quality improvement, and high-yield algorithms.'
+      },
+      {
+        title: '7. Test Day & Preparation Best Practices',
+        content:
+          'What Makes Step 2 CK Different from Step 1:\n• Clinical reasoning over mechanisms — Step 1 asks "why" (mechanism); Step 2 CK asks "what next" (management).\n• Next best step questions — Learn the algorithm: when to order imaging, when to biopsy, when to treat empirically.\n• Management & contraindications — Know first-line vs second-line drugs.\n• Ethics & Communication — A significant portion covers shared decision-making, informed consent, and difficult patient encounters.'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Finish Step 1 (or plan dual study carefully if still pending)' },
-      { id: 2, text: 'Complete a full Step 2 CK Qbank with thorough review' },
-      { id: 3, text: 'Master high-yield clinical algorithms (IM, Surgery, OB, Peds, Psych)' },
-      { id: 4, text: 'Take self-assessments and track predicted score range' },
-      { id: 5, text: 'Schedule and pass exam with score release before rank season if possible' },
+      { id: 1, text: 'Pass USMLE Step 1 and confirm passing status' },
+      { id: 2, text: 'Register via FSMB and obtain 3-month eligibility permit' },
+      { id: 3, text: 'Complete 100% of UWorld Step 2 CK Qbank' },
+      { id: 4, text: 'Review Divine Interventions podcasts (Biostats, Ethics, QI, Risk Factors)' },
+      { id: 5, text: 'Take at least 3 NBME practice exams (target score >245+)' },
+      { id: 6, text: 'Complete UWorld Self-Assessments (UWSA 1 & 2)' },
+      { id: 7, text: 'Sit for Step 2 CK with score release prior to Sept 24 ERAS opening' }
     ],
     tips: [
-      'Many IMGs find Step 2 more predictive of interview chances than Step 1 (Pass/Fail)',
-      'Clinical rotations and case practice help significantly',
-      'Aim above specialty averages published in Charting Outcomes',
-      'Leave buffer time for a retake if needed—do not cut it too close to ERAS',
-      'Review biostatistics and ethics; they are easy points if practiced',
+      'Step 2 CK is the single most important numeric filter for IMGs in 2026',
+      'Target 5–15 points above published US MD senior averages',
+      'Ethics, Biostatistics, and Quality Improvement are high-yield easy points — do NOT skip them',
+      'Read the last sentence of long clinical vignettes first to identify the question core',
+      'Once passed, Step 2 CK CANNOT be retaken for a higher score — make your first attempt count'
     ],
     resources: [
-      { title: 'USMLE Step 2 CK', url: 'https://www.usmle.org/step-2-ck', type: 'website' },
-      { title: 'UWorld Step 2', url: 'https://www.uworld.com', type: 'website' },
-      { title: 'Amboss', url: 'https://www.amboss.com', type: 'website' },
-      { title: 'NRMP Charting Outcomes', url: 'https://www.nrmp.org/main-residency-match-data', type: 'document' },
+      { title: 'USMLE Official Step 2 CK', url: 'https://www.usmle.org/step-2-ck', type: 'website' },
+      { title: 'UWorld Step 2 CK QBank', url: 'https://www.uworld.com', type: 'website' },
+      { title: 'Divine Interventions Podcast', url: 'https://divineinterventionspodcasts.com', type: 'website' },
+      { title: 'AMBOSS Step 2 Library', url: 'https://www.amboss.com', type: 'website' },
+      { title: 'NRMP Charting Outcomes 2024', url: 'https://www.nrmp.org/main-residency-match-data', type: 'document' }
     ],
+    faq: [
+      {
+        question: 'Is Step 2 CK required for ECFMG Certification?',
+        answer: 'Yes. Passing Step 2 CK is mandatory for ECFMG Certification. It replaced Step 2 CS as part of the pathway requirements.'
+      },
+      {
+        question: 'What is a good Step 2 CK score for an IMG?',
+        answer: 'For primary care (IM, FM, Peds, Psych), aim for 248+ as an IMG. For surgical or mid-competitive fields (Anesthesia, Surgery, EM), aim for 252+. For highly competitive fields (Derm, Ortho, Plastics), aim for 258+.'
+      },
+      {
+        question: 'Can I retake Step 2 CK if I pass but want a higher score?',
+        answer: 'No. Once you pass a USMLE Step exam, you cannot retake it for score improvement. Make sure you are hitting your target in NBMEs before sitting for the exam.'
+      },
+      {
+        question: 'Should I take Step 2 CK before applying in ERAS?',
+        answer: 'Yes! Having your Step 2 CK score available by September 24 when ERAS opens is essential. Many programs filter out IMG applications that lack a Step 2 CK score.'
+      },
+      {
+        question: 'How long should an IMG study for Step 2 CK?',
+        answer: 'If you recently completed clinical rotations: 4–8 weeks. If you have been out of clinical training for over a year: 3–6 months.'
+      },
+      {
+        question: 'Does Step 2 CK include CCS (Clinical Case Simulations)?',
+        answer: 'No. CCS is only tested on USMLE Step 3. Step 2 CK is 100% multiple-choice vignette questions.'
+      },
+      {
+        question: 'How much does Step 2 CK cost for IMGs?',
+        answer: 'The 2026–2027 fee is $695 plus a $235 international surcharge if testing outside the US/Canada.'
+      }
+    ]
   },
 
+  // ─── USMLE STEP 1 ─────────────────────────────────────────────────────
+  usmle_step1: {
+    title: 'USMLE Step 1 Guide for IMGs',
+    overview:
+      'Step 1 evaluates your understanding of basic science concepts fundamental to medicine. Now reported as Pass/Fail, but passing on your first attempt is essential for IMG credibility.',
+    sections: [
+      {
+        title: '1. What is USMLE Step 1?',
+        content:
+          'USMLE Step 1 assesses whether you understand and can apply important concepts of the basic sciences to the practice of medicine, with special emphasis on principles and mechanisms underlying health, disease, and modes of therapy.\n\nSince January 2022, Step 1 is scored as Pass/Fail. While it no longer provides a 3-digit score to differentiate applicants, a FIRST-ATTEMPT PASS is crucial for IMGs. A fail on Step 1 is a major red flag that can disqualify your application at many programs.'
+      },
+      {
+        title: '2. Registration & Prerequisites for IMGs',
+        content:
+          '• Obtain an ECFMG ID via MyIntealth / ECFMG portal.\n• Complete Form 186 (NotaryCam online identity verification).\n• Submit Step 1 application on fsmb.org ($695 + $235 international regional surcharge if outside US/Canada).\n• Medical School Certification: Your medical school must verify your student/graduate status electronically via EMMAP or paper Form 183.\n• Scheduling Permit: Pick a 3-month eligibility window and book a Prometric test seat.'
+      },
+      {
+        title: '3. Exam Format & Content Breakdown',
+        content:
+          '• Structure: 8-hour single-day exam divided into seven 60-minute blocks (up to 40 questions per block, max 280 total questions).\n• Break Time: 45 minutes total (plus 15 min optional tutorial).\n• Content Topics:\n  - Pathology & Pathophysiology (45–52%)\n  - Pharmacology & Biochemistry (15–22%)\n  - Physiology (12–18%)\n  - Microbiology & Immunology (10–15%)\n  - Anatomy & Embryology (6–10%)\n  - Behavioral Science, Biostatistics & Ethics (7–12%)'
+      },
+      {
+        title: '4. Preparation Strategy & Core Resources',
+        content:
+          'Gold Standard Resources:\n1. First Aid for the USMLE Step 1 (The bible — read & annotate 2–3 times).\n2. Pathoma (Dr. Sattar — Chapters 1–3 are mandatory for high-yield pathology).\n3. UWorld Step 1 QBank (Complete 100% of questions in random, timed mode).\n4. SketchyMicro & SketchyPharm (Visual memory hooks for microbiology & drugs).\n5. Boards & Beyond (Comprehensive video lectures for weak foundational topics).\n\nStudy Timeline:\n• Pre-Dedicated Phase (2–4 months): 1 block UWorld/day + Pathoma/Sketchy video review.\n• Dedicated Phase (4–8 weeks): 2–3 blocks UWorld/day + NBME practice exams every 7–10 days.\n• Passing Benchmark: Aim for >65% on NBME self-assessments (which correlates to >99% pass probability).'
+      }
+    ],
+    checklist: [
+      { id: 1, text: 'Obtain ECFMG ID and complete Form 186 identity verification' },
+      { id: 2, text: 'Submit Step 1 application on FSMB and secure Prometric permit' },
+      { id: 3, text: 'Complete Pathoma Chapters 1–3 and SketchyMicro/Pharm' },
+      { id: 4, text: 'Finish 100% of UWorld Step 1 Qbank' },
+      { id: 5, text: 'Score >65% consistently on NBME Practice Exams (Forms 26–31)' },
+      { id: 6, text: 'Pass Step 1 on first attempt' }
+    ],
+    tips: [
+      'Do NOT schedule your exam until you are scoring >65% on NBMEs (Forms 28, 29, 30, 31)',
+      'Pathoma Chapters 1–3 cover general pathology principles tested in almost every block',
+      'First-attempt pass is essential — a fail on Step 1 creates a severe hurdle for ERAS',
+      'Focus on concepts over rote memorization: Step 1 vignettes ask for underlying pathophysiology'
+    ],
+    resources: [
+      { title: 'USMLE Step 1 Official', url: 'https://www.usmle.org/step-1', type: 'website' },
+      { title: 'UWorld Step 1 QBank', url: 'https://www.uworld.com', type: 'website' },
+      { title: 'Pathoma Pathology', url: 'https://www.pathoma.com', type: 'website' },
+      { title: 'SketchyMedical', url: 'https://www.sketchy.com', type: 'website' }
+    ],
+    faq: [
+      {
+        question: 'Does Step 1 score matter now that it is Pass/Fail?',
+        answer: 'There is no numeric score reported, only Pass or Fail. However, passing on your FIRST attempt is critical. A fail attempt is permanently visible on your USMLE transcript.'
+      },
+      {
+        question: 'What NBME score means I am ready to pass?',
+        answer: 'An NBME score of 65% or higher (Equated Percent Correct) corresponds to a >99% probability of passing the actual Step 1 exam.'
+      }
+    ]
+  },
+
+  // ─── USMLE STEP 3 ─────────────────────────────────────────────────────
+  usmle_step3: {
+    title: 'USMLE Step 3 Guide for IMGs',
+    overview:
+      'Step 3 tests independent clinical management. Passing Step 3 before the Match makes you eligible for an H-1B visa and demonstrates clinical maturity to program directors.',
+    sections: [
+      {
+        title: '1. Why Take Step 3 Before the Match?',
+        content:
+          'Taking and passing Step 3 prior to residency application/ranking offers massive advantages for IMGs:\n1. H-1B Visa Eligibility: Programs can ONLY sponsor H-1B visas for applicants who have passed Step 3 before rank order list deadline.\n2. Overcoming Red Flags: If you have low Step 1/2 scores or a YOG gap, a strong Step 3 score proves current clinical competence.\n3. Program Director Confidence: Shows you will not fail Step 3 during intern year, freeing you to focus on patient care.'
+      },
+      {
+        title: '2. Exam Format & Two-Day Structure',
+        content:
+          'Day 1: Foundations of Independent Practice (FIP)\n• 7 hours total | 233 multiple-choice questions (divided into six 60-minute blocks).\n• Focus: Basic science, pathophysiology, biostatistics, epidemiology, medical ethics, and diagnostic reasoning.\n\nDay 2: Advanced Clinical Medicine (ACM)\n• 9 hours total | 180 multiple-choice questions (divided into six 45-minute blocks).\n• 13 Computer-Based Case Simulations (CCS): Real-time interactive patient management cases (10-minute or 20-minute cases).'
+      },
+      {
+        title: '3. Mastering CCS (Computer-Based Case Simulations)',
+        content:
+          'CCS accounts for ~25–30% of your Step 3 score!\n• Software Behavior: You type orders (labs, imaging, meds, consults) into a simulated EMR.\n• Key Practice Tool: CCSCases.com (Complete all 140+ interactive practice cases).\n• High-Yield Rules:\n  - Always order emergency vitals & IV access first for unstable patients.\n  - Move patients to ICU/CCU if unstable, or outpatient clinic if stable.\n  - Order follow-up appointments, patient counseling, and preventative screening before ending case.'
+      },
+      {
+        title: '4. Scoring & High-Yield Preparation',
+        content:
+          '• Passing Score: 198 (3-digit scale).\n• National Mean: ~228.\n• Recommended Resources:\n  - UWorld Step 3 QBank (1,800+ questions)\n  - CCSCases.com (Mandatory interactive case practice)\n  - Master the Boards Step 3 (Conrad Fischer)\n  - First Aid for Step 3\n• Study Duration: 3–6 weeks dedicated.'
+      }
+    ],
+    checklist: [
+      { id: 1, text: 'Obtain ECFMG Certification (Prerequisite for Step 3 registration)' },
+      { id: 2, text: 'Apply for Step 3 at FSMB.org ($925 registration fee)' },
+      { id: 3, text: 'Select a US state board for registration (Connecticut/Texas/Federation)' },
+      { id: 4, text: 'Complete UWorld Step 3 Qbank (focus on outpatient & inpatient management)' },
+      { id: 5, text: 'Practice 100+ cases on CCSCases.com until average score is >75%' },
+      { id: 6, text: 'Pass Step 3 and update your ERAS profile for H-1B visa eligibility' }
+    ],
+    tips: [
+      'Pass Step 3 before January of your application season if seeking H-1B visa sponsorship',
+      'CCSCases.com is significantly better for case software practice than UWorld interactive cases',
+      'Day 1 tests heavy biostatistics and ethics — review Divine Interventions biostats lectures',
+      'Do not neglect health maintenance orders (e.g. mammogram, colonoscopy, flu vaccine) in CCS cases'
+    ],
+    resources: [
+      { title: 'FSMB Step 3 Registration', url: 'https://www.fsmb.org/step-3', type: 'website' },
+      { title: 'CCSCases.com Interactive Prep', url: 'https://www.ccscases.com', type: 'website' },
+      { title: 'UWorld Step 3 QBank', url: 'https://www.uworld.com', type: 'website' }
+    ],
+    faq: [
+      {
+        question: 'Do I need ECFMG certification to register for Step 3?',
+        answer: 'Yes! IMGs must be officially ECFMG certified before FSMB allows Step 3 registration.'
+      },
+      {
+        question: 'Can I take Step 3 in my home country?',
+        answer: 'No. Step 3 is administered EXCLUSIVELY at Prometric centers inside the United States and US territories (e.g., Puerto Rico, Guam).'
+      }
+    ]
+  },
+
+  // ─── ECFMG PATHWAYS 2026 ──────────────────────────────────────────────
+  ecfmg_pathways: {
+    title: 'ECFMG Certification & 2026 Pathways Guide',
+    overview:
+      'ECFMG certification is REQUIRED for IMGs to enter US residency programs. The 2026 Pathways fulfill the clinical/communication skills component of certification via MyIntealth.',
+    sections: [
+      {
+        title: '1. What Are ECFMG Pathways?',
+        content:
+          'Pathways were established by ECFMG to evaluate clinical and communication skills after the permanent cancellation of Step 2 CS. Candidates must meet requirements under ONE of the 6 Pathways to earn ECFMG certification.'
+      },
+      {
+        title: '2. Summary of the 6 ECFMG Pathways',
+        content:
+          '• Pathway 1: Already Licensed to Practice Medicine in Another Country.\n• Pathway 2: Already Passed an OSCA (Objective Structured Clinical Assessment) for Licensure.\n• Pathway 3: Medical School Accredited by an Agency Recognized by WFME.\n• Pathway 4: Medical School Authorized for Attestation of Clinical Skills.\n• Pathway 5: Graduation from a Joint U.S. Degree Program.\n• Pathway 6: Evaluation of Clinical Skills by Licensed Physicians (Mini-CEX evaluations).'
+      },
+      {
+        title: '3. Communication Skills & OET Requirement',
+        content:
+          'All pathway applicants must demonstrate English language proficiency by passing the Occupational English Test (OET) Medicine with a minimum score of 350 in Listening, Reading, Writing, and Speaking.'
+      }
+    ],
+    checklist: [
+      { id: 1, text: 'Pass USMLE Step 1' },
+      { id: 2, text: 'Pass USMLE Step 2 CK' },
+      { id: 3, text: 'Achieve ≥350 in all 4 sections of OET Medicine' },
+      { id: 4, text: 'Determine eligible ECFMG Pathway (1–6)' },
+      { id: 5, text: 'Submit MyIntealth Pathway Application' },
+      { id: 6, text: 'Receive ECFMG Certificate by Jan 31, 2026 deadline' }
+    ],
+    tips: [
+      'Apply as early as MyIntealth opens (August) to prevent processing delays',
+      'Pathways certification expires after 3 years unless you enter an ACGME residency'
+    ],
+    resources: [
+      { title: 'ECFMG Pathways Official', url: 'https://www.ecfmg.org/certification-pathways', type: 'website' }
+    ]
+  },
+
+  // ─── OET MEDICINE ─────────────────────────────────────────────────────
   oet_medicine: {
-    title: 'OET Medicine',
+    title: 'OET Medicine Mastery Guide',
     overview:
-      'Occupational English Test (Medicine) is required for ECFMG 2026 Pathways communication skills. You need a minimum score of 350 in Listening, Reading, Writing, and Speaking. Test date must be on or after January 1, 2024. Results are used with your pathway application—not as a substitute for USMLE.',
-    deadline: 'Plan ahead of Jan 31, 2026 certification deadline (often by late 2025)',
+      'Detailed strategy to achieve ≥350 in Listening, Reading, Writing, and Speaking for ECFMG Certification.',
+    sections: [
+      {
+        title: '1. OET Score Requirements',
+        content:
+          'ECFMG requires a minimum grade of B (score 350 out of 500) in all four sub-tests:\n• Listening: ≥350\n• Reading: ≥350\n• Writing: ≥350 (Referral Letter focus)\n• Speaking: ≥350 (Clinical Consultation roleplay)'
+      },
+      {
+        title: '2. Preparation & Common Pitfalls',
+        content:
+          'Writing: Use standard clinical referral letter format (salutation, patient background, history, current presentation, plan).\nSpeaking: Demonstrate empathy, active listening, and clear communication techniques.'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Create OET account and select Medicine profession' },
-      { id: 2, text: 'Book a test date on/after Jan 1, 2024 with score-release buffer' },
-      { id: 3, text: 'Complete official practice materials for all four skills' },
-      { id: 4, text: 'Achieve ≥350 in ALL four sub-tests' },
-      { id: 5, text: 'Request official scores be available to ECFMG / MyIntealth' },
-      { id: 6, text: 'Save score report for personal and ERAS records' },
+      { id: 1, text: 'Book OET Medicine test date' },
+      { id: 2, text: 'Practice 10+ official referral writing samples' },
+      { id: 3, text: 'Conduct mock clinical speaking roleplays with a partner' },
+      { id: 4, text: 'Achieve ≥350 in all 4 sub-tests' },
+      { id: 5, text: 'Release scores to ECFMG via OET portal' }
     ],
     tips: [
-      'Writing and Speaking are the most common fail points—practice referral letters and clinical role-play',
-      'You need 350 in every skill; one weak sub-test fails the whole requirement',
-      'Schedule early: retakes and score release can take weeks',
-      'Align OET timing with your MyIntealth pathway application',
-      'Use free OET practice tests before investing in expensive courses',
+      'Writing is the most common failed sub-test — keep referral letters under 200 words and stick to relevant clinical facts'
     ],
     resources: [
-      { title: 'OET Official', url: 'https://www.occupationalenglishtest.org', type: 'website' },
-      { title: 'OET Practice Tests', url: 'https://www.occupationalenglishtest.org/prepare/practice-tests/', type: 'website' },
-      { title: 'ECFMG Pathways', url: 'https://www.ecfmg.org/certification-pathways', type: 'document' },
-    ],
+      { title: 'OET Official Website', url: 'https://www.occupationalenglishtest.org', type: 'website' }
+    ]
   },
 
+  // ─── US CLINICAL EXPERIENCE (USCE) ────────────────────────────────────
   clinical_experience: {
-    title: 'US Clinical Experience',
+    title: 'US Clinical Experience (USCE) Master Strategy',
     overview:
-      'US Clinical Experience (USCE) demonstrates your ability to work in the US healthcare system and often yields the strongest letters of recommendation. Hands-on externships/sub-internships are typically valued more than pure observerships, especially for competitive specialties.',
+      'How to secure hands-on electives, externships, and clinical rotations at US teaching hospitals to earn strong hospital-letterhead LORs.',
+    sections: [
+      {
+        title: '1. Types of USCE',
+        content:
+          '• Hands-On Elective: Best quality (for medical students). Direct patient management under attending supervision.\n• Hands-On Externship: Excellent for graduates. Clinical management in outpatient/inpatient settings.\n• Observership: Shadowing only (no patient contact/EMR access). Useful for networking but weighted lower by program directors.'
+      },
+      {
+        title: '2. How to Secure USCE',
+        content:
+          '• VSLO / VSAS for medical students.\n• Direct university hospital application (FIU, Cleveland Clinic, Cook County, Mayo, Harvard).\n• Cold emailing department chairs, program directors, and alumni.\n• Vetted clinical placement agencies (AmerClerkships, USMLE Mind, Chicago Clerkships).'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Decide observership vs hands-on externship needs for your specialty' },
-      { id: 2, text: 'Apply to multiple programs 6–12 months in advance' },
-      { id: 3, text: 'Secure at least 2–3 rotations, ideally in your target specialty' },
-      { id: 4, text: 'Prioritize sites that write detailed LoRs' },
-      { id: 5, text: 'Network professionally with attendings and residents' },
-      { id: 6, text: 'Document experiences accurately for ERAS' },
+      { id: 1, text: 'Secure 3+ months of US Clinical Experience (at least 2 months hands-on)' },
+      { id: 2, text: 'Obtain 3 specialty-specific LORs on US hospital letterhead' },
+      { id: 3, text: 'Request LOR writers to comment directly on your clinical competence and team communication' }
     ],
     tips: [
-      'For Surgery and other competitive fields: aim for at least one university/academic rotation',
-      'Target programs in geographic regions where you will apply',
-      'Be proactive—volunteer for cases, notes (if allowed), and presentations',
-      'Ask for letters while the experience is fresh',
-      'Beware of scams: verify hospital affiliation and payment policies',
+      'Hands-on rotations carry 3x more weight than shadowing observerships',
+      'Always request your LOR in person during the final week of your rotation'
     ],
     resources: [
-      { title: 'AMOpportunities', url: 'https://www.amopportunities.org', type: 'website' },
-      { title: 'VSLO (AAMC)', url: 'https://students-residents.aamc.org/vslo', type: 'website' },
-      { title: 'AMA International Medical Education', url: 'https://www.ama-assn.org/education/international-medical-education', type: 'document' },
-    ],
+      { title: 'MatchaMD Observerships Directory', url: '/IMGPrograms?tab=observerships', type: 'website' }
+    ]
   },
 
+  // ─── MEDICAL RESEARCH ─────────────────────────────────────────────────
   research: {
-    title: 'Research Experience',
+    title: 'Medical Research & Publication Guide for IMGs',
     overview:
-      'Research strengthens competitive applications. Publications, posters, and ongoing projects show scholarly engagement. Quality and relevance to your specialty usually matter more than raw volume.',
+      'Strategy for publishing papers, securing post-doc research fellowships, and building a competitive academic portfolio for US Match.',
+    sections: [
+      {
+        title: '1. Why Research Matters for IMGs',
+        content:
+          'Research publications demonstrate academic productivity, critical thinking, and commitment to specialty advancement — particularly vital for competitive specialties (Surgery, Neuro, Cardio, Radiology) and university programs.'
+      },
+      {
+        title: '2. Types of Feasible Research Projects',
+        content:
+          '• Systematic Reviews & Meta-Analyses (Can be written remotely with software like RevMan / Covidence).\n• Case Reports & Case Series (Fastest turnaround to PubMed indexing).\n• Clinical Retrospective Studies & Database Analysis (HCUP / NIS datasets).'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Identify research opportunities in your target specialty' },
-      { id: 2, text: 'Join a project (local, remote, or during USCE)' },
-      { id: 3, text: 'Aim for tangible outputs (abstract, poster, manuscript)' },
-      { id: 4, text: 'Present at conferences when possible' },
-      { id: 5, text: 'List research on ERAS with accurate citations and your role' },
+      { id: 1, text: 'Publish at least 2–5 peer-reviewed PubMed-indexed papers' },
+      { id: 2, text: 'Present abstracts or posters at national US conferences (ACP, AHA, ACC, RSNA)' },
+      { id: 3, text: 'Build ResearchGate and Google Scholar profiles' }
     ],
     tips: [
-      'One first-author paper often outweighs many low-quality abstracts',
-      'Case reports and systematic reviews are realistic entry points',
-      'Network with researchers at programs you hope to match into',
-      'Be honest about your contribution—interviewers will probe',
-      'Join specialty societies for mentorship and project leads',
+      'Ensure your articles are indexed in PubMed/MEDLINE for ERAS verification',
+      'Cold email PIs with specific ideas and a CV highlighting data analysis skills'
     ],
     resources: [
-      { title: 'ResearchMatch', url: 'https://www.researchmatch.org', type: 'website' },
-      { title: 'PubMed', url: 'https://pubmed.ncbi.nlm.nih.gov', type: 'website' },
-      { title: 'ACS Resources', url: 'https://www.facs.org', type: 'website' },
-    ],
+      { title: 'PubMed Central', url: 'https://pubmed.ncbi.nlm.nih.gov', type: 'website' }
+    ]
   },
 
+  // ─── ERAS APPLICATION ────────────────────────────────────────────────
   eras_registration: {
-    title: 'ERAS Application',
+    title: 'ERAS Application & Program Signaling Strategy',
     overview:
-      'The Electronic Residency Application Service (ERAS) is the centralized application system for most residency programs. IMGs typically access MyERAS through ECFMG. Applications are released to programs in September—prepare documents early.',
-    deadline: 'September application season (verify yearly AAMC/ECFMG calendar)',
+      'Everything you need to master MyERAS CV sections, geographic preferences, program signaling, and submission deadlines.',
+    sections: [
+      {
+        title: '1. Key Components of MyERAS Application',
+        content:
+          '• 10 Experiences Section (3 Key Experiences marked as Most Meaningful).\n• Geographic Preferences (Select up to 3 Census Regions + setting preference: urban, suburban, rural).\n• Program Signals (Gold and Silver signals to express high interest to target programs).'
+      },
+      {
+        title: '2. Program Signaling Master Rules',
+        content:
+          'Signals double or triple your interview invitation rate! Signal programs where your Step 2 score and visa status align with historical IMG intake.'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Create/access MyERAS through ECFMG token' },
-      { id: 2, text: 'Complete MyERAS application sections carefully' },
-      { id: 3, text: 'Upload personal statement(s)' },
-      { id: 4, text: 'Request and assign letters of recommendation' },
-      { id: 5, text: 'Upload/request USMLE transcript and photo' },
-      { id: 6, text: 'Certify and submit application' },
-      { id: 7, text: 'Assign documents and programs; track signals if used in your specialty' },
+      { id: 1, text: 'Purchase ERAS Token via MyIntealth' },
+      { id: 2, text: 'Complete 10 Experiences section with bulleted impact statements' },
+      { id: 3, text: 'Allocate Gold and Silver Program Signals strategically' },
+      { id: 4, text: 'Submit ERAS application by September 24' }
     ],
     tips: [
-      'Apply broadly for non-US IMGs—list size varies by specialty competitiveness',
-      'Submit as early as practical when programs begin reviewing',
-      'Have 3–4 strong letters ready before peak season',
-      'Double-check specialty filters, visa, and geographic preferences',
-      'Budget application fees with MatchaMD cost tools',
+      'Never waste signals on safety programs that do not sponsor visas',
+      'Submit ERAS on day 1 (Sept 24) — late applications miss initial interview waves'
     ],
     resources: [
-      { title: 'ERAS for Applicants', url: 'https://students-residents.aamc.org/eras', type: 'website' },
-      { title: 'Residency Explorer', url: 'https://www.residencyexplorer.org', type: 'website' },
-      { title: 'FREIDA', url: 'https://freida.ama-assn.org', type: 'website' },
-    ],
+      { title: 'AAMC MyERAS Portal', url: 'https://students-residents.aamc.org/applying-residencies-eras', type: 'website' }
+    ]
   },
 
+  // ─── PERSONAL STATEMENT ───────────────────────────────────────────────
   personal_statement: {
-    title: 'Personal Statement',
+    title: 'Personal Statement Writing Guide for IMGs',
     overview:
-      'Your ERAS personal statement explains why you chose your specialty and why you will succeed in US training. IMGs should show clinical readiness, meaningful experiences (including USCE when available), and a clear narrative—without excuses or negativity about prior systems.',
+      'How to craft a compelling, 1-page personal statement that hooks program directors and highlights your unique journey as an IMG.',
+    sections: [
+      {
+        title: '1. Recommended Structure (1 Page, 500–700 words)',
+        content:
+          '• Paragraph 1: The Hook — An engaging clinical vignette or formative moment that sparked your interest.\n• Paragraph 2: Clinical & Academic Development — Highlight specific clinical achievements, USCE, and problem-solving skills.\n• Paragraph 3: Research & Resilience — Discuss scholarly work, overcoming challenges, or adaptiveness.\n• Paragraph 4: Why This Specialty & Future Goals — Clear vision of your career aspirations (academic clinician, global health leader).\n• Paragraph 5: What You Bring to the Residency — Cultural competence, work ethic, and teamwork.'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Define specialty theme and 2–3 supporting stories' },
-      { id: 2, text: 'Draft within ERAS character limits (typically ~750–800 words target)' },
-      { id: 3, text: 'Highlight US clinical / research experiences that show fit' },
-      { id: 4, text: 'Get feedback from a mentor or US physician' },
-      { id: 5, text: 'Proofread for grammar, clarity, and tone' },
-      { id: 6, text: 'Upload final version to MyERAS and assign to programs' },
+      { id: 1, text: 'Draft 1-page statement (under 750 words)' },
+      { id: 2, text: 'Proofread for native English grammar, spelling, and tone' },
+      { id: 3, text: 'Tailor custom versions for specific program signals if applicable' }
     ],
     tips: [
-      'Lead with motivation and evidence, not a full life chronology',
-      'Avoid repeating your entire CV—highlight insight and growth',
-      'One strong statement beats many weak specialty variants',
-      'Have a strong English editor review if possible',
-      'Do not over-explain visa needs or criticize your home system',
+      'Avoid cliché openings ("Ever since I was 5 years old...")',
+      'Show, don\'t tell: describe specific patient interactions'
     ],
     resources: [
-      { title: 'AAMC Personal Statement Guidance', url: 'https://students-residents.aamc.org/applying-residencies-eras/personal-statement', type: 'website' },
-      { title: 'ERAS for Applicants', url: 'https://students-residents.aamc.org/eras', type: 'website' },
-    ],
+      { title: 'AAMC Personal Statement Tips', url: 'https://students-residents.aamc.org', type: 'website' }
+    ]
   },
 
+  // ─── LETTERS OF RECOMMENDATION (LORS) ──────────────────────────────────
   lors: {
-    title: 'Letters of Recommendation',
+    title: 'Letters of Recommendation (LoR) Strategy',
     overview:
-      'Strong LoRs—especially from US physicians in your target specialty—are critical for IMGs. Aim for 3–4 letters. Letters are uploaded confidentially through the ERAS LoR Portal.',
+      'How to secure 3–4 strong, waived US hospital-letterhead LORs that convince program directors of your clinical competence.',
+    sections: [
+      {
+        title: '1. LOR Requirements',
+        content:
+          'Programs require 3 to 4 LORs. At least 2 should come from US clinical attendings in your specialty of choice. Always WAIVE your right to view the letter — non-waived letters carry significantly less weight.'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Identify 3–4 letter writers early (ideally during USCE)' },
-      { id: 2, text: 'Provide CV, personal statement draft, and talking points' },
-      { id: 3, text: 'Request letters in ERAS LoR Portal with correct author details' },
-      { id: 4, text: 'Confirm writers submit before programs review applications' },
-      { id: 5, text: 'Assign letters to programs (specialty-specific as needed)' },
-      { id: 6, text: 'Track which programs received which letters' },
+      { id: 1, text: 'Request 4 waived LORs from US attending physicians' },
+      { id: 2, text: 'Provide writers with your CV, Personal Statement, and ERAS Letter Request Form' },
+      { id: 3, text: 'Confirm letters uploaded to ERAS LoRP prior to Sept 15' }
     ],
     tips: [
-      'A detailed US letter often outweighs a generic home-country letter',
-      'Ask: "Can you write a strong letter?"—accept a soft no gracefully',
-      'Chair/PD letters help when authentic, not forced',
-      'Never open or edit confidential letters',
-      'Start requests 6–8 weeks before you need them submitted',
+      'Waived letters are trusted by program directors; non-waived letters are heavily discounted'
     ],
     resources: [
-      { title: 'ERAS LoR Information', url: 'https://students-residents.aamc.org/eras-tools-and-worksheets-residency-applicants/letters-recommendation', type: 'website' },
-      { title: 'AAMC ERAS', url: 'https://students-residents.aamc.org/eras', type: 'website' },
-    ],
+      { title: 'ERAS Letter of Recommendation Portal (LoRP)', url: 'https://students-residents.aamc.org', type: 'website' }
+    ]
   },
 
+  // ─── PROGRAM RESEARCH & SIGNALING ─────────────────────────────────────
   program_research: {
-    title: 'Program Research',
+    title: 'Program Selection & Signaling Strategy',
     overview:
-      'IMG-friendly programs vary by specialty, visa sponsorship (J-1/H-1B), score filters, and USCE expectations. Use FREIDA, Residency Explorer, NRMP Charting Outcomes, and MatchaMD program search to build a realistic list with reach, target, and safety tiers.',
+      'Methodology to filter IMG-friendly programs, evaluate Step cutoffs and visa sponsorship, and maximize interview yield.',
+    sections: [
+      {
+        title: '1. Filtering Criteria for IMGs',
+        content:
+          '• Visa Sponsorship: J-1 vs H-1B vs Green Card/US Citizen.\n• IMG Percentage: Look for programs with >40% IMG residents.\n• Step 2 CK Minimum Cutoffs: Ensure your score is above their published threshold.\n• YOG Cutoff: Ensure your graduation year meets their 3–5 year rule.'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Define specialty and geographic preferences' },
-      { id: 2, text: 'Filter for J-1 / H-1B sponsorship and historical IMG presence' },
-      { id: 3, text: 'Check Step 2 CK expectations and USCE preferences' },
-      { id: 4, text: 'Build tiers: reach / target / safety' },
-      { id: 5, text: 'Note signaling / geographic preference strategies if applicable' },
-      { id: 6, text: 'Export final list for ERAS and track in MatchaMD favorites' },
+      { id: 1, text: 'Filter programs on MatchaMD Directory by visa and Step score fit' },
+      { id: 2, text: 'Build target list of 80–150 programs' },
+      { id: 3, text: 'Assign Gold and Silver Program Signals' }
     ],
     tips: [
-      'Prioritize programs with a history of interviewing non-US IMGs',
-      'Do not apply only to brand-name university programs',
-      'Track application fees vs expected interview yield',
-      'Verify visa policies yearly—they change',
-      'Use MatchaMD Directory fit scores as a starting point, not the only signal',
+      'Use MatchaMD Directory to instantly filter programs matching your visa and Step 2 CK score'
     ],
     resources: [
-      { title: 'FREIDA', url: 'https://freida.ama-assn.org', type: 'website' },
-      { title: 'Residency Explorer', url: 'https://www.residencyexplorer.org', type: 'website' },
-      { title: 'NRMP Charting Outcomes', url: 'https://www.nrmp.org/main-residency-match-data', type: 'document' },
-    ],
+      { title: 'MatchaMD Program Directory', url: '/IMGPrograms', type: 'website' }
+    ]
   },
 
+  // ─── INTERVIEW PREPARATION ───────────────────────────────────────────
   interviews: {
-    title: 'Interview Preparation',
+    title: 'Residency Interview Mastery for IMGs',
     overview:
-      'Interview season typically runs fall through winter. Prepare behavioral stories (STAR), specialty knowledge, visa logistics, and program-specific questions. Virtual interviews remain common—practice tech, lighting, and eye contact.',
+      'Comprehensive guide to virtual interview technology, common questions, behavioral answers (STAR method), and post-interview etiquette.',
+    sections: [
+      {
+        title: '1. Virtual Setup Checklist',
+        content:
+          '1080p webcam at eye level, ring light illumination, clean backdrop, ethernet connection, external microphone, professional suit.'
+      },
+      {
+        title: '2. Top 5 Questions You MUST Master',
+        content:
+          '1. "Tell me about yourself." (2-minute elevator pitch).\n2. "Why our program?" (Specific faculty, clinical tracks, patient population).\n3. "Tell me about a difficult patient or clinical mistake." (STAR method).\n4. "Why should we choose you over a US graduate?" (Adaptability, work ethic, high volume clinical experience).\n5. "Where do you see yourself in 5–10 years?"'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Build a story bank for common behavioral questions' },
-      { id: 2, text: 'Research each program (mission, strengths, faculty)' },
-      { id: 3, text: 'Complete mock interviews with a mentor or course' },
-      { id: 4, text: 'Prepare thoughtful questions for interviewers' },
-      { id: 5, text: 'Plan logistics (timezone, backup internet, attire)' },
-      { id: 6, text: 'Send professional thank-you notes when appropriate' },
+      { id: 1, text: 'Set up high-definition camera, lighting, and audio' },
+      { id: 2, text: 'Conduct 3+ mock interviews with mentors or peers' },
+      { id: 3, text: 'Prepare 5 specific questions to ask interviewers at each program' },
+      { id: 4, text: 'Send concise thank you emails within 24–48 hours of interview' }
     ],
     tips: [
-      'Be ready for "Why US?" and "Why this specialty?" with concrete answers',
-      'Never badmouth prior schools, colleagues, or countries',
-      'Know your application cold—gaps and research will be probed',
-      'Rank based on true fit after interviews, not prestige alone',
-      'Have a SOAP contingency plan early',
+      'Structure behavioral answers using STAR: Situation, Task, Action, Result'
     ],
     resources: [
-      { title: 'NRMP', url: 'https://www.nrmp.org', type: 'website' },
-      { title: 'AAMC Students & Residents', url: 'https://students-residents.aamc.org', type: 'website' },
-    ],
+      { title: 'MatchaMD Mentors Mock Interview', url: '/Mentors', type: 'website' }
+    ]
   },
 
+  // ─── NRMP MATCH & SOAP ────────────────────────────────────────────────
   nrmp_match: {
-    title: 'NRMP Match',
+    title: 'NRMP Match & SOAP Survival Guide',
     overview:
-      'The National Resident Matching Program pairs applicants with residency programs through a computerized algorithm based on rank order lists. Rank your true preferences; the algorithm is applicant-proposing.',
-    deadline: 'March Match Week (verify yearly NRMP calendar)',
+      'Rank Order List strategy, algorithm mechanics, and step-by-step preparation for SOAP (Supplemental Offer and Acceptance Program).',
+    sections: [
+      {
+        title: '1. Golden Rule of Ranking',
+        content:
+          'Rank programs in order of your TRUE preference — NOT where you think you have the highest chance. The NRMP algorithm is applicant-proposing and mathematically favors your preferred choices.'
+      },
+      {
+        title: '2. SOAP Preparation for Unmatched Applicants',
+        content:
+          'If unmatched on Match Monday, SOAP allows you to apply for unfilled residency positions in 4 rapid rounds.'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Register for the NRMP Main Residency Match' },
-      { id: 2, text: 'Complete interview season and take notes after each interview' },
-      { id: 3, text: 'Build your rank order list honestly' },
-      { id: 4, text: 'Certify rank list by the deadline' },
-      { id: 5, text: 'Prepare for Match Week / SOAP if needed' },
+      { id: 1, text: 'Register for NRMP Match ($90 fee)' },
+      { id: 2, text: 'Submit Rank Order List (ROL) before March deadline' },
+      { id: 3, text: 'Prepare SOAP documents in advance just in case' }
     ],
     tips: [
-      'Rank programs by true preference—not perceived chance',
-      'The algorithm favors applicants when both sides rank each other',
-      'Have a SOAP backup plan and documents ready',
-      'Do not rank a program you would not attend',
-      'Join peer support groups for Match Week stress',
+      'Never rank a program you would not be willing to train at for 3–5 years'
     ],
     resources: [
-      { title: 'NRMP Official', url: 'https://www.nrmp.org', type: 'website' },
-      { title: 'Match Process', url: 'https://www.nrmp.org/match-process', type: 'document' },
-      { title: 'Charting Outcomes', url: 'https://www.nrmp.org/main-residency-match-data', type: 'document' },
-    ],
+      { title: 'NRMP Official Match Website', url: 'https://www.nrmp.org', type: 'website' }
+    ]
   },
 
+  // ─── VISA GUIDE (J-1 VS H-1B) ──────────────────────────────────────────
   visa: {
-    title: 'Visa Planning',
+    title: 'J-1 vs H-1B Visa Guide for IMGs',
     overview:
-      'Most non-US IMGs train on J-1 (ECFMG-sponsored) or, less often, H-1B (program-sponsored). Visa type affects which programs you can apply to, moonlighting rules, and post-training options (including the J-1 two-year home-country requirement and waivers). This is educational guidance—not legal advice.',
+      'Detailed breakdown of ECFMG J-1 Exchange Visitor vs H-1B Specialty Worker visas, Step 3 requirements, and Conrad 30 waivers.',
+    sections: [
+      {
+        title: '1. J-1 Exchange Visitor Visa (ECFMG Sponsored)',
+        content:
+          '• Sponsor: ECFMG.\n• Requirements: Passed Step 1, Step 2 CK, Statement of Need from home country Ministry of Health.\n• 212(e) Rule: Requires returning to home country for 2 years after residency OR obtaining a Conrad 30 waiver.'
+      },
+      {
+        title: '2. H-1B Specialty Occupation Visa',
+        content:
+          '• Sponsor: Individual hospital/institution.\n• Requirements: Passed Step 1, Step 2 CK, AND USMLE Step 3 before Match.\n• Benefits: No 2-year home country requirement, direct path to permanent residency (Green Card).'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Decide J-1 vs H-1B target based on career goals' },
-      { id: 2, text: 'Filter programs by published visa sponsorship' },
-      { id: 3, text: 'Confirm passport validity and document readiness' },
-      { id: 4, text: 'Understand J-1 two-year home residence / waiver paths if relevant' },
-      { id: 5, text: 'Coordinate with program GME after Match for DS-2019 / petition' },
-      { id: 6, text: 'Budget visa fees, SEVIS, and travel timelines' },
+      { id: 1, text: 'Determine home country Statement of Need eligibility for J-1' },
+      { id: 2, text: 'If targeting H-1B, pass USMLE Step 3 prior to ROL deadline' },
+      { id: 3, text: 'Verify program visa sponsorship on MatchaMD directory' }
     ],
     tips: [
-      'H-1B is limited; many programs only offer J-1',
-      'Do not assume "visa sponsored" means H-1B',
-      'Ask programs clearly during interviews about historical sponsorship',
-      'Start document collection early after Match',
-      'Always verify on official ECFMG / State Department / USCIS sources',
+      'H-1B requires Step 3 passed BEFORE program rank lists are finalized'
     ],
     resources: [
-      { title: 'ECFMG J-1 / EVSP', url: 'https://www.ecfmg.org/evsp/', type: 'website' },
-      { title: 'US Dept of State J-1', url: 'https://j1visa.state.gov/', type: 'website' },
-      { title: 'USCIS H-1B', url: 'https://www.uscis.gov/working-in-the-united-states/h-1b-specialty-occupations', type: 'website' },
-    ],
-  },
-
-  // ─── Fellowship ────────────────────────────────────────────
-  ecfmg_certification: {
-    title: 'ECFMG Certification for Fellowship',
-    overview:
-      'ECFMG certification (or equivalent eligibility documentation) is typically required for IMGs entering ACGME fellowship. Confirm your certificate is current, USMLE requirements for your specialty, and how GME offices verify status before start date.',
-    checklist: [
-      { id: 1, text: 'Confirm current ECFMG certificate status in the official portal' },
-      { id: 2, text: 'Verify USMLE Step requirements for target fellowship' },
-      { id: 3, text: 'Ensure medical school credentials remain primary-source verified' },
-      { id: 4, text: 'Coordinate certificate reporting with fellowship GME office' },
-      { id: 5, text: 'Resolve any name/document discrepancies early' },
-    ],
-    tips: [
-      'Expired pathways or certificates may need revalidation—check dates',
-      'Fellowship programs will not finalize onboarding without credentials',
-      'Keep PDFs of verification emails and certificate copies',
-      'Name mismatches between passport and certificate cause delays',
-    ],
-    resources: [
-      { title: 'ECFMG Certification', url: 'https://www.ecfmg.org/certification/', type: 'website' },
-      { title: 'MyIntealth / ECFMG Portals', url: 'https://www.ecfmg.org', type: 'website' },
-    ],
-  },
-
-  residency_completion: {
-    title: 'Residency Completion',
-    overview:
-      'Most fellowships require successful completion (or near-completion) of an accredited residency in a related specialty. Document training, milestones, and board-eligibility track for applications and verification.',
-    checklist: [
-      { id: 1, text: 'Confirm ACGME (or equivalent) residency completion timeline' },
-      { id: 2, text: 'Request training verification and PD letter' },
-      { id: 3, text: 'Collect procedure/case logs if specialty-relevant' },
-      { id: 4, text: 'Update CV with residency roles, awards, and research' },
-      { id: 5, text: 'Align application year with expected graduation' },
-    ],
-    tips: [
-      'Apply in final year with PD support when common for your specialty',
-      'Address any remediation or training gaps proactively',
-      'International residency may limit some ACGME fellowship eligibility—verify per specialty',
-      'Keep evaluations organized for credentialing',
-    ],
-    resources: [
-      { title: 'ACGME', url: 'https://www.acgme.org', type: 'website' },
-      { title: 'NRMP Fellowship Applicants', url: 'https://www.nrmp.org/fellowship-applicants/', type: 'website' },
-    ],
-  },
-
-  board_eligibility: {
-    title: 'Board Eligibility',
-    overview:
-      'Fellowships and employers expect a clear path to specialty board certification. Know your ABMS member board requirements, exam windows, and how fellowship training affects eligibility.',
-    checklist: [
-      { id: 1, text: 'Identify your specialty board (ABIM, ABS, ABP, etc.)' },
-      { id: 2, text: 'Confirm residency training meets board eligibility rules' },
-      { id: 3, text: 'Register for board exams per board timeline if applicable' },
-      { id: 4, text: 'Document any international training credit policies' },
-      { id: 5, text: 'Discuss board plan with residency/fellowship PD' },
-    ],
-    tips: [
-      'Board rules differ by specialty—do not generalize from peers in other fields',
-      'Some fellowships require board-eligible status by start date',
-      'Keep exam receipts and eligibility letters organized',
-      'Plan study time around fellowship interview season',
-    ],
-    resources: [
-      { title: 'ABMS', url: 'https://www.abms.org', type: 'website' },
-      { title: 'ABMS Member Boards', url: 'https://www.abms.org/member-boards/', type: 'website' },
-    ],
-  },
-
-  fellowship_eras: {
-    title: 'Fellowship Application',
-    overview:
-      'Many fellowships use ERAS; others use SF Match, specialty portals, or Fellowship Council systems. Deadlines and document sets differ by specialty—map your field early and prepare LoRs, personal statement, and program list accordingly.',
-    checklist: [
-      { id: 1, text: 'Identify match system for your specialty (ERAS/SMS, SF Match, other)' },
-      { id: 2, text: 'Create/update application account for the correct cycle' },
-      { id: 3, text: 'Request 3–4 specialty LoRs (including PD when appropriate)' },
-      { id: 4, text: 'Write fellowship personal statement' },
-      { id: 5, text: 'Submit applications by specialty deadline' },
-      { id: 6, text: 'Track invitations and interview calendar' },
-    ],
-    tips: [
-      'Deadlines vary widely by specialty—build a calendar first',
-      'Research productivity matters more for competitive fellowships',
-      'Network at society meetings before application season',
-      'Confirm which programs use which match system',
-    ],
-    resources: [
-      { title: 'ERAS', url: 'https://students-residents.aamc.org/eras', type: 'website' },
-      { title: 'NRMP SMS', url: 'https://www.nrmp.org/fellowship-applicants/', type: 'website' },
-      { title: 'SF Match', url: 'https://www.sfmatch.org', type: 'website' },
-    ],
-  },
-
-  fellowship_interview: {
-    title: 'Fellowship Interviews',
-    overview:
-      'Fellowship interviews probe clinical maturity, research agenda, career plans, and fit with division culture. Expect discussions of cases, publications, and how you will contribute to the program.',
-    checklist: [
-      { id: 1, text: 'Prepare research and clinical elevator pitches' },
-      { id: 2, text: 'Review faculty research for each program' },
-      { id: 3, text: 'Practice case-based and behavioral questions' },
-      { id: 4, text: 'Clarify visa and start-date constraints' },
-      { id: 5, text: 'Send thank-you notes and update rank notes' },
-    ],
-    tips: [
-      'Have a 5-year career plan that matches the program’s strengths',
-      'Know your papers deeply—methods and limitations',
-      'Ask about call, research time, and alumni job placement',
-      'Be ready to discuss teaching and quality-improvement work',
-    ],
-    resources: [
-      { title: 'NRMP Fellowship Applicants', url: 'https://www.nrmp.org/fellowship-applicants/', type: 'website' },
-    ],
-  },
-
-  fellowship_match: {
-    title: 'Fellowship Match',
-    overview:
-      'NRMP Specialties Matching Service (SMS) and other systems pair applicants and programs via rank lists. Rank true preference order; understand contingency options if your specialty has them.',
-    checklist: [
-      { id: 1, text: 'Register for the correct match (NRMP SMS / SF Match / other)' },
-      { id: 2, text: 'Complete interviews before finalizing ranks' },
-      { id: 3, text: 'Build and certify rank order list by deadline' },
-      { id: 4, text: 'Prepare unmatched contingency plan' },
-      { id: 5, text: 'Complete post-match onboarding tasks promptly' },
-    ],
-    tips: [
-      'Algorithm favors applicant preference—rank honestly',
-      'Confirm program participation in the match you registered for',
-      'Track specialty-specific rank deadlines carefully',
-      'Do not rank programs you would not attend',
-    ],
-    resources: [
-      { title: 'NRMP SMS', url: 'https://www.nrmp.org/fellowship-applicants/', type: 'website' },
-      { title: 'Match Calendars', url: 'https://www.nrmp.org/match-calendars/', type: 'document' },
-    ],
-  },
-
-  // ─── Med school ────────────────────────────────────────────
-  prerequisites: {
-    title: 'Prerequisites',
-    overview:
-      'US MD/DO programs require specific undergraduate coursework (biology, chemistry, organic chemistry, physics, often biochemistry/English/math). International applicants must map home credentials to US expectations and plan transcripts/evaluations carefully.',
-    checklist: [
-      { id: 1, text: 'List target school prerequisite courses' },
-      { id: 2, text: 'Complete or plan missing coursework (US/online if accepted)' },
-      { id: 3, text: 'Obtain official transcripts and evaluations if needed' },
-      { id: 4, text: 'Plan clinical volunteering / shadowing hours' },
-      { id: 5, text: 'Confirm English proficiency requirements per school' },
-    ],
-    tips: [
-      'Requirements vary—build a spreadsheet per school',
-      'Some schools do not accept international applicants at all',
-      'Lab components for sciences are often mandatory',
-      'Start early if you need US post-bacc coursework',
-    ],
-    resources: [
-      { title: 'AAMC Students & Residents', url: 'https://students-residents.aamc.org', type: 'website' },
-      { title: 'AACOM (DO)', url: 'https://www.aacom.org', type: 'website' },
-    ],
-  },
-
-  mcat: {
-    title: 'MCAT Exam',
-    overview:
-      'The MCAT is required by nearly all US MD/DO schools. Competitive scores matter even more for international applicants. Plan 3–6 months of prep and leave buffer for a retake.',
-    checklist: [
-      { id: 1, text: 'Create AAMC account and learn exam structure' },
-      { id: 2, text: 'Take a diagnostic practice exam' },
-      { id: 3, text: 'Complete content review + practice questions' },
-      { id: 4, text: 'Take official AAMC full-length exams' },
-      { id: 5, text: 'Sit exam with score release before your application cycle' },
-    ],
-    tips: [
-      'Aim above school median scores for internationals',
-      'CARS is often limiting for non-native English speakers—practice daily',
-      'Official AAMC materials are highest yield',
-      'Do not sit the exam until practice scores are stable',
-    ],
-    resources: [
-      { title: 'AAMC MCAT', url: 'https://students-residents.aamc.org/mcat', type: 'website' },
-      { title: 'MCAT Prep', url: 'https://students-residents.aamc.org/mcat-prep', type: 'website' },
-    ],
-  },
-
-  amcas: {
-    title: 'AMCAS Application',
-    overview:
-      'AMCAS is the primary application for most US MD schools. Work and activities, coursework entry, personal statement, and letters are core. International applicants should start early for transcript processing. DO schools use AACOMAS; Texas uses TMDSAS.',
-    deadline: 'Varies by school (submit early in the cycle)',
-    checklist: [
-      { id: 1, text: 'Create AMCAS account for the correct cycle year' },
-      { id: 2, text: 'Enter coursework and request transcripts' },
-      { id: 3, text: 'Complete Work & Activities (including most meaningful)' },
-      { id: 4, text: 'Write personal statement' },
-      { id: 5, text: 'Assign letter writers' },
-      { id: 6, text: 'Submit and monitor verification status' },
-    ],
-    tips: [
-      'Verification can take weeks at peak—submit early',
-      'Be precise with international coursework entries',
-      'Confirm whether each target school uses AMCAS, AACOMAS, or TMDSAS',
-      'Keep copies of all submitted materials',
-    ],
-    resources: [
-      { title: 'AMCAS', url: 'https://students-residents.aamc.org/applying-medical-school-amcas', type: 'website' },
-    ],
-  },
-
-  secondaries: {
-    title: 'Secondary Applications',
-    overview:
-      'After primary verification, schools send secondary essays. Turnaround speed and quality matter. Pre-write common themes: diversity, adversity, why this school, and future goals.',
-    checklist: [
-      { id: 1, text: 'Track secondaries in a spreadsheet with deadlines' },
-      { id: 2, text: 'Pre-write common essay themes' },
-      { id: 3, text: 'Customize each school’s mission fit' },
-      { id: 4, text: 'Submit within 1–2 weeks of receipt when possible' },
-      { id: 5, text: 'Budget secondary fees strategically' },
-    ],
-    tips: [
-      'Do not copy-paste without school-specific edits',
-      'Answer only what is asked; respect word limits',
-      'Quality still beats same-day rushed essays',
-      'Track fee waivers if eligible',
-    ],
-    resources: [
-      { title: 'AAMC Applying to Medical School', url: 'https://students-residents.aamc.org/applying-medical-school', type: 'website' },
-    ],
-  },
-
-  med_interviews: {
-    title: 'Medical School Interviews',
-    overview:
-      'Schools use traditional interviews, MMI, or hybrid formats. International applicants should prepare to discuss their path to US training, funding, and cultural adaptability professionally.',
-    checklist: [
-      { id: 1, text: 'Learn interview format for each school (MMI vs traditional)' },
-      { id: 2, text: 'Practice ethics and scenario stations' },
-      { id: 3, text: 'Prepare personal journey and "why medicine" narratives' },
-      { id: 4, text: 'Plan travel or virtual setup' },
-      { id: 5, text: 'Send thank-you notes if appropriate' },
-    ],
-    tips: [
-      'MMI rewards clear structure under time pressure',
-      'Know your application experiences in depth',
-      'Be ready for funding and visa logistics questions',
-      'Practice calm, professional answers about being an international applicant',
-    ],
-    resources: [
-      { title: 'AAMC Students & Residents', url: 'https://students-residents.aamc.org', type: 'website' },
-    ],
-  },
-
-  financial_proof: {
-    title: 'Financial Documentation',
-    overview:
-      'Many US medical schools require internationals to show ability to fund all years of tuition and living expenses (bank letters, sponsors, or scholarships). This can be a hard gate even with strong academics. US federal loans are generally unavailable to non-citizens.',
-    checklist: [
-      { id: 1, text: 'Estimate 4-year cost of attendance per school' },
-      { id: 2, text: 'Gather bank statements / sponsor affidavits as required' },
-      { id: 3, text: 'Research scholarships open to internationals' },
-      { id: 4, text: 'Prepare documents for I-20 / visa after acceptance' },
-      { id: 5, text: 'Confirm school financial aid policies for non-citizens' },
-    ],
-    tips: [
-      'Start paperwork early—bank letters can take time',
-      'Ask admissions for the exact proof-of-funds format',
-      'Do not assume aid packages match US citizen options',
-      'Keep certified translations when documents are not in English',
-    ],
-    resources: [
-      { title: 'EducationUSA', url: 'https://educationusa.state.gov/', type: 'website' },
-      { title: 'AAMC Financial Aid', url: 'https://students-residents.aamc.org/financial-aid', type: 'website' },
-    ],
-  },
-
-  school_selection: {
-    title: 'School Selection',
-    overview:
-      'Only a subset of MD/DO schools accept international applicants, and seats are limited. Prioritize schools with a history of admitting non-US citizens, clear financial policies, and realistic MCAT/GPA ranges.',
-    checklist: [
-      { id: 1, text: 'Filter MSAR/school lists for international eligibility' },
-      { id: 2, text: 'Check historical international class sizes when available' },
-      { id: 3, text: 'Compare total cost and proof-of-funds rules' },
-      { id: 4, text: 'Balance reach / target / safety schools' },
-      { id: 5, text: 'Confirm state residency restrictions if any' },
-    ],
-    tips: [
-      'MSAR is essential for MD school research',
-      'Caribbean/off-shore paths are a separate strategy from US MD/DO',
-      'Contact admissions offices for the latest international policies',
-      'Track application costs carefully across many schools',
-    ],
-    resources: [
-      { title: 'AAMC MSAR', url: 'https://students-residents.aamc.org/msar', type: 'website' },
-      { title: 'AACOM Choose DO', url: 'https://choosedo.org', type: 'website' },
-    ],
-  },
-};
-
-const RICH_GUIDE_IDS = [
-  'ecfmg-certification',
-  'usmle-step-1',
-  'usmle-step-2-ck',
-  'research',
-  'eras-application',
-  'residency-application',
-];
-
-const RICH_GUIDE_ALIASES = {
-  ecfmg_certification: 'ecfmg-certification',
-  ecfmg_pathways: 'ecfmg-certification',
-  usmle_step1: 'usmle-step-1',
-  usmle_step_1: 'usmle-step-1',
-  step1: 'usmle-step-1',
-  usmle_step2_ck: 'usmle-step-2-ck',
-  usmle_step2: 'usmle-step-2-ck',
-  step2: 'usmle-step-2-ck',
-  step_2_ck: 'usmle-step-2-ck',
-  program_research: 'research',
-  research: 'research',
-  eras_registration: 'eras-application',
-  eras: 'eras-application',
-  eras_application: 'eras-application',
-  residency_application: 'residency-application',
-  match_guide: 'residency-application',
-};
-
-let richGuidesData = null;
-
-function getRichGuidesData() {
-  if (richGuidesData) return richGuidesData;
-  try {
-    richGuidesData = require('@/guides/guidesData').guidesData || {};
-  } catch (e) {
-    console.warn('Rich guide data unavailable:', e);
-    richGuidesData = {};
+      { title: 'ECFMG EVSP (J-1 Visa Portal)', url: 'https://www.ecfmg.org/evsp', type: 'website' },
+      { title: 'USCIS H-1B Info', url: 'https://www.uscis.gov', type: 'website' }
+    ]
   }
-  return richGuidesData;
-}
+};
 
+/**
+ * Get guide content object by ID with fallback.
+ */
 export function getGuideContent(guideId) {
-  if (!guideId) return null;
-  if (guideContent[guideId]) return guideContent[guideId];
-  const richId = RICH_GUIDE_ALIASES[guideId];
-  if (richId) {
-    const rich = getRichGuidesData()[richId];
-    if (rich) {
-      const overview = rich.subtitle
-        ? `${rich.title}\n\n${rich.subtitle}`
-        : rich.title || 'Guide content.';
-      const checklist = (rich.sections || [])
-        .slice(0, 6)
-        .map((section, idx) => ({
-          id: idx + 1,
-          text: section.heading || `Section ${idx + 1}`,
-          completed: false,
-        }));
-      const tips = (rich.sections || [])
-        .slice(0, 5)
-        .map(section => `${section.heading}: ${section.content}`)
-        .filter(Boolean);
-      const resources = (rich.sections || [])
-        .slice(-4)
-        .map(section => ({
-          title: section.heading,
-          url: '',
-          type: 'guide-section',
-        }));
-      return { title: rich.title, overview, checklist, tips, resources };
-    }
-  }
-  return null;
-}
-
-export function hasGuideContent(guideId) {
-  if (!guideId) return false;
-  if (guideContent[guideId]) return true;
-  return Boolean(RICH_GUIDE_ALIASES[guideId]);
+  if (!guideId) return guideContent.ecfmg_pathways;
+  return guideContent[guideId] || {
+    title: guideId.replace(/_/g, ' ').toUpperCase(),
+    overview: 'Comprehensive guidance and checklist for this match step.',
+    checklist: [
+      { id: 1, text: 'Review step requirements and official guidelines' },
+      { id: 2, text: 'Complete required documentation and score milestones' },
+      { id: 3, text: 'Save progress and update your MatchaMD profile' }
+    ],
+    tips: ['Keep your records updated', 'Check official source websites for deadline shifts'],
+    resources: [{ title: 'MatchaMD Directory', url: '/IMGPrograms', type: 'website' }]
+  };
 }
