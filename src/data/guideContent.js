@@ -219,42 +219,94 @@ export const guideContent = {
     ]
   },
 
-  // ─── ECFMG PATHWAYS 2026 ──────────────────────────────────────────────
+  // ─── ECFMG CERTIFICATION ──────────────────────────────────────────────
   ecfmg_pathways: {
-    title: 'ECFMG Certification & 2026 Pathways Guide',
+    title: 'ECFMG Certification: The Ultimate Guide for IMGs',
     overview:
-      'ECFMG certification is REQUIRED for IMGs to enter US residency programs. The 2026 Pathways fulfill the clinical/communication skills component of certification via MyIntealth.',
+      'For any International Medical Graduate (IMG) dreaming of practicing medicine in the United States, obtaining ECFMG Certification is the most critical milestone of your journey. Administered by the Educational Commission for Foreign Medical Graduates (ECFMG), a division of Intealth, this certification is the official stamp of approval showing that your medical education and clinical skills meet the rigorous standards required to enter a U.S. graduate medical education (GME) program (residency or fellowship).\n\nThis comprehensive, step-by-step guide is designed to help you navigate the entire ECFMG Certification process—reflecting all the major system overhauls, portal transitions, fee structures, and clinical skills pathway updates implemented for the 2025-2026 and upcoming 2027 Match cycles.',
+    deadline: 'January 31, 2026 (NRMP Rank List Deadline)',
     sections: [
       {
-        title: '1. What Are ECFMG Pathways?',
+        title: '1. What is ECFMG Certification?',
         content:
-          'Pathways were established by ECFMG to evaluate clinical and communication skills after the permanent cancellation of Step 2 CS. Candidates must meet requirements under ONE of the 6 Pathways to earn ECFMG certification.'
+          'Why It Matters:\nAn ECFMG Certificate is not just a piece of paper; it is a legal and academic prerequisite. You cannot participate in the National Resident Matching Program (NRMP) Main Residency Match, secure a U.S. residency position, or obtain a license to practice medicine in the United States without it.\n\nThe certificate serves three primary purposes:\n• Residency Eligibility: Program directors use it to verify that you are fully eligible to start an accredited residency program (ACGME-accredited).\n• USMLE Step 3 Eligibility: You must be ECFMG-certified to register and sit for the USMLE Step 3 exam (unless you are a U.S. or Canadian medical graduate).\n• State Licensure: Every U.S. state medical licensing board requires ECFMG Certification as part of their credentialing process for IMGs.\n\nWho Needs It?\nYou need ECFMG Certification if you graduated (or will graduate) from a medical school located outside the United States and Canada:\n• Non-U.S. IMGs: Foreign nationals who went to medical school abroad.\n• U.S. IMGs: U.S. citizens who completed their medical education abroad (e.g., in the Caribbean, Europe, or Asia).'
       },
       {
-        title: '2. Summary of the 6 ECFMG Pathways',
+        title: '2. Eligibility Requirements',
         content:
-          '• Pathway 1: Already Licensed to Practice Medicine in Another Country.\n• Pathway 2: Already Passed an OSCA (Objective Structured Clinical Assessment) for Licensure.\n• Pathway 3: Medical School Accredited by an Agency Recognized by WFME.\n• Pathway 4: Medical School Authorized for Attestation of Clinical Skills.\n• Pathway 5: Graduation from a Joint U.S. Degree Program.\n• Pathway 6: Evaluation of Clinical Skills by Licensed Physicians (Mini-CEX evaluations).'
+          'Before spending any money, you must confirm that you and your medical school meet the strict eligibility criteria set by ECFMG.\n\nThe World Directory of Medical Schools (WDOMS):\nYour medical school must be listed in WDOMS (wdoms.org). However, simply being listed is not enough.\n\nThe ECFMG "Sponsor Note":\nTo be eligible for certification, your medical school’s profile in WDOMS must include an active ECFMG Sponsor Note.\n• What it is: A specific text block on the "Sponsor Notes" tab of your school\'s listing indicating that students and graduates of the school are eligible to apply for ECFMG Certification.\n• Graduation Year Check: The Sponsor Note lists specific graduation years. You must have graduated during a year that is explicitly covered by this note.\n• How to check: Search for your school on wdoms.org, select the "Sponsor Notes" tab, and look for ECFMG.'
       },
       {
-        title: '3. Communication Skills & OET Requirement',
+        title: '3. Step-by-Step Process',
         content:
-          'All pathway applicants must demonstrate English language proficiency by passing the Occupational English Test (OET) Medicine with a minimum score of 350 in Listening, Reading, Writing, and Speaking.'
+          'System Landscape Shifts:\n• MyIntealth launch: All account management, certification applications, and credential uploads use the MyIntealth platform.\n• USMLE Registration Shift to FSMB: Effective January 12, 2026, all USMLE Step registrations, scheduling, and fees for IMGs are handled through the FSMB portal.\n\n7-Step Workflow:\nStep 1: Establish Your MyIntealth Account ($110 fee) -> Obtain ECFMG ID.\nStep 2: Submit Application for ECFMG Certification & Verify Identity via Form 186 & NotaryCam ($580 fee).\nStep 3: Primary-Source Verification of Credentials via EPIC ($220 total fee for diploma + transcript).\nStep 4: Create FSMB Portal Account ($75 fee) & Register for USMLE Step 1 and Step 2 CK ($695/exam + surcharges).\nStep 5: Pass USMLE Exams (Step 1 Pass/Fail & Step 2 CK numerical score).\nStep 6: Complete Communication & Clinical Skills via OET Medicine (min 350 Listening, Reading, Speaking; min 300 Writing) + ECFMG Pathway Application ($945 fee).\nStep 7: Receive Official ECFMG Certificate.'
+      },
+      {
+        title: '4. ECFMG Pathway Programs',
+        content:
+          'Pathway 1: Already Licensed to Practice Medicine (Must submit Letter of Good Standing).\nPathway 2: Passed an OSCE for Licensure in a specific country.\nPathway 3: Medical School Accredited by an Agency Recognized by WFME.\nPathway 4: Medical School Accredited by Other Agencies approved by ECFMG.\nPathway 5: Graduation from a Joint/Dual Degree U.S. LCME Program.\nPathway 6: Evaluation of Clinical Skills by Physicians (6 real-in-person Mini-CEX encounters).'
+      },
+      {
+        title: '5. Costs and Fees (2026 Table)',
+        content:
+          'Core Administrative & Exam Fees:\n• MyIntealth Account Establishment: $110 (One-time)\n• Application for ECFMG Certification: $580 (Includes NotaryCam)\n• Credential Verification (Diploma + Transcript): $220 ($110 each)\n• FSMB USMLE Portal Account Creation: $75 (One-time)\n• USMLE Step 1 Exam Registration: $695 per attempt\n• USMLE Step 2 CK Exam Registration: $695 per attempt\n• OET Medicine Exam: ~$455 per attempt\n• Application for ECFMG Pathway: $945 per season\n\nESTIMATED BASE TOTAL: $3,775 USD (excluding international delivery surcharges of $210 for Step 1 / $235 for Step 2 CK).'
+      },
+      {
+        title: '6. Recommended Timelines & Roadmap',
+        content:
+          'Typical Timeline:\n• Month 1: Account setup & Form 186 (NotaryCam)\n• Months 2–3: Basic approval & Credential verification\n• Months 4–9: Step 1 prep & exam (via FSMB)\n• Months 10–15: Step 2 CK prep & exam (via FSMB)\n• Months 16–17: OET Medicine exam\n• Month 18: Submit Pathway application (MyIntealth)\n• Months 19–20: ECFMG review & certificate issuance\n\nRecommended Start Window: Start 18 to 24 months before your target residency start date.'
+      },
+      {
+        title: '7. Common Mistakes and Pitfalls',
+        content:
+          '• Name Mismatches: Passport, MyIntealth, and FSMB names must match EXACTLY.\n• Delayed School Verification: Follow up directly with your medical school registrar to process EMSWP electronic requests.\n• Attempting USMLE Registration in MyIntealth: Remember that USMLE Step registrations use FSMB as of 2026.\n• OET Sub-Test Single Administration Rule: If you score <350 on Listening, Reading, or Speaking (or <300 on Writing), you must retake ALL 4 sub-tests in a single sitting.\n• Pathway Approval Expiration: Pathway approvals are cycle-specific — time your application for your target Match season.'
       }
     ],
     checklist: [
-      { id: 1, text: 'Pass USMLE Step 1' },
-      { id: 2, text: 'Pass USMLE Step 2 CK' },
-      { id: 3, text: 'Achieve ≥350 in all 4 sections of OET Medicine' },
-      { id: 4, text: 'Determine eligible ECFMG Pathway (1–6)' },
-      { id: 5, text: 'Submit MyIntealth Pathway Application' },
-      { id: 6, text: 'Receive ECFMG Certificate by Jan 31, 2026 deadline' }
+      { id: 1, text: 'Verify school & graduation year on WDOMS for active ECFMG Sponsor Note' },
+      { id: 2, text: 'Establish MyIntealth account ($110 fee) and complete Form 186 via NotaryCam ($580)' },
+      { id: 3, text: 'Submit medical diploma & transcript for EPIC primary-source verification ($220)' },
+      { id: 4, text: 'Register on FSMB portal ($75) and pass USMLE Step 1 & Step 2 CK ($695 each)' },
+      { id: 5, text: 'Pass OET Medicine (min 350 Listening/Reading/Speaking, min 300 Writing in 1 sitting)' },
+      { id: 6, text: 'Apply for ECFMG Pathway 1–6 ($945 fee) and obtain final ECFMG Certificate' }
     ],
     tips: [
-      'Apply as early as MyIntealth opens (August) to prevent processing delays',
-      'Pathways certification expires after 3 years unless you enter an ACGME residency'
+      'Start the process 18–24 months before your intended residency start date',
+      'Always use your exact legal passport name across MyIntealth, FSMB, and OET to prevent delays',
+      'OET Medicine scores must be achieved in a single administration — single sub-test retakes are not accepted by ECFMG'
     ],
     resources: [
-      { title: 'ECFMG Pathways Official', url: 'https://www.ecfmg.org/certification-pathways', type: 'website' }
+      { title: 'ECFMG Official Portal', url: 'https://www.ecfmg.org', type: 'website' },
+      { title: 'MyIntealth Portal', url: 'https://www.myintealth.app', type: 'website' },
+      { title: 'FSMB USMLE Portal', url: 'https://www.fsmb.org', type: 'website' },
+      { title: 'World Directory of Medical Schools (WDOMS)', url: 'https://www.wdoms.org', type: 'website' },
+      { title: 'OET Medicine Portal', url: 'https://www.occupationalenglishtest.org', type: 'website' }
+    ],
+    faq: [
+      {
+        question: 'Can I apply for ECFMG Certification before I graduate from medical school?',
+        answer: 'Yes. You can establish your MyIntealth account, verify identity via Form 186, and take USMLE Step 1 & Step 2 CK while a student. However, the final certificate is issued after graduation and credential verification.'
+      },
+      {
+        question: 'Is the OET the only English language exam ECFMG accepts?',
+        answer: 'Yes. ECFMG does not accept IELTS, TOEFL, or other exams. You must specifically pass OET Medicine.'
+      },
+      {
+        question: 'How long does my final ECFMG Certificate remain valid?',
+        answer: 'Certificates issued via Pathways are valid through the end of the specific Match cycle. Once you enter an ACGME-accredited residency and complete intern year, your ECFMG Certificate becomes permanently valid.'
+      },
+      {
+        question: 'What happens if my medical school does not use the electronic EMSWP portal?',
+        answer: 'ECFMG sends paper verification requests via mail/courier to your registrar. This adds 2–3 months to processing. Encourage your registrar to sign up for EMSWP (which is free for medical schools).'
+      },
+      {
+        question: 'What is the minimum score required to pass Step 1 and Step 2 CK?',
+        answer: 'Step 1 is Pass/Fail (equivalent to ~196). Step 2 CK minimum passing score is 214 (and 218 effective July 2025).'
+      },
+      {
+        question: 'Can I apply for a Pathway before passing Step 1 or Step 2 CK?',
+        answer: 'You can submit your Pathway application and take OET prior to Step completion, but ECFMG will not process or approve the Pathway until passing Step 1 and Step 2 CK scores are recorded.'
+      }
     ]
   },
 
