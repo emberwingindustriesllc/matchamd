@@ -1,8 +1,8 @@
 {
   "rewrites": [
-    { "source": "/:path*", "destination": "/index.html" }
-  ],
-  "redirects": [
-    { "source": "/", "destination": "/Login", "permanent": false }
+    {
+      "source": "/((?!assets/|privacy|terms|.*\\..*).*)",
+      "destination": "/index.html"
+    }
   ]
 }
