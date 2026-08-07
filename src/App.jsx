@@ -9,6 +9,8 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { LanguageProvider } from '@/components/i18n/LanguageContext';
 import Login from './pages/Login';
 
+import logo from '@/assets/logo.png';
+
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
 const MainPage = mainPageKey ? Pages[mainPageKey] : <></>;
@@ -19,8 +21,10 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
 
 /** Loading spinner shown while Supabase session is being resolved */
 const LoadingScreen = () => (
-  <div className="fixed inset-0 flex items-center justify-center bg-background">
-    <div className="w-8 h-8 border-4 border-[rgba(var(--color-primary),0.2)] border-t-[rgb(var(--color-primary))] rounded-full animate-spin shadow-[0_0_15px_rgba(var(--color-primary),0.3)]" />
+  <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#0b132b] text-white z-50">
+    <img src={logo} alt="MatchaMD" className="w-16 h-16 mb-4 animate-bounce" />
+    <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-400 rounded-full animate-spin shadow-lg" />
+    <p className="mt-4 text-xs text-slate-400 font-medium tracking-wide">Loading MatchaMD...</p>
   </div>
 );
 

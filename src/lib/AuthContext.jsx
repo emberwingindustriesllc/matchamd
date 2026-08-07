@@ -11,33 +11,66 @@ export const AuthProvider = ({ children }) => {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
+    // Safety fallback: force isLoadingAuth to false after 2.5s max
+    const timer = setTimeout(() => {
+      if (isMounted) {
+        setIsLoadingAuth(false);
+      }
+    }, 2500);
+
     // 1. Get the current session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsAuthenticated(!!session);
-      setIsLoadingAuth(false);
-      
-      // Initialize RevenueCat with user ID if available
-      purchaseManager.initialize(session?.user?.id);
-    });
+    supabase.auth.getSession()
+      .then(({ data }) => {
+        if (!isMounted) return;
+        const currentSession = data?.session ?? null;
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        setIsAuthenticated(!!currentSession);
+        setIsLoadingAuth(false);
+        clearTimeout(timer);
+        
+        try {
+          purchaseManager.initialize(currentSession?.user?.id);
+        } catch (e) {
+          console.warn('[AuthContext] RevenueCat init error:', e);
+        }
+      })
+      .catch((err) => {
+        console.error('[AuthContext] getSession error:', err);
+        if (isMounted) {
+          setIsLoadingAuth(false);
+          clearTimeout(timer);
+        }
+      });
 
     // 2. Listen for auth state changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
       setSession(session);
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       setIsAuthenticated(!!session);
       setIsLoadingAuth(false);
+      clearTimeout(timer);
       
-      if (currentUser) {
-        purchaseManager.logIn(currentUser.id);
-      } else {
-        purchaseManager.logOut();
+      try {
+        if (currentUser) {
+          purchaseManager.logIn(currentUser.id);
+        } else {
+          purchaseManager.logOut();
+        }
+      } catch (e) {
+        console.warn('[AuthContext] PurchaseManager auth change error:', e);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const logout = async () => {
