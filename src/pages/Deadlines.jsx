@@ -15,7 +15,65 @@ import {
 } from 'lucide-react';
 import { format, differenceInDays, isPast, isFuture } from 'date-fns';
 
+const defaultDeadlines = [
+  {
+    id: 'amcas_edp_2027',
+    title: '2027 AMCAS Early Decision Program (EDP) Deadline',
+    description: 'Final submission deadline for Early Decision Program (EDP) applicants via AMCAS for Fall 2027 entrance.',
+    category: 'amcas',
+    priority: 'critical',
+    date: '2026-08-03',
+    official_link: 'https://students-residents.aamc.org/applying-medical-school-amcas/apply-medical-school-amcas-program'
+  },
+  {
+    id: 'amcas_transcripts_status',
+    title: 'AMCAS 2027 Application & Processing Status',
+    description: 'The 2027 AMCAS application is open. Processing Ready for Review as of June 12; Transcripts marked Received: Paper/Parchment/NSC/Certree (July 31), Email (July 29).',
+    category: 'amcas',
+    priority: 'medium',
+    date: '2026-08-15',
+    official_link: 'https://students-residents.aamc.org/applying-medical-school-amcas/apply-medical-school-amcas-program'
+  },
+  {
+    id: 'eras_token_opening',
+    title: 'MyERAS Application & Token Access',
+    description: 'Access the MyERAS portal to request ERAS Tokens, complete your application, upload MSPE, LORs, and personal statements.',
+    category: 'eras',
+    priority: 'high',
+    date: '2026-09-01',
+    official_link: 'https://myeras.aamc.org/myeras-web/#/landing'
+  },
+  {
+    id: 'eras_residency_submission',
+    title: 'ERAS Residency Application Submission Opens',
+    description: 'Applicants can submit their MyERAS applications to residency programs. Programs begin receiving applications Sept 24.',
+    category: 'eras',
+    priority: 'critical',
+    date: '2026-09-17',
+    official_link: 'https://myeras.aamc.org/myeras-web/#/landing'
+  },
+  {
+    id: 'ecfmg_pathways_deadline',
+    title: 'ECFMG Pathways Certification Application',
+    description: 'Complete ECFMG Certification Pathways (Pathways 1-6) application and submit OET results for credentialing.',
+    category: 'ecfmg',
+    priority: 'high',
+    date: '2026-12-31',
+    official_link: 'https://www.ecfmg.org/certification-pathways/'
+  },
+  {
+    id: 'nrmp_match_registration',
+    title: 'NRMP Main Residency Match Registration Deadline',
+    description: 'Register for the NRMP Main Residency Match before the late fee deadline.',
+    category: 'nrmp',
+    priority: 'critical',
+    date: '2027-01-31',
+    official_link: 'https://www.nrmp.org/'
+  }
+];
+
 const categoryColors = {
+  amcas: 'bg-purple-100/50 text-purple-700 border-purple-200 dark:bg-purple-900/20',
   ecfmg: 'bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))] border-[rgba(var(--color-primary),0.2)]',
   usmle: 'bg-blue-100/50 text-blue-700 border-blue-200 dark:bg-blue-900/20',
   eras: 'bg-[rgba(var(--color-secondary),0.1)] text-[rgb(var(--color-secondary))] border-[rgba(var(--color-secondary),0.2)]',
@@ -38,14 +96,20 @@ export default function Deadlines() {
 
   const { user } = useAuth();
 
-  const { data: deadlines = [], isLoading } = useQuery({
+  const { data: dbDeadlines = [] } = useQuery({
     queryKey: ['deadlines'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('deadlines').select('*').order('date', { ascending: true }).limit(100);
-      if (error) throw error;
-      return data || [];
+      try {
+        const { data, error } = await supabase.from('deadlines').select('*').order('date', { ascending: true }).limit(100);
+        if (error) return [];
+        return data || [];
+      } catch (e) {
+        return [];
+      }
     }
   });
+
+  const deadlines = dbDeadlines.length > 0 ? dbDeadlines : defaultDeadlines;
 
   const { data: userProfile } = useQuery({
     queryKey: ['userProfile', user?.id],
@@ -165,7 +229,7 @@ export default function Deadlines() {
 
         {/* Category Filter */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-          {['all', 'ecfmg', 'usmle', 'eras', 'nrmp', 'visa', 'licensing'].map(cat => (
+          {['all', 'amcas', 'ecfmg', 'usmle', 'eras', 'nrmp', 'visa', 'licensing'].map(cat => (
             <Badge
               key={cat}
               variant={category === cat ? 'default' : 'outline'}

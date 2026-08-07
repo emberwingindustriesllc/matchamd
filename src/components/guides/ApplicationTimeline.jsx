@@ -61,7 +61,7 @@ export default function ApplicationTimeline() {
           ECFMG launched the MyIntealth online application system in August 2025. All pathway applications are submitted through this portal.
         </p>
         <a
-          href="https://www.ecfmg.org/certification-pathways/myintealth.html"
+          href="https://www.ecfmg.org/certification-pathways/"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-sm font-medium text-indigo-700 dark:text-indigo-300 hover:underline"

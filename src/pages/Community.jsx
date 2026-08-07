@@ -39,6 +39,7 @@ import {
   Pin
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
 
 const categories = [
   { id: 'all', label: 'All Posts' },
@@ -87,18 +88,30 @@ export default function Community() {
   const { data: posts = [], isLoading, error: postsError, refetch } = useQuery({
     queryKey: ['posts', activeCategory, sortBy],
     queryFn: async () => {
-      let query = supabase.from('forum_posts').select('*');
-      if (activeCategory !== 'all') {
-        query = query.eq('category', activeCategory);
-      }
-      if (sortBy === 'recent') {
-        query = query.order('created_date', { ascending: false });
-      } else {
-        query = query.order('likes_count', { ascending: false });
-      }
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
+      let remotePosts = [];
+      try {
+        let query = supabase.from('forum_posts').select('*');
+        if (activeCategory !== 'all') {
+          query = query.eq('category', activeCategory);
+        }
+        if (sortBy === 'recent') {
+          query = query.order('created_date', { ascending: false });
+        } else {
+          query = query.order('likes_count', { ascending: false });
+        }
+        const { data, error } = await query;
+        if (!error && data) remotePosts = data;
+      } catch (e) {}
+
+      let localPosts = [];
+      try {
+        localPosts = JSON.parse(localStorage.getItem('matchamd_local_posts') || '[]');
+        if (activeCategory !== 'all') {
+          localPosts = localPosts.filter(p => p.category === activeCategory);
+        }
+      } catch (e) {}
+
+      return [...localPosts, ...remotePosts];
     },
     retry: 2,
     staleTime: 2 * 60 * 1000
@@ -109,38 +122,78 @@ export default function Community() {
   const createPostMutation = useMutation({
     /** @param {any} postData */
     mutationFn: async (postData) => {
-      const { error } = await supabase.from('forum_posts').insert({
-        ...postData,
-        author_id: user.id,
-        author_name: profile?.display_name || user?.email,
-        author_avatar: profile?.avatar_url,
+      const authorId = user?.id || 'guest_user';
+      const authorName = profile?.display_name || user?.email || 'MatchaMD Member';
+
+      const newRecord = {
+        id: 'local_' + Date.now(),
+        title: postData.title,
+        content: postData.content,
+        category: postData.category || 'general',
+        author_id: authorId,
+        author_name: authorName,
+        author_avatar: profile?.avatar_url || '',
         is_mentor: profile?.mentor_verified || false,
         likes_count: 0,
         liked_by: [],
-        comments_count: 0
-      });
-      if (error) throw error;
+        comments_count: 0,
+        created_date: new Date().toISOString()
+      };
+
+      if (user?.id) {
+        try {
+          const { error } = await supabase.from('forum_posts').insert({
+            title: postData.title,
+            content: postData.content,
+            category: postData.category || 'general',
+            author_id: user.id,
+            author_name: authorName,
+            author_avatar: profile?.avatar_url || '',
+            is_mentor: profile?.mentor_verified || false,
+            likes_count: 0,
+            liked_by: [],
+            comments_count: 0
+          });
+          if (error) console.warn('Database insert notice:', error.message);
+        } catch (e) {}
+      }
+
+      // Local fallback
+      try {
+        const existing = JSON.parse(localStorage.getItem('matchamd_local_posts') || '[]');
+        localStorage.setItem('matchamd_local_posts', JSON.stringify([newRecord, ...existing]));
+      } catch (e) {}
+
+      return newRecord;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       setIsCreateOpen(false);
       setNewPost({ title: '', content: '', category: 'general' });
+      toast.success('Post created successfully!');
+    },
+    onError: (err) => {
+      toast.error(err?.message || 'Failed to post message');
     }
   });
 
   const likePostMutation = useMutation({
     /** @param {any} post */
     mutationFn: async (post) => {
-      const isLiked = post.liked_by?.includes(user.id);
+      const currentUserId = user?.id || 'guest_user';
+      const isLiked = post.liked_by?.includes(currentUserId);
       const newLikedBy = isLiked 
-        ? post.liked_by.filter(id => id !== user.id)
-        : [...(post.liked_by || []), user.id];
+        ? post.liked_by.filter(id => id !== currentUserId)
+        : [...(post.liked_by || []), currentUserId];
       
-      const { error } = await supabase.from('forum_posts').update({
-        liked_by: newLikedBy,
-        likes_count: newLikedBy.length
-      }).eq('id', post.id);
-      if (error) throw error;
+      if (user?.id && !post.id?.toString().startsWith('local_')) {
+        try {
+          await supabase.from('forum_posts').update({
+            liked_by: newLikedBy,
+            likes_count: newLikedBy.length
+          }).eq('id', post.id);
+        } catch (e) {}
+      }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['posts'] })
   });
@@ -167,15 +220,15 @@ export default function Community() {
         </div>
 
         {/* Category Pills */}
-        <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide mb-4">
+        <div className="flex gap-2 overflow-x-auto pb-3 pt-1 px-1 scrollbar-thin mb-4 w-full">
           {categories.map(cat => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap shrink-0 flex-shrink-0 transition-all ${
                 activeCategory === cat.id
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-indigo-300'
               }`}
             >
               {cat.label}

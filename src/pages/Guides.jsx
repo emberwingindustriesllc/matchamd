@@ -173,6 +173,14 @@ export default function Guides() {
                 route: 'SurgeryGuide',
               },
               {
+                id: 'anki_hub',
+                title: 'Anki Flashcards & Decks',
+                description: 'AnKing Step 1 & Step 2 decks, add-ons & spaced repetition strategy',
+                icon: BookOpen,
+                color: 'from-blue-500 to-indigo-600',
+                route: 'AnkiGuide',
+              },
+              {
                 id: 'interview_premium',
                 title: 'Interview Mastery Course',
                 description: '20+ video lessons & expert practice questions',
