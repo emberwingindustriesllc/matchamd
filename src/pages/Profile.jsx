@@ -110,7 +110,7 @@ export default function Profile() {
       // Clean/sanitize fields for database
       const cleanedData = { ...validated.data };
       if (cleanedData.graduation_year !== undefined) {
-        cleanedData.graduation_year = cleanedData.graduation_year ? parseInt(cleanedData.graduation_year, 10) : null;
+        cleanedData.graduation_year = cleanedData.graduation_year ? parseInt(String(cleanedData.graduation_year), 10) : null;
       }
 
       const { data, error } = await supabase.from('user_profiles').update(cleanedData).eq('id', profile.id).select();
