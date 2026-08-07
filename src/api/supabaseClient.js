@@ -10,10 +10,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-// Strip trailing /rest/v1/ if it was accidentally appended in the environment variables
 const cleanSupabaseUrl = supabaseUrl ? supabaseUrl.replace(/\/rest\/v1\/?$/, '') : '';
+const safeSupabaseUrl = cleanSupabaseUrl || 'https://placeholder.supabase.co';
+const safeSupabaseAnonKey = supabaseAnonKey || 'placeholder-anon-key';
 
-export const supabase = createClient(cleanSupabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(safeSupabaseUrl, safeSupabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
