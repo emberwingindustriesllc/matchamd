@@ -6,9 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Loader2, Search, Filter, MapPin, BookOpen, Shield, Plus, AlertTriangle, Verified } from 'lucide-react';
+import { Loader2, Search, Filter, MapPin, BookOpen, Shield, Plus, AlertTriangle, Verified, Stethoscope, Download } from 'lucide-react';
 import { fetchPrograms } from '@/api/programs';
 import AddProgramModal from '@/components/community/AddProgramModal';
+import MultiSelectDropdown from '@/components/ui/MultiSelectDropdown';
+import { exportProgramsToCSV } from '@/utils/csvExporter';
 import { toast } from 'sonner';
 
 const SPECIALTIES = [
@@ -20,50 +22,66 @@ const SPECIALTIES = [
   'Rheumatology', 'Allergy/Immunology', 'Other',
 ];
 
+const SPECIALTY_PRESETS = [
+  { label: 'Primary Care Net', values: ['Internal Medicine', 'Family Medicine', 'Pediatrics'] },
+  { label: 'Hospital / Acute', values: ['Internal Medicine', 'Emergency Medicine', 'Psychiatry'] },
+];
+
 const PROGRAM_TYPES = [
   { value: '', label: 'All Types' },
   { value: 'residency', label: 'Residency' },
   { value: 'fellowship', label: 'Fellowship' },
-  { value: 'observership', 'label': 'Observership' },
+  { value: 'observership', label: 'Observership' },
   { value: 'research', label: 'Research' },
   { value: 'elective', label: 'Elective' },
 ];
 
 const US_STATES = [
-  { value: '', label: 'All States' },
-  ...['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
-    'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
-    'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-    'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
-    'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'].map(s => ({ value: s, label: s })),
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+];
+
+const STATE_PRESETS = [
+  { label: 'Tri-State Area', values: ['NY', 'NJ', 'PA', 'CT'] },
+  { label: 'West Coast', values: ['CA', 'OR', 'WA'] },
 ];
 
 export default function ProgramsList() {
   const navigate = useNavigate();
-  const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    search: '',
-    specialty: '',
-    program_type: '',
-    state: '',
-    verifiedOnly: false,
-  });
+  const [programs, setPrograms] = useState([]);
+  const [filteredPrograms, setFilteredPrograms] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
 
+  const [filters, setFilters] = useState({
+    search: '',
+    specialty: '',
+    specialties: [],
+    programType: '',
+    state: '',
+    states: [],
+    verifiedOnly: false,
+    hasScamReports: false,
+  });
+
   useEffect(() => {
     loadPrograms();
-  }, [filters, activeTab]);
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [filters, programs, activeTab]);
 
   const loadPrograms = async () => {
     setLoading(true);
     try {
-      const data = await fetchPrograms({
-        ...filters,
-        limit: 100,
-      });
+      const data = await fetchPrograms();
       setPrograms(data);
+      setFilteredPrograms(data);
     } catch (error) {
       console.error('Failed to load programs:', error);
       toast.error('Failed to load programs');
@@ -72,67 +90,149 @@ export default function ProgramsList() {
     }
   };
 
+  const applyFilters = () => {
+    let result = [...programs];
+
+    if (activeTab === 'verified') result = result.filter(p => p.verified);
+    if (activeTab === 'unverified') result = result.filter(p => !p.verified);
+    if (activeTab === 'scams') result = result.filter(p => p.scam_reports_count > 0);
+
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      result = result.filter(p =>
+        p.name?.toLowerCase().includes(q) ||
+        p.institution?.toLowerCase().includes(q) ||
+        p.city?.toLowerCase().includes(q) ||
+        p.state?.toLowerCase().includes(q)
+      );
+    }
+
+    if (filters.specialties && filters.specialties.length > 0) {
+      result = result.filter(p => {
+        if (!p.specialty) return false;
+        if (Array.isArray(p.specialty)) {
+          return filters.specialties.some(s => p.specialty.includes(s));
+        }
+        return filters.specialties.includes(p.specialty);
+      });
+    } else if (filters.specialty) {
+      result = result.filter(p => p.specialty === filters.specialty);
+    }
+
+    if (filters.programType) result = result.filter(p => p.program_type === filters.programType);
+
+    if (filters.states && filters.states.length > 0) {
+      result = result.filter(p => filters.states.includes(p.state));
+    } else if (filters.state) {
+      result = result.filter(p => p.state === filters.state);
+    }
+
+    if (filters.verifiedOnly) result = result.filter(p => p.verified);
+    if (filters.hasScamReports) result = result.filter(p => p.scam_reports_count > 0);
+
+    setFilteredPrograms(result);
+  };
+
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const clearFilters = () => {
-    setFilters({ search: '', specialty: '', program_type: '', state: '', verifiedOnly: false });
+  const resetFilters = () => {
+    setFilters({
+      search: '',
+      specialty: '',
+      specialties: [],
+      programType: '',
+      state: '',
+      states: [],
+      verifiedOnly: false,
+      hasScamReports: false,
+    });
+    setActiveTab('all');
   };
 
-  const filteredPrograms = programs.filter(p => {
-    if (activeTab === 'verified' && !p.verified) return false;
-    if (activeTab === 'unverified' && p.verified) return false;
-    if (activeTab === 'scams' && p.scam_reports_count === 0) return false;
-    return true;
-  });
-
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6 px-4 py-6 pb-24">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">Program Directory</h1>
           <p className="text-muted-foreground">Community-sourced programs, notes, and scam reports for IMGs</p>
         </div>
-        <AddProgramModal open={showAddModal} onOpenChange={setShowAddModal} onSuccess={loadPrograms} />
-        <Button onClick={() => setShowAddModal(true)}><Plus className="h-4 w-4 mr-2" /> Add Program</Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => exportProgramsToCSV(filteredPrograms, 'MatchaMD_Programs_Export.csv')}
+            className="rounded-xl border-slate-200 dark:border-slate-700"
+          >
+            <Download className="h-4 w-4 mr-2" /> Export CSV
+          </Button>
+          <AddProgramModal open={showAddModal} onOpenChange={setShowAddModal} onSuccess={loadPrograms} />
+          <Button onClick={() => setShowAddModal(true)} className="rounded-xl"><Plus className="h-4 w-4 mr-2" /> Add Program</Button>
+        </div>
       </div>
 
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex flex-wrap gap-4 items-end">
-            <div className="relative flex-1 min-w-[250px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search programs, institutions..."
-                value={filters.search}
-                onChange={e => handleFilterChange('search', e.target.value)}
-                className="pl-10"
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+            <div className="relative min-w-[200px]">
+              <label className="text-xs text-muted-foreground font-medium mb-1 block">Search</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search programs..."
+                  value={filters.search}
+                  onChange={e => handleFilterChange('search', e.target.value)}
+                  className="pl-10 h-11 rounded-xl"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-muted-foreground font-medium mb-1 block">Specialties</label>
+              <MultiSelectDropdown
+                title="Specialties"
+                placeholder="All Specialties"
+                options={SPECIALTIES}
+                selectedValues={filters.specialties}
+                onChange={vals => handleFilterChange('specialties', vals)}
+                presets={SPECIALTY_PRESETS}
+                icon={Stethoscope}
               />
             </div>
-            <Select value={filters.specialty} onValueChange={v => handleFilterChange('specialty', v)}>
-              <SelectTrigger className="w-[200px]"><SelectValue placeholder="Specialty" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All Specialties</SelectItem>
-                {SPECIALTIES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={filters.program_type} onValueChange={v => handleFilterChange('program_type', v)}>
-              <SelectTrigger className="w-[200px]"><SelectValue placeholder="Type" /></SelectTrigger>
-              <SelectContent>{PROGRAM_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={filters.state} onValueChange={v => handleFilterChange('state', v)}>
-              <SelectTrigger className="w-[140px]"><SelectValue placeholder="State" /></SelectTrigger>
-              <SelectContent>{US_STATES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
-            </Select>
+
+            <div>
+              <label className="text-xs text-muted-foreground font-medium mb-1 block">US States</label>
+              <MultiSelectDropdown
+                title="US States"
+                placeholder="All States"
+                options={US_STATES}
+                selectedValues={filters.states}
+                onChange={vals => handleFilterChange('states', vals)}
+                presets={STATE_PRESETS}
+                icon={MapPin}
+              />
+            </div>
+
+            <div className="flex flex-col justify-between h-full space-y-2">
+              <div>
+                <label className="text-xs text-muted-foreground font-medium mb-1 block">Program Type</label>
+                <Select value={filters.program_type} onValueChange={v => handleFilterChange('program_type', v)}>
+                  <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="All Types" /></SelectTrigger>
+                  <SelectContent>{PROGRAM_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={filters.verifiedOnly} onChange={e => handleFilterChange('verifiedOnly', e.target.checked)} className="rounded border" />
-              <span className="text-sm">Verified only</span>
+              <span className="text-sm font-medium">Verified only</span>
             </label>
-            {(filters.search || filters.specialty || filters.program_type || filters.state || filters.verifiedOnly) && (
-              <Button variant="ghost" size="sm" onClick={clearFilters}><Filter className="h-4 w-4 mr-1" /> Clear</Button>
+            {hasAnyFilter && (
+              <Button variant="ghost" size="sm" onClick={clearFilters}><Filter className="h-4 w-4 mr-1" /> Clear All Filters</Button>
             )}
           </div>
         </CardContent>

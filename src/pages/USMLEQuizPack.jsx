@@ -136,6 +136,58 @@ const sampleQuestions = {
       explanation: "Hashimoto's thyroiditis is the most common cause of hypothyroidism in the US. Biopsy features lymphocytic infiltration with germinal centers and Hurthle (oncocytic) cells."
     }
   ],
+  step1_pharmacology: [
+    {
+      id: 450,
+      question: "A 62-year-old male with heart failure and atrial fibrillation is started on a medication. Two weeks later, he complains of nausea, vomiting, and yellow-green visual halos. Which of the following drugs is responsible?",
+      options: [
+        "Metoprolol",
+        "Digoxin",
+        "Amiodarone",
+        "Furosemide"
+      ],
+      correct: 1,
+      explanation: "Digoxin toxicity presents with gastrointestinal distress (nausea, vomiting), neurological symptoms, and characteristic color vision changes (yellow-green halos/xanthopsia)."
+    },
+    {
+      id: 451,
+      question: "A 48-year-old female with severe rheumatoid arthritis is treated with a biologic agent that inhibits tumor necrosis factor-alpha (TNF-alpha). Prior to initiating treatment, which test is mandatory?",
+      options: [
+        "Tuberculin skin test (PPD) or IGRA",
+        "Serum creatinine",
+        "Electrocardiogram",
+        "Liver biopsy"
+      ],
+      correct: 0,
+      explanation: "TNF-alpha inhibitors (e.g., infliximab, etanercept) impair granuloma formation, risking reactivation of latent Tuberculosis. Screening with PPD or IGRA is mandatory prior to initiation."
+    }
+  ],
+  step2_ethics: [
+    {
+      id: 950,
+      question: "A 78-year-old competent male with terminal pancreatic cancer refuses further chemotherapy and requests palliative care. His family strongly insists the physician continue aggressive chemotherapy. What is the most ethical action?",
+      options: [
+        "Follow the family's wishes to prolong life",
+        "Respect the patient's autonomous refusal of chemotherapy",
+        "Seek a court order for medical guardianship",
+        "Transfer the patient to another physician immediately"
+      ],
+      correct: 1,
+      explanation: "Autonomy grants a competent adult patient the right to refuse any medical treatment, even if life-sustaining. The physician must respect the patient's decision over family preferences."
+    },
+    {
+      id: 951,
+      question: "A 16-year-old female presents to the clinic seeking prescription contraception. She asks the physician not to inform her parents. How should the physician respond?",
+      options: [
+        "Refuse to provide contraception without parental consent",
+        "Provide confidential contraception and counseling",
+        "Inform her parents immediately as she is a minor",
+        "Require a signed parental waiver"
+      ],
+      correct: 1,
+      explanation: "In most US jurisdictions, minors can access confidential care for contraception, STIs, prenatal care, and substance use without parental consent or notification."
+    }
+  ],
   step2_internal_medicine: [
     {
       id: 5,
@@ -531,6 +583,13 @@ const quizCategories = [
     timeEstimate: '150 min'
   },
   {
+    id: 'step1_pharmacology',
+    title: 'Step 1: Pharmacology',
+    questions: 90,
+    difficulty: 'Hard',
+    timeEstimate: '110 min'
+  },
+  {
     id: 'step2_internal_medicine',
     title: 'Step 2 CK: Internal Medicine',
     questions: 150,
@@ -564,6 +623,13 @@ const quizCategories = [
     questions: 50,
     difficulty: 'Easy',
     timeEstimate: '60 min'
+  },
+  {
+    id: 'step2_ethics',
+    title: 'Step 2 CK: Ethics & Communication',
+    questions: 65,
+    difficulty: 'Medium',
+    timeEstimate: '70 min'
   }
 ];
 
@@ -598,24 +664,41 @@ export default function USMLEQuizPack() {
     }
   });
 
-  // Query category progress statistics
+  // Query category progress statistics with local fallback
   const { data: progressList = [], refetch: refetchProgress } = useQuery({
     queryKey: ['quiz_progress', user?.id],
     queryFn: async () => {
-      if (!user?.id) return [];
-      try {
-        const { data, error } = await supabase
-          .from('quiz_progress')
-          .select('*')
-          .eq('user_id', user.id);
-        if (error) throw error;
-        return data || [];
-      } catch (err) {
-        console.warn('Could not load quiz progress from DB', err);
-        return [];
+      let dbProgress = [];
+      if (user?.id) {
+        try {
+          const { data, error } = await supabase
+            .from('quiz_progress')
+            .select('*')
+            .eq('user_id', user.id);
+          if (!error && data) dbProgress = data;
+        } catch (err) {
+          console.warn('Could not load quiz progress from DB:', err);
+        }
       }
-    },
-    enabled: !!user?.id
+
+      let localProgress = [];
+      try {
+        localProgress = JSON.parse(localStorage.getItem('matchamd_local_quiz_progress') || '[]');
+      } catch (e) {}
+
+      const combinedMap = new Map();
+      [...localProgress, ...dbProgress].forEach((p) => {
+        const cat = p.category_id;
+        const existing = combinedMap.get(cat) || { category_id: cat, questions_answered: 0, questions_correct: 0 };
+        combinedMap.set(cat, {
+          category_id: cat,
+          questions_answered: Math.max(existing.questions_answered, p.questions_answered),
+          questions_correct: Math.max(existing.questions_correct, p.questions_correct),
+        });
+      });
+
+      return Array.from(combinedMap.values());
+    }
   });
 
   const hasPurchased = purchases.some(p => p.content_id === 'quiz_usmle');
@@ -634,37 +717,55 @@ export default function USMLEQuizPack() {
     setScore(0);
   };
 
-  // Sync completed quiz score to DB
+  // Sync completed quiz score to DB and localStorage
   const handleFinishQuiz = async () => {
-    if (user?.id && activeCategory) {
+    if (activeCategory) {
+      const correctAnswers = score;
+      const totalQs = activeQuestions.length;
+      const existing = progressList.find((p) => p.category_id === activeCategory.id);
+      const newAnswered = (existing?.questions_answered || 0) + totalQs;
+      const newCorrect = (existing?.questions_correct || 0) + correctAnswers;
+
+      // Save locally
       try {
-        const correctAnswers = score;
-        const totalQs = activeQuestions.length;
-        const existing = progressList.find(p => p.category_id === activeCategory.id);
-        
-        if (existing) {
-          await supabase
-            .from('quiz_progress')
-            .update({
-              questions_answered: existing.questions_answered + totalQs,
-              questions_correct: existing.questions_correct + correctAnswers,
-              last_updated: new Date().toISOString()
-            })
-            .eq('id', existing.id);
-        } else {
-          await supabase
-            .from('quiz_progress')
-            .insert({
+        const local = JSON.parse(localStorage.getItem('matchamd_local_quiz_progress') || '[]');
+        const updatedLocal = local.filter((p) => p.category_id !== activeCategory.id);
+        updatedLocal.push({
+          category_id: activeCategory.id,
+          questions_answered: newAnswered,
+          questions_correct: newCorrect,
+          last_updated: new Date().toISOString(),
+        });
+        localStorage.setItem('matchamd_local_quiz_progress', JSON.stringify(updatedLocal));
+      } catch (e) {}
+
+      // Save to Supabase if logged in
+      if (user?.id) {
+        try {
+          if (existing) {
+            await supabase
+              .from('quiz_progress')
+              .update({
+                questions_answered: newAnswered,
+                questions_correct: newCorrect,
+                last_updated: new Date().toISOString(),
+              })
+              .eq('category_id', activeCategory.id)
+              .eq('user_id', user.id);
+          } else {
+            await supabase.from('quiz_progress').insert({
               user_id: user.id,
               category_id: activeCategory.id,
               questions_answered: totalQs,
-              questions_correct: correctAnswers
+              questions_correct: correctAnswers,
             });
+          }
+        } catch (err) {
+          console.warn('DB quiz update fallback to local:', err);
         }
-        refetchProgress();
-      } catch (err) {
-        console.error('Error saving quiz progress:', err);
       }
+
+      refetchProgress();
     }
     setActiveCategory(null);
   };

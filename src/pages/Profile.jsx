@@ -197,26 +197,53 @@ export default function Profile() {
                   className="hidden"
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
-                    if (file) {
-                      try {
+                    if (!file) return;
+
+                    const readAsBase64 = (f) =>
+                      new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(f);
+                      });
+
+                    try {
+                      if (user?.id) {
                         const fileExt = file.name.split('.').pop();
-                        const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+                        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
                         const filePath = `${user.id}/${fileName}`;
-                        
+
                         const { error: uploadError } = await supabase.storage
                           .from('avatars')
-                          .upload(filePath, file);
+                          .upload(filePath, file, { upsert: true });
 
-                        if (uploadError) throw uploadError;
-
-                        const { data } = supabase.storage
-                          .from('avatars')
-                          .getPublicUrl(filePath);
-
-                        updateProfileMutation.mutate({ avatar_url: data.publicUrl });
-                      } catch (error) {
-                        console.error('Error uploading avatar:', error);
+                        if (!uploadError) {
+                          const { data } = supabase.storage
+                            .from('avatars')
+                            .getPublicUrl(filePath);
+                          if (data?.publicUrl) {
+                            updateProfileMutation.mutate({ avatar_url: data.publicUrl });
+                            return;
+                          }
+                        }
                       }
+                    } catch (error) {
+                      console.warn('Supabase storage upload failed, using local Base64 fallback:', error);
+                    }
+
+                    // Base64 Fallback
+                    try {
+                      const base64Url = await readAsBase64(file);
+                      localStorage.setItem('matchamd_local_avatar', base64Url);
+                      if (profile?.id && user?.id) {
+                        updateProfileMutation.mutate({ avatar_url: base64Url });
+                      } else {
+                        queryClient.setQueryData(['userProfile', user?.id], (old) => {
+                          if (!old || old.length === 0) return [{ ...profile, avatar_url: base64Url }];
+                          return [{ ...old[0], avatar_url: base64Url }];
+                        });
+                      }
+                    } catch (err) {
+                      console.error('Failed to convert avatar to Base64:', err);
                     }
                   }}
                 />

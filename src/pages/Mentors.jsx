@@ -37,10 +37,13 @@ import {
   X,
   Users,
   Video,
-  ChevronRight
+  ChevronRight,
+  UserCheck,
+  Plus
 } from 'lucide-react';
 import VideoCallModal from '@/components/mentorship/VideoCallModal';
 import MentorDetailModal from '@/components/mentorship/MentorDetailModal';
+import BecomeMentorModal from '@/components/mentorship/BecomeMentorModal';
 import { mockMentors } from '@/data/mockMentors';
 
 export default function Mentors() {
@@ -54,6 +57,7 @@ export default function Mentors() {
   const [requestMessage, setRequestMessage] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [videoCallMentor, setVideoCallMentor] = useState(null);
+  const [showBecomeMentorModal, setShowBecomeMentorModal] = useState(false);
 
   const { user } = useAuth();
 
@@ -67,7 +71,7 @@ export default function Mentors() {
     enabled: !!user?.id
   });
 
-  const { data: dbMentors = [], isLoading } = useQuery({
+  const { data: dbMentors = [], isLoading, refetch: refetchMentors } = useQuery({
     queryKey: ['mentors'],
     queryFn: async () => {
       try {
@@ -80,11 +84,13 @@ export default function Mentors() {
     }
   });
 
-  // Combine DB mentors with mockMentors (avoiding duplicates)
+  // Combine DB mentors with mockMentors and local applications
   const mentors = React.useMemo(() => {
+    const local = JSON.parse(localStorage.getItem('matchamd_local_mentors') || '[]');
     const dbIds = new Set(dbMentors.map(m => m.user_id || m.id));
     const uniqueMock = mockMentors.filter(m => !dbIds.has(m.id) && !dbIds.has(m.user_id));
-    return [...dbMentors, ...uniqueMock];
+    const uniqueLocal = local.filter(m => !dbIds.has(m.id) && !dbIds.has(m.user_id));
+    return [...uniqueLocal, ...dbMentors, ...uniqueMock];
   }, [dbMentors]);
 
   const { data: myRequests = [] } = useQuery({
@@ -152,7 +158,19 @@ export default function Mentors() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
-      <Header title="Find a Mentor" showBack />
+      <Header
+        title="Find a Mentor"
+        showBack
+        rightContent={
+          <Button
+            onClick={() => setShowBecomeMentorModal(true)}
+            size="sm"
+            className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold shadow-sm"
+          >
+            <UserCheck className="w-4 h-4 mr-1" /> Become Mentor
+          </Button>
+        }
+      />
 
       <main className="px-4 py-6 max-w-lg mx-auto">
         {/* Hero Section */}
@@ -163,11 +181,21 @@ export default function Mentors() {
         >
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="relative">
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mb-3">
-              <Star className="w-6 h-6" />
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                <Star className="w-6 h-6" />
+              </div>
+              <Button
+                onClick={() => setShowBecomeMentorModal(true)}
+                variant="secondary"
+                size="sm"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30 rounded-xl text-xs"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1" /> Join as Mentor
+              </Button>
             </div>
             <h2 className="text-xl font-bold mb-1">Connect with Verified FMG Mentors</h2>
-            <p className="text-white/80 text-sm">
+            <p className="text-white/90 text-sm">
               Get personalized 1-on-1 guidance, personal statement edits, and mock interviews from physicians who matched.
             </p>
           </div>
@@ -429,6 +457,12 @@ export default function Mentors() {
         isOpen={!!videoCallMentor}
         onClose={() => setVideoCallMentor(null)}
         mentorName={videoCallMentor?.display_name || 'Mentor'}
+      />
+
+      <BecomeMentorModal
+        open={showBecomeMentorModal}
+        onOpenChange={setShowBecomeMentorModal}
+        onSuccess={refetchMentors}
       />
 
       <BottomNav />

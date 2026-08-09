@@ -194,3 +194,111 @@ BEGIN
   ON CONFLICT (user_id) DO UPDATE SET
     score = user_reputation.score + EXCLUDED.score;
 END $$;
+
+-- 9. RESEARCH OPPORTUNITIES TABLE
+CREATE TABLE IF NOT EXISTS research_opportunities (
+  id text PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  title text NOT NULL,
+  institution text NOT NULL,
+  specialty text,
+  city text,
+  state text,
+  compensation text CHECK (compensation IN ('unpaid', 'stipend', 'paid')),
+  remote_allowed boolean DEFAULT false,
+  positions_available int DEFAULT 1,
+  duration text,
+  description text NOT NULL,
+  requirements text[],
+  contact_email text NOT NULL,
+  application_deadline date,
+  status text DEFAULT 'open',
+  tags text[],
+  submitted_by uuid REFERENCES auth.users,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE research_opportunities ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+  DROP POLICY IF EXISTS "Public read research opportunities" ON research_opportunities;
+  DROP POLICY IF EXISTS "Authenticated insert research opportunities" ON research_opportunities;
+
+  CREATE POLICY "Public read research opportunities" ON research_opportunities FOR SELECT USING (true);
+  CREATE POLICY "Authenticated insert research opportunities" ON research_opportunities FOR INSERT WITH CHECK (true);
+END $$;
+
+-- 10. QUIZ PROGRESS TABLE
+CREATE TABLE IF NOT EXISTS quiz_progress (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users NOT NULL,
+  category_id text NOT NULL,
+  questions_answered int DEFAULT 0,
+  questions_correct int DEFAULT 0,
+  last_updated timestamptz DEFAULT now(),
+  CONSTRAINT unique_user_category UNIQUE (user_id, category_id)
+);
+
+ALTER TABLE quiz_progress ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+  DROP POLICY IF EXISTS "Users can view own quiz progress" ON quiz_progress;
+  DROP POLICY IF EXISTS "Users can insert own quiz progress" ON quiz_progress;
+  DROP POLICY IF EXISTS "Users can update own quiz progress" ON quiz_progress;
+
+  CREATE POLICY "Users can view own quiz progress" ON quiz_progress FOR SELECT USING (auth.uid() = user_id);
+  CREATE POLICY "Users can insert own quiz progress" ON quiz_progress FOR INSERT WITH CHECK (auth.uid() = user_id);
+  CREATE POLICY "Users can update own quiz progress" ON quiz_progress FOR UPDATE USING (auth.uid() = user_id);
+END $$;
+
+-- 11. SUBSCRIPTIONS TABLE
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  plan text NOT NULL DEFAULT 'free',
+  status text NOT NULL DEFAULT 'active',
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  current_period_start timestamptz,
+  current_period_end timestamptz,
+  cancel_at_period_end boolean DEFAULT false,
+  created_at timestamptz DEFAULT now(),
+  CONSTRAINT unique_user_subscription UNIQUE (user_id)
+);
+
+-- 12. PURCHASED_CONTENT TABLE
+CREATE TABLE IF NOT EXISTS purchased_content (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  content_type text NOT NULL DEFAULT 'unknown',
+  content_id text NOT NULL DEFAULT 'unknown',
+  price numeric(10,2) NOT NULL DEFAULT 0.00,
+  stripe_payment_id text,
+  purchased_at timestamptz DEFAULT now(),
+  CONSTRAINT unique_user_content UNIQUE (user_id, content_id)
+);
+
+ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE purchased_content ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+  DROP POLICY IF EXISTS "Users can view own subscription" ON subscriptions;
+  DROP POLICY IF EXISTS "Users can insert own subscription" ON subscriptions;
+  DROP POLICY IF EXISTS "Users can update own subscription" ON subscriptions;
+
+  CREATE POLICY "Users can view own subscription" ON subscriptions FOR SELECT USING (auth.uid() = user_id);
+  CREATE POLICY "Users can insert own subscription" ON subscriptions FOR INSERT WITH CHECK (auth.uid() = user_id);
+  CREATE POLICY "Users can update own subscription" ON subscriptions FOR UPDATE USING (auth.uid() = user_id);
+
+  DROP POLICY IF EXISTS "Users can view own purchases" ON purchased_content;
+  DROP POLICY IF EXISTS "Users can insert own purchases" ON purchased_content;
+
+  CREATE POLICY "Users can view own purchases" ON purchased_content FOR SELECT USING (auth.uid() = user_id);
+  CREATE POLICY "Users can insert own purchases" ON purchased_content FOR INSERT WITH CHECK (auth.uid() = user_id);
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
+CREATE INDEX IF NOT EXISTS idx_purchased_content_user_id ON purchased_content(user_id);
+

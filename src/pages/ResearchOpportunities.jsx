@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,8 @@ import {
   Users, 
   Globe,
   Mail,
-  Beaker
+  Beaker,
+  Plus
 } from 'lucide-react';
 import { 
   Dialog, 
@@ -24,30 +25,46 @@ import {
   DialogHeader, 
   DialogTitle 
 } from '@/components/ui/dialog';
+import PostResearchModal from '@/components/research/PostResearchModal';
+import { mockResearchOpportunities } from '@/data/mockResearchOpportunities';
 
 export default function ResearchOpportunities() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
+  const [showPostModal, setShowPostModal] = useState(false);
 
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-
-  const { data: opportunities = [], isLoading } = useQuery({
+  const { data: dbOpportunities = [], isLoading, refetch } = useQuery({
     queryKey: ['researchOpportunities'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('research_opportunities').select('*').eq('status', 'open');
-      if (error) throw error;
-      return data || [];
+      try {
+        const { data, error } = await supabase.from('research_opportunities').select('*').eq('status', 'open');
+        if (error) return [];
+        return data || [];
+      } catch (e) {
+        return [];
+      }
     }
   });
 
-  const specialties = [...new Set(opportunities.map(o => o.specialty))];
+  const opportunities = useMemo(() => {
+    const local = JSON.parse(localStorage.getItem('matchamd_local_research_opps') || '[]');
+    const dbIds = new Set(dbOpportunities.map((o) => o.id));
+    const uniqueMock = mockResearchOpportunities.filter((o) => !dbIds.has(o.id));
+    const uniqueLocal = local.filter((o) => !dbIds.has(o.id));
+    return [...uniqueLocal, ...dbOpportunities, ...uniqueMock];
+  }, [dbOpportunities]);
 
-  const filteredOpportunities = opportunities.filter(opp => {
-    const matchesSearch = opp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         opp.institution.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         opp.description.toLowerCase().includes(searchQuery.toLowerCase());
+  const specialties = [...new Set(opportunities.map((o) => o.specialty).filter(Boolean))];
+
+  const filteredOpportunities = opportunities.filter((opp) => {
+    const matchesSearch =
+      opp.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      opp.institution?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      opp.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSpecialty = selectedSpecialty === 'all' || opp.specialty === selectedSpecialty;
     return matchesSearch && matchesSpecialty;
   });
@@ -55,28 +72,49 @@ export default function ResearchOpportunities() {
   const compensationColors = {
     unpaid: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
     stipend: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-    paid: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+    paid: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
-      <Header title="Research Opportunities" showBack showSearch={false} />
+      <Header
+        title="Research Opportunities"
+        showBack
+        showSearch={false}
+        rightContent={
+          <Button
+            onClick={() => setShowPostModal(true)}
+            size="sm"
+            className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-sm"
+          >
+            <Plus className="w-4 h-4 mr-1" /> Post Position
+          </Button>
+        }
+      />
 
       <main className="px-4 py-6 max-w-4xl mx-auto space-y-6">
         {/* Hero */}
         <Card className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border-indigo-200 dark:border-indigo-800">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center flex-shrink-0">
-              <Beaker className="w-6 h-6 text-white" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center flex-shrink-0">
+                <Beaker className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
+                  Find Research Opportunities
+                </h2>
+                <p className="text-slate-600 dark:text-slate-400 text-sm">
+                  Connect with mentors offering clinical research positions. Perfect for unmatched IMGs looking to strengthen their ERAS applications with publications.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                Find Research Opportunities
-              </h2>
-              <p className="text-slate-600 dark:text-slate-400 text-sm">
-                Connect with mentors offering research positions. Perfect for unmatched IMGs looking to strengthen their applications with publications and clinical research experience.
-              </p>
-            </div>
+            <Button
+              onClick={() => setShowPostModal(true)}
+              className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-sm shrink-0"
+            >
+              <Plus className="w-4 h-4 mr-1.5" /> Post Position
+            </Button>
           </div>
         </Card>
 
@@ -279,6 +317,12 @@ export default function ResearchOpportunities() {
           )}
         </DialogContent>
       </Dialog>
+
+      <PostResearchModal
+        open={showPostModal}
+        onOpenChange={setShowPostModal}
+        onSuccess={refetch}
+      />
 
       <BottomNav />
     </div>

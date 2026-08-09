@@ -52,9 +52,13 @@ import {
   Calendar,
   Building,
   ClipboardList,
+  Stethoscope,
   X,
+  Download
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import MultiSelectDropdown from '@/components/ui/MultiSelectDropdown';
+import { exportProgramsToCSV } from '@/utils/csvExporter';
 import { localPrograms } from '@/api/programs.local';
 import { mockFellowships } from '@/data/mockFellowships';
 import { mockObserverships } from '@/data/mockObserverships';
@@ -70,6 +74,16 @@ import {
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 
+const SPECIALTY_PRESETS = [
+  { label: 'Primary Care Net', values: ['Internal Medicine', 'Family Medicine', 'Pediatrics'] },
+  { label: 'Hospitalist / Acute', values: ['Internal Medicine', 'Emergency Medicine', 'Psychiatry'] },
+];
+
+const REGION_PRESETS = [
+  { label: 'East Coast', values: ['Northeast', 'South'] },
+  { label: 'Midwest & West', values: ['Midwest', 'West'] },
+];
+
 export default function IMGPrograms() {
   const [activeTab, setActiveTab] = useState('search');
   const [categoryTab, setCategoryTab] = useState('residencies'); // 'residencies' | 'fellowships' | 'observerships' | 'medschools'
@@ -77,7 +91,9 @@ export default function IMGPrograms() {
 
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
+  const [selectedSpecialties, setSelectedSpecialties] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState('all');
+  const [selectedRegions, setSelectedRegions] = useState([]);
   const [selectedVisa, setSelectedVisa] = useState('all');
   const [selectedSize, setSelectedSize] = useState('all');
   const [selectedFormat, setSelectedFormat] = useState('all');
@@ -267,7 +283,9 @@ export default function IMGPrograms() {
     setSearchQuery('');
     setDebouncedSearch('');
     setSelectedSpecialty('all');
+    setSelectedSpecialties([]);
     setSelectedRegion('all');
+    setSelectedRegions([]);
     setSelectedVisa('all');
     setSelectedSize('all');
     setSelectedFormat('all');
@@ -334,13 +352,15 @@ export default function IMGPrograms() {
     () => ({
       searchQuery: debouncedSearch,
       specialty: selectedSpecialty,
+      specialties: selectedSpecialties,
       region: selectedRegion,
+      regions: selectedRegions,
       visa: selectedVisa,
       size: selectedSize,
       format: selectedFormat,
       fitOnly: fitFilter,
     }),
-    [debouncedSearch, selectedSpecialty, selectedRegion, selectedVisa, selectedSize, selectedFormat, fitFilter]
+    [debouncedSearch, selectedSpecialty, selectedSpecialties, selectedRegion, selectedRegions, selectedVisa, selectedSize, selectedFormat, fitFilter]
   );
 
   const fitMap = useMemo(() => buildFitScoreMap(programs, profile), [programs, profile]);
@@ -360,14 +380,18 @@ export default function IMGPrograms() {
         item.specialty.toLowerCase().includes(q) ||
         item.city.toLowerCase().includes(q) ||
         item.state.toLowerCase().includes(q);
-      const matchesSpecialty = selectedSpecialty === 'all' || item.specialty === selectedSpecialty;
-      const matchesRegion = selectedRegion === 'all' || item.region === selectedRegion;
+      const matchesSpecialty = selectedSpecialties.length === 0 
+        ? (selectedSpecialty === 'all' || item.specialty === selectedSpecialty)
+        : selectedSpecialties.includes(item.specialty);
+      const matchesRegion = selectedRegions.length === 0
+        ? (selectedRegion === 'all' || item.region === selectedRegion)
+        : selectedRegions.includes(item.region);
       const matchesVisa = selectedVisa === 'all' || 
         (selectedVisa === 'j1' && item.visa_j1) || 
         (selectedVisa === 'h1b' && item.visa_h1b);
       return matchesSearch && matchesSpecialty && matchesRegion && matchesVisa;
     });
-  }, [debouncedSearch, selectedSpecialty, selectedRegion, selectedVisa]);
+  }, [debouncedSearch, selectedSpecialty, selectedSpecialties, selectedRegion, selectedRegions, selectedVisa]);
 
   // Observerships Filtered
   const filteredObserverships = useMemo(() => {
@@ -379,10 +403,12 @@ export default function IMGPrograms() {
         item.specialty.toLowerCase().includes(q) ||
         item.city.toLowerCase().includes(q) ||
         item.state.toLowerCase().includes(q);
-      const matchesSpecialty = selectedSpecialty === 'all' || item.specialty === selectedSpecialty;
+      const matchesSpecialty = selectedSpecialties.length === 0 
+        ? (selectedSpecialty === 'all' || item.specialty === selectedSpecialty)
+        : selectedSpecialties.includes(item.specialty);
       return matchesSearch && matchesSpecialty;
     });
-  }, [debouncedSearch, selectedSpecialty]);
+  }, [debouncedSearch, selectedSpecialty, selectedSpecialties]);
 
   // Medical Schools Filtered
   const filteredMedicalSchools = useMemo(() => {
@@ -669,33 +695,29 @@ export default function IMGPrograms() {
                     className="overflow-hidden pt-4 grid grid-cols-2 md:grid-cols-3 gap-3 border-t border-slate-100 dark:border-slate-800"
                   >
                     <div>
-                      <label className="text-xs text-slate-500 font-medium mb-1 block">Specialty</label>
-                      <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
-                        <SelectTrigger className="rounded-xl">
-                          <SelectValue placeholder="All Specialties" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Specialties</SelectItem>
-                          {specialties.map(spec => (
-                            <SelectItem key={spec} value={spec}>{spec}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <label className="text-xs text-slate-500 font-medium mb-1 block">Specialties (Select Multiple)</label>
+                      <MultiSelectDropdown
+                        title="Specialties"
+                        placeholder="All Specialties"
+                        options={specialties}
+                        selectedValues={selectedSpecialties}
+                        onChange={setSelectedSpecialties}
+                        presets={SPECIALTY_PRESETS}
+                        icon={Stethoscope}
+                      />
                     </div>
 
                     <div>
-                      <label className="text-xs text-slate-500 font-medium mb-1 block">US Region</label>
-                      <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-                        <SelectTrigger className="rounded-xl">
-                          <SelectValue placeholder="All Regions" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Regions</SelectItem>
-                          {regions.map(reg => (
-                            <SelectItem key={reg} value={reg}>{reg}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <label className="text-xs text-slate-500 font-medium mb-1 block">US Regions (Select Multiple)</label>
+                      <MultiSelectDropdown
+                        title="US Regions"
+                        placeholder="All Regions"
+                        options={regions}
+                        selectedValues={selectedRegions}
+                        onChange={setSelectedRegions}
+                        presets={REGION_PRESETS}
+                        icon={MapPin}
+                      />
                     </div>
 
                     <div>
@@ -807,6 +829,21 @@ export default function IMGPrograms() {
                   {categoryTab === 'observerships' && `${filteredObserverships.length} observerships & clinical rotations found`}
                   {categoryTab === 'medschools' && `${filteredMedicalSchools.length} international medical schools found`}
                 </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const listToExport = categoryTab === 'residencies' ? filteredPrograms :
+                                         categoryTab === 'fellowships' ? filteredFellowships :
+                                         categoryTab === 'observerships' ? filteredObserverships : filteredMedicalSchools;
+                    const name = `MatchaMD_${categoryTab}_export.csv`;
+                    exportProgramsToCSV(listToExport, name);
+                  }}
+                  className="rounded-xl border-slate-200 dark:border-slate-700 text-xs gap-1.5"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Export CSV
+                </Button>
               </div>
 
               {/* CATEGORY 1: RESIDENCIES */}

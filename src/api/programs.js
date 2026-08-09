@@ -14,9 +14,17 @@ import { normalizeProgramCounts, sanitizeIlikeTerm } from '@/lib/programSearch';
 export function buildProgramFetchOptions(filters = {}) {
   const options = {
     specialty: filters.specialty && filters.specialty !== 'all' ? filters.specialty : undefined,
+    specialties:
+      Array.isArray(filters.specialties) && filters.specialties.length > 0
+        ? filters.specialties.filter((s) => s && s !== 'all')
+        : undefined,
     program_type:
       filters.program_type && filters.program_type !== 'all' ? filters.program_type : undefined,
     state: filters.state && filters.state !== 'all' ? filters.state : undefined,
+    states:
+      Array.isArray(filters.states) && filters.states.length > 0
+        ? filters.states.filter((s) => s && s !== 'all')
+        : undefined,
     limit: filters.limit || 50,
   };
 
@@ -47,13 +55,19 @@ export async function fetchPrograms(filters = {}) {
     )
     .order('created_at', { ascending: false });
 
-  if (opts.specialty) {
+  if (opts.specialties && opts.specialties.length > 0) {
+    query = query.overlaps('specialty', opts.specialties);
+  } else if (opts.specialty) {
     query = query.contains('specialty', [opts.specialty]);
   }
+
   if (opts.program_type) {
     query = query.eq('program_type', opts.program_type);
   }
-  if (opts.state) {
+
+  if (opts.states && opts.states.length > 0) {
+    query = query.in('state', opts.states);
+  } else if (opts.state) {
     query = query.eq('state', opts.state);
   }
   if (opts.verified !== undefined) {

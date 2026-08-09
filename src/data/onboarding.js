@@ -2,7 +2,7 @@
 // This file can be imported by Onboarding.jsx and any tests
 
 export const countries = [
-  'India', 'Pakistan', 'Nigeria', 'Philippines', 'Egypt', 'Mexico', 'Brazil',
+  'India', 'Pakistan', 'Nepal', 'Nigeria', 'Philippines', 'Egypt', 'Mexico', 'Brazil',
   'Colombia', 'China', 'Bangladesh', 'Iran', 'Iraq', 'Syria', 'Lebanon',
   'Jordan', 'Saudi Arabia', 'UAE', 'United Kingdom', 'Canada', 'Other'
 ];

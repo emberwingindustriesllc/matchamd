@@ -90,6 +90,21 @@ const LOCATION_TIPS = {
     visaInfo: 'TN visa option available for Canadians (faster than J-1/H-1B).',
     resources: []
   },
+  NP: {
+    title: 'Tips for IMGs from Nepal',
+    tips: [
+      'Obtain Nepal Medical Council (NMC) registration & Statement of Need early for J-1',
+      'Verify medical school is listed in WDOMS with active ECFMG sponsor notes',
+      'OET Medicine accepted for ECFMG English proficiency requirement',
+      'Network with Nepalese physician organizations (ANMN & regional alumni networks)',
+      'Allow extra lead time for primary source credential verification (NMC/University)'
+    ],
+    visaInfo: 'J-1 visa is most common. Ministry of Health Statement of Need is required for ECFMG J-1 sponsorship.',
+    resources: [
+      { title: 'ANMN (Nepalese Medical Professionals in Americas)', url: 'https://anmn.org' },
+      { title: 'ECFMG Certification Pathways', url: 'https://www.ecfmg.org/certification-pathways' }
+    ]
+  },
   DEFAULT: {
     title: 'General Tips for International Medical Graduates',
     tips: [

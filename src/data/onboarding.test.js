@@ -44,6 +44,7 @@ describe('Onboarding Data & Validation', () => {
     it('includes major IMG source countries', () => {
       expect(countries).toContain('India');
       expect(countries).toContain('Pakistan');
+      expect(countries).toContain('Nepal');
       expect(countries).toContain('Nigeria');
       expect(countries).toContain('Philippines');
       expect(countries).toContain('Egypt');
@@ -58,6 +59,12 @@ describe('Onboarding Data & Validation', () => {
     it('has schools for India', () => {
       expect(commonMedSchools['India']).toContain('AIIMS New Delhi');
       expect(commonMedSchools['India']).toContain('Other');
+    });
+
+    it('has schools for Nepal', () => {
+      expect(commonMedSchools['Nepal']).toContain('Tribhuvan University Institute of Medicine (IOM)');
+      expect(commonMedSchools['Nepal']).toContain('B.P. Koirala Institute of Health Sciences (BPKIHS)');
+      expect(commonMedSchools['Nepal']).toContain('Other');
     });
 
     it('has fallback for unknown countries', () => {

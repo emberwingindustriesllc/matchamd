@@ -124,17 +124,47 @@ export function filterIMGPrograms(programs, filters = {}, profile = null, fitFn 
   const {
     searchQuery = '',
     specialty = 'all',
+    specialties = [],
     region = 'all',
+    regions = [],
+    state = 'all',
+    states = [],
     visa = 'all',
     size = 'all',
     format = 'all',
     fitOnly = false,
   } = filters;
 
+  const activeSpecialties = Array.isArray(specialties) && specialties.length > 0
+    ? specialties.filter(s => s && s !== 'all')
+    : (specialty && specialty !== 'all' ? [specialty] : []);
+
+  const activeRegions = Array.isArray(regions) && regions.length > 0
+    ? regions.filter(r => r && r !== 'all')
+    : (region && region !== 'all' ? [region] : []);
+
+  const activeStates = Array.isArray(states) && states.length > 0
+    ? states.filter(s => s && s !== 'all')
+    : (state && state !== 'all' ? [state] : []);
+
   return (programs || []).filter((prog) => {
     if (!matchesSearchQuery(prog, searchQuery)) return false;
-    if (specialty !== 'all' && prog.specialty !== specialty) return false;
-    if (region !== 'all' && prog.region !== region) return false;
+
+    if (activeSpecialties.length > 0) {
+      if (Array.isArray(prog.specialty)) {
+        if (!prog.specialty.some(s => activeSpecialties.includes(s))) return false;
+      } else if (!activeSpecialties.includes(prog.specialty)) {
+        return false;
+      }
+    }
+
+    if (activeRegions.length > 0) {
+      if (!activeRegions.includes(prog.region)) return false;
+    }
+
+    if (activeStates.length > 0) {
+      if (!activeStates.includes(prog.state)) return false;
+    }
 
     if (visa === 'j1' && !prog.visa_j1) return false;
     if (visa === 'h1b' && !prog.visa_h1b) return false;
@@ -243,10 +273,23 @@ export function normalizeProgramCounts(program) {
 }
 
 export function hasActiveIMGFilters(filters = {}) {
+  const hasSpecialties =
+    (Array.isArray(filters.specialties) && filters.specialties.length > 0) ||
+    (filters.specialty && filters.specialty !== 'all');
+
+  const hasRegions =
+    (Array.isArray(filters.regions) && filters.regions.length > 0) ||
+    (filters.region && filters.region !== 'all');
+
+  const hasStates =
+    (Array.isArray(filters.states) && filters.states.length > 0) ||
+    (filters.state && filters.state !== 'all');
+
   return Boolean(
     (filters.searchQuery && filters.searchQuery.trim()) ||
-      (filters.specialty && filters.specialty !== 'all') ||
-      (filters.region && filters.region !== 'all') ||
+      hasSpecialties ||
+      hasRegions ||
+      hasStates ||
       (filters.visa && filters.visa !== 'all') ||
       (filters.size && filters.size !== 'all') ||
       (filters.format && filters.format !== 'all') ||

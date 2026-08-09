@@ -24,6 +24,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import PremiumGate from '@/components/premium/PremiumGate';
 import { toast } from 'sonner';
+import { generateLessonHandoutPDF } from '@/utils/pdfHandoutGenerator';
+import MockInterviewVideoPlayer from '@/components/interview/MockInterviewVideoPlayer';
 
 const courseModules = [
   {
@@ -296,39 +298,15 @@ export default function InterviewCourse() {
 
   const handleDownloadLessonHandout = (lesson) => {
     const detail = lessonDetails[lesson.id] || {};
-    const content = `=====================================================
-MATCHA MD INTERVIEW LESSON #${lesson.id}: ${lesson.title.toUpperCase()}
-=====================================================
-Duration: ${lesson.duration}
-
-1. LESSON OVERVIEW & SUMMARY
------------------------------------------------------
-${lesson.summary}
-
-${detail.details || ''}
-
-2. KEY TAKEAWAYS & FRAMEWORKS
------------------------------------------------------
-${(detail.takeaways || []).map(t => '* ' + t).join('\n')}
-
-3. PRACTICE PROMPT & ACTION STEPS
------------------------------------------------------
-${detail.practicePrompt || 'Practice your answer out loud and record yourself on webcam.'}
-`;
+    const parentModule = courseModules.find(m => m.lessons.some(l => l.id === lesson.id));
+    const moduleTitle = parentModule ? parentModule.title : 'Interview Course';
 
     try {
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `MatchaMD_Lesson_${lesson.id}_${lesson.title.replace(/[^a-zA-Z0-9]/g, '_')}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      toast.success(`Downloaded Handout for Lesson #${lesson.id}!`);
+      generateLessonHandoutPDF(lesson, moduleTitle, detail, practiceNote);
+      toast.success(`Downloaded PDF Handout for Lesson #${lesson.id}!`);
     } catch (e) {
-      toast.error('Failed to download handout');
+      console.error('PDF generation error:', e);
+      toast.error('Failed to generate PDF handout');
     }
   };
 
@@ -792,39 +770,28 @@ Strategy: Present (current role/USCE), Past (med school & key achievement), Futu
               </button>
 
               {/* Lesson Video Viewer */}
-              <div className="relative aspect-video rounded-2xl bg-slate-950 flex items-center justify-center mb-4 overflow-hidden border border-slate-800 shadow-inner flex-shrink-0">
-                {isPlaying ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900 text-slate-200 p-6 text-center">
-                    <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-3 animate-pulse">
-                      <Play className="w-6 h-6 fill-current" />
-                    </div>
-                    <p className="font-bold text-white mb-1">Playing Lesson #{activeLesson.id}: {activeLesson.title}</p>
-                    <p className="text-xs text-slate-400 max-w-md">HD Video & Audio stream active ({activeLesson.duration})</p>
-                    <Button 
-                      size="sm" 
-                      onClick={() => setIsPlaying(false)} 
-                      variant="outline"
-                      className="mt-4 border-slate-700 text-xs text-white hover:bg-slate-800"
+              {isPlaying || activeLesson.id === 18 || activeLesson.id === 19 ? (
+                <div className="mb-4">
+                  <MockInterviewVideoPlayer
+                    lesson={activeLesson}
+                    onClose={() => setIsPlaying(false)}
+                  />
+                </div>
+              ) : (
+                <div className="relative aspect-video rounded-2xl bg-slate-950 flex items-center justify-center mb-4 overflow-hidden border border-slate-800 shadow-inner flex-shrink-0">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/60 to-purple-900/60 opacity-80" />
+                  <div className="relative text-center p-6 z-10 flex flex-col items-center">
+                    <div 
+                      onClick={() => setIsPlaying(true)}
+                      className="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center shadow-2xl mb-3 cursor-pointer hover:scale-110 transition-transform"
                     >
-                      Pause Video
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/60 to-purple-900/60 opacity-80" />
-                    <div className="relative text-center p-6 z-10 flex flex-col items-center">
-                      <div 
-                        onClick={() => setIsPlaying(true)}
-                        className="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center shadow-2xl mb-3 cursor-pointer hover:scale-110 transition-transform"
-                      >
-                        <Play className="w-8 h-8 text-white ml-1 fill-white" />
-                      </div>
-                      <p className="text-white font-bold text-base">Lesson #{activeLesson.id}: {activeLesson.title}</p>
-                      <p className="text-slate-300 text-xs mt-1">Duration: {activeLesson.duration} • Interactive Video & Guide</p>
+                      <Play className="w-8 h-8 text-white ml-1 fill-white" />
                     </div>
-                  </>
-                )}
-              </div>
+                    <p className="text-white font-bold text-base">Lesson #{activeLesson.id}: {activeLesson.title}</p>
+                    <p className="text-slate-300 text-xs mt-1">Duration: {activeLesson.duration} • Interactive Video & Guide</p>
+                  </div>
+                </div>
+              )}
 
               {/* Lesson Nav Tabs */}
               <div className="flex gap-2 mb-4 border-b border-slate-200 dark:border-slate-800 pb-2">
