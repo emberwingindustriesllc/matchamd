@@ -349,6 +349,8 @@ export default function IMGPrograms() {
     }
   });
 
+  const programs = dbPrograms.length > 0 ? dbPrograms : localPrograms;
+
   // Query RPC programs if RPC chips/filters are active
   const { data: rpcPrograms = [] } = useQuery({
     queryKey: ['rpcPrograms', selectedSpecialties, selectedLocations, debouncedSearch, rpcFilters],
