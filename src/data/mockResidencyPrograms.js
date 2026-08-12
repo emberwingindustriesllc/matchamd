@@ -1,4 +1,5 @@
 export const mockResidencyPrograms = [
+  // --- COOK COUNTY IM ---
   {
     id: "cook_county_im",
     program_name: "Internal Medicine Residency Program",
@@ -32,6 +33,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-12-01",
     stipends_benefits: { annual_stipend: 69200, health_insurance: true, cme_allowance: 1500, educational_allowance: 500, housing_stipend: 0 }
   },
+  // --- JACOBI IM ---
   {
     id: "jacobi_im",
     program_name: "Internal Medicine Residency Program",
@@ -65,6 +67,245 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-11-15",
     stipends_benefits: { annual_stipend: 73500, health_insurance: true, cme_allowance: 1000, educational_allowance: 300, housing_stipend: 2000 }
   },
+  // --- PITTSBURGH: UPMC INTERNAL MEDICINE ---
+  {
+    id: "upmc_im",
+    program_name: "Internal Medicine Residency Program",
+    institution: "UPMC Medical Center / University of Pittsburgh",
+    specialty: "Internal Medicine",
+    subspecialty: "General Internal Medicine",
+    city: "Pittsburgh",
+    state: "PA",
+    region: "Northeast",
+    visa_j1: true,
+    visa_h1b: true,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 140,
+    annual_intake: 46,
+    interview_format: "Virtual",
+    website: "https://www.upmc.com",
+    nrmp_code: "1652140C0",
+    community_program: false,
+    img_friendly_score: 8.7,
+    img_residents: 75,
+    img_percentage: 53.5,
+    graduation_rate: "99%",
+    step1_score_min: 220,
+    step2_score_min: 230,
+    step2_score_avg: 244,
+    step3_required: false,
+    min_usce_months: 2,
+    grad_year_cutoff: 5,
+    lor_required: 3,
+    application_deadline: "2026-12-01",
+    stipends_benefits: { annual_stipend: 68500, health_insurance: true, cme_allowance: 1500, educational_allowance: 500, housing_stipend: 0 }
+  },
+  // --- PITTSBURGH: UPMC PEDIATRICS ---
+  {
+    id: "upmc_chp_peds",
+    program_name: "Pediatric Residency Program",
+    institution: "UPMC Children's Hospital of Pittsburgh",
+    specialty: "Pediatrics",
+    subspecialty: "General Pediatrics",
+    city: "Pittsburgh",
+    state: "PA",
+    region: "Northeast",
+    visa_j1: true,
+    visa_h1b: true,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 90,
+    annual_intake: 30,
+    interview_format: "Virtual",
+    website: "https://www.chp.edu",
+    nrmp_code: "1652320C0",
+    community_program: false,
+    img_friendly_score: 8.3,
+    img_residents: 42,
+    img_percentage: 46.6,
+    graduation_rate: "99%",
+    step1_score_min: 220,
+    step2_score_min: 230,
+    step2_score_avg: 243,
+    step3_required: false,
+    min_usce_months: 2,
+    grad_year_cutoff: 4,
+    lor_required: 3,
+    application_deadline: "2026-11-15",
+    stipends_benefits: { annual_stipend: 68500, health_insurance: true, cme_allowance: 1500, educational_allowance: 500, housing_stipend: 0 }
+  },
+  // --- LOS ANGELES: UCLA INTERNAL MEDICINE ---
+  {
+    id: "ucla_im",
+    program_name: "Internal Medicine Residency Program",
+    institution: "David Geffen School of Medicine at UCLA",
+    specialty: "Internal Medicine",
+    subspecialty: "General Internal Medicine",
+    city: "Los Angeles",
+    state: "CA",
+    region: "West",
+    visa_j1: true,
+    visa_h1b: true,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 160,
+    annual_intake: 52,
+    interview_format: "Virtual",
+    website: "https://www.uclahealth.org",
+    nrmp_code: "1036140C0",
+    community_program: false,
+    img_friendly_score: 7.8,
+    img_residents: 48,
+    img_percentage: 30.0,
+    graduation_rate: "100%",
+    step1_score_min: 225,
+    step2_score_min: 235,
+    step2_score_avg: 248,
+    step3_required: false,
+    min_usce_months: 1,
+    grad_year_cutoff: 3,
+    lor_required: 3,
+    application_deadline: "2026-11-01",
+    stipends_benefits: { annual_stipend: 78000, health_insurance: true, cme_allowance: 2000, educational_allowance: 800, housing_stipend: 4000 }
+  },
+  // --- LOS ANGELES: CHLA / USC PEDIATRICS ---
+  {
+    id: "chla_usc_peds",
+    program_name: "Pediatric Residency Program",
+    institution: "Children's Hospital Los Angeles / Keck School of Medicine of USC",
+    specialty: "Pediatrics",
+    subspecialty: "General Pediatrics",
+    city: "Los Angeles",
+    state: "CA",
+    region: "West",
+    visa_j1: true,
+    visa_h1b: false,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 105,
+    annual_intake: 35,
+    interview_format: "Virtual",
+    website: "https://www.chla.org",
+    nrmp_code: "1044320C0",
+    community_program: false,
+    img_friendly_score: 8.1,
+    img_residents: 45,
+    img_percentage: 42.8,
+    graduation_rate: "99%",
+    step1_score_min: 220,
+    step2_score_min: 230,
+    step2_score_avg: 243,
+    step3_required: false,
+    min_usce_months: 2,
+    grad_year_cutoff: 4,
+    lor_required: 3,
+    application_deadline: "2026-11-15",
+    stipends_benefits: { annual_stipend: 77500, health_insurance: true, cme_allowance: 1800, educational_allowance: 600, housing_stipend: 3500 }
+  },
+  // --- LOS ANGELES: CEDARS-SINAI IM ---
+  {
+    id: "cedars_sinai_im",
+    program_name: "Internal Medicine Residency Program",
+    institution: "Cedars-Sinai Medical Center",
+    specialty: "Internal Medicine",
+    subspecialty: "General Internal Medicine",
+    city: "Los Angeles",
+    state: "CA",
+    region: "West",
+    visa_j1: true,
+    visa_h1b: true,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 96,
+    annual_intake: 32,
+    interview_format: "Virtual",
+    website: "https://www.cedars-sinai.org",
+    nrmp_code: "1032140C0",
+    community_program: false,
+    img_friendly_score: 8.4,
+    img_residents: 52,
+    img_percentage: 54.1,
+    graduation_rate: "99%",
+    step1_score_min: 220,
+    step2_score_min: 230,
+    step2_score_avg: 245,
+    step3_required: false,
+    min_usce_months: 2,
+    grad_year_cutoff: 5,
+    lor_required: 3,
+    application_deadline: "2026-12-01",
+    stipends_benefits: { annual_stipend: 78500, health_insurance: true, cme_allowance: 2000, educational_allowance: 700, housing_stipend: 4000 }
+  },
+  // --- NEW YORK: MOUNT SINAI PEDIATRICS ---
+  {
+    id: "mount_sinai_peds",
+    program_name: "Pediatric Residency Program",
+    institution: "Kravis Children's Hospital at Mount Sinai",
+    specialty: "Pediatrics",
+    subspecialty: "General Pediatrics",
+    city: "New York",
+    state: "NY",
+    region: "Northeast",
+    visa_j1: true,
+    visa_h1b: true,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 78,
+    annual_intake: 26,
+    interview_format: "Virtual",
+    website: "https://www.mountsinai.org",
+    nrmp_code: "1468320C0",
+    community_program: false,
+    img_friendly_score: 8.6,
+    img_residents: 46,
+    img_percentage: 58.9,
+    graduation_rate: "99%",
+    step1_score_min: 220,
+    step2_score_min: 230,
+    step2_score_avg: 244,
+    step3_required: false,
+    min_usce_months: 2,
+    grad_year_cutoff: 4,
+    lor_required: 3,
+    application_deadline: "2026-11-15",
+    stipends_benefits: { annual_stipend: 76000, health_insurance: true, cme_allowance: 1500, educational_allowance: 500, housing_stipend: 2500 }
+  },
+  // --- NEW YORK: NYU LANGONE IM ---
+  {
+    id: "nyu_langone_im",
+    program_name: "Internal Medicine Residency Program",
+    institution: "NYU Grossman School of Medicine / NYU Langone Health",
+    specialty: "Internal Medicine",
+    subspecialty: "General Internal Medicine",
+    city: "New York",
+    state: "NY",
+    region: "Northeast",
+    visa_j1: true,
+    visa_h1b: true,
+    visa_opt: true,
+    visa_ead: true,
+    program_size: 155,
+    annual_intake: 51,
+    interview_format: "Virtual",
+    website: "https://nyulangone.org",
+    nrmp_code: "1471140C0",
+    community_program: false,
+    img_friendly_score: 8.2,
+    img_residents: 62,
+    img_percentage: 40.0,
+    graduation_rate: "100%",
+    step1_score_min: 225,
+    step2_score_min: 235,
+    step2_score_avg: 249,
+    step3_required: false,
+    min_usce_months: 1,
+    grad_year_cutoff: 3,
+    lor_required: 3,
+    application_deadline: "2026-11-01",
+    stipends_benefits: { annual_stipend: 77000, health_insurance: true, cme_allowance: 2000, educational_allowance: 600, housing_stipend: 3000 }
+  },
+  // --- BRONXCARE FM ---
   {
     id: "bronxcare_fm",
     program_name: "Family Medicine Residency Program",
@@ -98,6 +339,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-11-01",
     stipends_benefits: { annual_stipend: 72800, health_insurance: true, cme_allowance: 1200, educational_allowance: 400, housing_stipend: 1500 }
   },
+  // --- CLEVELAND CLINIC IM ---
   {
     id: "cleveland_clinic_im",
     program_name: "Internal Medicine Residency Program",
@@ -131,6 +373,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-10-31",
     stipends_benefits: { annual_stipend: 66900, health_insurance: true, cme_allowance: 2000, educational_allowance: 800, housing_stipend: 0 }
   },
+  // --- RUTGERS NJMS IM ---
   {
     id: "rutgers_njms_im",
     program_name: "Internal Medicine Residency Program",
@@ -164,6 +407,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-11-30",
     stipends_benefits: { annual_stipend: 71400, health_insurance: true, cme_allowance: 1000, educational_allowance: 300, housing_stipend: 0 }
   },
+  // --- TEXAS TECH FM ---
   {
     id: "texas_tech_fm",
     program_name: "Family Medicine Residency Program",
@@ -197,6 +441,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-12-31",
     stipends_benefits: { annual_stipend: 63000, health_insurance: true, cme_allowance: 1500, educational_allowance: 400, housing_stipend: 0 }
   },
+  // --- MGH PEDS ---
   {
     id: "mgh_peds",
     program_name: "Pediatric Residency Program",
@@ -230,6 +475,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-10-15",
     stipends_benefits: { annual_stipend: 76200, health_insurance: true, cme_allowance: 2500, educational_allowance: 1000, housing_stipend: 3000 }
   },
+  // --- JACKSON MEMORIAL PEDS ---
   {
     id: "jackson_memorial_peds",
     program_name: "Pediatric Residency Program",
@@ -263,6 +509,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-11-01",
     stipends_benefits: { annual_stipend: 68000, health_insurance: true, cme_allowance: 1000, educational_allowance: 500, housing_stipend: 1000 }
   },
+  // --- DMC WAYNE IM ---
   {
     id: "dmc_wayne_im",
     program_name: "Internal Medicine Residency Program",
@@ -296,6 +543,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-12-15",
     stipends_benefits: { annual_stipend: 67500, health_insurance: true, cme_allowance: 1500, educational_allowance: 300, housing_stipend: 0 }
   },
+  // --- HOUSTON METHODIST SURGERY ---
   {
     id: "houston_methodist_surg",
     program_name: "General Surgery Residency Program",
@@ -329,6 +577,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-10-01",
     stipends_benefits: { annual_stipend: 69800, health_insurance: true, cme_allowance: 2000, educational_allowance: 600, housing_stipend: 0 }
   },
+  // --- MAYO CLINIC SURGERY ---
   {
     id: "mayo_surg",
     program_name: "General Surgery Residency Program",
@@ -362,6 +611,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-10-15",
     stipends_benefits: { annual_stipend: 70500, health_insurance: true, cme_allowance: 2500, educational_allowance: 1000, housing_stipend: 0 }
   },
+  // --- SUNY DOWNSTATE IM ---
   {
     id: "suny_downstate_im",
     program_name: "Internal Medicine Residency Program",
@@ -395,6 +645,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-12-01",
     stipends_benefits: { annual_stipend: 74000, health_insurance: true, cme_allowance: 1200, educational_allowance: 500, housing_stipend: 0 }
   },
+  // --- ELMHURST PSYCHIATRY ---
   {
     id: "elmhurst_psych",
     program_name: "Psychiatry Residency Program",
@@ -428,6 +679,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-11-15",
     stipends_benefits: { annual_stipend: 75000, health_insurance: true, cme_allowance: 1200, educational_allowance: 400, housing_stipend: 1500 }
   },
+  // --- CREIGHTON NEUROLOGY ---
   {
     id: "creighton_neuro",
     program_name: "Neurology Residency Program",
@@ -461,6 +713,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-11-30",
     stipends_benefits: { annual_stipend: 64500, health_insurance: true, cme_allowance: 1500, educational_allowance: 500, housing_stipend: 0 }
   },
+  // --- ST VINCENT PATHOLOGY ---
   {
     id: "st_vincent_path",
     program_name: "Pathology-Anatomic and Clinical Residency",
@@ -494,6 +747,7 @@ export const mockResidencyPrograms = [
     application_deadline: "2026-12-01",
     stipends_benefits: { annual_stipend: 62000, health_insurance: true, cme_allowance: 1500, educational_allowance: 400, housing_stipend: 0 }
   },
+  // --- LSU SHREVEPORT EMERGENCY MEDICINE ---
   {
     id: "lsu_shreveport_em",
     program_name: "Emergency Medicine Residency Program",
