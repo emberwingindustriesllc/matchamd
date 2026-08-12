@@ -71,6 +71,8 @@ import {
   sortPrograms,
   hasActiveIMGFilters,
 } from '@/lib/programSearch';
+import ChipSearchBar from '@/components/search/ChipSearchBar';
+import { multiSearch } from '@/lib/search/multiSearch';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 
@@ -92,6 +94,13 @@ export default function IMGPrograms() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [selectedSpecialties, setSelectedSpecialties] = useState([]);
+  const [selectedLocations, setSelectedLocations] = useState([]);
+  const [rpcFilters, setRpcFilters] = useState({
+    acgmeAccredited: null,
+    ecfmgPathway: null,
+    j1Visa: null,
+    h1bVisa: null,
+  });
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [selectedRegions, setSelectedRegions] = useState([]);
   const [selectedVisa, setSelectedVisa] = useState('all');
@@ -340,7 +349,28 @@ export default function IMGPrograms() {
     }
   });
 
-  const programs = dbPrograms.length > 0 ? dbPrograms : localPrograms;
+  // Query RPC programs if RPC chips/filters are active
+  const { data: rpcPrograms = [] } = useQuery({
+    queryKey: ['rpcPrograms', selectedSpecialties, selectedLocations, debouncedSearch, rpcFilters],
+    queryFn: async () => {
+      const state = {
+        programTypes: ['residency', 'fellowship', 'observership', 'research', 'elective'],
+        specialties: selectedSpecialties,
+        locations: selectedLocations,
+        searchQuery: debouncedSearch,
+        filters: rpcFilters,
+        pagination: { limit: 100, offset: 0 }
+      };
+      const { data, error } = await multiSearch(state);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: selectedSpecialties.length > 0 || selectedLocations.length > 0
+  });
+
+  const activeProgramList = (selectedSpecialties.length > 0 || selectedLocations.length > 0) && rpcPrograms.length > 0
+    ? rpcPrograms
+    : programs;
 
   const getFit = (prog) => calculateFitScore(prog, profile);
 
@@ -353,6 +383,7 @@ export default function IMGPrograms() {
       searchQuery: debouncedSearch,
       specialty: selectedSpecialty,
       specialties: selectedSpecialties,
+      locations: selectedLocations,
       region: selectedRegion,
       regions: selectedRegions,
       visa: selectedVisa,
@@ -360,15 +391,15 @@ export default function IMGPrograms() {
       format: selectedFormat,
       fitOnly: fitFilter,
     }),
-    [debouncedSearch, selectedSpecialty, selectedSpecialties, selectedRegion, selectedRegions, selectedVisa, selectedSize, selectedFormat, fitFilter]
+    [debouncedSearch, selectedSpecialty, selectedSpecialties, selectedLocations, selectedRegion, selectedRegions, selectedVisa, selectedSize, selectedFormat, fitFilter]
   );
 
-  const fitMap = useMemo(() => buildFitScoreMap(programs, profile), [programs, profile]);
+  const fitMap = useMemo(() => buildFitScoreMap(activeProgramList, profile), [activeProgramList, profile]);
 
   const filteredPrograms = useMemo(() => {
-    const filtered = filterIMGPrograms(programs, searchFilters, profile);
+    const filtered = filterIMGPrograms(activeProgramList, searchFilters, profile);
     return sortPrograms(filtered, sortBy, fitMap);
-  }, [programs, searchFilters, profile, sortBy, fitMap]);
+  }, [activeProgramList, searchFilters, profile, sortBy, fitMap]);
 
   // Fellowships Filtered
   const filteredFellowships = useMemo(() => {
@@ -641,49 +672,22 @@ export default function IMGPrograms() {
               </button>
             </div>
 
-            {/* Filters */}
-            <div className="space-y-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <Input
-                    placeholder={
-                      categoryTab === 'residencies'
-                        ? "Search residency programs, hospitals, or cities..."
-                        : categoryTab === 'fellowships'
-                        ? "Search fellowships, subspecialties, or institutions..."
-                        : categoryTab === 'observerships'
-                        ? "Search clinical rotations, observerships, or cities..."
-                        : "Search international medical schools or countries..."
-                    }
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') setDebouncedSearch(searchQuery);
-                    }}
-                    className="pl-12 h-12 rounded-xl border-slate-200 dark:border-slate-800"
-                  />
-                </div>
-
-                <Button
-                  onClick={() => setDebouncedSearch(searchQuery)}
-                  className="h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-5 shadow-sm font-semibold"
-                >
-                  <Search className="w-4 h-4 mr-1.5" />
-                  Search
-                </Button>
-
-                {categoryTab !== 'medschools' && (
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                    className={`h-12 rounded-xl px-4 ${showAdvancedFilters ? 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-950/20 dark:border-indigo-800' : 'border-slate-200 dark:border-slate-800'}`}
-                  >
-                    <SlidersHorizontal className="w-5 h-5" />
-                    <span className="ml-2 hidden sm:inline">Filters</span>
-                  </Button>
-                )}
-              </div>
+            {/* Multi-Search Chip Search Bar */}
+            <ChipSearchBar
+              specialties={selectedSpecialties}
+              onAddSpecialty={(spec) => setSelectedSpecialties(prev => [...prev.filter(s => s !== spec), spec])}
+              onRemoveSpecialty={(spec) => setSelectedSpecialties(prev => prev.filter(s => s !== spec))}
+              locations={selectedLocations}
+              onAddLocation={(loc) => setSelectedLocations(prev => [...prev.filter(l => l !== loc), loc])}
+              onRemoveLocation={(loc) => setSelectedLocations(prev => prev.filter(l => l !== loc))}
+              searchQuery={searchQuery}
+              onSearchQueryChange={setSearchQuery}
+              onExecuteSearch={() => setDebouncedSearch(searchQuery)}
+              showAdvancedFilters={showAdvancedFilters}
+              onToggleAdvancedFilters={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              filters={rpcFilters}
+              onFilterChange={(key, val) => setRpcFilters(prev => ({ ...prev, [key]: val }))}
+            />
 
               {/* Advanced Filter Panel */}
               <AnimatePresence>

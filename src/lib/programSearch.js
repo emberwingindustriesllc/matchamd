@@ -125,6 +125,7 @@ export function filterIMGPrograms(programs, filters = {}, profile = null, fitFn 
     searchQuery = '',
     specialty = 'all',
     specialties = [],
+    locations = [],
     region = 'all',
     regions = [],
     state = 'all',
@@ -138,6 +139,10 @@ export function filterIMGPrograms(programs, filters = {}, profile = null, fitFn 
   const activeSpecialties = Array.isArray(specialties) && specialties.length > 0
     ? specialties.filter(s => s && s !== 'all')
     : (specialty && specialty !== 'all' ? [specialty] : []);
+
+  const activeLocations = Array.isArray(locations) && locations.length > 0
+    ? locations.filter(l => l && l !== 'all')
+    : [];
 
   const activeRegions = Array.isArray(regions) && regions.length > 0
     ? regions.filter(r => r && r !== 'all')
@@ -156,6 +161,17 @@ export function filterIMGPrograms(programs, filters = {}, profile = null, fitFn 
       } else if (!activeSpecialties.includes(prog.specialty)) {
         return false;
       }
+    }
+
+    if (activeLocations.length > 0) {
+      const matchLoc = activeLocations.some(loc => {
+        const q = loc.toLowerCase().trim();
+        const cityState = `${prog.city || ''}, ${prog.state || ''}`.toLowerCase();
+        const city = (prog.city || '').toLowerCase();
+        const stateStr = (prog.state || '').toLowerCase();
+        return cityState.includes(q) || city.includes(q) || stateStr.includes(q);
+      });
+      if (!matchLoc) return false;
     }
 
     if (activeRegions.length > 0) {
