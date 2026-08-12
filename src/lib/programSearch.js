@@ -2,6 +2,8 @@
  * Pure helpers for IMG program directory search, fit scoring, and sorting.
  * Kept free of React so they can be unit-tested.
  */
+import { normalizeStateTerm } from '@/utils/stateMap';
+import { parseLocationLabel } from '@/lib/search/locationTypeahead';
 
 export function normalizeSearchText(value = '') {
   return String(value).trim().toLowerCase();
@@ -9,9 +11,6 @@ export function normalizeSearchText(value = '') {
 
 /**
  * Calculate how well a residency program fits a user profile.
- * @param {object} prog
- * @param {object|null} profile
- * @param {{ currentYear?: number }} [options]
  */
 export function calculateFitScore(prog, profile, options = {}) {
   if (!profile) {
@@ -96,12 +95,16 @@ function matchesSearchQuery(prog, searchQuery) {
   const q = normalizeSearchText(searchQuery);
   if (!q) return true;
 
+  const tokens = q.split(/[,;\s]+/).filter(Boolean);
+  const expandedTokens = tokens.flatMap(token => normalizeStateTerm(token).map(t => t.toLowerCase()));
+
   const haystack = [
     prog.program_name,
+    prog.name,
     prog.institution,
     prog.city,
     prog.state,
-    prog.specialty,
+    Array.isArray(prog.specialty) ? prog.specialty.join(' ') : prog.specialty,
     prog.subspecialty,
     prog.region,
     prog.nrmp_code,
@@ -110,15 +113,12 @@ function matchesSearchQuery(prog, searchQuery) {
     .map((v) => String(v).toLowerCase())
     .join(' ');
 
-  return haystack.includes(q);
+  if (haystack.includes(q)) return true;
+  return expandedTokens.some(token => haystack.includes(token));
 }
 
 /**
  * Filter residency programs by search + advanced filters + optional fit gate.
- * @param {object[]} programs
- * @param {object} filters
- * @param {object|null} profile
- * @param {(prog: object, profile: object|null) => object} [fitFn]
  */
 export function filterIMGPrograms(programs, filters = {}, profile = null, fitFn = calculateFitScore) {
   const {
@@ -155,21 +155,35 @@ export function filterIMGPrograms(programs, filters = {}, profile = null, fitFn 
   return (programs || []).filter((prog) => {
     if (!matchesSearchQuery(prog, searchQuery)) return false;
 
+    // OR logic for specialties (match if program specialty matches ANY active specialty)
     if (activeSpecialties.length > 0) {
-      if (Array.isArray(prog.specialty)) {
-        if (!prog.specialty.some(s => activeSpecialties.includes(s))) return false;
-      } else if (!activeSpecialties.includes(prog.specialty)) {
-        return false;
-      }
+      const matchSpec = activeSpecialties.some(spec => {
+        const target = spec.toLowerCase();
+        if (Array.isArray(prog.specialty)) {
+          return prog.specialty.some(s => s.toLowerCase().includes(target));
+        }
+        return (prog.specialty || '').toLowerCase().includes(target);
+      });
+      if (!matchSpec) return false;
     }
 
+    // OR logic for locations (match if program city/state matches ANY active location chip)
     if (activeLocations.length > 0) {
       const matchLoc = activeLocations.some(loc => {
         const q = loc.toLowerCase().trim();
-        const cityState = `${prog.city || ''}, ${prog.state || ''}`.toLowerCase();
+        const parsed = parseLocationLabel(loc);
+        const stateTerms = normalizeStateTerm(parsed.state || loc).map(s => s.toLowerCase());
+
         const city = (prog.city || '').toLowerCase();
         const stateStr = (prog.state || '').toLowerCase();
-        return cityState.includes(q) || city.includes(q) || stateStr.includes(q);
+        const cityState = `${city}, ${stateStr}`;
+
+        return (
+          city.includes(q) ||
+          stateTerms.some(st => stateStr === st || stateStr.includes(st)) ||
+          cityState.includes(q) ||
+          (parsed.city && city.includes(parsed.city.toLowerCase()))
+        );
       });
       if (!matchLoc) return false;
     }
@@ -179,7 +193,8 @@ export function filterIMGPrograms(programs, filters = {}, profile = null, fitFn 
     }
 
     if (activeStates.length > 0) {
-      if (!activeStates.includes(prog.state)) return false;
+      const expandedActiveStates = activeStates.flatMap(s => normalizeStateTerm(s).map(st => st.toUpperCase()));
+      if (!expandedActiveStates.includes((prog.state || '').toUpperCase())) return false;
     }
 
     if (visa === 'j1' && !prog.visa_j1) return false;
@@ -201,9 +216,6 @@ export function filterIMGPrograms(programs, filters = {}, profile = null, fitFn 
   });
 }
 
-/**
- * Build a map of programId -> fit result (memo-friendly pure function).
- */
 export function buildFitScoreMap(programs, profile, options = {}) {
   const map = {};
   for (const prog of programs || []) {
@@ -212,17 +224,11 @@ export function buildFitScoreMap(programs, profile, options = {}) {
   return map;
 }
 
-/**
- * Sort programs by fit, IMG friendliness, deadline, or name.
- * @param {object[]} programs
- * @param {'fit'|'img_friendly'|'deadline'|'name'} sortBy
- * @param {Record<string, {score: number}>} fitMap
- */
 export function sortPrograms(programs, sortBy = 'fit', fitMap = {}) {
   const list = [...(programs || [])];
 
   const byName = (a, b) =>
-    String(a.program_name || '').localeCompare(String(b.program_name || ''));
+    String(a.program_name || a.name || '').localeCompare(String(b.program_name || b.name || ''));
 
   if (sortBy === 'name') {
     return list.sort(byName);
@@ -254,9 +260,6 @@ export function sortPrograms(programs, sortBy = 'fit', fitMap = {}) {
   });
 }
 
-/**
- * Sanitize free-text for PostgREST .or() ilike filters.
- */
 export function sanitizeIlikeTerm(raw = '') {
   return String(raw)
     .trim()
@@ -265,9 +268,6 @@ export function sanitizeIlikeTerm(raw = '') {
     .slice(0, 80);
 }
 
-/**
- * Normalize nested PostgREST count aggregates on community programs.
- */
 export function normalizeProgramCounts(program) {
   if (!program) return program;
   const notesCount =
@@ -293,6 +293,9 @@ export function hasActiveIMGFilters(filters = {}) {
     (Array.isArray(filters.specialties) && filters.specialties.length > 0) ||
     (filters.specialty && filters.specialty !== 'all');
 
+  const hasLocations =
+    Array.isArray(filters.locations) && filters.locations.length > 0;
+
   const hasRegions =
     (Array.isArray(filters.regions) && filters.regions.length > 0) ||
     (filters.region && filters.region !== 'all');
@@ -304,6 +307,7 @@ export function hasActiveIMGFilters(filters = {}) {
   return Boolean(
     (filters.searchQuery && filters.searchQuery.trim()) ||
       hasSpecialties ||
+      hasLocations ||
       hasRegions ||
       hasStates ||
       (filters.visa && filters.visa !== 'all') ||

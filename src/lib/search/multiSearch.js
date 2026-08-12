@@ -1,5 +1,6 @@
 import { supabase } from '@/api/supabaseClient';
 import { parseLocationLabel } from './locationTypeahead';
+import { normalizeStateTerm } from '@/utils/stateMap';
 
 /**
  * Default state when the page loads — default program types on,
@@ -21,7 +22,7 @@ export const defaultSearchState = {
     verifiedOnly: null
   },
   pagination: {
-    limit: 20,
+    limit: 100,
     offset: 0
   }
 };
@@ -38,7 +39,14 @@ export function buildSearchParams(state) {
   for (const loc of (state.locations || [])) {
     const parsed = parseLocationLabel(loc);
     if (parsed.city) cities.push(parsed.city);
-    if (parsed.state) states.push(parsed.state);
+    if (parsed.state) {
+      const normalized = normalizeStateTerm(parsed.state);
+      states.push(...normalized);
+    } else if (parsed.city) {
+      // Check if the location string itself is a state name/code like "California" or "PA"
+      const normalized = normalizeStateTerm(parsed.city);
+      states.push(...normalized);
+    }
   }
 
   const {
@@ -54,8 +62,8 @@ export function buildSearchParams(state) {
   return {
     p_program_types,
     p_specialties,
-    p_cities: cities.length > 0 ? cities : [],
-    p_states: states.length > 0 ? states : [],
+    p_cities: cities.length > 0 ? Array.from(new Set(cities)) : [],
+    p_states: states.length > 0 ? Array.from(new Set(states)) : [],
     p_acgme_accredited: acgmeAccredited ?? null,
     p_ecfmg_pathway: ecfmgPathway ?? null,
     p_j1_visa: j1Visa ?? null,
@@ -64,7 +72,7 @@ export function buildSearchParams(state) {
     p_nrmp_participating: nrmpParticipating ?? null,
     p_verified_only: verifiedOnly ?? null,
     p_search: state.searchQuery || null,
-    p_limit: state.pagination?.limit || 20,
+    p_limit: state.pagination?.limit || 100,
     p_offset: state.pagination?.offset || 0
   };
 }
@@ -87,7 +95,7 @@ export async function multiSearch(state) {
 export function resetPagination(state) {
   return {
     ...state,
-    pagination: { limit: state.pagination?.limit || 20, offset: 0 }
+    pagination: { limit: state.pagination?.limit || 100, offset: 0 }
   };
 }
 
@@ -95,8 +103,8 @@ export function nextPage(state) {
   return {
     ...state,
     pagination: {
-      limit: state.pagination?.limit || 20,
-      offset: (state.pagination?.offset || 0) + (state.pagination?.limit || 20)
+      limit: state.pagination?.limit || 100,
+      offset: (state.pagination?.offset || 0) + (state.pagination?.limit || 100)
     }
   };
 }
