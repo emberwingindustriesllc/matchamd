@@ -672,22 +672,24 @@ export default function IMGPrograms() {
               </button>
             </div>
 
-            {/* Multi-Search Chip Search Bar */}
-            <ChipSearchBar
-              specialties={selectedSpecialties}
-              onAddSpecialty={(spec) => setSelectedSpecialties(prev => [...prev.filter(s => s !== spec), spec])}
-              onRemoveSpecialty={(spec) => setSelectedSpecialties(prev => prev.filter(s => s !== spec))}
-              locations={selectedLocations}
-              onAddLocation={(loc) => setSelectedLocations(prev => [...prev.filter(l => l !== loc), loc])}
-              onRemoveLocation={(loc) => setSelectedLocations(prev => prev.filter(l => l !== loc))}
-              searchQuery={searchQuery}
-              onSearchQueryChange={setSearchQuery}
-              onExecuteSearch={() => setDebouncedSearch(searchQuery)}
-              showAdvancedFilters={showAdvancedFilters}
-              onToggleAdvancedFilters={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              filters={rpcFilters}
-              onFilterChange={(key, val) => setRpcFilters(prev => ({ ...prev, [key]: val }))}
-            />
+            {/* Filters Container */}
+            <div className="space-y-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              {/* Multi-Search Chip Search Bar */}
+              <ChipSearchBar
+                specialties={selectedSpecialties}
+                onAddSpecialty={(spec) => setSelectedSpecialties(prev => [...prev.filter(s => s !== spec), spec])}
+                onRemoveSpecialty={(spec) => setSelectedSpecialties(prev => prev.filter(s => s !== spec))}
+                locations={selectedLocations}
+                onAddLocation={(loc) => setSelectedLocations(prev => [...prev.filter(l => l !== loc), loc])}
+                onRemoveLocation={(loc) => setSelectedLocations(prev => prev.filter(l => l !== loc))}
+                searchQuery={searchQuery}
+                onSearchQueryChange={setSearchQuery}
+                onExecuteSearch={() => setDebouncedSearch(searchQuery)}
+                showAdvancedFilters={showAdvancedFilters}
+                onToggleAdvancedFilters={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                filters={rpcFilters}
+                onFilterChange={(key, val) => setRpcFilters(prev => ({ ...prev, [key]: val }))}
+              />
 
               {/* Advanced Filter Panel */}
               <AnimatePresence>
