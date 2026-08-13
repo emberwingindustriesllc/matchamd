@@ -174,9 +174,8 @@ export default function Legal() {
                 <p className="text-xs text-slate-500 dark:text-slate-400">Effective April 5, 2026 · Last updated April 5, 2026</p>
               </div>
               <a
-                href={tab === 'privacy' ? 'https://matchamd.app/privacy' : 'https://matchamd.app/terms'}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={tab === 'privacy' ? '/Legal?tab=privacy' : '/Legal?tab=terms'}
+                className="inline-flex items-center gap-1.5 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
               >
                 <Button variant="outline" size="sm" className="flex items-center gap-1.5 text-xs">
                   Full version <ExternalLink className="w-3 h-3" />

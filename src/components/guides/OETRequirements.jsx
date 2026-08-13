@@ -86,7 +86,7 @@ export default function OETRequirements() {
             </a>
 
             <a
-              href="https://www.occupationalenglishtest.org/prepare/practice-tests/"
+              href="https://oet.com/en-us/ready/sample-tests"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg hover:shadow-md transition-shadow"
@@ -103,7 +103,7 @@ export default function OETRequirements() {
             </a>
 
             <a
-              href="https://preparation.occupationalenglishtest.org"
+              href="https://oet.com/en-us"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg hover:shadow-md transition-shadow"
