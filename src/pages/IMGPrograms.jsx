@@ -60,9 +60,7 @@ import { Link } from 'react-router-dom';
 import MultiSelectDropdown from '@/components/ui/MultiSelectDropdown';
 import { exportProgramsToCSV } from '@/utils/csvExporter';
 import { localPrograms } from '@/api/programs.local';
-import { mockFellowships } from '@/data/mockFellowships';
-import { mockObserverships } from '@/data/mockObserverships';
-import { mockMedicalSchools } from '@/data/mockMedicalSchools';
+
 import ProgramDetailsModal from '@/components/community/ProgramDetailsModal';
 import {
   calculateFitScore,
@@ -403,56 +401,138 @@ export default function IMGPrograms() {
     return sortPrograms(filtered, sortBy, fitMap);
   }, [activeProgramList, searchFilters, profile, sortBy, fitMap]);
 
-  // Fellowships Filtered
+  // Fellowships — Supabase RPC via multiSearch (program_type = 'fellowship')
+  const { data: fellowshipPrograms = [], isLoading: isFellowshipsLoading } = useQuery({
+    queryKey: ['fellowships'],
+    queryFn: async () => {
+      const { data, error } = await multiSearch({
+        programTypes: ['fellowship'],
+        specialties: [],
+        locations: [],
+        searchQuery: debouncedSearch,
+        filters: {
+          acgmeAccredited: null,
+          ecfmgPathway: null,
+          j1Visa: selectedVisa === 'j1' ? true : selectedVisa === 'h1b' ? false : null,
+          h1bVisa: selectedVisa === 'h1b' ? true : selectedVisa === 'j1' ? false : null,
+        },
+        pagination: { limit: 200, offset: 0 }
+      });
+      if (error) throw error;
+      return (data || []).map(p => ({
+        ...p,
+        program_name: p.name,
+        visa_j1: p.j1_visa === true,
+        visa_h1b: p.h1b_visa === true,
+        specialty: Array.isArray(p.specialty) ? p.specialty.join('; ') : p.specialty || ''
+      }));
+    }
+  });
+
+  // Observerships — Supabase RPC via multiSearch (program_type = 'observership')
+  const { data: observershipPrograms = [], isLoading: isObservershipsLoading } = useQuery({
+    queryKey: ['observerships'],
+    queryFn: async () => {
+      const { data, error } = await multiSearch({
+        programTypes: ['observership'],
+        specialties: [],
+        locations: [],
+        searchQuery: debouncedSearch,
+        filters: {
+          acgmeAccredited: null,
+          ecfmgPathway: null,
+          j1Visa: null,
+          h1bVisa: null,
+        },
+        pagination: { limit: 200, offset: 0 }
+      });
+      if (error) throw error;
+      return (data || []).map(p => ({
+        ...p,
+        title: p.name,
+        visa_j1: p.j1_visa === true,
+        visa_h1b: p.h1b_visa === true,
+        specialty: Array.isArray(p.specialty) ? p.specialty.join('; ') : p.specialty || ''
+      }));
+    }
+  });
+
+  // Medical Schools — Supabase RPC via multiSearch (program_type = 'medical_school')
+  const { data: medSchoolPrograms = [], isLoading: isMedSchoolsLoading } = useQuery({
+    queryKey: ['medschools'],
+    queryFn: async () => {
+      const { data, error } = await multiSearch({
+        programTypes: ['medical_school'],
+        specialties: [],
+        locations: [],
+        searchQuery: debouncedSearch,
+        filters: {
+          acgmeAccredited: null,
+          ecfmgPathway: null,
+          j1Visa: null,
+          h1bVisa: null,
+        },
+        pagination: { limit: 200, offset: 0 }
+      });
+      if (error) throw error;
+      return (data || []).map(p => ({
+        ...p,
+        school_name: p.name,
+        specialty: Array.isArray(p.specialty) ? p.specialty.join('; ') : p.specialty || ''
+      }));
+    }
+  });
+
+  // Fellowships filtered (wraps Supabase results with in-component search/specialty filter)
   const filteredFellowships = useMemo(() => {
-    return mockFellowships.filter(item => {
+    return fellowshipPrograms.filter(item => {
       const q = debouncedSearch.toLowerCase();
-      const matchesSearch = !q || 
-        item.program_name.toLowerCase().includes(q) ||
-        item.institution.toLowerCase().includes(q) ||
-        item.specialty.toLowerCase().includes(q) ||
-        item.city.toLowerCase().includes(q) ||
-        item.state.toLowerCase().includes(q);
-      const matchesSpecialty = selectedSpecialties.length === 0 
+      const matchesSearch = !q ||
+        item.program_name?.toLowerCase().includes(q) ||
+        item.institution?.toLowerCase().includes(q) ||
+        item.specialty?.toLowerCase().includes(q) ||
+        item.city?.toLowerCase().includes(q) ||
+        item.state?.toLowerCase().includes(q);
+      const matchesSpecialty = selectedSpecialties.length === 0
         ? (selectedSpecialty === 'all' || item.specialty === selectedSpecialty)
         : selectedSpecialties.includes(item.specialty);
       const matchesRegion = selectedRegions.length === 0
-        ? (selectedRegion === 'all' || item.region === selectedRegion)
-        : selectedRegions.includes(item.region);
-      const matchesVisa = selectedVisa === 'all' || 
-        (selectedVisa === 'j1' && item.visa_j1) || 
+        ? true // no region data in Supabase programs table
+        : selectedRegions.includes(item.region || '');
+      const matchesVisa = selectedVisa === 'all' ||
+        (selectedVisa === 'j1' && item.visa_j1) ||
         (selectedVisa === 'h1b' && item.visa_h1b);
       return matchesSearch && matchesSpecialty && matchesRegion && matchesVisa;
     });
-  }, [debouncedSearch, selectedSpecialty, selectedSpecialties, selectedRegion, selectedRegions, selectedVisa]);
+  }, [fellowshipPrograms, debouncedSearch, selectedSpecialty, selectedSpecialties, selectedRegion, selectedRegions, selectedVisa]);
 
-  // Observerships Filtered
+  // Observerships filtered
   const filteredObserverships = useMemo(() => {
-    return mockObserverships.filter(item => {
+    return observershipPrograms.filter(item => {
       const q = debouncedSearch.toLowerCase();
-      const matchesSearch = !q || 
-        item.title.toLowerCase().includes(q) ||
-        item.institution.toLowerCase().includes(q) ||
-        item.specialty.toLowerCase().includes(q) ||
-        item.city.toLowerCase().includes(q) ||
-        item.state.toLowerCase().includes(q);
-      const matchesSpecialty = selectedSpecialties.length === 0 
+      const matchesSearch = !q ||
+        item.title?.toLowerCase().includes(q) ||
+        item.institution?.toLowerCase().includes(q) ||
+        item.specialty?.toLowerCase().includes(q) ||
+        item.city?.toLowerCase().includes(q) ||
+        item.state?.toLowerCase().includes(q);
+      const matchesSpecialty = selectedSpecialties.length === 0
         ? (selectedSpecialty === 'all' || item.specialty === selectedSpecialty)
         : selectedSpecialties.includes(item.specialty);
       return matchesSearch && matchesSpecialty;
     });
-  }, [debouncedSearch, selectedSpecialty, selectedSpecialties]);
+  }, [observershipPrograms, debouncedSearch, selectedSpecialty, selectedSpecialties]);
 
-  // Medical Schools Filtered
+  // Medical Schools filtered
   const filteredMedicalSchools = useMemo(() => {
-    return mockMedicalSchools.filter(item => {
+    return medSchoolPrograms.filter(item => {
       const q = debouncedSearch.toLowerCase();
-      return !q || 
-        item.school_name.toLowerCase().includes(q) ||
-        item.city.toLowerCase().includes(q) ||
-        item.country.toLowerCase().includes(q);
+      return !q ||
+        item.school_name?.toLowerCase().includes(q) ||
+        item.city?.toLowerCase().includes(q) ||
+        item.state?.toLowerCase().includes(q); // state is empty for intl schools
     });
-  }, [debouncedSearch]);
+  }, [medSchoolPrograms, debouncedSearch]);
 
   const filtersActive = hasActiveIMGFilters(searchFilters) || sortBy !== 'fit';
 
@@ -969,6 +1049,321 @@ export default function IMGPrograms() {
                       </motion.div>
                     );
                   })
+                )
+              )}
+
+              {/* CATEGORY 2: FELLOWSHIPS */}
+              {categoryTab === 'fellowships' && (
+                isFellowshipsLoading ? (
+                  <div className="text-center py-12">
+                    <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                  </div>
+                ) : filteredFellowships.length === 0 ? (
+                  <Card className="p-12 text-center rounded-3xl border-slate-200 dark:border-slate-700">
+                    <Stethoscope className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+                    <p className="text-slate-700 dark:text-slate-300 font-medium mb-1">No fellowship programs found</p>
+                    <p className="text-slate-500 text-sm mb-4">
+                      Try a broader search or clear all filters.
+                    </p>
+                    {filtersActive && (
+                      <Button onClick={clearAllFilters} className="rounded-xl">
+                        Clear all filters
+                      </Button>
+                    )}
+                  </Card>
+                ) : (
+                  filteredFellowships.map((prog, idx) => (
+                    <motion.div
+                      key={prog.id || `fellowship-${idx}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <Card
+                        className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 space-y-4"
+                        onClick={() => setSelectedProgram(prog)}
+                      >
+                        <div className="flex items-start justify-between gap-4 mb-3">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
+                              {prog.program_name}
+                            </h3>
+                            <p className="text-sm text-slate-500 flex items-center gap-1">
+                              <Building className="w-4 h-4 flex-shrink-0" />
+                              <span className="truncate">{prog.institution}</span>
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            <button
+                              onClick={(e) => toggleFavorite(e, prog.id)}
+                              className={`p-2 rounded-full transition-colors ${
+                                profile?.favorite_programs?.includes(prog.id)
+                                  ? 'bg-rose-100 text-rose-500 dark:bg-rose-950/30'
+                                  : 'bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-400 dark:bg-slate-800'
+                              }`}
+                            >
+                              <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
+                            </button>
+                            <Badge
+                              className={`font-bold px-2 py-0.5 text-xs ${
+                                prog.visa_j1
+                                  ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400'
+                                  : fit.score >= 90
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                    : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
+                              }`}
+                              variant="outline"
+                            >
+                              {prog.visa_j1 ? "J-1 Eligible" : `${fit.score || 0}% Match`}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                            {prog.specialty}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                            <MapPin className="w-3 h-3 mr-1 text-slate-400" />
+                            {prog.city}, {prog.state}
+                          </Badge>
+                          {prog.visa_j1 && (
+                            <Badge className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400" variant="outline">
+                              Sponsors J-1
+                            </Badge>
+                          )}
+                          {prog.visa_h1b && (
+                            <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-400" variant="outline">
+                              Sponsors H-1B
+                            </Badge>
+                          )}
+                          {prog.is_acgme_accredited && (
+                            <Badge className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400" variant="outline">
+                              ACGME Accredited
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
+                          {prog.website && (
+                            <div>
+                              <span className="font-semibold text-slate-700 dark:text-slate-350">Website:</span>{' '}
+                              <a href={prog.website} target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                                {prog.website.replace(/^https?:\/\//, '')}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                        {prog.description && (
+                          <p className="text-sm text-slate-600 dark:text-slate-400">{prog.description}</p>
+                        )}
+                      </Card>
+                    </motion.div>
+                  ))
+                )
+              )}
+
+              {/* CATEGORY 3: OBSERVERSHIPS & CLINICAL ROTATIONS */}
+              {categoryTab === 'observerships' && (
+                isObservershipsLoading ? (
+                  <div className="text-center py-12">
+                    <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                  </div>
+                ) : filteredObserverships.length === 0 ? (
+                  <Card className="p-12 text-center rounded-3xl border-slate-200 dark:border-slate-700">
+                    <ClipboardList className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+                    <p className="text-slate-700 dark:text-slate-300 font-medium mb-1">No observerships or clinical rotations found</p>
+                    <p className="text-slate-500 text-sm mb-4">
+                      Try a broader search or clear all filters.
+                    </p>
+                    {filtersActive && (
+                      <Button onClick={clearAllFilters} className="rounded-xl">
+                        Clear all filters
+                      </Button>
+                    )}
+                  </Card>
+                ) : (
+                  filteredObserverships.map((prog, idx) => (
+                    <motion.div
+                      key={prog.id || `obs-${idx}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <Card
+                        className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 space-y-4"
+                        onClick={() => setSelectedProgram(prog)}
+                      >
+                        <div className="flex items-start justify-between gap-4 mb-3">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
+                              {prog.title}
+                            </h3>
+                            <p className="text-sm text-slate-500 flex items-center gap-1">
+                              <Building className="w-4 h-4 flex-shrink-0" />
+                              <span className="truncate">{prog.institution}</span>
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            <button
+                              onClick={(e) => toggleFavorite(e, prog.id)}
+                              className={`p-2 rounded-full transition-colors ${
+                                profile?.favorite_programs?.includes(prog.id)
+                                  ? 'bg-rose-100 text-rose-500 dark:bg-rose-950/30'
+                                  : 'bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-400 dark:bg-slate-800'
+                              }`}
+                            >
+                              <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
+                            </button>
+                            <Badge
+                              className={`font-bold px-2 py-0.5 text-xs ${
+                                prog.j1_visa
+                                  ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400'
+                                  : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
+                              }`}
+                              variant="outline"
+                            >
+                              {prog.j1_visa ? "J-1 Visa" : "No Visa Sponsorship"}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                            {prog.specialty}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                            <MapPin className="w-3 h-3 mr-1 text-slate-400" />
+                            {prog.city}, {prog.state}
+                          </Badge>
+                          {prog.j1_visa && (
+                            <Badge className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400" variant="outline">
+                              J-1 Available
+                            </Badge>
+                          )}
+                          {prog.h1b_visa && (
+                            <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-400" variant="outline">
+                              H-1B Available
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
+                          {prog.website && (
+                            <div>
+                              <span className="font-semibold text-slate-700 dark:text-slate-350">Apply:</span>{' '}
+                              <a href={prog.website} target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                                {prog.website.replace(/^https?:\/\//, '')}
+                              </a>
+                            </div>
+                          )}
+                          {prog.program_type && (
+                            <div>
+                              <span className="font-semibold text-slate-700 dark:text-slate-350">Type:</span> {prog.program_type}
+                            </div>
+                          )}
+                        </div>
+                        {prog.description && (
+                          <p className="text-sm text-slate-600 dark:text-slate-400">{prog.description}</p>
+                        )}
+                      </Card>
+                    </motion.div>
+                  ))
+                )
+              )}
+
+              {/* CATEGORY 4: MEDICAL SCHOOLS */}
+              {categoryTab === 'medschools' && (
+                isMedSchoolsLoading ? (
+                  <div className="text-center py-12">
+                    <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                  </div>
+                ) : filteredMedicalSchools.length === 0 ? (
+                  <Card className="p-12 text-center rounded-3xl border-slate-200 dark:border-slate-700">
+                    <GraduationCap className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+                    <p className="text-slate-700 dark:text-slate-300 font-medium mb-1">No medical schools found</p>
+                    <p className="text-slate-500 text-sm mb-4">
+                      Try searching by country or school name.
+                    </p>
+                  </Card>
+                ) : (
+                  filteredMedicalSchools.map((prog, idx) => (
+                    <motion.div
+                      key={prog.id || `medschool-${idx}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <Card
+                        className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 space-y-4"
+                        onClick={() => setSelectedProgram(prog)}
+                      >
+                        <div className="flex items-start justify-between gap-4 mb-3">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
+                              {prog.school_name}
+                            </h3>
+                            <p className="text-sm text-slate-500 flex items-center gap-1">
+                              <Building className="w-4 h-4 flex-shrink-0" />
+                              <span className="truncate">{prog.institution}</span>
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            <button
+                              onClick={(e) => toggleFavorite(e, prog.id)}
+                              className={`p-2 rounded-full transition-colors ${
+                                profile?.favorite_programs?.includes(prog.id)
+                                  ? 'bg-rose-100 text-rose-500 dark:bg-rose-950/30'
+                                  : 'bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-400 dark:bg-slate-800'
+                              }`}
+                            >
+                              <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
+                            </button>
+                            <Badge
+                              className={`font-bold px-2 py-0.5 text-xs ${
+                                prog.ecfmg_pathway_eligible
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                  : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400'
+                              }`}
+                              variant="outline"
+                            >
+                              {prog.ecfmg_pathway_eligible ? "ECFMG Eligible" : "Not ECFMG Listed"}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                            {prog.city}, {prog.state || 'International'}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                            {prog.specialty}
+                          </Badge>
+                          {prog.verified && (
+                            <Badge className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400" variant="outline">
+                              Verified
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
+                          {prog.website && (
+                            <div>
+                              <span className="font-semibold text-slate-700 dark:text-slate-350">Website:</span>{' '}
+                              <a href={prog.website} target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                                {prog.website.replace(/^https?:\/\//, '')}
+                              </a>
+                            </div>
+                          )}
+                          {prog.is_acgme_accredited && (
+                            <div>
+                              <span className="font-semibold text-slate-700 dark:text-slate-350">ACGME:</span> Yes
+                            </div>
+                          )}
+                        </div>
+                        {prog.description && (
+                          <p className="text-sm text-slate-600 dark:text-slate-400">{prog.description}</p>
+                        )}
+                      </Card>
+                    </motion.div>
+                  ))
                 )
               )}
             </div>
