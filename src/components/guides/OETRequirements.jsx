@@ -69,7 +69,7 @@ export default function OETRequirements() {
           </h4>
           <div className="space-y-2">
             <a
-              href="https://www.occupationalenglishtest.org"
+              href="https://oet.com/en-us/test/book-a-test"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg hover:shadow-md transition-shadow"
