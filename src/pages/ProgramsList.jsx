@@ -25,7 +25,14 @@ const SPECIALTIES = [
   'Radiation Oncology', 'Thoracic Surgery', 'Urology', 'ENT',
   'Medical Genetics', 'Cardiology', 'Gastroenterology', 'Nephrology',
   'Pulmonology', 'Endocrinology', 'Hematology/Oncology', 'Infectious Disease',
-  'Rheumatology', 'Allergy/Immunology', 'Other',
+  'Rheumatology', 'Allergy/Immunology',
+  // Pediatric Subspecialties
+  'Pediatric Hematology-Oncology', 'Pediatric Cardiology', 'Pediatric Gastroenterology',
+  'Pediatric Emergency Medicine', 'Pediatric Critical Care', 'Pediatric Endocrinology',
+  'Pediatric Nephrology', 'Pediatric Pulmonology', 'Pediatric Neonatology',
+  // OB/GYN Subspecialties
+  'Urogynecology', 'Maternal-Fetal Medicine', 'Gynecologic Oncology', 'Reproductive Endocrinology',
+  'Other',
 ];
 
 const SPECIALTY_PRESETS = [

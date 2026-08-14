@@ -12,7 +12,14 @@ const SPECIALTIES = [
   'Radiation Oncology', 'Thoracic Surgery', 'Urology', 'ENT',
   'Medical Genetics', 'Cardiology', 'Gastroenterology', 'Nephrology',
   'Pulmonology', 'Endocrinology', 'Hematology/Oncology', 'Infectious Disease',
-  'Rheumatology', 'Allergy/Immunology', 'Other',
+  'Rheumatology', 'Allergy/Immunology',
+  // Pediatric Subspecialties
+  'Pediatric Hematology-Oncology', 'Pediatric Cardiology', 'Pediatric Gastroenterology',
+  'Pediatric Emergency Medicine', 'Pediatric Critical Care', 'Pediatric Endocrinology',
+  'Pediatric Nephrology', 'Pediatric Pulmonology', 'Pediatric Neonatology',
+  // OB/GYN Subspecialties
+  'Urogynecology', 'Maternal-Fetal Medicine', 'Gynecologic Oncology', 'Reproductive Endocrinology',
+  'Other',
 ];
 
 /**
@@ -74,7 +81,18 @@ export async function fetchPrograms(filters = {}) {
     const formattedSpecs = opts.specialties.map(s => `"${s}"`).join(',');
     query = query.or(`specialty.ov.{${formattedSpecs}}`);
   } else if (opts.specialty) {
-    query = query.contains('specialty', [opts.specialty]);
+    const specLower = opts.specialty.toLowerCase();
+    if (specLower.includes('pediatric hematology') || specLower.includes('peds hem')) {
+      query = query.or('specialty.ilike.%Pediatric Hematology%,name.ilike.%Pediatric Hematology%,name.ilike.%Pediatric Oncology%');
+    } else if (specLower.includes('pediatric cardiology')) {
+      query = query.or('specialty.ilike.%Pediatric Cardiology%,name.ilike.%Pediatric Cardiology%');
+    } else if (specLower.includes('pediatric gastroenterology')) {
+      query = query.or('specialty.ilike.%Pediatric Gastroenterology%,name.ilike.%Pediatric Gastroenterology%');
+    } else if (specLower.includes('urogynecology')) {
+      query = query.or('specialty.ilike.%Urogynecology%,name.ilike.%Urogynecology%');
+    } else {
+      query = query.contains('specialty', [opts.specialty]);
+    }
   }
 
   if (opts.program_type) {
