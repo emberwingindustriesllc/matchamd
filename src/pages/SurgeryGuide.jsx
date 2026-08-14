@@ -12,8 +12,7 @@ import {
   BookOpen,
   Target,
   FileText,
-  Award,
-  AlertCircle
+  Award
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PremiumGate from '@/components/premium/PremiumGate';

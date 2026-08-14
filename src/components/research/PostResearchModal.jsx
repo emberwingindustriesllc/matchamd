@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { toast } from 'sonner';
-import { Beaker, Send, MapPin, Mail } from 'lucide-react';
+import { Beaker, Send } from 'lucide-react';
 
 const SPECIALTIES = [
   'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery',

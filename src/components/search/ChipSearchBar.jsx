@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, X, MapPin, Stethoscope, Filter, Check } from 'lucide-react';
+import { Search, X, MapPin, Stethoscope, Filter } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { loadSpecialties, filterSpecialties } from '@/lib/search/specialtyTypeahead';

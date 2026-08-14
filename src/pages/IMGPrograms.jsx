@@ -33,14 +33,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { 
-  Search, 
   MapPin,
   CheckCircle2,
   Circle,
   GraduationCap,
   Globe,
   Heart,
-  SlidersHorizontal,
   Star,
   Trash2,
   Plus,

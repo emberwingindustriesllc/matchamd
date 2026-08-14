@@ -2,19 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { 
   Play, 
   Pause, 
   Volume2, 
   VolumeX, 
-  Maximize, 
   Clock, 
-  MessageSquare, 
   Star, 
   CheckCircle2, 
   AlertTriangle,
-  ChevronRight,
   Sparkles
 } from 'lucide-react';
 
