@@ -5,8 +5,8 @@
  * Run: node src/lib/search/searchParser.test.js
  */
 
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
+import { describe, it } from 'vitest';
+import assert from 'assert';
 import {
   normalizeQuery,
   normalizeAlias,
@@ -52,7 +52,7 @@ describe('normalizeQuery', () => {
   });
 
   it('normalizes & to space', () => {
-    assert.strictEqual(normalizeQuery('Obstetrics & Gynecology'), 'obstetrics and gynecology');
+    assert.strictEqual(normalizeQuery('Obstetrics & Gynecology'), 'obstetrics gynecology');
   });
 
   it('collapses multiple spaces', () => {
