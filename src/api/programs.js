@@ -5,7 +5,15 @@ import { normalizeProgramCounts, sanitizeIlikeTerm } from '@/lib/programSearch';
  * Programs API - Community-driven program intelligence
  */
 
-// --- Programs ---
+const SPECIALTIES = [
+  'Internal Medicine', 'Family Medicine', 'Pediatrics', 'Surgery',
+  'Emergency Medicine', 'Psychiatry', 'OB/GYN', 'Neurology',
+  'Radiology', 'Anesthesiology', 'Pathology', 'Dermatology',
+  'Radiation Oncology', 'Thoracic Surgery', 'Urology', 'ENT',
+  'Medical Genetics', 'Cardiology', 'Gastroenterology', 'Nephrology',
+  'Pulmonology', 'Endocrinology', 'Hematology/Oncology', 'Infectious Disease',
+  'Rheumatology', 'Allergy/Immunology', 'Other',
+];
 
 /**
  * Build filters for community programs list.
@@ -26,6 +34,12 @@ export function buildProgramFetchOptions(filters = {}) {
         ? filters.states.filter((s) => s && s !== 'all')
         : undefined,
     limit: filters.limit || 50,
+    page: filters.page || 1,
+    pageSize: filters.pageSize || 50,
+    visa_j1: filters.visa_j1,
+    visa_h1b: filters.visa_h1b,
+    accepts_img: filters.accepts_img,
+    is_acgme_accredited: filters.is_acgme_accredited,
   };
 
   if (filters.verified !== undefined) {
@@ -51,12 +65,14 @@ export async function fetchPrograms(filters = {}) {
       *,
       program_notes(count),
       scam_reports(count)
-    `
+    `,
+      { count: 'exact' }
     )
     .order('created_at', { ascending: false });
 
   if (opts.specialties && opts.specialties.length > 0) {
-    query = query.overlaps('specialty', opts.specialties);
+    const formattedSpecs = opts.specialties.map(s => `"${s}"`).join(',');
+    query = query.or(`specialty.ov.{${formattedSpecs}}`);
   } else if (opts.specialty) {
     query = query.contains('specialty', [opts.specialty]);
   }
@@ -70,16 +86,129 @@ export async function fetchPrograms(filters = {}) {
   } else if (opts.state) {
     query = query.eq('state', opts.state);
   }
+
   if (opts.verified !== undefined) {
     query = query.eq('verified', opts.verified);
   }
-  if (opts.search) {
-    query = query.or(`name.ilike.%${opts.search}%,institution.ilike.%${opts.search}%`);
+  if (opts.visa_j1) {
+    query = query.eq('visa_j1', true);
+  }
+  if (opts.visa_h1b) {
+    query = query.eq('visa_h1b', true);
+  }
+  if (opts.accepts_img) {
+    query = query.eq('accepts_img', true);
+  }
+  if (opts.is_acgme_accredited) {
+    query = query.eq('is_acgme_accredited', true);
   }
 
-  const { data, error } = await query.limit(opts.limit || 50);
+  if (opts.search) {
+    const lowercaseSearch = opts.search.toLowerCase().trim();
+    const matchedSpecs = SPECIALTIES.filter(spec => {
+      const specLower = spec.toLowerCase();
+      return specLower.includes(lowercaseSearch) || lowercaseSearch.includes(specLower);
+    });
+
+    const keywords = opts.search.trim().split(/\s+/).filter(Boolean);
+    keywords.forEach(kw => {
+      const kwLower = kw.toLowerCase();
+      SPECIALTIES.forEach(spec => {
+        const specLower = spec.toLowerCase();
+        if (specLower.includes(kwLower) && !matchedSpecs.includes(spec)) {
+          matchedSpecs.push(spec);
+        }
+      });
+    });
+
+    let specialtyFilter = '';
+    if (matchedSpecs.length > 0) {
+      const formattedSpecs = matchedSpecs.map(s => `"${s}"`).join(',');
+      specialtyFilter = `,specialty.ov.{${formattedSpecs}}`;
+    }
+
+    keywords.forEach(kw => {
+      query = query.or(`name.ilike.%${kw}%,institution.ilike.%${kw}%,city.ilike.%${kw}%,state.ilike.%${kw}%${specialtyFilter}`);
+    });
+  }
+
+  const page = opts.page || 1;
+  const pageSize = opts.pageSize || 50;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  query = query.range(from, to);
+
+  const { data, count, error } = await query;
   if (error) throw error;
-  return (data || []).map(normalizeProgramCounts);
+  const normalized = (data || []).map(normalizeProgramCounts);
+  return { data: normalized, totalCount: count || normalized.length };
+}
+
+// --- Saved Searches API ---
+
+export async function fetchSavedSearches() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    const local = localStorage.getItem('matchamd_saved_searches');
+    return local ? JSON.parse(local) : [];
+  }
+
+  const { data, error } = await supabase
+    .from('user_saved_searches')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.warn('Supabase saved searches table not reachable, using localStorage:', error.message);
+    const local = localStorage.getItem('matchamd_saved_searches');
+    return local ? JSON.parse(local) : [];
+  }
+  return data;
+}
+
+export async function saveSearch(name, filters) {
+  const searchObj = { id: `search-${Date.now()}`, name, filters, created_at: new Date().toISOString() };
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    const local = localStorage.getItem('matchamd_saved_searches');
+    const existing = local ? JSON.parse(local) : [];
+    const updated = [searchObj, ...existing];
+    localStorage.setItem('matchamd_saved_searches', JSON.stringify(updated));
+    return searchObj;
+  }
+
+  const { data, error } = await supabase
+    .from('user_saved_searches')
+    .insert({ user_id: user.id, name, filters })
+    .select()
+    .single();
+
+  if (error) {
+    console.warn('Falling back to local storage for saved search:', error.message);
+    const local = localStorage.getItem('matchamd_saved_searches');
+    const existing = local ? JSON.parse(local) : [];
+    const updated = [searchObj, ...existing];
+    localStorage.setItem('matchamd_saved_searches', JSON.stringify(updated));
+    return searchObj;
+  }
+  return data;
+}
+
+export async function deleteSavedSearch(id) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || id.startsWith('search-')) {
+    const local = localStorage.getItem('matchamd_saved_searches');
+    if (local) {
+      const existing = JSON.parse(local);
+      const updated = existing.filter(s => s.id !== id);
+      localStorage.setItem('matchamd_saved_searches', JSON.stringify(updated));
+    }
+    return;
+  }
+
+  await supabase.from('user_saved_searches').delete().eq('id', id);
 }
 
 export async function fetchProgramById(id) {
