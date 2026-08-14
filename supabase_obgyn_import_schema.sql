@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS obgyn_program_candidates (
   updated_at timestamptz DEFAULT now()
 );
 
--- 4. ENABLE RLS AND POLICIES FOR BENCH TABLES
+-- 5. ENABLE RLS AND POLICIES FOR BENCH TABLES & PROGRAMS IMPORT
 ALTER TABLE obgyn_import_batches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE obgyn_program_candidates ENABLE ROW LEVEL SECURITY;
 
@@ -111,10 +111,18 @@ BEGIN
   DROP POLICY IF EXISTS "Allow anon select candidates" ON obgyn_program_candidates;
   DROP POLICY IF EXISTS "Allow anon all candidates" ON obgyn_program_candidates;
   CREATE POLICY "Allow anon all candidates" ON obgyn_program_candidates FOR ALL USING (true) WITH CHECK (true);
+
+  -- Allow program insertion/update for verified program imports
+  DROP POLICY IF EXISTS "Allow anon insert programs" ON programs;
+  CREATE POLICY "Allow anon insert programs" ON programs FOR INSERT WITH CHECK (true);
+
+  DROP POLICY IF EXISTS "Allow anon update programs" ON programs;
+  CREATE POLICY "Allow anon update programs" ON programs FOR UPDATE USING (true);
 END $$;
 
--- 5. INDEXES FOR FAST RECONCILIATION
+-- 6. INDEXES FOR FAST RECONCILIATION
 CREATE INDEX IF NOT EXISTS idx_programs_acgme_no ON programs(acgme_program_number);
 CREATE INDEX IF NOT EXISTS idx_candidates_acgme_no ON obgyn_program_candidates(acgme_program_number);
 CREATE INDEX IF NOT EXISTS idx_candidates_batch_id ON obgyn_program_candidates(batch_id);
 CREATE INDEX IF NOT EXISTS idx_candidates_verification_status ON obgyn_program_candidates(verification_status);
+

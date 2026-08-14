@@ -226,8 +226,23 @@ async function applyBatch(targetBatchId) {
         })
         .eq('id', cand.matched_program_id);
 
-      if (!updateErr) updatedCount++;
+      if (updateErr) {
+        console.error(`Update error for ${cand.program_name}:`, updateErr.message);
+      } else {
+        updatedCount++;
+      }
     } else {
+      // Determine specialty array and program_type based on candidate
+      let specialtyArray = ['Obstetrics and Gynecology'];
+      let pType = 'residency';
+      if (cand.batch_id.includes('OBSERVERSHIP')) {
+        specialtyArray = ['Obstetrics/Gynecology'];
+        pType = 'observership';
+      } else if (cand.batch_id.includes('IMG-RESIDENCY')) {
+        specialtyArray = ['Internal Medicine'];
+        pType = 'residency';
+      }
+
       // Insert missing program
       const { error: insertErr } = await supabase.from('programs').insert({
         name: cand.program_name,
@@ -235,9 +250,9 @@ async function applyBatch(targetBatchId) {
         city: cand.city,
         state: cand.state,
         zip: cand.zip,
-        specialty: ['Obstetrics and Gynecology'],
-        program_type: 'residency',
-        is_acgme_accredited: true,
+        specialty: specialtyArray,
+        program_type: pType,
+        is_acgme_accredited: cand.acgme_program_number ? true : false,
         acgme_program_number: cand.acgme_program_number,
         program_director: cand.program_director,
         website: cand.website,
@@ -254,7 +269,11 @@ async function applyBatch(targetBatchId) {
         provisional_data: false
       });
 
-      if (!insertErr) insertedCount++;
+      if (insertErr) {
+        console.error(`Insert error for ${cand.program_name}:`, insertErr.message);
+      } else {
+        insertedCount++;
+      }
     }
   }
 
