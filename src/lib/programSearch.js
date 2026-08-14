@@ -4,6 +4,7 @@
  */
 import { normalizeStateTerm } from '@/utils/stateMap';
 import { parseLocationLabel } from '@/lib/search/locationTypeahead';
+import { expandMedicalSearchTerms } from '@/lib/medicalSynonyms';
 
 export function normalizeSearchText(value = '') {
   return String(value).trim().toLowerCase();
@@ -96,7 +97,10 @@ function matchesSearchQuery(prog, searchQuery) {
   if (!q) return true;
 
   const tokens = q.split(/[,;\s]+/).filter(Boolean);
-  const expandedTokens = tokens.flatMap(token => normalizeStateTerm(token).map(t => t.toLowerCase()));
+  const stateTokens = tokens.flatMap(token => normalizeStateTerm(token).map(t => t.toLowerCase()));
+  const medicalTerms = expandMedicalSearchTerms(q);
+
+  const allSearchTokens = Array.from(new Set([...tokens, ...stateTokens, ...medicalTerms]));
 
   const haystack = [
     prog.program_name,
@@ -108,13 +112,15 @@ function matchesSearchQuery(prog, searchQuery) {
     prog.subspecialty,
     prog.region,
     prog.nrmp_code,
+    prog.acgme_program_number,
+    prog.program_director,
   ]
     .filter(Boolean)
     .map((v) => String(v).toLowerCase())
     .join(' ');
 
   if (haystack.includes(q)) return true;
-  return expandedTokens.some(token => haystack.includes(token));
+  return allSearchTokens.some(token => token.length >= 2 && haystack.includes(token));
 }
 
 /**

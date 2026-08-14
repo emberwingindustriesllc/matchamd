@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { normalizeProgramCounts, sanitizeIlikeTerm } from '@/lib/programSearch';
+import { expandMedicalSearchTerms } from '@/lib/medicalSynonyms';
 
 /**
  * Programs API - Community-driven program intelligence
@@ -122,21 +123,13 @@ export async function fetchPrograms(filters = {}) {
   }
 
   if (opts.search) {
-    const lowercaseSearch = opts.search.toLowerCase().trim();
+    const rawSearch = opts.search.trim();
+    const expandedTerms = expandMedicalSearchTerms(rawSearch);
+    const keywords = Array.from(new Set([rawSearch.toLowerCase(), ...rawSearch.split(/\s+/).filter(Boolean), ...expandedTerms]));
+
     const matchedSpecs = SPECIALTIES.filter(spec => {
       const specLower = spec.toLowerCase();
-      return specLower.includes(lowercaseSearch) || lowercaseSearch.includes(specLower);
-    });
-
-    const keywords = opts.search.trim().split(/\s+/).filter(Boolean);
-    keywords.forEach(kw => {
-      const kwLower = kw.toLowerCase();
-      SPECIALTIES.forEach(spec => {
-        const specLower = spec.toLowerCase();
-        if (specLower.includes(kwLower) && !matchedSpecs.includes(spec)) {
-          matchedSpecs.push(spec);
-        }
-      });
+      return keywords.some(kw => specLower.includes(kw) || kw.includes(specLower));
     });
 
     let specialtyFilter = '';
@@ -145,9 +138,8 @@ export async function fetchPrograms(filters = {}) {
       specialtyFilter = `,specialty.ov.{${formattedSpecs}}`;
     }
 
-    keywords.forEach(kw => {
-      query = query.or(`name.ilike.%${kw}%,institution.ilike.%${kw}%,city.ilike.%${kw}%,state.ilike.%${kw}%${specialtyFilter}`);
-    });
+    const primaryKw = keywords[0] || rawSearch;
+    query = query.or(`name.ilike.%${primaryKw}%,institution.ilike.%${primaryKw}%,city.ilike.%${primaryKw}%,state.ilike.%${primaryKw}%,specialty.ilike.%${primaryKw}%${specialtyFilter}`);
   }
 
   const page = opts.page || 1;
