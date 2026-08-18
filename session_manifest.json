@@ -1,0 +1,98 @@
+{
+  "session": {
+    "date": "2026-08-12",
+    "branch": "main",
+    "head_commit": "9df5e5b",
+    "working_dir": "C:\\Users\\paulf\\matchamd",
+    "supabase_project": "mmfixpgfaskufmrfmzcc",
+    "supabase_url": "https://mmfixpgfaskufmrfmzcc.supabase.co"
+  },
+  "completed": [
+    {
+      "date": "2026-08-12",
+      "task": "Delete scratch scripts (check_db.cjs, check_db_count.js)",
+      "status": "done",
+      "files_removed": ["scripts/check_db.cjs", "scripts/check_db_count.js"]
+    },
+    {
+      "date": "2026-08-12",
+      "task": "Fix Endocrinology split specialty elements",
+      "status": "done",
+      "sql_file": "store_assets/supabase_seeds/fix_endocrinology_specialty.sql",
+      "detail": "UPDATE merged 3 split array elements into single ARRAY['Endocrinology, Diabetes, and Metabolism (Internal Medicine)'] for 161 programs"
+    },
+    {
+      "date": "2026-08-12",
+      "task": "Add specialty to free-text search function",
+      "status": "done",
+      "sql_file": "store_assets/supabase_seeds/fix_search_specialty.sql",
+      "detail": "Re-created search_programs() with p.specialty::text ILIKE for free-text search bar"
+    },
+    {
+      "date": "2026-08-12",
+      "task": "Seed 137 ophthalmology residency programs",
+      "status": "done",
+      "sql_file": "store_assets/supabase_seeds/seed_ophthalmology.sql",
+      "detail": "137 INSERT statements across 46 states/territories, no \\' backslash-quotes, no ON CONFLICT"
+    },
+    {
+      "date": "2026-08-12",
+      "task": "Update seed manifest",
+      "status": "done",
+      "file": "store_assets/supabase_seeds/seed_manifest.json",
+      "detail": "Updated generated_at to 2026-08-12, scope description, ophthalmology count 370->137"
+    },
+    {
+      "date": "2026-08-12",
+      "task": "Fix ResourceLink.jsx — use <Link> for internal paths",
+      "status": "done",
+      "file": "src/components/common/ResourceLink.jsx",
+      "detail": "Internal paths (/IMGPrograms, /Mentors, etc.) now render as react-router-dom <Link> instead of <a href> to prevent full page reloads"
+    },
+    {
+      "date": "2026-08-12",
+      "task": "Fix Legal.jsx — relative links instead of matchamd.app",
+      "status": "done",
+      "file": "src/pages/Legal.jsx",
+      "detail": "Privacy/Terms 'Full version' buttons now point to /Legal?tab=privacy and /Legal?tab=terms (relative to app) instead of https://matchamd.app/..."
+    },
+    {
+      "date": "2026-08-12",
+      "task": "Fix OETRequirements.jsx — update OET prep URLs",
+      "status": "done",
+      "file": "src/components/guides/OETRequirements.jsx",
+      "detail": "Updated https://occupationalenglishtest.org/prepare/practice-tests/ to https://oet.com/en-us/ready/sample-tests and https://oet.com/en-us"
+    },
+    {
+      "date": "2026-08-12",
+      "task": "Build fellowship SQL seed (117 programs)",
+      "status": "done",
+      "sql_file": "store_assets/supabase_seeds/seed_fellowships.sql",
+      "detail": "117 ACGME-accredited fellowship programs across 14+ specialties at major US institutions (Chicago, NY, Baltimore, Cleveland, Columbus, Cincinnati, Pittsburgh, Hershey, Danville)"
+    },
+    {
+      "date": "2026-08-12",
+      "task": "Build observerships SQL seed (76 programs)",
+      "status": "done",
+      "sql_file": "store_assets/supabase_seeds/seed_observerships.sql",
+      "detail": "76 observership/clinical rotation programs at major US hospitals and visiting student electives. Includes observerships, surgical rotations, research rotations, and VSLO visiting student electives."
+    }
+  ],
+  "pending": [
+    {
+      "task": "Seed medical schools (real international medical schools)",
+      "file": "store_assets/supabase_seeds/seed_medical_schools.sql",
+      "status": "ready_to_run"
+    },
+    {
+      "task": "Run all three SQL seeds against Supabase",
+      "detail": "seed_fellowships.sql, seed_observerships.sql, seed_medical_schools.sql",
+      "status": "pending"
+    },
+    {
+      "task": "Remove mock data references from IMGPrograms.jsx (lines 855-881)",
+      "detail": "Replace mockFellowships/mockObserverships/mockMedicalSchools fallback with empty arrays + growth tips",
+      "status": "pending"
+    }
+  ]
+}

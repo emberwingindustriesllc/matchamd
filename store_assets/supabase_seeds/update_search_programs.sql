@@ -6,6 +6,13 @@
 -- 4. Program type inference from query text
 -- ============================================================
 
+-- Drop existing function first (return type changed: added relevance_score)
+DROP FUNCTION IF EXISTS public.search_programs(
+  text[], text[], text[], text[], text[],
+  boolean, boolean, boolean, boolean, boolean, boolean, boolean,
+  text, integer, integer
+);
+
 CREATE OR REPLACE FUNCTION search_programs(
   p_program_types TEXT[] DEFAULT NULL,
   p_specialties TEXT[] DEFAULT NULL,
@@ -309,16 +316,11 @@ BEGIN
       )
     )
   ORDER BY
-    -- When searching: relevance first, then verified, then created_at
-    CASE WHEN p_search IS NOT NULL AND TRIM(p_search) <> '' THEN
-      relevance_score DESC,
-      CASE WHEN p.verified = true THEN 0 ELSE 1 END,
-      p.created_at DESC
-    ELSE
-      -- Default ordering when no search: verified first, then created_at
-      CASE WHEN p.verified = true THEN 0 ELSE 1 END,
-      p.created_at DESC
-    END
+    -- When searching: relevance first. When not searching: relevance_score is 0 for all rows (no match points awarded),
+    -- so ordering by it first is harmless — all rows tie at 0, then fall through to verified and created_at.
+    CASE WHEN p_search IS NOT NULL AND TRIM(p_search) <> '' THEN relevance_score ELSE 0 END DESC,
+    CASE WHEN p.verified = true THEN 0 ELSE 1 END,
+    p.created_at DESC
   LIMIT p_limit
   OFFSET p_offset;
 END;
