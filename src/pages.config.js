@@ -21,6 +21,7 @@ import Subscription from './pages/Subscription';
 import SurgeryGuide from './pages/SurgeryGuide';
 import AnkiGuide from './pages/AnkiGuide';
 import MatchCostCalculator from './pages/MatchCostCalculator';
+import BookCatalog from './pages/BookCatalog';
 import __Layout from './Layout.jsx';
 
 
@@ -28,6 +29,7 @@ export const PAGES = {
     "Login": Login,
     "AdminModeration": AdminModeration,
     "AnkiGuide": AnkiGuide,
+    "BookCatalog": BookCatalog,
     "Community": Community,
     "Deadlines": Deadlines,
     "GuideDetail": GuideDetail,

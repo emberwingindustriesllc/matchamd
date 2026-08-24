@@ -1,6 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ExternalLink, FileText, Video, Book, Calculator } from 'lucide-react';
+import { ExternalLink, FileText, Video, Book, Calculator, ChevronRight } from 'lucide-react';
 
 export default function ResourceHub() {
   const resources = [
@@ -20,6 +21,7 @@ export default function ResourceHub() {
       icon: Book,
       color: 'from-amber-500 to-orange-500',
       links: [
+        { title: 'Medical Book Catalog', url: '/BookCatalog', isInternal: true, desc: 'USMLE & Board prep book tracker' },
         { title: 'UWorld Step 2 CK', url: 'https://www.uworld.com', desc: 'Question bank - essential' },
         { title: 'AMBOSS', url: 'https://www.amboss.com', desc: 'Study platform & library' },
         { title: 'Anki Decks', url: 'https://www.ankipalace.com', desc: 'Spaced repetition cards' }
@@ -70,25 +72,46 @@ export default function ResourceHub() {
                 </h4>
               </div>
               <div className="space-y-1.5 ml-10">
-                {category.links.map((link, linkIdx) => (
-                  <a
-                    key={linkIdx}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400 group-hover:underline">
-                          {link.title}
-                        </span>
-                        <ExternalLink className="w-3 h-3 text-slate-400" />
+                {category.links.map((link, linkIdx) => {
+                  if (link.isInternal) {
+                    return (
+                      <Link
+                        key={linkIdx}
+                        to={link.url}
+                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400 group-hover:underline">
+                              {link.title}
+                            </span>
+                            <ChevronRight className="w-3.5 h-3.5 text-emerald-500" />
+                          </div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{link.desc}</p>
+                        </div>
+                      </Link>
+                    );
+                  }
+                  return (
+                    <a
+                      key={linkIdx}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400 group-hover:underline">
+                            {link.title}
+                          </span>
+                          <ExternalLink className="w-3 h-3 text-slate-400" />
+                        </div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{link.desc}</p>
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{link.desc}</p>
-                    </div>
-                  </a>
-                ))}
+                    </a>
+                  );
+                })}
               </div>
             </div>
           );
