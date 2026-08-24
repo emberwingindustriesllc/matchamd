@@ -32,50 +32,50 @@ const courseModules = [
     id: 1,
     title: 'Interview Fundamentals',
     lessons: [
-      { id: 1, title: 'What Program Directors Look For', duration: '8 min', completed: true, videoUrl: 'https://www.youtube.com/embed/508-R7mR9y8', summary: 'Learn the core criteria US program directors evaluate: clinical competence, communication skills, professionalism, and team fit.' },
-      { id: 2, title: 'Virtual vs In-Person Interviews', duration: '6 min', completed: false, videoUrl: 'https://www.youtube.com/embed/uQ-6_r8w7h8', summary: 'Master lighting, camera setup, eye contact, and platform troubleshooting for virtual residency interviews.' },
-      { id: 3, title: 'First Impressions & Body Language', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/0x-vW63d8tE', summary: 'Key posture tips, confident vocal tone, and engaging storytelling techniques.' },
-      { id: 4, title: 'Structuring Your Answers (STAR Method)', duration: '12 min', completed: false, videoUrl: 'https://www.youtube.com/embed/K8-vW43d8tA', summary: 'Situation, Task, Action, Result framework tailored for medical clinical vignettes.' }
+      { id: 1, title: 'What Program Directors Look For', duration: '8 min', completed: true, videoUrl: 'https://www.youtube.com/embed/DiUI7_oKxho', summary: 'Learn the core criteria US program directors evaluate: clinical competence, communication skills, professionalism, and team fit.' },
+      { id: 2, title: 'Virtual vs In-Person Interviews', duration: '6 min', completed: false, videoUrl: 'https://www.youtube.com/embed/b3vI35Zc_Z8', summary: 'Master lighting, camera setup, eye contact, and avoiding common virtual residency interview mistakes.' },
+      { id: 3, title: 'First Impressions & Body Language', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'Key posture tips, confident vocal tone, and engaging storytelling techniques.' },
+      { id: 4, title: 'Structuring Your Answers (STAR Method)', duration: '12 min', completed: false, videoUrl: 'https://www.youtube.com/embed/WRLF8ULhZmw', summary: 'Situation, Task, Action, Result framework tailored for medical clinical vignettes.' }
     ]
   },
   {
     id: 2,
     title: 'Common Interview Questions',
     lessons: [
-      { id: 5, title: '"Tell Me About Yourself" - Perfect Answer', duration: '15 min', completed: false, videoUrl: 'https://www.youtube.com/embed/508-R7mR9y8', summary: 'Crafting a 2-minute elevated pitch connecting your medical background to your residency goals.' },
-      { id: 6, title: '"Why Our Program?" Research Strategies', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/uQ-6_r8w7h8', summary: 'How to analyze hospital patient volume, fellowship matches, and faculty research.' },
-      { id: 7, title: '"Why This Specialty?" Compelling Narratives', duration: '12 min', completed: false, videoUrl: 'https://www.youtube.com/embed/0x-vW63d8tE', summary: 'Articulating passion through patient encounters and rotation highlights.' },
-      { id: 8, title: 'Handling Weakness Questions', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/K8-vW43d8tA', summary: 'Authentic self-reflection paired with tangible action steps for improvement.' },
-      { id: 9, title: 'Discussing Gap Years & Challenges', duration: '14 min', completed: false, videoUrl: 'https://www.youtube.com/embed/708-W73d8tC', summary: 'Framing clinical gaps or visa hurdles into stories of resilience and dedication.' }
+      { id: 5, title: '"Tell Me About Yourself" - Perfect Answer', duration: '15 min', completed: false, videoUrl: 'https://www.youtube.com/embed/JTnTbzskEuo', summary: 'Crafting a 2-minute elevated pitch connecting your medical background to your residency goals.' },
+      { id: 6, title: '"Why Our Program?" Research Strategies', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/b3vI35Zc_Z8', summary: 'How to analyze hospital patient volume, fellowship matches, and faculty research.' },
+      { id: 7, title: '"Why This Specialty?" Compelling Narratives', duration: '12 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'Articulating passion through patient encounters and rotation highlights.' },
+      { id: 8, title: 'Handling Weakness Questions', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'Authentic self-reflection paired with tangible action steps for improvement.' },
+      { id: 9, title: 'Discussing Gap Years & Challenges', duration: '14 min', completed: false, videoUrl: 'https://www.youtube.com/embed/b3vI35Zc_Z8', summary: 'Framing clinical gaps or visa hurdles into stories of resilience and dedication.' }
     ]
   },
   {
     id: 3,
     title: 'IMG-Specific Challenges',
     lessons: [
-      { id: 10, title: 'Addressing Visa Status Confidently', duration: '8 min', completed: false, videoUrl: 'https://www.youtube.com/embed/708-W73d8tC', summary: 'Clear explanations of J-1 vs H-1B requirements and state licensing.' },
-      { id: 11, title: 'Explaining Multiple Step Attempts', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/508-R7mR9y8', summary: 'Addressing exam setbacks proactively with proven growth metrics.' },
-      { id: 12, title: 'Showcasing International Experience', duration: '9 min', completed: false, videoUrl: 'https://www.youtube.com/embed/uQ-6_r8w7h8', summary: 'Translating global healthcare insights into unique clinical strengths.' },
-      { id: 13, title: 'Cultural Differences & Communication', duration: '11 min', completed: false, videoUrl: 'https://www.youtube.com/embed/0x-vW63d8tE', summary: 'Navigating US medical hierarchy, patient autonomy, and interprofessional teams.' }
+      { id: 10, title: 'Addressing Visa Status Confidently', duration: '8 min', completed: false, videoUrl: 'https://www.youtube.com/embed/DiUI7_oKxho', summary: 'Clear explanations of J-1 vs H-1B requirements and state licensing.' },
+      { id: 11, title: 'Explaining Multiple Step Attempts', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/b3vI35Zc_Z8', summary: 'Addressing exam setbacks proactively with proven growth metrics.' },
+      { id: 12, title: 'Showcasing International Experience', duration: '9 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'Translating global healthcare insights into unique clinical strengths.' },
+      { id: 13, title: 'Cultural Differences & Communication', duration: '11 min', completed: false, videoUrl: 'https://www.youtube.com/embed/DiUI7_oKxho', summary: 'Navigating US medical hierarchy, patient autonomy, and interprofessional teams.' }
     ]
   },
   {
     id: 4,
     title: 'Advanced Techniques',
     lessons: [
-      { id: 14, title: 'Asking Smart Questions to Interviewers', duration: '12 min', completed: false, videoUrl: 'https://www.youtube.com/embed/K8-vW43d8tA', summary: 'High-yield questions that demonstrate deep interest and clinical ambition.' },
-      { id: 15, title: 'Reading the Room & Adapting', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/508-R7mR9y8', summary: 'Adjusting tone based on interviewer style—academic vs clinical focus.' },
-      { id: 16, title: 'Ranking Programs After Interviews', duration: '15 min', completed: false, videoUrl: 'https://www.youtube.com/embed/uQ-6_r8w7h8', summary: 'Objective scoring matrices for gut feeling, geography, and career trajectory.' },
-      { id: 17, title: 'Thank You Notes That Stand Out', duration: '8 min', completed: false, videoUrl: 'https://www.youtube.com/embed/0x-vW63d8tE', summary: 'Timing, personalized references, and post-interview communication etiquette.' }
+      { id: 14, title: 'Asking Smart Questions to Interviewers', duration: '12 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'High-yield questions that demonstrate deep interest and clinical ambition.' },
+      { id: 15, title: 'Reading the Room & Adapting', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/b3vI35Zc_Z8', summary: 'Adjusting tone based on interviewer style—academic vs clinical focus.' },
+      { id: 16, title: 'Ranking Programs After Interviews', duration: '15 min', completed: false, videoUrl: 'https://www.youtube.com/embed/DiUI7_oKxho', summary: 'Objective scoring matrices for gut feeling, geography, and career trajectory.' },
+      { id: 17, title: 'Thank You Notes That Stand Out', duration: '8 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'Timing, personalized references, and post-interview communication etiquette.' }
     ]
   },
   {
     id: 5,
     title: 'Mock Interviews & Practice',
     lessons: [
-      { id: 18, title: 'Full Mock Interview #1 - Internal Medicine', duration: '25 min', completed: false, videoUrl: 'https://www.youtube.com/embed/508-R7mR9y8', summary: 'Watch a real IMG participate in a 25-minute mock interview with detailed faculty critique.' },
-      { id: 19, title: 'Full Mock Interview #2 - Surgery', duration: '22 min', completed: false, videoUrl: 'https://www.youtube.com/embed/uQ-6_r8w7h8', summary: 'Surgical subspecialty mock interview breakdown and scoring.' },
-      { id: 20, title: 'Analyzing Your Performance', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/K8-vW43d8tA', summary: 'Self-video analysis checklist for final interview week preparation.' }
+      { id: 18, title: 'Full Mock Interview #1 - Internal Medicine', duration: '25 min', completed: false, videoUrl: 'https://www.youtube.com/embed/JTnTbzskEuo', summary: 'Watch a real IMG participate in a 25-minute mock interview with detailed faculty critique.' },
+      { id: 19, title: 'Full Mock Interview #2 - Surgery', duration: '22 min', completed: false, videoUrl: 'https://www.youtube.com/embed/JTnTbzskEuo', summary: 'Surgical subspecialty mock interview breakdown and scoring.' },
+      { id: 20, title: 'Analyzing Your Performance', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/WRLF8ULhZmw', summary: 'Self-video analysis checklist for final interview week preparation.' }
     ]
   }
 ];
