@@ -58,7 +58,7 @@ import { Link } from 'react-router-dom';
 import MultiSelectDropdown from '@/components/ui/MultiSelectDropdown';
 import { exportProgramsToCSV } from '@/utils/csvExporter';
 import { localPrograms } from '@/api/programs.local';
-
+import AddProgramModal from '@/components/community/AddProgramModal';
 import ProgramDetailsModal from '@/components/community/ProgramDetailsModal';
 import {
   calculateFitScore,
@@ -108,6 +108,7 @@ export default function IMGPrograms() {
   
   // Detail dialog state
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [showAddProgramModal, setShowAddProgramModal] = useState(false);
 
   // Interview state
   const [isLogInterviewOpen, setIsLogInterviewOpen] = useState(false);
@@ -684,18 +685,37 @@ export default function IMGPrograms() {
           <TabsContent value="search" className="space-y-6">
             {/* Intro Header */}
             <Card className="p-6 bg-gradient-to-br from-indigo-50 via-purple-50 to-white dark:from-indigo-950/20 dark:to-slate-900 border-indigo-200 dark:border-indigo-900/60 rounded-3xl">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-200 dark:shadow-none">
-                  <Globe className="w-6 h-6 text-white" />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-200 dark:shadow-none">
+                    <Globe className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold mb-1">Global Medical Opportunities Directory</h2>
+                    <p className="text-slate-600 dark:text-slate-400 text-sm">
+                      Explore US Residencies, Fellowships, Clinical Observerships/Rotations, and International Medical Schools.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-1">Global Medical Opportunities Directory</h2>
-                  <p className="text-slate-600 dark:text-slate-400 text-sm">
-                    Explore US Residencies, Fellowships, Clinical Observerships/Rotations, and International Medical Schools.
-                  </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={() => setShowAddProgramModal(true)}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md"
+                  >
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    Submit / Add Program
+                  </Button>
                 </div>
               </div>
             </Card>
+            <AddProgramModal
+              open={showAddProgramModal}
+              onOpenChange={setShowAddProgramModal}
+              onSuccess={() => {
+                queryClient.invalidateQueries(['programs']);
+                toast.success('Thank you! Your program submission was received.');
+              }}
+            />
 
             {/* Category Selector Tabs */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl">
