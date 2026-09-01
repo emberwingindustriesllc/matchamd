@@ -33,9 +33,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { 
   Settings, 
   LogOut, 
+  Trash2,
   Trophy, 
   MapPin, 
   Stethoscope,
@@ -148,8 +160,25 @@ export default function Profile() {
     setIsEditOpen(true);
   };
 
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
   const handleLogout = () => {
     logout();
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeletingAccount(true);
+    try {
+      if (user?.id) {
+        await supabase.from('profiles').delete().eq('id', user.id);
+        localStorage.clear();
+      }
+      await logout();
+      navigate(createPageUrl('Onboarding'));
+    } catch (err) {
+      console.error('Error deleting account:', err);
+      setIsDeletingAccount(false);
+    }
   };
 
   if (isLoading || !profile) {
@@ -514,11 +543,45 @@ export default function Profile() {
         <Button 
           variant="outline" 
           onClick={handleLogout}
-          className="w-full h-12 rounded-xl text-red-600 border-red-200 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-900/20"
+          className="w-full h-12 rounded-xl text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
         >
-          <LogOut className="w-5 h-5 mr-2" />
+          <LogOut className="w-5 h-5 mr-2 text-slate-500" />
           Sign Out
         </Button>
+
+        {/* Delete Account (Google Play & Privacy Requirement) */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button 
+              variant="outline" 
+              className="w-full h-12 rounded-xl text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              <Trash2 className="w-5 h-5 mr-2" />
+              Delete Account & Data
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="rounded-2xl max-w-sm sm:max-w-md">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-red-600 dark:text-red-400 flex items-center gap-2">
+                <Trash2 className="w-5 h-5" />
+                Delete Account?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-slate-600 dark:text-slate-400 text-sm">
+                This will permanently delete your account profile, saved residency programs, checklist progress, and quiz history. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-row gap-2 justify-end">
+              <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleDeleteAccount}
+                disabled={isDeletingAccount}
+                className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
+              >
+                {isDeletingAccount ? 'Deleting...' : 'Delete Everything'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
 
       {/* Edit Dialog */}
