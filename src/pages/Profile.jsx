@@ -272,17 +272,27 @@ export default function Profile() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4">
-          <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700 text-center">
+          <Card 
+            onClick={() => navigate(createPageUrl('Guides'))}
+            className="p-5 rounded-2xl border-slate-200 dark:border-slate-700 text-center hover:border-indigo-400 dark:hover:border-indigo-600 cursor-pointer transition-all hover:shadow-md group"
+          >
             <ProgressRing progress={(completedModules / totalModules) * 100} size={80} strokeWidth={6} />
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-3">Journey Progress</p>
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mt-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              Journey Progress
+            </p>
+            <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">View Roadmap →</span>
           </Card>
           
-          <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700 text-center">
-            <div className="text-3xl font-bold text-slate-800 dark:text-white mb-1">
+          <Card 
+            onClick={() => navigate(createPageUrl('Guides'))}
+            className="p-5 rounded-2xl border-slate-200 dark:border-slate-700 text-center hover:border-indigo-400 dark:hover:border-indigo-600 cursor-pointer transition-all hover:shadow-md group"
+          >
+            <div className="text-3xl font-bold text-slate-800 dark:text-white mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               {completedModules}
             </div>
             <p className="text-sm text-slate-500 dark:text-slate-400">Steps Completed</p>
             <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">of {totalModules} total</p>
+            <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium mt-1 inline-block">Click to explore →</span>
           </Card>
         </div>
 
@@ -340,13 +350,22 @@ export default function Profile() {
 
         {/* USMLE Scores */}
         <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">
-          <h3 className="font-semibold text-slate-800 dark:text-white mb-4">USMLE Progress</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-slate-800 dark:text-white">USMLE Progress</h3>
+            <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">Click step to view guide</span>
+          </div>
           
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+            <div 
+              onClick={() => navigate(createPageUrl('GuideDetail?id=usmle_step1'))}
+              className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800 dark:hover:bg-indigo-900/30 border border-transparent hover:border-indigo-300 dark:hover:border-indigo-700 transition-all cursor-pointer group"
+            >
               <div>
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Step 1</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{profile.usmle_step1_status}</p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex items-center gap-1">
+                  Step 1
+                  <span className="text-xs text-indigo-600 dark:text-indigo-400 font-normal">→</span>
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{profile.usmle_step1_status?.replace('_', ' ')}</p>
               </div>
               {profile.usmle_step1_score && (
                 <div className="text-right">
@@ -355,23 +374,35 @@ export default function Profile() {
               )}
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+            <div 
+              onClick={() => navigate(createPageUrl('GuideDetail?id=usmle_step2'))}
+              className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800 dark:hover:bg-indigo-900/30 border border-transparent hover:border-indigo-300 dark:hover:border-indigo-700 transition-all cursor-pointer group"
+            >
               <div>
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Step 2 CK</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{profile.usmle_step2_status}</p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex items-center gap-1">
+                  Step 2 CK
+                  <span className="text-xs text-indigo-600 dark:text-indigo-400 font-normal">→</span>
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{profile.usmle_step2_status?.replace('_', ' ')}</p>
               </div>
               {profile.usmle_step2_score && (
                 <div className="text-right">
                   <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{profile.usmle_step2_score}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Critical for matching</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">Critical for matching</p>
                 </div>
               )}
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+            <div 
+              onClick={() => navigate(createPageUrl('GuideDetail?id=usmle_step3'))}
+              className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800 dark:hover:bg-indigo-900/30 border border-transparent hover:border-indigo-300 dark:hover:border-indigo-700 transition-all cursor-pointer group"
+            >
               <div>
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Step 3</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{profile.usmle_step3_status || 'not_started'}</p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex items-center gap-1">
+                  Step 3
+                  <span className="text-xs text-indigo-600 dark:text-indigo-400 font-normal">→</span>
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{(profile.usmle_step3_status || 'not_started').replace('_', ' ')}</p>
               </div>
               {profile.usmle_step3_result && profile.usmle_step3_result !== 'not_applicable' && (
                 <Badge className={profile.usmle_step3_result === 'pass' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}>

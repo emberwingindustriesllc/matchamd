@@ -194,17 +194,27 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4"
+            className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 shadow-sm"
           >
-            <h3 className="font-semibold text-slate-800 dark:text-white mb-3 text-sm">Your USMLE Status</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-slate-800 dark:text-white text-sm">Your USMLE Status</h3>
+              <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">Click step to view guide</span>
+            </div>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { label: 'Step 1', status: profile.usmle_step1_status, score: profile.usmle_step1_score },
-                { label: 'Step 2 CK', status: profile.usmle_step2_status, score: profile.usmle_step2_score },
-                { label: 'Step 3', status: profile.usmle_step3_status, score: null },
-              ].map(({ label, status, score }) => (
-                <div key={label} className="text-center p-2 rounded-xl bg-slate-50 dark:bg-slate-700/50">
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{label}</p>
+                { label: 'Step 1', guideId: 'usmle_step1', status: profile.usmle_step1_status, score: profile.usmle_step1_score },
+                { label: 'Step 2 CK', guideId: 'usmle_step2', status: profile.usmle_step2_status, score: profile.usmle_step2_score },
+                { label: 'Step 3', guideId: 'usmle_step3', status: profile.usmle_step3_status, score: null },
+              ].map(({ label, guideId, status, score }) => (
+                <div
+                  key={label}
+                  onClick={() => navigate(createPageUrl(`GuideDetail?id=${guideId}`))}
+                  className="text-center p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-700/50 dark:hover:bg-indigo-900/30 transition-all cursor-pointer border border-transparent hover:border-indigo-300 dark:hover:border-indigo-700 group"
+                >
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex items-center justify-center gap-0.5">
+                    {label}
+                    <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </p>
                   <Badge
                     className={`text-xs ${
                       status === 'passed' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
@@ -216,10 +226,10 @@ export default function Dashboard() {
                   </Badge>
                   {score && <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mt-1">{score}</p>}
                   {label === 'Step 2 CK' && status === 'passed' && score && parseInt(score) >= 240 && (
-                    <p className="text-xs text-emerald-600 dark:text-emerald-400">✓ Competitive</p>
+                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5">✓ Competitive</p>
                   )}
                   {label === 'Step 2 CK' && status === 'passed' && score && parseInt(score) < 240 && (
-                    <p className="text-xs text-amber-600 dark:text-amber-400">Target ≥240</p>
+                    <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">Target ≥240</p>
                   )}
                 </div>
               ))}
@@ -413,11 +423,22 @@ export default function Dashboard() {
             </div>
             <ChevronRight className="w-5 h-5 text-slate-400" />
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {currentSteps.filter(s => s.deadline).slice(0, 3).map(step => (
-              <div key={step.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{step.title}</span>
-                <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">{step.deadline}</span>
+              <div
+                key={step.id}
+                onClick={() => navigate(createPageUrl(`GuideDetail?id=${step.id}`))}
+                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-indigo-50/60 dark:bg-slate-800/50 dark:hover:bg-indigo-900/20 border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800 transition-all cursor-pointer group"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    {step.title}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">⏰ {step.deadline}</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all" />
+                </div>
               </div>
             ))}
           </div>

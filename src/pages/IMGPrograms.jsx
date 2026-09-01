@@ -1436,31 +1436,104 @@ export default function IMGPrograms() {
 
                       <Progress value={progress} className="h-2 mb-4" />
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 mt-4">
                         {[
-                          { key: 'statementTailored', label: 'Tailored Personal Statement' },
-                          { key: 'lorsAssigned', label: 'Request/Assign LoRs' },
-                          { key: 'step2Uploaded', label: 'Upload USMLE Step 2 CK' },
-                          { key: 'mspeUploaded', label: 'Upload MSPE (Dean\'s Letter)' },
-                          { key: 'erasApplied', label: 'ERAS Application Submitted' },
-                          { key: 'thankYouSent', label: 'Post-Interview Thank You Sent' },
+                          { 
+                            key: 'statementTailored', 
+                            label: 'Tailored Personal Statement',
+                            hint: 'Customize paragraph 5 with hospital tracks/faculty',
+                            guideUrl: 'GuideDetail?id=personal_statement',
+                            guideLabel: 'PS Guide'
+                          },
+                          { 
+                            key: 'lorsAssigned', 
+                            label: 'Request/Assign LoRs',
+                            hint: 'Ensure 3-4 specialty-specific waived letters uploaded',
+                            guideUrl: 'GuideDetail?id=lors',
+                            guideLabel: 'LoR Guide'
+                          },
+                          { 
+                            key: 'step2Uploaded', 
+                            label: 'Upload USMLE Step 2 CK',
+                            hint: 'Authorize USMLE score transcript in ERAS',
+                            guideUrl: 'GuideDetail?id=usmle_step2',
+                            guideLabel: 'Step 2 Guide'
+                          },
+                          { 
+                            key: 'mspeUploaded', 
+                            label: 'Upload MSPE (Dean\'s Letter)',
+                            hint: 'Confirm medical school sent MSPE via EMSWP',
+                            guideUrl: 'GuideDetail?id=ecfmg_pathways',
+                            guideLabel: 'MSPE Info'
+                          },
+                          { 
+                            key: 'erasApplied', 
+                            label: 'ERAS Application Submitted',
+                            hint: 'Certify and submit before September 24 deadline',
+                            guideUrl: 'GuideDetail?id=eras_registration',
+                            guideLabel: 'ERAS Guide'
+                          },
+                          { 
+                            key: 'thankYouSent', 
+                            label: 'Post-Interview Thank You Sent',
+                            hint: 'Send personalized note 24-48h after interview',
+                            guideUrl: 'InterviewCourse',
+                            guideLabel: 'Interview Tips'
+                          },
                         ].map(task => (
-                          <button
+                          <div
                             key={task.key}
-                            onClick={() => toggleChecklistItem(prog.id, task.key)}
-                            className={`flex items-center gap-3 p-3 rounded-2xl border text-left text-sm transition-all ${
+                            className={`p-3.5 rounded-2xl border transition-all ${
                               check[task.key]
-                                ? 'bg-emerald-50/70 border-emerald-200 text-emerald-800 dark:bg-emerald-950/20 dark:border-emerald-900 dark:text-emerald-400'
-                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 dark:bg-slate-800/40 dark:border-slate-850 dark:text-slate-400'
+                                ? 'bg-emerald-50/70 border-emerald-300 text-emerald-950 dark:bg-emerald-950/20 dark:border-emerald-800 dark:text-emerald-300'
+                                : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:border-indigo-300 dark:bg-slate-800/60 dark:border-slate-800 dark:text-slate-300'
                             }`}
                           >
-                            {check[task.key] ? (
-                              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                            ) : (
-                              <Circle className="w-5 h-5 text-slate-400 flex-shrink-0" />
-                            )}
-                            <span className="font-medium">{task.label}</span>
-                          </button>
+                            <div className="flex items-start gap-3">
+                              <button
+                                type="button"
+                                onClick={() => toggleChecklistItem(prog.id, task.key)}
+                                className="mt-0.5 flex-shrink-0 transition-transform active:scale-90"
+                              >
+                                {check[task.key] ? (
+                                  <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                ) : (
+                                  <Circle className="w-5 h-5 text-slate-400 hover:text-indigo-500" />
+                                )}
+                              </button>
+
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span 
+                                    onClick={() => toggleChecklistItem(prog.id, task.key)}
+                                    className={`font-semibold text-sm cursor-pointer ${check[task.key] ? 'line-through opacity-80' : ''}`}
+                                  >
+                                    {task.label}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{task.hint}</p>
+
+                                <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleChecklistItem(prog.id, task.key)}
+                                    className="text-[11px] font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                                  >
+                                    {check[task.key] ? 'Mark Pending' : 'Mark Completed'}
+                                  </button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => navigate(createPageUrl(task.guideUrl))}
+                                    className="h-6 px-2 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg"
+                                  >
+                                    {task.guideLabel}
+                                    <ChevronRight className="w-3 h-3 ml-0.5" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </Card>

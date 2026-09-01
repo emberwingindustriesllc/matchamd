@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -20,7 +20,7 @@ import MatchProcessFlowchart from '@/components/guides/MatchProcessFlowchart';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import PathwayEligibilityChat from '@/components/ai/PathwayEligibilityChat';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import {
@@ -33,6 +33,13 @@ import {
   Zap,
   Share2,
   HelpCircle,
+  ChevronDown,
+  ChevronUp,
+  ArrowRight,
+  Sparkles,
+  CheckCircle2,
+  Circle,
+  Compass,
 } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import confetti from 'canvas-confetti';
@@ -52,6 +59,8 @@ export default function GuideDetail() {
   const [visualMode, setVisualMode] = useState('mountain');
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [localChecklist, setLocalChecklist] = useState([]);
+  const [highlightedSectionIndex, setHighlightedSectionIndex] = useState(null);
+  const [expandedHowToId, setExpandedHowToId] = useState(null);
   const visualRef = React.useRef(null);
 
   const guide = getGuideContent(guideId);
@@ -77,13 +86,24 @@ export default function GuideDetail() {
     if (!guide) return;
     if (user?.id && progressLoading) return;
 
+    // Merge saved progress status with latest rich guide checklist items
+    const mergeChecklist = (savedItems = []) => {
+      return (guide.checklist || []).map((baseItem) => {
+        const saved = savedItems.find((s) => s.id === baseItem.id);
+        return {
+          ...baseItem,
+          completed: !!saved?.completed,
+        };
+      });
+    };
+
     if (progress?.checklist_items?.length) {
-      setLocalChecklist(progress.checklist_items);
+      setLocalChecklist(mergeChecklist(progress.checklist_items));
     } else {
       try {
         const savedChecklist = localStorage.getItem(`matchamd_checklist_${guideId}`);
         if (savedChecklist) {
-          setLocalChecklist(JSON.parse(savedChecklist));
+          setLocalChecklist(mergeChecklist(JSON.parse(savedChecklist)));
         } else {
           setLocalChecklist(guide.checklist.map((item) => ({ ...item, completed: false })));
         }
@@ -146,16 +166,20 @@ export default function GuideDetail() {
     }
   };
 
-  const toggleChecklistItem = (itemId) => {
+  const toggleChecklistItem = (itemId, e) => {
+    if (e) e.stopPropagation();
     if (!guide) return;
     if (!user?.id) {
-      toast.error('Please log in to track progress');
-      return;
+      toast.error('Please log in to track progress across devices (saved locally)');
     }
     const newChecklist = localChecklist.map((item) =>
       item.id === itemId ? { ...item, completed: !item.completed } : item
     );
     setLocalChecklist(newChecklist);
+
+    try {
+      localStorage.setItem(`matchamd_checklist_${guideId}`, JSON.stringify(newChecklist));
+    } catch (err) {}
 
     const completedCount = newChecklist.filter((i) => i.completed).length;
     const total = newChecklist.length;
@@ -166,11 +190,32 @@ export default function GuideDetail() {
       confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
 
-    updateProgressMutation.mutate({
-      checklist_items: newChecklist,
-      completion_percentage: percentage,
-      status: percentage === 100 ? 'completed' : percentage > 0 ? 'in_progress' : 'not_started',
-    });
+    if (user?.id) {
+      updateProgressMutation.mutate({
+        checklist_items: newChecklist,
+        completion_percentage: percentage,
+        status: percentage === 100 ? 'completed' : percentage > 0 ? 'in_progress' : 'not_started',
+      });
+    }
+  };
+
+  const handleJumpToSection = (sectionIndex) => {
+    if (sectionIndex === undefined || sectionIndex === null) {
+      const overviewEl = document.getElementById('guide-overview');
+      if (overviewEl) overviewEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    const targetEl = document.getElementById(`guide-section-${sectionIndex}`);
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setHighlightedSectionIndex(sectionIndex);
+      setTimeout(() => {
+        setHighlightedSectionIndex(null);
+      }, 3000);
+    } else {
+      const overviewEl = document.getElementById('guide-overview');
+      if (overviewEl) overviewEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   if (!guide) {
@@ -208,16 +253,22 @@ export default function GuideDetail() {
 
       <main className="px-4 py-6 max-w-lg mx-auto space-y-6">
         <Breadcrumb items={breadcrumbItems} />
+
         {/* Visual Progress */}
         <motion.div
           ref={visualRef}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700"
+          className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm"
         >
           {/* Header with Share Button */}
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-slate-800 dark:text-white">Your Progress</h2>
+            <div>
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white">Your Progress</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {completedCount} of {localChecklist.length} tasks completed ({progressPercentage}%)
+              </p>
+            </div>
             <Button
               onClick={() => setShowShareDialog(true)}
               size="sm"
@@ -270,15 +321,152 @@ export default function GuideDetail() {
 
           {/* Deadline */}
           {guide.deadline && (
-            <div className="flex items-center justify-center gap-2 mt-4 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
-              <Clock className="w-4 h-4 text-amber-600" />
+            <div className="flex items-center justify-center gap-2 mt-4 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800/40">
+              <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
               <span className="text-sm font-medium text-amber-700 dark:text-amber-400">Due: {guide.deadline}</span>
             </div>
           )}
         </motion.div>
 
+        {/* Interactive Actionable Checklist */}
+        <Card className="p-5 rounded-2xl border-2 border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50/40 via-white to-purple-50/30 dark:from-slate-900 dark:to-indigo-950/20 shadow-sm">
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <h3 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+                <Check className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                Actionable Checklist & Guidance
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                Click any task to jump to its detailed guide section or view step-by-step instructions.
+              </p>
+            </div>
+            <Badge variant="secondary" className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 font-semibold">
+              {completedCount}/{localChecklist.length}
+            </Badge>
+          </div>
+
+          <div className="space-y-3">
+            {localChecklist.map((item, idx) => {
+              const isExpanded = expandedHowToId === item.id;
+
+              return (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.04 }}
+                  className={`rounded-2xl border-2 transition-all overflow-hidden ${
+                    item.completed
+                      ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800'
+                      : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700'
+                  }`}
+                >
+                  <div className="p-4 flex items-start gap-3">
+                    {/* Checkbox Complete Toggle */}
+                    <button
+                      type="button"
+                      onClick={(e) => toggleChecklistItem(item.id, e)}
+                      aria-label={item.completed ? "Mark incomplete" : "Mark complete"}
+                      className="mt-0.5 flex-shrink-0 transition-transform active:scale-90"
+                    >
+                      {item.completed ? (
+                        <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                      ) : (
+                        <Circle className="w-6 h-6 text-slate-400 hover:text-indigo-500" />
+                      )}
+                    </button>
+
+                    {/* Task Title & Direct Jump */}
+                    <div className="flex-1 min-w-0">
+                      <div 
+                        onClick={() => handleJumpToSection(item.sectionIndex)}
+                        className="cursor-pointer group"
+                      >
+                        <span className={`font-semibold text-sm leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors ${
+                          item.completed 
+                            ? 'text-emerald-800 dark:text-emerald-300 line-through opacity-85' 
+                            : 'text-slate-900 dark:text-white'
+                        }`}>
+                          {item.text}
+                        </span>
+
+                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                          {item.sectionIndex !== undefined && (
+                            <span className="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400 font-medium group-hover:underline">
+                              <Compass className="w-3 h-3" />
+                              Jump to Section {item.sectionIndex + 1}
+                              <ArrowRight className="w-3 h-3" />
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Expandable Instructions / Actions Toggle */}
+                      <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                        {item.howTo && (
+                          <button
+                            type="button"
+                            onClick={() => setExpandedHowToId(isExpanded ? null : item.id)}
+                            className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300 flex items-center gap-1 py-0.5"
+                          >
+                            <HelpCircle className="w-3.5 h-3.5 text-indigo-500" />
+                            {isExpanded ? 'Hide how-to' : 'How to do this?'}
+                            {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                          </button>
+                        )}
+
+                        {/* Direct Action Trigger */}
+                        {item.actionRoute && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => navigate(createPageUrl(item.actionRoute))}
+                            className="h-6 px-2 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg ml-auto"
+                          >
+                            <Sparkles className="w-3 h-3 mr-1 text-indigo-500" />
+                            {item.actionLabel || 'Go to Tool'}
+                          </Button>
+                        )}
+
+                        {item.actionUrl && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => window.open(item.actionUrl, '_blank')}
+                            className="h-6 px-2 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg ml-auto"
+                          >
+                            <ExternalLink className="w-3 h-3 mr-1" />
+                            {item.actionLabel || 'Open Portal'}
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* How-To Accordion */}
+                      <AnimatePresence>
+                        {isExpanded && item.howTo && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="mt-2.5 p-3 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 text-xs text-indigo-950 dark:text-indigo-200 leading-relaxed"
+                          >
+                            <p className="font-semibold text-[11px] text-indigo-700 dark:text-indigo-400 uppercase tracking-wider mb-1">
+                              Step-by-step guidance:
+                            </p>
+                            <p>{item.howTo}</p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </Card>
+
         {/* Overview */}
-        <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">
+        <Card id="guide-overview" className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">
           <h3 className="font-semibold text-slate-800 dark:text-white mb-3 flex items-center gap-2">
             <FileText className="w-5 h-5 text-indigo-500" />
             Overview
@@ -286,23 +474,41 @@ export default function GuideDetail() {
           <p className="text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-line">{guide.overview}</p>
         </Card>
 
-        {/* Detailed Sections */}
+        {/* Detailed Sections with Jump Anchors & Glowing Highlight */}
         {guide.sections && guide.sections.length > 0 && (
           <div className="space-y-4">
-            {guide.sections.map((sec, idx) => (
-              <Card key={idx} className="p-5 rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
-                <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-3 flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-indigo-500" />
-                  {sec.title}
-                </h3>
-                <div className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-line leading-relaxed space-y-2">
-                  {sec.content}
-                </div>
-              </Card>
-            ))}
+            {guide.sections.map((sec, idx) => {
+              const isHighlighted = highlightedSectionIndex === idx;
+
+              return (
+                <Card
+                  key={idx}
+                  id={`guide-section-${idx}`}
+                  className={`p-5 rounded-2xl border transition-all duration-500 shadow-sm ${
+                    isHighlighted
+                      ? 'ring-4 ring-indigo-500/80 bg-indigo-50/90 dark:bg-indigo-950/60 border-indigo-500 shadow-xl scale-[1.01]'
+                      : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                      <Zap className={`w-5 h-5 ${isHighlighted ? 'text-indigo-600 animate-bounce' : 'text-indigo-500'}`} />
+                      {sec.title}
+                    </h3>
+                    {isHighlighted && (
+                      <Badge className="bg-indigo-600 text-white text-[10px]">
+                        Target Section
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-line leading-relaxed space-y-2">
+                    {sec.content}
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         )}
-
 
         {/* ECFMG-Specific Content */}
         {guideId === 'oet_medicine' && (
@@ -314,8 +520,8 @@ export default function GuideDetail() {
             <p className="text-sm text-slate-700 dark:text-slate-300 mb-3">
               Ready to find programs? Use MatchaMD's IMG-friendly directory with fit scoring.
             </p>
-            <Button onClick={() => navigate(createPageUrl('IMGPrograms'))} className="rounded-xl w-full">
-              Open program search
+            <Button onClick={() => navigate(createPageUrl('IMGPrograms'))} className="rounded-xl w-full bg-indigo-600 hover:bg-indigo-700 text-white">
+              Open Program Search & Fit Calculator
             </Button>
           </Card>
         )}
@@ -326,7 +532,7 @@ export default function GuideDetail() {
             <Card className="p-4 rounded-2xl border-2 border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-900/20">
               <p className="text-sm text-rose-800 dark:text-rose-300">
                 ⚠️ <strong>DISCLAIMER:</strong> This information is for guidance only and may not reflect the latest updates. Always consult the official ECFMG website ({' '}
-                <a href="https://www.ecfmg.org" target="_blank" rel="noopener noreferrer" className="underline">
+                <a href="https://www.ecfmg.org" target="_blank" rel="noopener noreferrer" className="underline font-semibold">
                   ecfmg.org
                 </a>
                 ) for authoritative and current requirements. ECFMG certification requires BOTH passing USMLE exams AND completing a pathway.
@@ -364,59 +570,6 @@ export default function GuideDetail() {
             <OfficialReferences />
           </>
         )}
-
-        {/* Checklist */}
-        <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">
-          <h3 className="font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-            <Check className="w-5 h-5 text-emerald-500" />
-            Checklist
-          </h3>
-          <div className="space-y-3">
-            {localChecklist.map((item, idx) => (
-              <motion.button
-                key={item.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                onClick={() => toggleChecklistItem(item.id)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`w-full flex items-center gap-3 p-4 rounded-xl transition-all relative overflow-hidden ${
-                  item.completed
-                    ? 'bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-300 dark:border-emerald-700'
-                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700'
-                } border-2`}
-              >
-                {item.completed && (
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    className="absolute top-2 right-2"
-                  >
-                    <Zap className="w-5 h-5 text-amber-500 fill-amber-500" />
-                  </motion.div>
-                )}
-                <Checkbox checked={item.completed} className="pointer-events-none" />
-                <span className={`flex-1 text-left font-medium ${
-                  item.completed 
-                    ? 'text-emerald-700 dark:text-emerald-400' 
-                    : 'text-slate-700 dark:text-slate-300'
-                }`}>
-                  {item.text}
-                </span>
-                {item.completed && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-2xl"
-                  >
-                    ✨
-                  </motion.div>
-                )}
-              </motion.button>
-            ))}
-          </div>
-        </Card>
 
         {/* Tips */}
         <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">
@@ -457,7 +610,6 @@ export default function GuideDetail() {
           </Card>
         )}
 
-
         {/* Resources */}
         <Card className="p-5 rounded-2xl border-slate-200 dark:border-slate-700">
           <h3 className="font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
@@ -482,7 +634,7 @@ export default function GuideDetail() {
           />
           <Button 
             onClick={handleSaveNotes}
-            className="mt-3 rounded-xl"
+            className="mt-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
           >
             Save Notes
           </Button>

@@ -1,6 +1,7 @@
 /**
  * Comprehensive Guide Content Database for MatchaMD
  * Contains in-depth, structured guides for all USMLE exams and IMG Match steps.
+ * Includes interactive section navigation targets, actionable "howTo" guidance, and direct action triggers.
  */
 
 export const guideContent = {
@@ -48,13 +49,62 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Pass USMLE Step 1 and confirm passing status' },
-      { id: 2, text: 'Register via FSMB and obtain 3-month eligibility permit' },
-      { id: 3, text: 'Complete 100% of UWorld Step 2 CK Qbank' },
-      { id: 4, text: 'Review Divine Interventions podcasts (Biostats, Ethics, QI, Risk Factors)' },
-      { id: 5, text: 'Take at least 3 NBME practice exams (target score >245+)' },
-      { id: 6, text: 'Complete UWorld Self-Assessments (UWSA 1 & 2)' },
-      { id: 7, text: 'Sit for Step 2 CK with score release prior to Sept 24 ERAS opening' }
+      {
+        id: 1,
+        text: 'Pass USMLE Step 1 and confirm passing status',
+        sectionIndex: 1,
+        howTo: 'Verify your Step 1 official score transcript in MyIntealth or FSMB before beginning Step 2 CK registration.',
+        actionRoute: 'GuideDetail?id=usmle_step1',
+        actionLabel: 'View Step 1 Guide'
+      },
+      {
+        id: 2,
+        text: 'Register via FSMB and obtain 3-month eligibility permit',
+        sectionIndex: 1,
+        howTo: 'Go to FSMB.org -> USMLE registration, pay $695, and select your 3-month testing window.',
+        actionUrl: 'https://www.fsmb.org',
+        actionLabel: 'Open FSMB Portal'
+      },
+      {
+        id: 3,
+        text: 'Complete 100% of UWorld Step 2 CK Qbank',
+        sectionIndex: 5,
+        howTo: 'Do 2–3 blocks per day in random untimed mode; make Anki cards for every incorrect question.',
+        actionRoute: 'USMLEQuizPack',
+        actionLabel: 'Practice Quiz Pack'
+      },
+      {
+        id: 4,
+        text: 'Review Divine Interventions podcasts (Biostats, Ethics, QI, Risk Factors)',
+        sectionIndex: 6,
+        howTo: 'Listen to Episode 37 (Risk Factors), Episode 97 (Ethics), and Episode 143 (Biostats) during commutes.',
+        actionUrl: 'https://divineinterventionspodcasts.com',
+        actionLabel: 'Open Divine Podcasts'
+      },
+      {
+        id: 5,
+        text: 'Take at least 3 NBME practice exams (target score >245+)',
+        sectionIndex: 3,
+        howTo: 'Take NBME Forms 11, 12, 13, and 14 under full test simulation to assess your readiness.',
+        actionUrl: 'https://www.mynbme.org',
+        actionLabel: 'Open NBME Portal'
+      },
+      {
+        id: 6,
+        text: 'Complete UWorld Self-Assessments (UWSA 1 & 2)',
+        sectionIndex: 5,
+        howTo: 'Take UWSA 1 at 3 weeks out and UWSA 2 at 1 week out to calculate your projected 3-digit score.',
+        actionUrl: 'https://www.uworld.com',
+        actionLabel: 'Open UWorld'
+      },
+      {
+        id: 7,
+        text: 'Sit for Step 2 CK with score release prior to Sept 24 ERAS opening',
+        sectionIndex: 6,
+        howTo: 'Book your Prometric seat early and ensure your test date is at least 3 weeks before Sept 24 for score release.',
+        actionUrl: 'https://www.prometric.com',
+        actionLabel: 'Schedule Prometric'
+      }
     ],
     tips: [
       'Step 2 CK is the single most important numeric filter for IMGs in 2026',
@@ -130,12 +180,54 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Obtain ECFMG ID and complete Form 186 identity verification' },
-      { id: 2, text: 'Submit Step 1 application on FSMB and secure Prometric permit' },
-      { id: 3, text: 'Complete Pathoma Chapters 1–3 and SketchyMicro/Pharm' },
-      { id: 4, text: 'Finish 100% of UWorld Step 1 Qbank' },
-      { id: 5, text: 'Score >65% consistently on NBME Practice Exams (Forms 26–31)' },
-      { id: 6, text: 'Pass Step 1 on first attempt' }
+      {
+        id: 1,
+        text: 'Obtain ECFMG ID and complete Form 186 identity verification',
+        sectionIndex: 1,
+        howTo: 'Sign up on MyIntealth, upload your passport, and complete the live NotaryCam identity verification session.',
+        actionUrl: 'https://myintealth.ecfmg.org',
+        actionLabel: 'Open MyIntealth'
+      },
+      {
+        id: 2,
+        text: 'Submit Step 1 application on FSMB and secure Prometric permit',
+        sectionIndex: 1,
+        howTo: 'Apply on FSMB.org, pay the $695 fee, have your medical school verify enrollment, and receive your scheduling permit.',
+        actionUrl: 'https://www.fsmb.org',
+        actionLabel: 'Open FSMB Portal'
+      },
+      {
+        id: 3,
+        text: 'Complete Pathoma Chapters 1–3 and SketchyMicro/Pharm',
+        sectionIndex: 3,
+        howTo: 'Watch Dr. Sattar\'s fundamental general pathology lectures and memorize Sketchy visual mnemonics for high-yield bugs and drugs.',
+        actionUrl: 'https://www.pathoma.com',
+        actionLabel: 'Open Pathoma'
+      },
+      {
+        id: 4,
+        text: 'Finish 100% of UWorld Step 1 Qbank',
+        sectionIndex: 3,
+        howTo: 'Solve all ~3,700 questions in tutor or untimed mode, thoroughly annotating high-yield educational objectives into First Aid.',
+        actionRoute: 'USMLEQuizPack',
+        actionLabel: 'Practice Step 1 Qs'
+      },
+      {
+        id: 5,
+        text: 'Score >65% consistently on NBME Practice Exams (Forms 26–31)',
+        sectionIndex: 3,
+        howTo: 'Take NBME Forms 28, 29, 30, and 31. Scoring ≥65% equated percent correct represents a 99% pass probability.',
+        actionUrl: 'https://www.mynbme.org',
+        actionLabel: 'Open NBME Portal'
+      },
+      {
+        id: 6,
+        text: 'Pass Step 1 on first attempt',
+        sectionIndex: 0,
+        howTo: 'Take the exam with calm focus and confirm your official electronic PASS result on FSMB score release Wednesday.',
+        actionRoute: 'Dashboard',
+        actionLabel: 'View Dashboard'
+      }
     ],
     tips: [
       'Do NOT schedule your exam until you are scoring >65% on NBMEs (Forms 28, 29, 30, 31)',
@@ -189,12 +281,54 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Obtain ECFMG Certification (Prerequisite for Step 3 registration)' },
-      { id: 2, text: 'Apply for Step 3 at FSMB.org ($925 registration fee)' },
-      { id: 3, text: 'Select a US state board for registration (Connecticut/Texas/Federation)' },
-      { id: 4, text: 'Complete UWorld Step 3 Qbank (focus on outpatient & inpatient management)' },
-      { id: 5, text: 'Practice 100+ cases on CCSCases.com until average score is >75%' },
-      { id: 6, text: 'Pass Step 3 and update your ERAS profile for H-1B visa eligibility' }
+      {
+        id: 1,
+        text: 'Obtain ECFMG Certification (Prerequisite for Step 3 registration)',
+        sectionIndex: 0,
+        howTo: 'Ensure your ECFMG pathway and exams are fully approved and your certificate is issued before applying on FSMB.',
+        actionRoute: 'GuideDetail?id=ecfmg_pathways',
+        actionLabel: 'View ECFMG Guide'
+      },
+      {
+        id: 2,
+        text: 'Apply for Step 3 at FSMB.org ($925 registration fee)',
+        sectionIndex: 1,
+        howTo: 'Log in to FSMB.org, select Step 3 application, submit payment, and choose your US state medical board.',
+        actionUrl: 'https://www.fsmb.org/step-3',
+        actionLabel: 'Register on FSMB'
+      },
+      {
+        id: 3,
+        text: 'Select a US state board for registration (Connecticut/Texas/Federation)',
+        sectionIndex: 1,
+        howTo: 'Choose a state board with straightforward licensing prerequisites (e.g. Connecticut or Texas) on the FSMB dropdown.',
+        actionUrl: 'https://www.fsmb.org',
+        actionLabel: 'Check State Rules'
+      },
+      {
+        id: 4,
+        text: 'Complete UWorld Step 3 Qbank (focus on outpatient & inpatient management)',
+        sectionIndex: 3,
+        howTo: 'Focus on primary care management algorithms, vaccination guidelines, and high-yield biostatistics questions.',
+        actionUrl: 'https://www.uworld.com',
+        actionLabel: 'Open UWorld'
+      },
+      {
+        id: 5,
+        text: 'Practice 100+ cases on CCSCases.com until average score is >75%',
+        sectionIndex: 2,
+        howTo: 'Work through the top 100 high-yield cases on CCSCases.com to master EMR order entry and timed clock advance.',
+        actionUrl: 'https://www.ccscases.com',
+        actionLabel: 'Open CCSCases.com'
+      },
+      {
+        id: 6,
+        text: 'Pass Step 3 and update your ERAS profile for H-1B visa eligibility',
+        sectionIndex: 0,
+        howTo: 'Once you receive your passing score, re-transmit your USMLE transcript in MyERAS and notify H-1B sponsoring programs.',
+        actionRoute: 'IMGPrograms',
+        actionLabel: 'Filter H-1B Programs'
+      }
     ],
     tips: [
       'Pass Step 3 before January of your application season if seeking H-1B visa sponsorship',
@@ -263,12 +397,54 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Verify school & graduation year on WDOMS for active ECFMG Sponsor Note' },
-      { id: 2, text: 'Establish MyIntealth account ($110 fee) and complete Form 186 via NotaryCam ($580)' },
-      { id: 3, text: 'Submit medical diploma & transcript for EPIC primary-source verification ($220)' },
-      { id: 4, text: 'Register on FSMB portal ($75) and pass USMLE Step 1 & Step 2 CK ($695 each)' },
-      { id: 5, text: 'Pass OET Medicine (min 350 Listening/Reading/Speaking, min 300 Writing in 1 sitting)' },
-      { id: 6, text: 'Apply for ECFMG Pathway 1–6 ($945 fee) and obtain final ECFMG Certificate' }
+      {
+        id: 1,
+        text: 'Verify school & graduation year on WDOMS for active ECFMG Sponsor Note',
+        sectionIndex: 1,
+        howTo: 'Search for your university on wdoms.org, open the "Sponsor Notes" tab, and verify that ECFMG is listed for your graduation year.',
+        actionUrl: 'https://www.wdoms.org',
+        actionLabel: 'Search WDOMS'
+      },
+      {
+        id: 2,
+        text: 'Establish MyIntealth account ($110 fee) and complete Form 186 via NotaryCam ($580)',
+        sectionIndex: 2,
+        howTo: 'Create your account on myintealth.ecfmg.org, upload your valid passport, and attend the online NotaryCam video verification.',
+        actionUrl: 'https://myintealth.ecfmg.org',
+        actionLabel: 'Open MyIntealth'
+      },
+      {
+        id: 3,
+        text: 'Submit medical diploma & transcript for EPIC primary-source verification ($220)',
+        sectionIndex: 2,
+        howTo: 'Upload high-resolution color scans of your final diploma and dean\'s transcript to EPIC / MyIntealth for institutional verification.',
+        actionUrl: 'https://myintealth.ecfmg.org',
+        actionLabel: 'Upload Credentials'
+      },
+      {
+        id: 4,
+        text: 'Register on FSMB portal ($75) and pass USMLE Step 1 & Step 2 CK ($695 each)',
+        sectionIndex: 2,
+        howTo: 'Create an FSMB account, link your USMLE/ECFMG ID, schedule exam periods at Prometric, and pass both core examinations.',
+        actionUrl: 'https://www.fsmb.org',
+        actionLabel: 'Open FSMB Portal'
+      },
+      {
+        id: 5,
+        text: 'Pass OET Medicine (min 350 Listening/Reading/Speaking, min 300 Writing in 1 sitting)',
+        sectionIndex: 3,
+        howTo: 'Book OET Medicine at an official test center or OET@Home and achieve minimum required scores across all 4 sub-tests in one test sitting.',
+        actionRoute: 'GuideDetail?id=oet_medicine',
+        actionLabel: 'View OET Guide'
+      },
+      {
+        id: 6,
+        text: 'Apply for ECFMG Pathway 1–6 ($945 fee) and obtain final ECFMG Certificate',
+        sectionIndex: 3,
+        howTo: 'Submit your online pathway application via MyIntealth, upload your license or clinical evaluation documents, and receive your certification certificate.',
+        actionUrl: 'https://www.ecfmg.org/certification-pathways',
+        actionLabel: 'ECFMG Pathways'
+      }
     ],
     tips: [
       'Start the process 18–24 months before your intended residency start date',
@@ -328,11 +504,46 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Book OET Medicine test date' },
-      { id: 2, text: 'Practice 10+ official referral writing samples' },
-      { id: 3, text: 'Conduct mock clinical speaking roleplays with a partner' },
-      { id: 4, text: 'Achieve ≥350 in all 4 sub-tests' },
-      { id: 5, text: 'Release scores to ECFMG via OET portal' }
+      {
+        id: 1,
+        text: 'Book OET Medicine test date',
+        sectionIndex: 0,
+        howTo: 'Register on occupationalenglishtest.org, choose test center or OET@Home, and book a seat at least 2 months ahead.',
+        actionUrl: 'https://www.occupationalenglishtest.org',
+        actionLabel: 'Book OET Seat'
+      },
+      {
+        id: 2,
+        text: 'Practice 10+ official referral writing samples',
+        sectionIndex: 1,
+        howTo: 'Practice transforming clinical case notes into concise 180–200 word referral letters without copying irrelevant background.',
+        actionUrl: 'https://www.occupationalenglishtest.org/sample-tests',
+        actionLabel: 'Practice Sample Tests'
+      },
+      {
+        id: 3,
+        text: 'Conduct mock clinical speaking roleplays with a partner',
+        sectionIndex: 1,
+        howTo: 'Practice the 5-minute doctor-patient consultation cards; focus on empathy ("I understand how difficult this is...") and structuring questions.',
+        actionRoute: 'Community',
+        actionLabel: 'Find Study Partner'
+      },
+      {
+        id: 4,
+        text: 'Achieve ≥350 in all 4 sub-tests',
+        sectionIndex: 0,
+        howTo: 'Verify your scores online upon release; ensure all 4 components meet the minimum threshold in a single administration.',
+        actionUrl: 'https://www.occupationalenglishtest.org',
+        actionLabel: 'Check Results'
+      },
+      {
+        id: 5,
+        text: 'Release scores to ECFMG via OET portal',
+        sectionIndex: 0,
+        howTo: 'Log into your OET account, go to "Manage Verifier Access", and grant ECFMG permission to view your verified results.',
+        actionUrl: 'https://my.occupationalenglishtest.org',
+        actionLabel: 'Release Scores to ECFMG'
+      }
     ],
     tips: [
       'Writing is the most common failed sub-test — keep referral letters under 200 words and stick to relevant clinical facts'
@@ -360,9 +571,30 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Secure 3+ months of US Clinical Experience (at least 2 months hands-on)' },
-      { id: 2, text: 'Obtain 3 specialty-specific LORs on US hospital letterhead' },
-      { id: 3, text: 'Request LOR writers to comment directly on your clinical competence and team communication' }
+      {
+        id: 1,
+        text: 'Secure 3+ months of US Clinical Experience (at least 2 months hands-on)',
+        sectionIndex: 0,
+        howTo: 'Apply to clinical rotation sites 6–9 months ahead to secure spots in teaching hospitals with ACGME residency programs.',
+        actionRoute: 'IMGPrograms',
+        actionLabel: 'Explore USCE Sites'
+      },
+      {
+        id: 2,
+        text: 'Obtain 3 specialty-specific LORs on US hospital letterhead',
+        sectionIndex: 1,
+        howTo: 'Perform diligently on rounds, present patients clearly, and request letters in person during your final week.',
+        actionRoute: 'GuideDetail?id=lors',
+        actionLabel: 'View LOR Guide'
+      },
+      {
+        id: 3,
+        text: 'Request LOR writers to comment directly on your clinical competence and team communication',
+        sectionIndex: 1,
+        howTo: 'Provide your attending with your CV, personal statement, and ERAS letter request form with specific patient memories.',
+        actionUrl: 'https://students-residents.aamc.org',
+        actionLabel: 'AAMC LOR Portal'
+      }
     ],
     tips: [
       'Hands-on rotations carry 3x more weight than shadowing observerships',
@@ -391,9 +623,30 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Publish at least 2–5 peer-reviewed PubMed-indexed papers' },
-      { id: 2, text: 'Present abstracts or posters at national US conferences (ACP, AHA, ACC, RSNA)' },
-      { id: 3, text: 'Build ResearchGate and Google Scholar profiles' }
+      {
+        id: 1,
+        text: 'Publish at least 2–5 peer-reviewed PubMed-indexed papers',
+        sectionIndex: 1,
+        howTo: 'Identify rare clinical cases from rotations or conduct PRISMA-compliant systematic reviews and submit to open-access indexed journals.',
+        actionUrl: 'https://pubmed.ncbi.nlm.nih.gov',
+        actionLabel: 'Search PubMed'
+      },
+      {
+        id: 2,
+        text: 'Present abstracts or posters at national US conferences (ACP, AHA, ACC, RSNA)',
+        sectionIndex: 0,
+        howTo: 'Submit abstracts to annual specialty conferences; poster presentations demonstrate national academic involvement in ERAS.',
+        actionRoute: 'Community',
+        actionLabel: 'Research Forum'
+      },
+      {
+        id: 3,
+        text: 'Build ResearchGate and Google Scholar profiles',
+        sectionIndex: 0,
+        howTo: 'Set up an online academic portfolio linking your PMIDs and citations so program directors can verify your scholarly impact.',
+        actionUrl: 'https://scholar.google.com',
+        actionLabel: 'Google Scholar'
+      }
     ],
     tips: [
       'Ensure your articles are indexed in PubMed/MEDLINE for ERAS verification',
@@ -422,10 +675,38 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Purchase ERAS Token via MyIntealth' },
-      { id: 2, text: 'Complete 10 Experiences section with bulleted impact statements' },
-      { id: 3, text: 'Allocate Gold and Silver Program Signals strategically' },
-      { id: 4, text: 'Submit ERAS application by September 24' }
+      {
+        id: 1,
+        text: 'Purchase ERAS Token via MyIntealth',
+        sectionIndex: 0,
+        howTo: 'Log into MyIntealth in June/July, purchase the ERAS token ($165), and register it on AAMC MyERAS.',
+        actionUrl: 'https://myintealth.ecfmg.org',
+        actionLabel: 'Buy ERAS Token'
+      },
+      {
+        id: 2,
+        text: 'Complete 10 Experiences section with bulleted impact statements',
+        sectionIndex: 0,
+        howTo: 'Use concise action verbs (Led, Diagnosed, Spearheaded) and explain your personal contribution and clinical outcome.',
+        actionUrl: 'https://students-residents.aamc.org/applying-residencies-eras',
+        actionLabel: 'Open MyERAS'
+      },
+      {
+        id: 3,
+        text: 'Allocate Gold and Silver Program Signals strategically',
+        sectionIndex: 1,
+        howTo: 'Use the MatchaMD Program Directory to identify programs where your score exceeds the 50th percentile and matches their visa policy.',
+        actionRoute: 'IMGPrograms',
+        actionLabel: 'Signal Match Directory'
+      },
+      {
+        id: 4,
+        text: 'Submit ERAS application by September 24',
+        sectionIndex: 0,
+        howTo: 'Finalize and certify your application before 9:00 AM ET on opening day to ensure programs receive your file simultaneously.',
+        actionUrl: 'https://students-residents.aamc.org',
+        actionLabel: 'Submit on ERAS'
+      }
     ],
     tips: [
       'Never waste signals on safety programs that do not sponsor visas',
@@ -449,9 +730,30 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Draft 1-page statement (under 750 words)' },
-      { id: 2, text: 'Proofread for native English grammar, spelling, and tone' },
-      { id: 3, text: 'Tailor custom versions for specific program signals if applicable' }
+      {
+        id: 1,
+        text: 'Draft 1-page statement (under 750 words)',
+        sectionIndex: 0,
+        howTo: 'Write a 5-paragraph draft focusing on clinical anecdotes that demonstrate patient empathy, procedural curiosity, and resilience.',
+        actionRoute: 'Mentors',
+        actionLabel: 'Request Mentor Review'
+      },
+      {
+        id: 2,
+        text: 'Proofread for native English grammar, spelling, and tone',
+        sectionIndex: 0,
+        howTo: 'Run your essay through Grammarly or have a physician mentor check for natural phrasing and professional clinical tone.',
+        actionRoute: 'Mentors',
+        actionLabel: 'Find Essay Reviewer'
+      },
+      {
+        id: 3,
+        text: 'Tailor custom versions for specific program signals if applicable',
+        sectionIndex: 0,
+        howTo: 'Add a customized concluding paragraph for top-choice signaled programs mentioning specific faculty or unique tracks.',
+        actionRoute: 'IMGPrograms',
+        actionLabel: 'View Saved Programs'
+      }
     ],
     tips: [
       'Avoid cliché openings ("Ever since I was 5 years old...")',
@@ -475,9 +777,30 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Request 4 waived LORs from US attending physicians' },
-      { id: 2, text: 'Provide writers with your CV, Personal Statement, and ERAS Letter Request Form' },
-      { id: 3, text: 'Confirm letters uploaded to ERAS LoRP prior to Sept 15' }
+      {
+        id: 1,
+        text: 'Request 4 waived LORs from US attending physicians',
+        sectionIndex: 0,
+        howTo: 'Generate ERAS Letter Request Forms in MyERAS with the "Waived" checkbox ticked, and provide them to your attendings.',
+        actionUrl: 'https://students-residents.aamc.org',
+        actionLabel: 'Generate LoR Form'
+      },
+      {
+        id: 2,
+        text: 'Provide writers with your CV, Personal Statement, and ERAS Letter Request Form',
+        sectionIndex: 0,
+        howTo: 'Email your writers a clean packet containing your CV, personal statement, draft points on shared patient cases, and the LoRP link.',
+        actionRoute: 'Profile',
+        actionLabel: 'Export My Profile'
+      },
+      {
+        id: 3,
+        text: 'Confirm letters uploaded to ERAS LoRP prior to Sept 15',
+        sectionIndex: 0,
+        howTo: 'Check your MyERAS Letters of Recommendation tab regularly to ensure all 4 letters have been uploaded before applications open.',
+        actionUrl: 'https://students-residents.aamc.org',
+        actionLabel: 'Check ERAS LoRP'
+      }
     ],
     tips: [
       'Waived letters are trusted by program directors; non-waived letters are heavily discounted'
@@ -500,9 +823,30 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Filter programs on MatchaMD Directory by visa and Step score fit' },
-      { id: 2, text: 'Build target list of 80–150 programs' },
-      { id: 3, text: 'Assign Gold and Silver Program Signals' }
+      {
+        id: 1,
+        text: 'Filter programs on MatchaMD Directory by visa and Step score fit',
+        sectionIndex: 0,
+        howTo: 'Use the MatchaMD Program Directory filters to search by state, visa sponsorship (J-1/H-1B), and minimum Step score.',
+        actionRoute: 'IMGPrograms',
+        actionLabel: 'Open Program Directory'
+      },
+      {
+        id: 2,
+        text: 'Build target list of 80–150 programs',
+        sectionIndex: 0,
+        howTo: 'Favorite 80–150 programs across Reach, Match, and Safety tiers in the Program Directory to calculate your application costs.',
+        actionRoute: 'MatchCostCalculator',
+        actionLabel: 'Calculate ERAS Budget'
+      },
+      {
+        id: 3,
+        text: 'Assign Gold and Silver Program Signals',
+        sectionIndex: 0,
+        howTo: 'Select the programs you genuinely intend to signal and review their historical IMG acceptance rate in MatchaMD.',
+        actionRoute: 'IMGPrograms',
+        actionLabel: 'Assign Program Signals'
+      }
     ],
     tips: [
       'Use MatchaMD Directory to instantly filter programs matching your visa and Step 2 CK score'
@@ -530,10 +874,38 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Set up high-definition camera, lighting, and audio' },
-      { id: 2, text: 'Conduct 3+ mock interviews with mentors or peers' },
-      { id: 3, text: 'Prepare 5 specific questions to ask interviewers at each program' },
-      { id: 4, text: 'Send concise thank you emails within 24–48 hours of interview' }
+      {
+        id: 1,
+        text: 'Set up high-definition camera, lighting, and audio',
+        sectionIndex: 0,
+        howTo: 'Position your camera at eye level, set up soft front lighting, and test audio using our interactive Mock Interview player.',
+        actionRoute: 'InterviewCourse',
+        actionLabel: 'Open Interview Course'
+      },
+      {
+        id: 2,
+        text: 'Conduct 3+ mock interviews with mentors or peers',
+        sectionIndex: 1,
+        howTo: 'Book 1-on-1 mock interviews with matched resident mentors to practice behavioral responses under timed pressure.',
+        actionRoute: 'Mentors',
+        actionLabel: 'Book Mentor Session'
+      },
+      {
+        id: 3,
+        text: 'Prepare 5 specific questions to ask interviewers at each program',
+        sectionIndex: 1,
+        howTo: 'Review faculty research interests, hospital clinical tracks, and fellowship match rates for each program in MatchaMD.',
+        actionRoute: 'IMGPrograms',
+        actionLabel: 'Review Program Notes'
+      },
+      {
+        id: 4,
+        text: 'Send concise thank you emails within 24–48 hours of interview',
+        sectionIndex: 1,
+        howTo: 'Send a 3-sentence personalized thank you note referencing a specific discussion topic to each interviewer who permits post-interview contact.',
+        actionRoute: 'InterviewCourse',
+        actionLabel: 'View Email Templates'
+      }
     ],
     tips: [
       'Structure behavioral answers using STAR: Situation, Task, Action, Result'
@@ -561,9 +933,30 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Register for NRMP Match ($90 fee)' },
-      { id: 2, text: 'Submit Rank Order List (ROL) before March deadline' },
-      { id: 3, text: 'Prepare SOAP documents in advance just in case' }
+      {
+        id: 1,
+        text: 'Register for NRMP Match ($90 fee)',
+        sectionIndex: 0,
+        howTo: 'Register on NRMP.org by the late November deadline to avoid late registration penalty fees.',
+        actionUrl: 'https://www.nrmp.org',
+        actionLabel: 'Register on NRMP'
+      },
+      {
+        id: 2,
+        text: 'Submit Rank Order List (ROL) before March deadline',
+        sectionIndex: 0,
+        howTo: 'Rank all programs where you interviewed in order of true preference and certify your list before the 9:00 PM ET deadline.',
+        actionRoute: 'IMGPrograms',
+        actionLabel: 'Manage Rank List'
+      },
+      {
+        id: 3,
+        text: 'Prepare SOAP documents in advance just in case',
+        sectionIndex: 1,
+        howTo: 'Draft alternative specialty personal statements and verify your ERAS contact info is up to date ahead of Match Week.',
+        actionRoute: 'GuideDetail?id=personal_statement',
+        actionLabel: 'Draft Backup PS'
+      }
     ],
     tips: [
       'Never rank a program you would not be willing to train at for 3–5 years'
@@ -591,9 +984,30 @@ export const guideContent = {
       }
     ],
     checklist: [
-      { id: 1, text: 'Determine home country Statement of Need eligibility for J-1' },
-      { id: 2, text: 'If targeting H-1B, pass USMLE Step 3 prior to ROL deadline' },
-      { id: 3, text: 'Verify program visa sponsorship on MatchaMD directory' }
+      {
+        id: 1,
+        text: 'Determine home country Statement of Need eligibility for J-1',
+        sectionIndex: 0,
+        howTo: 'Contact your home country Ministry of Health to confirm they issue Statements of Need for your target specialty.',
+        actionUrl: 'https://www.ecfmg.org/evsp',
+        actionLabel: 'ECFMG EVSP Portal'
+      },
+      {
+        id: 2,
+        text: 'If targeting H-1B, pass USMLE Step 3 prior to ROL deadline',
+        sectionIndex: 1,
+        howTo: 'Complete Step 3 registration via FSMB and obtain passing scores before program rank lists close in late February.',
+        actionRoute: 'GuideDetail?id=usmle_step3',
+        actionLabel: 'View Step 3 Guide'
+      },
+      {
+        id: 3,
+        text: 'Verify program visa sponsorship on MatchaMD directory',
+        sectionIndex: 0,
+        howTo: 'Filter programs in MatchaMD by "J-1 Sponsoring" or "H-1B Sponsoring" to prevent applying to programs that require US citizenship.',
+        actionRoute: 'IMGPrograms',
+        actionLabel: 'Filter by Visa Type'
+      }
     ],
     tips: [
       'H-1B requires Step 3 passed BEFORE program rank lists are finalized'
@@ -605,18 +1019,58 @@ export const guideContent = {
   }
 };
 
+const GUIDE_ALIASES = {
+  eras_application: 'eras_registration',
+  eras: 'eras_registration',
+  rank_order_list: 'nrmp_match',
+  post_match: 'nrmp_match',
+  step1: 'usmle_step1',
+  step2: 'usmle_step2',
+  step3: 'usmle_step3',
+  ecfmg: 'ecfmg_pathways',
+  oet: 'oet_medicine',
+};
+
 /**
- * Get guide content object by ID with fallback.
+ * Get guide content object by ID with fallback and alias resolution.
  */
 export function getGuideContent(guideId) {
   if (!guideId) return guideContent.ecfmg_pathways;
-  return guideContent[guideId] || {
+  const canonicalId = GUIDE_ALIASES[guideId] || guideId;
+  return guideContent[canonicalId] || {
     title: guideId.replace(/_/g, ' ').toUpperCase(),
     overview: 'Comprehensive guidance and checklist for this match step.',
+    sections: [
+      {
+        title: '1. Overview & Requirements',
+        content: 'Review the official prerequisites and instructions for this match milestone.'
+      }
+    ],
     checklist: [
-      { id: 1, text: 'Review step requirements and official guidelines' },
-      { id: 2, text: 'Complete required documentation and score milestones' },
-      { id: 3, text: 'Save progress and update your MatchaMD profile' }
+      {
+        id: 1,
+        text: 'Review step requirements and official guidelines',
+        sectionIndex: 0,
+        howTo: 'Read through the section breakdown above and review prerequisites.',
+        actionRoute: 'Guides',
+        actionLabel: 'View All Guides'
+      },
+      {
+        id: 2,
+        text: 'Complete required documentation and score milestones',
+        sectionIndex: 0,
+        howTo: 'Ensure all test scores, transcripts, and official forms are up to date.',
+        actionRoute: 'Profile',
+        actionLabel: 'Check Profile'
+      },
+      {
+        id: 3,
+        text: 'Save progress and update your MatchaMD profile',
+        sectionIndex: 0,
+        howTo: 'Mark this item as complete to track your overall match readiness.',
+        actionRoute: 'Dashboard',
+        actionLabel: 'Open Dashboard'
+      }
     ],
     tips: ['Keep your records updated', 'Check official source websites for deadline shifts'],
     resources: [{ title: 'MatchaMD Directory', url: '/IMGPrograms', type: 'website' }]

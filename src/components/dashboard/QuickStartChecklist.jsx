@@ -79,11 +79,11 @@ export default function QuickStartChecklist({ profile, progressList }) {
           Essential first steps for US medical match success
         </p>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="space-y-2.5">
         {quickStartItems.map((item) => {
           const isCompleted = getItemStatus(item.id);
           return (
-            <button
+            <div
               key={item.id}
               onClick={() => {
                 if (item.external) {
@@ -92,35 +92,37 @@ export default function QuickStartChecklist({ profile, progressList }) {
                   navigate(item.link);
                 }
               }}
-              className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all text-left border border-slate-200 dark:border-slate-700"
+              className="w-full p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer group hover:border-indigo-400 dark:hover:border-indigo-600"
             >
               <div className="flex items-start gap-3">
                 {isCompleted ? (
                   <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
                 ) : (
-                  <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-slate-400 group-hover:text-indigo-500 flex-shrink-0 mt-0.5 transition-colors" />
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium text-slate-800 dark:text-white text-sm">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h4 className="font-semibold text-slate-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       {item.title}
                     </h4>
-                    <Badge className={`${priorityColors[item.priority]} text-xs px-1.5 py-0`}>
+                    <Badge className={`${priorityColors[item.priority]} text-xs px-1.5 py-0 font-medium`}>
                       {item.priority}
                     </Badge>
                   </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">{item.description}</p>
-                  {item.deadline && (
-                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">⏰ {item.deadline}</p>
-                  )}
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{item.description}</p>
+                  
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                    {item.deadline ? (
+                      <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">⏰ {item.deadline}</span>
+                    ) : <span />}
+                    <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                      {item.external ? 'Open Portal' : 'Jump to Guide'}
+                      {item.external ? <ExternalLink className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                    </span>
+                  </div>
                 </div>
-                {item.external ? (
-                  <ExternalLink className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-                )}
               </div>
-            </button>
+            </div>
           );
         })}
       </CardContent>

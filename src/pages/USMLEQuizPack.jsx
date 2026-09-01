@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   BookOpen, 
-  Clock,
+  Sparkles,
   ChevronRight,
   Brain,
   CheckCircle,
@@ -565,71 +565,61 @@ const quizCategories = [
     id: 'step1_anatomy',
     title: 'Step 1: Anatomy',
     questions: 75,
-    difficulty: 'Medium',
-    timeEstimate: '90 min'
+    difficulty: 'Medium'
   },
   {
     id: 'step1_physiology',
     title: 'Step 1: Physiology',
     questions: 100,
-    difficulty: 'Hard',
-    timeEstimate: '120 min'
+    difficulty: 'Hard'
   },
   {
     id: 'step1_pathology',
     title: 'Step 1: Pathology',
     questions: 125,
-    difficulty: 'Hard',
-    timeEstimate: '150 min'
+    difficulty: 'Hard'
   },
   {
     id: 'step1_pharmacology',
     title: 'Step 1: Pharmacology',
     questions: 90,
-    difficulty: 'Hard',
-    timeEstimate: '110 min'
+    difficulty: 'Hard'
   },
   {
     id: 'step2_internal_medicine',
     title: 'Step 2 CK: Internal Medicine',
     questions: 150,
-    difficulty: 'Hard',
-    timeEstimate: '180 min'
+    difficulty: 'Hard'
   },
   {
     id: 'step2_surgery',
     title: 'Step 2 CK: Surgery',
     questions: 100,
-    difficulty: 'Medium',
-    timeEstimate: '120 min'
+    difficulty: 'Medium'
   },
   {
     id: 'step2_pediatrics',
     title: 'Step 2 CK: Pediatrics',
     questions: 80,
-    difficulty: 'Medium',
-    timeEstimate: '100 min'
+    difficulty: 'Medium'
   },
   {
     id: 'step2_obgyn',
     title: 'Step 2 CK: OB/GYN',
     questions: 60,
-    difficulty: 'Medium',
-    timeEstimate: '75 min'
+    difficulty: 'Medium'
   },
   {
     id: 'step2_psychiatry',
     title: 'Step 2 CK: Psychiatry',
     questions: 50,
-    difficulty: 'Easy',
-    timeEstimate: '60 min'
+    difficulty: 'Easy'
   },
   {
     id: 'step2_ethics',
     title: 'Step 2 CK: Ethics & Communication',
     questions: 65,
-    difficulty: 'Medium',
-    timeEstimate: '70 min'
+    difficulty: 'Medium'
   }
 ];
 
@@ -779,7 +769,7 @@ export default function USMLEQuizPack() {
         features={[
           'Detailed explanations for every question',
           'Track your performance by category',
-          'Timed practice mode',
+          'Untimed, self-paced study mode',
           'Bookmark difficult questions',
           'Based on real exam patterns'
         ]}
@@ -917,9 +907,9 @@ export default function USMLEQuizPack() {
                           <Badge className={difficultyColors[category.difficulty]}>
                             {category.difficulty}
                           </Badge>
-                          <Badge variant="outline" className="text-xs flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {category.timeEstimate}
+                          <Badge variant="outline" className="text-xs flex items-center gap-1 bg-emerald-50/50 text-emerald-700 dark:text-emerald-400 border-emerald-200">
+                            <Sparkles className="w-3 h-3 text-emerald-500" />
+                            Untimed / Self-Paced
                           </Badge>
                           {progress && (
                             <Badge variant="outline" className="bg-indigo-50/50 text-indigo-600 border-indigo-200">

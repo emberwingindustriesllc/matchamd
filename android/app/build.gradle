@@ -27,7 +27,14 @@ android {
             }
             
             def storeFilePath = localProperties.getProperty('release.storeFile') ?: System.getenv("RELEASE_STORE_FILE")
-            def keystoreFile = storeFilePath ? file(storeFilePath) : null
+            def keystoreFile = null
+            if (storeFilePath) {
+                if (file(storeFilePath).exists()) {
+                    keystoreFile = file(storeFilePath)
+                } else if (rootProject.file(storeFilePath).exists()) {
+                    keystoreFile = rootProject.file(storeFilePath)
+                }
+            }
             if (keystoreFile && keystoreFile.exists()) {
                 storeFile keystoreFile
                 storePassword localProperties.getProperty('release.storePassword') ?: System.getenv("RELEASE_STORE_PASSWORD")
