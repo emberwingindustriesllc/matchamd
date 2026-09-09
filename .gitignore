@@ -32,3 +32,6 @@ dist-ssr
 .env*.local
 hermes_session.json
 
+# Data and large seeds
+store_assets/supabase_seeds/
+supabase/.temp/

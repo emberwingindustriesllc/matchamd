@@ -62,7 +62,8 @@ CREATE INDEX IF NOT EXISTS idx_programs_program_type ON programs (program_type);
 -- 4. VIEW: search_specialties
 -- Returns distinct specialties with program counts for typeahead
 -- ------------------------------------------------------------
-CREATE VIEW search_specialties AS
+CREATE OR REPLACE VIEW search_specialties
+WITH (security_invoker = true) AS
 SELECT 
   TRIM(s) AS specialty,
   TRIM(s) AS name,
@@ -85,7 +86,8 @@ GRANT SELECT ON search_specialties TO anon, authenticated;
 -- 5. VIEW: search_locations
 -- Matches location-typeahead.js (selects city, state, location_label, program_count)
 -- ------------------------------------------------------------
-CREATE VIEW search_locations AS
+CREATE OR REPLACE VIEW search_locations
+WITH (security_invoker = true) AS
 SELECT 
   TRIM(city) AS city,
   TRIM(state) AS state,

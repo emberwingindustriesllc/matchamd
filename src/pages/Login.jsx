@@ -6,24 +6,49 @@ import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight, CheckCircle2 } from 'lucide-react';
 import logo from '@/assets/logo.png';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState('login'); // 'login' | 'signup' | 'reset'
+  const [mode, setMode] = useState('login'); // 'login' | 'signup' | 'reset' | 'update_password'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  // Redirect if already logged in
+  // Handle recovery tokens & redirect if already logged in (non-recovery)
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) navigate(createPageUrl('Dashboard'), { replace: true });
+    const searchParams = new URLSearchParams(window.location.search);
+    const hash = window.location.hash || '';
+    const isRecovery = searchParams.get('type') === 'recovery' || hash.includes('type=recovery');
+
+    if (isRecovery) {
+      setMode('update_password');
+    }
+
+    // Auth state listener to catch PASSWORD_RECOVERY events
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setMode('update_password');
+      }
     });
+
+    // Check existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      // Only auto-redirect to Dashboard if NOT currently handling a password reset/recovery
+      if (session && !isRecovery && !hash.includes('type=recovery')) {
+        navigate(createPageUrl('Dashboard'), { replace: true });
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const handleEmailAuth = async (e) => {
@@ -39,18 +64,52 @@ export default function Login() {
         navigate(createPageUrl('Dashboard'), { replace: true });
 
       } else if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            // Explicitly redirect back to the current app origin instead of Supabase dashboard default
+            emailRedirectTo: `${window.location.origin}/Login`,
+          },
+        });
         if (error) throw error;
-        setMessage('Check your email to confirm your account, then log in.');
-        setMode('login');
+
+        if (data?.session) {
+          // If auto-confirm is enabled in Supabase
+          navigate(createPageUrl('Dashboard'), { replace: true });
+        } else {
+          setMessage('Account created! Please check your email to confirm your account, then log in.');
+          setMode('login');
+        }
 
       } else if (mode === 'reset') {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/Login`,
+          redirectTo: `${window.location.origin}/Login?type=recovery`,
         });
         if (error) throw error;
-        setMessage('Password reset email sent. Check your inbox.');
+        setMessage('Password reset email sent! Please check your inbox and click the reset link.');
         setMode('login');
+
+      } else if (mode === 'update_password') {
+        if (password.length < 6) {
+          throw new Error('Password must be at least 6 characters long.');
+        }
+        if (password !== confirmPassword) {
+          throw new Error('Passwords do not match.');
+        }
+
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) throw error;
+
+        // Clean up hash/query parameters from the URL
+        if (window.history.replaceState) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+
+        setMessage('Your password has been successfully updated!');
+        setTimeout(() => {
+          navigate(createPageUrl('Dashboard'), { replace: true });
+        }, 1200);
       }
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
@@ -59,11 +118,11 @@ export default function Login() {
     }
   };
 
-
   const modeConfig = {
-    login:  { title: 'Welcome back',       subtitle: 'Sign in to your FMG Pathway account', cta: 'Sign In' },
-    signup: { title: 'Create account',     subtitle: 'Start your journey to US residency',   cta: 'Create Account' },
-    reset:  { title: 'Reset password',     subtitle: "We'll send a link to your email",        cta: 'Send Reset Link' },
+    login:           { title: 'Welcome back',       subtitle: 'Sign in to your MatchaMD account',    cta: 'Sign In' },
+    signup:          { title: 'Create account',     subtitle: 'Start your journey to US residency',   cta: 'Create Account' },
+    reset:           { title: 'Reset password',     subtitle: "We'll send a reset link to your email", cta: 'Send Reset Link' },
+    update_password: { title: 'Set new password',   subtitle: 'Enter your new password below',        cta: 'Update Password' },
   };
 
   return (
@@ -86,7 +145,7 @@ export default function Login() {
           <div className="flex justify-center mb-6">
             <img
               src={logo}
-              alt="FMG Pathway"
+              alt="MatchaMD"
               className="h-16 w-16 object-contain drop-shadow-lg"
               onError={(e) => { e.target.onerror = null; e.target.src = 'https://img.icons8.com/color/512/matcha.png'; }}
             />
@@ -114,32 +173,37 @@ export default function Login() {
             </div>
           )}
           {message && (
-            <div className="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm text-center">
-              {message}
+            <div className="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm text-center flex items-center justify-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>{message}</span>
             </div>
           )}
 
           {/* Form */}
           <form onSubmit={handleEmailAuth} className="space-y-4">
-            <div>
-              <Label className="text-slate-300 text-sm mb-1.5 block">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  required
-                  className="pl-10 h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-[rgb(var(--color-secondary))] focus:ring-[rgb(var(--color-secondary))]"
-                />
+            {mode !== 'update_password' && (
+              <div>
+                <Label className="text-slate-300 text-sm mb-1.5 block">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                    className="pl-10 h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-[rgb(var(--color-secondary))] focus:ring-[rgb(var(--color-secondary))]"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {mode !== 'reset' && (
               <div>
-                <Label className="text-slate-300 text-sm mb-1.5 block">Password</Label>
+                <Label className="text-slate-300 text-sm mb-1.5 block">
+                  {mode === 'update_password' ? 'New Password' : 'Password'}
+                </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                   <Input
@@ -158,6 +222,32 @@ export default function Login() {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {mode === 'update_password' && (
+              <div>
+                <Label className="text-slate-300 text-sm mb-1.5 block">Confirm New Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <Input
+                    id="confirm-password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={6}
+                    className="pl-10 pr-10 h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-[rgb(var(--color-secondary))] focus:ring-[rgb(var(--color-secondary))]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
@@ -190,8 +280,6 @@ export default function Login() {
               )}
             </Button>
           </form>
-
-
 
           {/* Mode switcher */}
           <div className="mt-6 text-center text-sm text-slate-400">

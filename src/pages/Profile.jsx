@@ -58,7 +58,11 @@ import {
   GraduationCap,
   BookOpen,
   Crown,
-  Shield
+  Shield,
+  KeyRound,
+  Eye,
+  EyeOff,
+  Loader2
 } from 'lucide-react';
 
 const languages = [
@@ -82,6 +86,16 @@ export default function Profile() {
   const queryClient = useQueryClient();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editData, setEditData] = useState(null);
+
+  // Change Password state
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
 
   const { user, logout } = useAuth();
 
@@ -178,6 +192,46 @@ export default function Profile() {
     } catch (err) {
       console.error('Error deleting account:', err);
       setIsDeletingAccount(false);
+    }
+  };
+
+  const handleOpenPasswordModal = () => {
+    setPasswordError('');
+    setPasswordSuccess('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setIsPasswordModalOpen(true);
+  };
+
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    if (newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters long.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match.');
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      setPasswordSuccess('Password updated successfully!');
+      setTimeout(() => {
+        setIsPasswordModalOpen(false);
+        setNewPassword('');
+        setConfirmPassword('');
+        setPasswordSuccess('');
+      }, 1500);
+    } catch (err) {
+      setPasswordError(err.message || 'Failed to update password.');
+    } finally {
+      setIsUpdatingPassword(false);
     }
   };
 
@@ -529,6 +583,16 @@ export default function Profile() {
           </div>
         </Card>
 
+        {/* Security */}
+        <Button 
+          variant="outline" 
+          onClick={handleOpenPasswordModal}
+          className="w-full h-12 rounded-xl"
+        >
+          <KeyRound className="w-5 h-5 mr-2 text-slate-600 dark:text-slate-400" />
+          Change Password
+        </Button>
+
         {/* Legal */}
         <Button 
           variant="outline" 
@@ -768,6 +832,98 @@ export default function Profile() {
               </Button>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Password Dialog */}
+      <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
+        <DialogContent className="rounded-2xl max-w-md p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-[rgb(var(--color-primary))]" />
+              Change Password
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleUpdatePassword} className="space-y-4 mt-2">
+            {passwordError && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm">
+                {passwordError}
+              </div>
+            )}
+            {passwordSuccess && (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{passwordSuccess}</span>
+              </div>
+            )}
+
+            <div>
+              <Label className="text-sm font-medium mb-1.5 block">New Password</Label>
+              <div className="relative">
+                <Input
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="At least 6 characters"
+                  required
+                  minLength={6}
+                  className="rounded-xl pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                >
+                  {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium mb-1.5 block">Confirm New Password</Label>
+              <div className="relative">
+                <Input
+                  type={showConfirmNewPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-enter new password"
+                  required
+                  minLength={6}
+                  className="rounded-xl pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmNewPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                >
+                  {showConfirmNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsPasswordModalOpen(false)}
+                className="flex-1 rounded-xl"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isUpdatingPassword}
+                className="flex-1 rounded-xl bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] text-white font-medium"
+              >
+                {isUpdatingPassword ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  'Update Password'
+                )}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
 
