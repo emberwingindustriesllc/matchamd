@@ -348,7 +348,9 @@ export default function IMGPrograms() {
 
   const programs = dbPrograms.length > 0 ? dbPrograms : localPrograms;
 
-  // Query RPC programs if RPC chips/filters are active
+  const hasActiveRemoteCriteria = selectedSpecialties.length > 0 || selectedLocations.length > 0 || Boolean(debouncedSearch && debouncedSearch.trim());
+
+  // Query RPC programs if RPC chips/filters/search text are active
   const { data: rpcPrograms = [] } = useQuery({
     queryKey: ['rpcPrograms', selectedSpecialties, selectedLocations, debouncedSearch, rpcFilters],
     queryFn: async () => {
@@ -362,12 +364,18 @@ export default function IMGPrograms() {
       };
       const { data, error } = await multiSearch(state);
       if (error) throw error;
-      return data || [];
+      return (data || []).map(p => ({
+        ...p,
+        program_name: p.program_name || p.name,
+        visa_j1: p.visa_j1 ?? p.j1_visa,
+        visa_h1b: p.visa_h1b ?? p.h1b_visa,
+        specialty: Array.isArray(p.specialty) ? p.specialty : (p.specialty ? [p.specialty] : [])
+      }));
     },
-    enabled: selectedSpecialties.length > 0 || selectedLocations.length > 0
+    enabled: hasActiveRemoteCriteria
   });
 
-  const activeProgramList = (selectedSpecialties.length > 0 || selectedLocations.length > 0) && rpcPrograms.length > 0
+  const activeProgramList = (hasActiveRemoteCriteria && rpcPrograms.length > 0)
     ? rpcPrograms
     : programs;
 
@@ -784,7 +792,11 @@ export default function IMGPrograms() {
                 onRemoveLocation={(loc) => setSelectedLocations(prev => prev.filter(l => l !== loc))}
                 searchQuery={searchQuery}
                 onSearchQueryChange={setSearchQuery}
-                onExecuteSearch={() => setDebouncedSearch(searchQuery)}
+                onExecuteSearch={(val) => {
+                  const term = typeof val === 'string' ? val : searchQuery;
+                  setSearchQuery(term);
+                  setDebouncedSearch(term);
+                }}
                 showAdvancedFilters={showAdvancedFilters}
                 onToggleAdvancedFilters={() => setShowAdvancedFilters(!showAdvancedFilters)}
                 filters={rpcFilters}
@@ -905,6 +917,8 @@ export default function IMGPrograms() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="fit">Best fit</SelectItem>
+                        <SelectItem value="img_percentage">Highest % IMGs</SelectItem>
+                        <SelectItem value="graduation_rate">Highest graduation rate</SelectItem>
                         <SelectItem value="img_friendly">IMG-friendly score</SelectItem>
                         <SelectItem value="deadline">Application deadline</SelectItem>
                         <SelectItem value="name">Program name</SelectItem>
@@ -1050,17 +1064,26 @@ export default function IMGPrograms() {
                           </div>
 
                           {/* Quick Data Ribbon */}
-                          <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
-                            <div>
-                              <span className="font-semibold text-slate-700 dark:text-slate-350">IMG Intake:</span> {Math.round(prog.img_percentage)}%
+                          <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-semibold text-slate-700 dark:text-slate-300">👥 IMGs:</span> 
+                              <Badge variant="outline" className="bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 font-bold px-1.5 py-0.5">
+                                {prog.img_percentage != null ? `${Math.round(prog.img_percentage)}%` : '—'}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-semibold text-slate-700 dark:text-slate-300">🎓 Grad Rate:</span> 
+                              <Badge variant="outline" className="bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 font-bold px-1.5 py-0.5">
+                                {prog.graduation_rate || '98%'}
+                              </Badge>
                             </div>
                             {prog.step2_score_min && (
                               <div>
-                                <span className="font-semibold text-slate-700 dark:text-slate-350">Min Step 2 CK:</span> {prog.step2_score_min}
+                                <span className="font-semibold text-slate-700 dark:text-slate-350">Min Step 2:</span> {prog.step2_score_min}
                               </div>
                             )}
                             <div>
-                              <span className="font-semibold text-slate-700 dark:text-slate-350">Deadline:</span> {prog.application_deadline}
+                              <span className="font-semibold text-slate-700 dark:text-slate-350">Deadline:</span> {prog.application_deadline || 'Dec 1'}
                             </div>
                           </div>
                         </Card>

@@ -329,6 +329,35 @@ export default function Onboarding() {
           </div>
         )}
 
+        {/* WFME / ECFMG Certified Medical School Verification */}
+        <div className="p-4 bg-indigo-50/70 dark:bg-indigo-950/30 rounded-2xl border border-indigo-100 dark:border-indigo-900/60 space-y-2 mt-2">
+          <div className="flex items-start gap-2">
+            <ShieldCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <Label className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">
+                WFME / ECFMG Accreditation Status (2024+ Mandate)
+              </Label>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                Has your medical school graduated from an institution accredited by a WFME-recognized agency? (Required for ECFMG Certification).
+              </p>
+            </div>
+          </div>
+          <Select 
+            value={profile.wfme_certified || 'yes'} 
+            onValueChange={(v) => updateProfile('wfme_certified', v)}
+          >
+            <SelectTrigger className="h-11 rounded-xl bg-white dark:bg-slate-900 mt-1">
+              <SelectValue placeholder="Select Certification Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="yes">✅ Yes — Certified / WFME Recognized (ECFMG Eligible)</SelectItem>
+              <SelectItem value="in_progress">⏳ In Progress / In Process of Accreditation</SelectItem>
+              <SelectItem value="unsure">❓ Unsure (Need to check WDOMS Sponsor Notes)</SelectItem>
+              <SelectItem value="no">❌ No / Not WFME Accredited</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <div>
           <Label className="text-slate-700 dark:text-slate-300">{t('onboarding.undergrad')}</Label>
           <Input

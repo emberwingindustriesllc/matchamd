@@ -298,8 +298,18 @@ export default function ProgramsList() {
                     {program.visa_h1b && (
                       <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">H-1B Visa</Badge>
                     )}
-                    {program.accepts_img && (
+                    {program.img_percentage != null && (
+                      <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
+                        👥 {Math.round(program.img_percentage)}% IMGs
+                      </Badge>
+                    )}
+                    {program.accepts_img && program.img_percentage == null && (
                       <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">IMG Friendly</Badge>
+                    )}
+                    {program.graduation_rate && (
+                      <Badge variant="outline" className="bg-teal-50 text-teal-800 border-teal-200">
+                        🎓 {program.graduation_rate} Grad
+                      </Badge>
                     )}
                   </div>
 

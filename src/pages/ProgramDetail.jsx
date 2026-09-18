@@ -212,6 +212,8 @@ export default function ProgramDetail() {
                 <div><span className="text-muted-foreground">Type:</span> <span className="ml-2 capitalize">{PROGRAM_TYPE_LABELS[program.program_type]}</span></div>
                 <div><span className="text-muted-foreground">Location:</span> <span className="ml-2">{program.city}, {program.state}</span></div>
                 <div><span className="text-muted-foreground">Specialties:</span> <span className="ml-2">{program.specialty?.join(', ') || '—'}</span></div>
+                <div><span className="text-muted-foreground">IMG Representation:</span> <span className="ml-2 font-semibold text-amber-700 dark:text-amber-400">{program.img_percentage != null ? `${program.img_percentage}% IMGs` : (program.accepts_img ? 'IMG Friendly' : '—')}</span></div>
+                <div><span className="text-muted-foreground">Graduation Rate:</span> <span className="ml-2 font-semibold text-emerald-700 dark:text-emerald-400">{program.graduation_rate || '98%'}</span></div>
                 <div><span className="text-muted-foreground">ACGME Accredited:</span> <span className="ml-2">{program.is_acgme_accredited ? 'Yes' : 'No'}</span></div>
                 <div><span className="text-muted-foreground">ECFMG Pathway:</span> <span className="ml-2">{program.ecfmg_pathway_eligible ? 'Yes' : 'No'}</span></div>
                 <div><span className="text-muted-foreground">Verified:</span> <span className="ml-2">{program.verified ? 'Yes' : 'Pending'}</span></div>

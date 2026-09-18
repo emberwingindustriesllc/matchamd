@@ -84,6 +84,24 @@ export function matchAlias(query, aliasMap) {
   return aliasMap[normalized] || null;
 }
 
+const DEFAULT_SPECIALTIES = [
+  { specialty: 'Internal Medicine', name: 'Internal Medicine', program_count: 600 },
+  { specialty: 'Family Medicine', name: 'Family Medicine', program_count: 550 },
+  { specialty: 'Pediatrics', name: 'Pediatrics', program_count: 280 },
+  { specialty: 'Surgery', name: 'Surgery', program_count: 260 },
+  { specialty: 'Emergency Medicine', name: 'Emergency Medicine', program_count: 240 },
+  { specialty: 'Psychiatry', name: 'Psychiatry', program_count: 220 },
+  { specialty: 'OB/GYN', name: 'OB/GYN', program_count: 210 },
+  { specialty: 'Neurology', name: 'Neurology', program_count: 170 },
+  { specialty: 'Pathology', name: 'Pathology', program_count: 150 },
+  { specialty: 'Radiology', name: 'Radiology', program_count: 160 },
+  { specialty: 'Anesthesiology', name: 'Anesthesiology', program_count: 160 },
+  { specialty: 'Pediatric Hematology-Oncology', name: 'Pediatric Hematology-Oncology', program_count: 65 },
+  { specialty: 'Pediatric Cardiology', name: 'Pediatric Cardiology', program_count: 60 },
+  { specialty: 'Pediatric Emergency Medicine', name: 'Pediatric Emergency Medicine', program_count: 55 },
+  { specialty: 'Pediatric Critical Care', name: 'Pediatric Critical Care', program_count: 50 },
+];
+
 /**
  * Filter cached specialties by user query — enhanced with alias matching.
  * 
@@ -92,10 +110,10 @@ export function matchAlias(query, aliasMap) {
  * @returns {Array} matching specialty items
  */
 export function filterSpecialties(query, limit = 15) {
-  if (!specialtyCache) return [];
+  const pool = (specialtyCache && specialtyCache.length > 0) ? specialtyCache : DEFAULT_SPECIALTIES;
 
   if (!query || query.trim() === '') {
-    return specialtyCache.slice(0, limit);
+    return pool.slice(0, limit);
   }
 
   const normalized = normalizeQuery(query);

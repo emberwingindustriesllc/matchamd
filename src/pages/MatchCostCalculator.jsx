@@ -60,6 +60,16 @@ export function calculateErasFees(count) {
   return total;
 }
 
+export function calculateRemainingBudget(budget, totalExpenses) {
+  const b = Number(budget) || 0;
+  const e = Number(totalExpenses) || 0;
+  return {
+    remaining: b - e,
+    percentUsed: b > 0 ? Math.min(100, Math.round((e / b) * 100)) : (e > 0 ? 100 : 0),
+    isOverBudget: e > b
+  };
+}
+
 export default function MatchCostCalculator() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -80,6 +90,12 @@ export default function MatchCostCalculator() {
 
   // Selected Country for Currency Conversion
   const [selectedCountry, setSelectedCountry] = useState('Other');
+
+  // Total Target Budget State
+  const [totalBudget, setTotalBudget] = useState(() => {
+    const saved = localStorage.getItem('match_target_budget');
+    return saved ? Number(saved) : 15000;
+  });
 
   // Sliders & Toggles State
   const [exams, setExams] = useState({
@@ -110,6 +126,12 @@ export default function MatchCostCalculator() {
     }
   }, [profileCountry]);
 
+  const handleBudgetChange = (val) => {
+    const num = Math.max(0, Number(val) || 0);
+    setTotalBudget(num);
+    localStorage.setItem('match_target_budget', String(num));
+  };
+
   // Calculations
   const examCosts = 
     (exams.step1 ? 1000 : 0) +
@@ -126,6 +148,9 @@ export default function MatchCostCalculator() {
   const totalCostUsd = examCosts + rotationsCost + travelCost + erasCost + agencyTotalCost;
   const currencyInfo = EXCHANGE_RATES[selectedCountry] || EXCHANGE_RATES.Other;
   const totalCostLocal = totalCostUsd * currencyInfo.rate;
+
+  const { remaining: remainingBudgetUsd, percentUsed, isOverBudget } = calculateRemainingBudget(totalBudget, totalCostUsd);
+  const remainingBudgetLocal = remainingBudgetUsd * currencyInfo.rate;
 
   const handleExamsChange = (key, value) => {
     setExams(prev => ({ ...prev, [key]: value }));
@@ -157,11 +182,64 @@ export default function MatchCostCalculator() {
           </p>
         </div>
 
-        {/* Dynamic Live Summary Card */}
+        {/* Target Budget Control Card */}
+        <Card className="rounded-3xl border-slate-200 dark:border-slate-700 shadow-md p-5 bg-white dark:bg-slate-900 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Coins className="w-4 h-4 text-indigo-500" /> Target Application Budget (USD)
+              </Label>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Set your maximum available funds. The calculator will deduct expenses in real-time as you customize items below.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="relative w-36">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">$</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="500"
+                  value={totalBudget || ''}
+                  onChange={(e) => handleBudgetChange(e.target.value)}
+                  className="w-full pl-7 pr-3 py-2 text-base font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                  placeholder="15000"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Preset Buttons */}
+          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase">Presets:</span>
+            {[10000, 15000, 20000, 25000, 30000].map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => handleBudgetChange(preset)}
+                className={`text-xs px-3 py-1 rounded-lg font-semibold transition-all ${
+                  totalBudget === preset
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                }`}
+              >
+                ${(preset / 1000).toFixed(0)}k
+              </button>
+            ))}
+          </div>
+        </Card>
+
+        {/* Dynamic Live Summary Card: Total Budget vs Total Expenses vs Remaining Balance */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 p-6 text-white shadow-xl"
+          className={`relative overflow-hidden rounded-3xl p-6 text-white shadow-xl transition-all ${
+            isOverBudget 
+              ? 'bg-gradient-to-br from-rose-600 via-red-600 to-amber-700'
+              : remainingBudgetUsd < 2500
+              ? 'bg-gradient-to-br from-amber-500 via-orange-600 to-red-600'
+              : 'bg-gradient-to-br from-emerald-600 via-teal-600 to-indigo-700'
+          }`}
         >
           <div className="absolute top-0 right-0 w-36 h-36 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
@@ -169,26 +247,64 @@ export default function MatchCostCalculator() {
           <div className="relative space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-xs font-semibold uppercase tracking-wider bg-white/20 rounded-full px-3 py-1">
-                Estimated Matching Budget
+                {isOverBudget ? '⚠️ Budget Deficit Alert' : 'Live Matching Budget Tracker'}
               </span>
               <Coins className="w-6 h-6 animate-pulse" />
             </div>
 
-            <div>
-              <p className="text-3xl font-extrabold">${totalCostUsd.toLocaleString('en-US')}</p>
-              <p className="text-sm text-white/80">Total in US Dollars (USD)</p>
+            {/* Grid for Total Budget, Total Expenses, and Remaining Balance */}
+            <div className="grid grid-cols-3 gap-2 bg-black/20 backdrop-blur-sm p-4 rounded-2xl border border-white/15">
+              <div>
+                <p className="text-[11px] font-medium text-white/80 uppercase">Target Budget</p>
+                <p className="text-lg sm:text-xl font-bold">${totalBudget.toLocaleString('en-US')}</p>
+              </div>
+              <div className="border-l border-white/20 pl-2 sm:pl-3">
+                <p className="text-[11px] font-medium text-white/80 uppercase">Total Expenses</p>
+                <p className="text-lg sm:text-xl font-bold text-amber-200">${totalCostUsd.toLocaleString('en-US')}</p>
+              </div>
+              <div className="border-l border-white/20 pl-2 sm:pl-3">
+                <p className="text-[11px] font-medium text-white/80 uppercase">Remaining</p>
+                <p className={`text-lg sm:text-xl font-extrabold ${isOverBudget ? 'text-rose-200' : 'text-emerald-200'}`}>
+                  {isOverBudget ? `-$${Math.abs(remainingBudgetUsd).toLocaleString('en-US')}` : `$${remainingBudgetUsd.toLocaleString('en-US')}`}
+                </p>
+              </div>
             </div>
 
+            {/* Visual Budget Utilization Progress Bar */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-xs font-medium text-white/90">
+                <span>Budget Utilized: {percentUsed}%</span>
+                <span>{isOverBudget ? 'Over Budget' : `${100 - percentUsed}% Remaining`}</span>
+              </div>
+              <div className="w-full h-3 bg-white/25 rounded-full overflow-hidden p-0.5">
+                <div 
+                  className={`h-full rounded-full transition-all duration-300 ${
+                    isOverBudget 
+                      ? 'bg-rose-300' 
+                      : percentUsed > 80 
+                      ? 'bg-amber-300' 
+                      : 'bg-emerald-300'
+                  }`}
+                  style={{ width: `${Math.min(100, percentUsed)}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Local Currency Conversion */}
             {selectedCountry !== 'Other' && (
-              <div className="pt-2 border-t border-white/20">
-                <p className="text-2xl font-bold">
-                  {currencyInfo.symbol}{Math.round(totalCostLocal).toLocaleString('en-US')}
-                </p>
-                <p className="text-xs text-white/85">
-                  Equivalent in {currencyInfo.name} ({currencyInfo.code}) @ 1 USD = {currencyInfo.rate} {currencyInfo.code}
-                </p>
-                <p className="text-[10px] text-amber-200 mt-1 italic font-medium">
-                  ⚠️ Currency exchange rates significantly amplify costs in South Asian home countries.
+              <div className="pt-3 border-t border-white/20 space-y-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-white/85">Total Cost in {currencyInfo.name}:</span>
+                  <span className="text-base font-bold">{currencyInfo.symbol}{Math.round(totalCostLocal).toLocaleString('en-US')}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-white/85">Remaining in {currencyInfo.name}:</span>
+                  <span className={`text-base font-bold ${isOverBudget ? 'text-rose-200' : 'text-emerald-200'}`}>
+                    {currencyInfo.symbol}{Math.round(remainingBudgetLocal).toLocaleString('en-US')}
+                  </span>
+                </div>
+                <p className="text-[10px] text-amber-200 italic font-medium">
+                  Exchange rate: 1 USD = {currencyInfo.rate} {currencyInfo.code}
                 </p>
               </div>
             )}
@@ -199,7 +315,7 @@ export default function MatchCostCalculator() {
         <Tabs defaultValue="calculator" className="w-full">
           <TabsList className="grid grid-cols-2 rounded-xl p-1 bg-slate-100 dark:bg-slate-800">
             <TabsTrigger value="calculator" className="rounded-lg text-sm py-2">
-              <Calculator className="w-4 h-4 mr-2" /> Calculator
+              <Calculator className="w-4 h-4 mr-2" /> Calculator & Deductions
             </TabsTrigger>
             <TabsTrigger value="guides" className="rounded-lg text-sm py-2">
               <Sparkles className="w-4 h-4 mr-2" /> IMG Strategy
@@ -208,6 +324,47 @@ export default function MatchCostCalculator() {
 
           <TabsContent value="calculator" className="space-y-6 mt-4">
             
+            {/* Live Budget Deductions Breakdown Table */}
+            <Card className="rounded-2xl border-slate-200 dark:border-slate-700 shadow-sm p-4 bg-slate-50/70 dark:bg-slate-800/30">
+              <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-3">
+                <Calculator className="w-3.5 h-3.5 text-indigo-500" /> Itemized Budget Deductions
+              </h3>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between py-1 border-b border-slate-200 dark:border-slate-700 font-semibold">
+                  <span className="text-slate-700 dark:text-slate-300">Initial Target Budget:</span>
+                  <span className="text-slate-900 dark:text-white font-bold">${totalBudget.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                  <span>(-) 1. Exams & ECFMG Fees:</span>
+                  <span className="font-semibold text-rose-600 dark:text-rose-400">-${examCosts.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                  <span>(-) 2. Clinical Rotations (USCE):</span>
+                  <span className="font-semibold text-rose-600 dark:text-rose-400">-${rotationsCost.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                  <span>(-) 3. Travel & Housing:</span>
+                  <span className="font-semibold text-rose-600 dark:text-rose-400">-${travelCost.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                  <span>(-) 4. ERAS Application Fees:</span>
+                  <span className="font-semibold text-rose-600 dark:text-rose-400">-${erasCost.toLocaleString()}</span>
+                </div>
+                {useAgency && (
+                  <div className="flex justify-between py-1 text-slate-600 dark:text-slate-400">
+                    <span>(-) 5. Placement Agency Fees:</span>
+                    <span className="font-semibold text-rose-600 dark:text-rose-400">-${agencyTotalCost.toLocaleString()}</span>
+                  </div>
+                )}
+                <div className="flex justify-between py-2 border-t-2 border-slate-200 dark:border-slate-700 font-bold text-sm">
+                  <span className="text-slate-900 dark:text-white">Net Remaining Balance:</span>
+                  <span className={isOverBudget ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}>
+                    {isOverBudget ? `-$${Math.abs(remainingBudgetUsd).toLocaleString()}` : `$${remainingBudgetUsd.toLocaleString()}`}
+                  </span>
+                </div>
+              </div>
+            </Card>
+
             {/* Country Selector for Local Exchange Rates */}
             <Card className="rounded-2xl border-slate-200 dark:border-slate-700 shadow-sm p-4">
               <div className="space-y-2">

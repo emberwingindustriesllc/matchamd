@@ -43,6 +43,13 @@ export default function ChipSearchBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Sync input value if parent searchQuery changes to empty
+  useEffect(() => {
+    if (searchQuery === '' && inputValue !== '') {
+      setInputValue('');
+    }
+  }, [searchQuery]);
+
   // Update suggestions when user types
   const handleInputChange = (e) => {
     const val = e.target.value;
@@ -74,11 +81,18 @@ export default function ChipSearchBar({
     setIsOpen(false);
   };
 
+  const handleExecute = () => {
+    onSearchQueryChange(inputValue);
+    if (onExecuteSearch) {
+      onExecuteSearch(inputValue);
+    }
+    setIsOpen(false);
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      onExecuteSearch();
-      setIsOpen(false);
+      handleExecute();
     }
   };
 
@@ -147,8 +161,8 @@ export default function ChipSearchBar({
           {/* Search Button */}
           <Button
             type="button"
-            onClick={onExecuteSearch}
-            className="h-10 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-5 font-semibold text-xs shrink-0"
+            onClick={handleExecute}
+            className="h-10 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 active:scale-95 transition-all text-white px-5 font-semibold text-xs shrink-0 cursor-pointer shadow-sm"
           >
             Search
           </Button>

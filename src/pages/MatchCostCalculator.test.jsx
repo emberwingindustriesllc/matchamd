@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateErasFees } from './MatchCostCalculator';
+import { calculateErasFees, calculateRemainingBudget } from './MatchCostCalculator';
 
 describe('MatchCostCalculator ERAS Progressive Fees Logic', () => {
   it('should return 0 when program count is 0 or negative', () => {
@@ -32,6 +32,28 @@ describe('MatchCostCalculator ERAS Progressive Fees Logic', () => {
     expect(calculateErasFees(35)).toBe(759);
     // 150 programs: 30 at $599 + 120 at $32 = 599 + 3840 = 4439
     expect(calculateErasFees(150)).toBe(4439);
+  });
+});
+
+describe('MatchCostCalculator Budget & Deduction Logic', () => {
+  it('should calculate remaining surplus and percentage correctly when under budget', () => {
+    const result = calculateRemainingBudget(15000, 10000);
+    expect(result.remaining).toBe(5000);
+    expect(result.percentUsed).toBe(67);
+    expect(result.isOverBudget).toBe(false);
+  });
+
+  it('should detect when expenses exceed budget (deficit)', () => {
+    const result = calculateRemainingBudget(10000, 12500);
+    expect(result.remaining).toBe(-2500);
+    expect(result.percentUsed).toBe(100);
+    expect(result.isOverBudget).toBe(true);
+  });
+
+  it('should handle zero or missing budget safely', () => {
+    const result = calculateRemainingBudget(0, 5000);
+    expect(result.remaining).toBe(-5000);
+    expect(result.isOverBudget).toBe(true);
   });
 });
 

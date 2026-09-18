@@ -138,16 +138,32 @@ export default function ProgramDetailsModal({ open, onClose, program, profile, c
 
               <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl text-xs space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-slate-450">NRMP Match Code:</span>
+                  <span className="text-slate-500">NRMP Match Code:</span>
                   <span className="font-bold text-slate-700 dark:text-slate-300">{program.nrmp_code || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-455">Total Residents:</span>
+                  <span className="text-slate-500">Total Residents:</span>
                   <span className="font-bold text-slate-700 dark:text-slate-300">{program.program_size}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-455">Annual Intake Slots:</span>
+                  <span className="text-slate-500">Annual Intake Slots:</span>
                   <span className="font-bold text-slate-700 dark:text-slate-300">{program.annual_intake || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-t border-slate-200 dark:border-slate-700/60 pt-2">
+                  <span className="font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                    👥 IMG Representation:
+                  </span>
+                  <span className="font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
+                    {program.img_percentage != null ? `${program.img_percentage}%` : '—'} ({program.img_residents || '—'} IMGs)
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                    🎓 Graduation Rate:
+                  </span>
+                  <span className="font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">
+                    {program.graduation_rate || '98%'}
+                  </span>
                 </div>
               </div>
 

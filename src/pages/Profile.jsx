@@ -414,6 +414,24 @@ export default function Profile() {
                 {profile.medical_school_country && (
                   <p className="text-xs text-slate-500 dark:text-slate-400">{profile.medical_school_country}</p>
                 )}
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  <Badge variant="outline" className={`text-[11px] font-semibold ${
+                    profile.wfme_certified === 'no' 
+                      ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400'
+                      : profile.wfme_certified === 'in_progress' || profile.wfme_certified === 'unsure'
+                      ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400'
+                      : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400'
+                  }`}>
+                    <ShieldCheck className="w-3 h-3 mr-1 inline" />
+                    {profile.wfme_certified === 'no'
+                      ? 'WFME: Unaccredited'
+                      : profile.wfme_certified === 'in_progress'
+                      ? 'WFME: In Progress'
+                      : profile.wfme_certified === 'unsure'
+                      ? 'WFME: Needs Verification'
+                      : 'WFME / ECFMG Certified'}
+                  </Badge>
+                </div>
               </div>
             </div>
 
@@ -711,6 +729,24 @@ export default function Profile() {
                   placeholder="Country"
                   className="rounded-xl mt-1"
                 />
+              </div>
+
+              <div>
+                <Label>WFME / ECFMG School Certification Status</Label>
+                <Select 
+                  value={editData.wfme_certified || 'yes'} 
+                  onValueChange={(v) => setEditData({ ...editData, wfme_certified: v })}
+                >
+                  <SelectTrigger className="rounded-xl mt-1">
+                    <SelectValue placeholder="Select WFME status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="yes">✅ Yes — WFME Recognized / Accredited</SelectItem>
+                    <SelectItem value="in_progress">⏳ In Progress / In Process</SelectItem>
+                    <SelectItem value="unsure">❓ Unsure / Check WDOMS</SelectItem>
+                    <SelectItem value="no">❌ No / Unaccredited</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

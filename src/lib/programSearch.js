@@ -247,6 +247,21 @@ export function sortPrograms(programs, sortBy = 'fit', fitMap = {}) {
     });
   }
 
+  if (sortBy === 'img_percentage') {
+    return list.sort((a, b) => {
+      const diff = (Number(b.img_percentage) || 0) - (Number(a.img_percentage) || 0);
+      return diff !== 0 ? diff : byName(a, b);
+    });
+  }
+
+  if (sortBy === 'graduation_rate') {
+    return list.sort((a, b) => {
+      const parseRate = (r) => parseInt(String(r).replace(/[^0-9]/g, ''), 10) || 0;
+      const diff = parseRate(b.graduation_rate) - parseRate(a.graduation_rate);
+      return diff !== 0 ? diff : byName(a, b);
+    });
+  }
+
   if (sortBy === 'deadline') {
     return list.sort((a, b) => {
       const da = a.application_deadline ? new Date(a.application_deadline).getTime() : Infinity;
