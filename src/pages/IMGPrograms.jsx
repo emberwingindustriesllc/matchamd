@@ -814,19 +814,6 @@ export default function IMGPrograms() {
                 <ClipboardList className="w-4 h-4" />
                 <span>Observerships</span>
               </button>
-
-              <button
-                type="button"
-                onClick={() => setCategoryTab('medschools')}
-                className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
-                  categoryTab === 'medschools'
-                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <GraduationCap className="w-4 h-4" />
-                <span>Med Schools</span>
-              </button>
             </div>
 
             {/* Filters Container */}
@@ -1360,102 +1347,6 @@ export default function IMGPrograms() {
                 )
               )}
 
-              {/* CATEGORY 4: MEDICAL SCHOOLS */}
-              {categoryTab === 'medschools' && (
-                isMedSchoolsLoading ? (
-                  <div className="text-center py-12">
-                    <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
-                  </div>
-                ) : filteredMedicalSchools.length === 0 ? (
-                  <Card className="p-12 text-center rounded-3xl border-slate-200 dark:border-slate-700">
-                    <GraduationCap className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
-                    <p className="text-slate-700 dark:text-slate-300 font-medium mb-1">No medical schools found</p>
-                    <p className="text-slate-500 text-sm mb-4">
-                      Try searching by country or school name.
-                    </p>
-                  </Card>
-                ) : (
-                  filteredMedicalSchools.map((prog, idx) => (
-                    <motion.div
-                      key={prog.id || `medschool-${idx}`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <Card
-                        className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 space-y-4"
-                        onClick={() => setSelectedProgram(prog)}
-                      >
-                        <div className="flex items-start justify-between gap-4 mb-3">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
-                              {prog.school_name}
-                            </h3>
-                            <p className="text-sm text-slate-500 flex items-center gap-1">
-                              <Building className="w-4 h-4 flex-shrink-0" />
-                              <span className="truncate">{prog.institution}</span>
-                            </p>
-                          </div>
-                          <div className="flex flex-col items-end gap-2">
-                            <button
-                              onClick={(e) => toggleFavorite(e, prog.id)}
-                              className={`p-2 rounded-full transition-colors ${
-                                profile?.favorite_programs?.includes(prog.id)
-                                  ? 'bg-rose-100 text-rose-500 dark:bg-rose-950/30'
-                                  : 'bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-400 dark:bg-slate-800'
-                              }`}
-                            >
-                              <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
-                            </button>
-                            <Badge
-                              className={`font-bold px-2 py-0.5 text-xs ${
-                                prog.ecfmg_pathway_eligible !== false
-                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400'
-                                  : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
-                              }`}
-                              variant="outline"
-                            >
-                              {prog.ecfmg_pathway_eligible !== false ? "WDOMS Listed / ECFMG Eligible" : "Verification Required"}
-                            </Badge>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                            {prog.city}, {prog.state || 'International'}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                            {prog.specialty}
-                          </Badge>
-                          {prog.verified && (
-                            <Badge className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400" variant="outline">
-                              Verified
-                            </Badge>
-                          )}
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
-                          {prog.website && (
-                            <div>
-                              <span className="font-semibold text-slate-700 dark:text-slate-350">Website:</span>{' '}
-                              <a href={prog.website} target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-                                {prog.website.replace(/^https?:\/\//, '')}
-                              </a>
-                            </div>
-                          )}
-                          {prog.is_acgme_accredited && (
-                            <div>
-                              <span className="font-semibold text-slate-700 dark:text-slate-350">ACGME:</span> Yes
-                            </div>
-                          )}
-                        </div>
-                        {prog.description && (
-                          <p className="text-sm text-slate-600 dark:text-slate-400">{prog.description}</p>
-                        )}
-                      </Card>
-                    </motion.div>
-                  ))
-                )
-              )}
             </div>
           </TabsContent>
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/components/ui/use-toast';
@@ -8,14 +8,35 @@ import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Lock, Sparkles } from 'lucide-react';
+import { Check, Lock, Sparkles, ShieldCheck, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createPageUrl } from '@/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
-export default function PremiumGate({ title, description, price, features, contentId }) {
+export default function PremiumGate({ title, description, price, features, contentId, onUnlocked }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [showStagingModal, setShowStagingModal] = useState(false);
+
+  const handleActivateDemo = () => {
+    purchaseManager.activateDemoAddOn(contentId, title);
+    queryClient.invalidateQueries({ queryKey: ['purchases'] });
+    setShowStagingModal(false);
+    toast({
+      title: 'Content Unlocked! 🎉',
+      description: `Successfully unlocked ${title} in demo mode.`
+    });
+    if (onUnlocked) {
+      onUnlocked();
+    }
+  };
 
   const purchaseMutation = useMutation({
     mutationFn: async () => {
@@ -24,16 +45,16 @@ export default function PremiumGate({ title, description, price, features, conte
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['purchases'] });
       toast({
-        title: 'Content Unlocked!',
+        title: 'Content Unlocked! 🎉',
         description: `You now have full access to ${title}.`
       });
+      if (onUnlocked) {
+        onUnlocked();
+      }
     },
     onError: (error) => {
-      toast({
-        title: 'Purchase Failed',
-        description: error.message || 'Could not process purchase.',
-        variant: 'destructive'
-      });
+      console.warn('Purchase failed in staging mode:', error);
+      setShowStagingModal(true);
     }
   });
 
@@ -122,6 +143,62 @@ export default function PremiumGate({ title, description, price, features, conte
           </Card>
         </motion.div>
       </main>
+
+      {/* Stripe Staging & Demo Mode Modal */}
+      <Dialog open={showStagingModal} onOpenChange={setShowStagingModal}>
+        <DialogContent className="rounded-3xl max-w-md p-6">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
+                  Payment Gateway Notice
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-500">
+                  Staging Mode & Test Access
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-3.5 my-2">
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              MatchaMD production payment processing is currently in staging mode while merchant banking accounts and live webhooks are being connected.
+            </p>
+
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50/80 to-purple-50/60 dark:from-indigo-950/30 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/60">
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="text-xs font-bold text-indigo-950 dark:text-indigo-200">
+                  Instant Demo Access Available
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                You can activate this course in Demo Mode right now to preview and explore all modules.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2.5 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowStagingModal(false)}
+              className="flex-1 rounded-xl text-xs"
+            >
+              Dismiss
+            </Button>
+            <Button
+              onClick={handleActivateDemo}
+              className="flex-1 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-semibold shadow-md shadow-indigo-500/20"
+            >
+              <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+              Unlock in Demo Mode
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <BottomNav />
     </div>

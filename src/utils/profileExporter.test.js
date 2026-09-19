@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { generateProfileSummaryText, exportProfileAsJSON } from './profileExporter';
+import { describe, it, expect, vi } from 'vitest';
+import { generateProfileSummaryText, exportProfileAsJSON, exportFullUserDataArchive } from './profileExporter';
 
 describe('profileExporter', () => {
   const mockProfile = {
@@ -20,6 +20,7 @@ describe('profileExporter', () => {
   };
 
   const mockUser = {
+    id: 'user_123',
     full_name: 'Jane Doe',
     email: 'jane.doe@example.com'
   };
@@ -41,5 +42,23 @@ describe('profileExporter', () => {
     expect(text).toContain('Medical Residency Applicant');
     expect(text).toContain('test@example.com');
     expect(text).toContain('Not specified');
+  });
+
+  it('exports user data archive without throwing', () => {
+    // Mock DOM download anchor
+    const clickSpy = vi.fn();
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, 'createElement').mockImplementation((tag) => {
+      const el = originalCreateElement(tag);
+      if (tag === 'a') {
+        el.click = clickSpy;
+      }
+      return el;
+    });
+
+    expect(() => exportFullUserDataArchive(mockProfile, mockUser)).not.toThrow();
+    expect(clickSpy).toHaveBeenCalled();
+
+    vi.restoreAllMocks();
   });
 });

@@ -14,11 +14,14 @@ import {
   Copy,
   Check,
   Share2,
-  Sparkles
+  Sparkles,
+  Database,
+  ShieldCheck
 } from 'lucide-react';
 import {
   generateProfileSummaryText,
   exportProfileAsJSON,
+  exportFullUserDataArchive,
   printProfileCV
 } from '@/utils/profileExporter';
 
@@ -43,17 +46,17 @@ export default function ExportProfileModal({ open, onOpenChange, profile, user }
             </div>
             <div>
               <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">
-                Export Candidate Profile
+                Export & Download Candidate Data
               </DialogTitle>
               <DialogDescription className="text-xs text-slate-500">
-                Share your credentials with letter writers, mentors, and programs.
+                Print your CV, export formatted summaries, or download your complete user data archive.
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-3 gap-3 my-4">
+        <div className="grid grid-cols-3 gap-3 my-3">
           <Button
             onClick={() => printProfileCV(profile, user)}
             className="rounded-2xl h-auto py-3.5 flex-col gap-1.5 bg-gradient-to-br from-teal-600 to-emerald-700 hover:from-teal-700 hover:to-emerald-800 text-white shadow-md shadow-teal-600/20"
@@ -68,7 +71,7 @@ export default function ExportProfileModal({ open, onOpenChange, profile, user }
             className="rounded-2xl h-auto py-3.5 flex-col gap-1.5 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850"
           >
             <Download className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <span className="text-xs font-semibold">Export JSON</span>
+            <span className="text-xs font-semibold">Profile JSON</span>
           </Button>
 
           <Button
@@ -85,6 +88,27 @@ export default function ExportProfileModal({ open, onOpenChange, profile, user }
           </Button>
         </div>
 
+        {/* Full User Data Archive (GDPR / Privacy Portability) */}
+        <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-indigo-50/50 dark:from-slate-900 dark:to-indigo-950/30 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+              <Database className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              Complete User Data Archive
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+              Download all saved programs, checklists, rank list, interviews, and budget data in one JSON package.
+            </p>
+          </div>
+          <Button
+            onClick={() => exportFullUserDataArchive(profile, user)}
+            size="sm"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shrink-0 gap-1.5 rounded-xl shadow-sm"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Download Archive
+          </Button>
+        </div>
+
         {/* Text Preview */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
@@ -93,7 +117,7 @@ export default function ExportProfileModal({ open, onOpenChange, profile, user }
             </span>
             <span className="text-[11px] text-slate-400">Attach to emails for writers</span>
           </div>
-          <pre className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-700 dark:text-slate-300 overflow-x-auto whitespace-pre-wrap max-h-60">
+          <pre className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-700 dark:text-slate-300 overflow-x-auto whitespace-pre-wrap max-h-52">
             {summaryText}
           </pre>
         </div>

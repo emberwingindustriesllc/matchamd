@@ -1,6 +1,6 @@
 /**
- * MatchaMD Profile Exporter Utility
- * Generates formatted print-ready CV summary, downloadable JSON, and clipboard text.
+ * MatchaMD Profile & Data Exporter Utility
+ * Generates formatted print-ready CV summary, downloadable JSON, full user data archive, and clipboard text.
  */
 
 export function generateProfileSummaryText(profile, user) {
@@ -29,7 +29,7 @@ export function generateProfileSummaryText(profile, user) {
   const bio = profile?.bio || 'N/A';
 
   return `=====================================================
-MATAMD RESIDENCY APPLICANT PROFILE SUMMARY
+MATCHAMD RESIDENCY APPLICANT PROFILE SUMMARY
 =====================================================
 Candidate Name: ${name}
 Email: ${email}
@@ -54,7 +54,7 @@ VISA & ELIGIBILITY
 -----------------------------------------------------
 Visa Status: ${visa}
 ACGME Waiver: ${acgmeWaiver}
-Previous Clinical / Residency Training: ${previousTraining}
+Previous Clinical / Postgraduate Training: ${previousTraining}
 
 ABOUT & PERSONAL STATEMENT SUMMARY
 -----------------------------------------------------
@@ -98,6 +98,66 @@ export function exportProfileAsJSON(profile, user) {
   downloadAnchor.setAttribute('href', jsonString);
   const sanitizedName = (profile?.display_name || 'applicant').toLowerCase().replace(/[^a-z0-9]/g, '_');
   downloadAnchor.setAttribute('download', `MatchaMD_Profile_${sanitizedName}.json`);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+}
+
+/**
+ * Full User Data Portability Export (GDPR / CCPA Compliant)
+ * Exports complete profile, saved programs, application checklists, rank order list,
+ * logged interviews, custom budget calculator settings, and review queue submissions.
+ */
+export function exportFullUserDataArchive(profile, user) {
+  const userId = user?.id || 'current_user';
+  
+  // Collect all user data from profile and local storage
+  let savedChecklists = {};
+  let savedInterviews = [];
+  let savedRankList = [];
+  let savedReviews = [];
+  let savedBudget = {};
+
+  try {
+    savedChecklists = profile?.program_checklists || JSON.parse(localStorage.getItem(`match_checklists_${userId}`) || '{}');
+    savedInterviews = profile?.interviews || JSON.parse(localStorage.getItem(`match_interviews_${userId}`) || '[]');
+    savedRankList = profile?.rank_order_list || JSON.parse(localStorage.getItem(`match_ranklist_${userId}`) || '[]');
+    savedReviews = JSON.parse(localStorage.getItem('matchamd_async_reviews') || '[]');
+    savedBudget = JSON.parse(localStorage.getItem('matchamd_cost_calculator_settings') || '{}');
+  } catch (err) {
+    console.warn('Could not read all local storage keys for data export', err);
+  }
+
+  const fullArchive = {
+    archiveVersion: "2.0",
+    exportTimestamp: new Date().toISOString(),
+    account: {
+      userId: user?.id,
+      email: user?.email,
+      fullName: user?.full_name || profile?.display_name,
+      createdAt: user?.created_at
+    },
+    candidateProfile: profile || {},
+    matchApplicationData: {
+      favoritePrograms: profile?.favorite_programs || [],
+      rankOrderList: savedRankList,
+      programChecklists: savedChecklists,
+      interviewsLogged: savedInterviews,
+      budgetAndCostSettings: savedBudget
+    },
+    reviewsAndSubmissions: savedReviews,
+    gamification: {
+      points: profile?.points || 0,
+      badges: profile?.badges || []
+    }
+  };
+
+  const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(fullArchive, null, 2))}`;
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute('href', jsonString);
+  const timestampStr = new Date().toISOString().split('T')[0];
+  const sanitizedName = (profile?.display_name || user?.full_name || 'user').toLowerCase().replace(/[^a-z0-9]/g, '_');
+  downloadAnchor.setAttribute('download', `MatchaMD_Full_Data_Archive_${sanitizedName}_${timestampStr}.json`);
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   downloadAnchor.remove();
