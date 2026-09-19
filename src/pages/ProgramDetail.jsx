@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   MapPin, Globe, Mail, Shield, AlertTriangle, BookOpen, Plus, Loader2,
-  Verified
+  Verified, Calculator
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/lib/AuthContext';
@@ -43,6 +43,38 @@ export default function ProgramDetail() {
   const [newNote, setNewNote] = useState({ title: '', content: '', note_type: 'experience', rating: null });
   const [submittingNote, setSubmittingNote] = useState(false);
   const [isModerator, setIsModerator] = useState(false);
+  const [budgetedPrograms, setBudgetedPrograms] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('matchamd_budgeted_programs') || '[]');
+    } catch {
+      return [];
+    }
+  });
+
+  const isBudgeted = program && budgetedPrograms.some(p => p.id === program.id || p.name === program.name);
+
+  const toggleBudgetProgram = () => {
+    if (!program) return;
+    const exists = budgetedPrograms.some(p => p.id === program.id || p.name === program.name);
+    let updated;
+    if (exists) {
+      updated = budgetedPrograms.filter(p => p.id !== program.id && p.name !== program.name);
+      toast.info(`Removed ${program.name} from ERAS Budget`);
+    } else {
+      const entry = {
+        id: program.id,
+        name: program.name,
+        institution: program.institution,
+        specialty: Array.isArray(program.specialty) ? program.specialty.join(', ') : program.specialty,
+        city: program.city,
+        state: program.state
+      };
+      updated = [...budgetedPrograms, entry];
+      toast.success(`Added ${program.name} to ERAS Budget!`);
+    }
+    setBudgetedPrograms(updated);
+    localStorage.setItem('matchamd_budgeted_programs', JSON.stringify(updated));
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -155,7 +187,16 @@ export default function ProgramDetail() {
             )}
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant={isBudgeted ? "default" : "outline"}
+            onClick={toggleBudgetProgram}
+            className={isBudgeted ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "border-emerald-600/40 text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400"}
+          >
+            <Calculator className="h-4 w-4 mr-2" />
+            {isBudgeted ? 'In ERAS Budget ✓' : '+ Add to ERAS Budget'}
+          </Button>
           <AddProgramModal open={showAddProgramModal} onOpenChange={setShowAddProgramModal} onSuccess={loadProgram} />
           <Button variant="outline" onClick={() => setShowAddProgramModal(true)}><Plus className="h-4 w-4 mr-2" /> Add Program</Button>
           <ReportScamModal

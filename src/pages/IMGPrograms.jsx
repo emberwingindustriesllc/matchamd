@@ -52,7 +52,8 @@ import {
   ClipboardList,
   Stethoscope,
   X,
-  Download
+  Download,
+  Calculator
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import MultiSelectDropdown from '@/components/ui/MultiSelectDropdown';
@@ -231,6 +232,38 @@ export default function IMGPrograms() {
     } catch (err) {
       console.warn('Failed to save interviews to Supabase, fell back to localStorage:', err);
     }
+  };
+
+  const [budgetedPrograms, setBudgetedPrograms] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('matchamd_budgeted_programs') || '[]');
+    } catch {
+      return [];
+    }
+  });
+
+  const toggleBudgetProgram = (e, prog) => {
+    e.stopPropagation();
+    const progId = prog.id;
+    const exists = budgetedPrograms.some(p => p.id === progId);
+    let updated;
+    if (exists) {
+      updated = budgetedPrograms.filter(p => p.id !== progId);
+      toast.info(`Removed ${prog.program_name || prog.name} from ERAS Budget`);
+    } else {
+      const entry = {
+        id: prog.id,
+        name: prog.program_name || prog.name,
+        institution: prog.institution,
+        specialty: Array.isArray(prog.specialty) ? prog.specialty.join(', ') : prog.specialty,
+        city: prog.city,
+        state: prog.state
+      };
+      updated = [...budgetedPrograms, entry];
+      toast.success(`Added ${prog.program_name || prog.name} to ERAS Budget!`);
+    }
+    setBudgetedPrograms(updated);
+    localStorage.setItem('matchamd_budgeted_programs', JSON.stringify(updated));
   };
 
   const saveRankList = async (newList) => {
@@ -978,28 +1011,39 @@ export default function IMGPrograms() {
 
             {/* Results Grid */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
                   {categoryTab === 'residencies' && `${filteredPrograms.length} residency programs found`}
                   {categoryTab === 'fellowships' && `${filteredFellowships.length} fellowship programs found`}
                   {categoryTab === 'observerships' && `${filteredObserverships.length} observerships & clinical rotations found`}
                   {categoryTab === 'medschools' && `${filteredMedicalSchools.length} international medical schools found`}
                 </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const listToExport = categoryTab === 'residencies' ? filteredPrograms :
-                                         categoryTab === 'fellowships' ? filteredFellowships :
-                                         categoryTab === 'observerships' ? filteredObserverships : filteredMedicalSchools;
-                    const name = `MatchaMD_${categoryTab}_export.csv`;
-                    exportProgramsToCSV(listToExport, name);
-                  }}
-                  className="rounded-xl border-slate-200 dark:border-slate-700 text-xs gap-1.5"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  Export CSV
-                </Button>
+                <div className="flex items-center gap-2">
+                  {budgetedPrograms.length > 0 && (
+                    <Link
+                      to={createPageUrl('MatchCostCalculator')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold hover:bg-emerald-100 transition-colors dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+                    >
+                      <Calculator className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      {budgetedPrograms.length} in ERAS Budget →
+                    </Link>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const listToExport = categoryTab === 'residencies' ? filteredPrograms :
+                                           categoryTab === 'fellowships' ? filteredFellowships :
+                                           categoryTab === 'observerships' ? filteredObserverships : filteredMedicalSchools;
+                      const name = `MatchaMD_${categoryTab}_export.csv`;
+                      exportProgramsToCSV(listToExport, name);
+                    }}
+                    className="rounded-xl border-slate-200 dark:border-slate-700 text-xs gap-1.5"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    Export CSV
+                  </Button>
+                </div>
               </div>
 
               {/* CATEGORY 1: RESIDENCIES */}
@@ -1121,6 +1165,18 @@ export default function IMGPrograms() {
                             <div>
                               <span className="font-semibold text-slate-700 dark:text-slate-350">Deadline:</span> {prog.application_deadline || 'Dec 1'}
                             </div>
+                            <button
+                              type="button"
+                              onClick={(e) => toggleBudgetProgram(e, prog)}
+                              className={`ml-auto text-xs px-2.5 py-1 rounded-xl font-medium transition-all flex items-center gap-1.5 ${
+                                budgetedPrograms.some(p => p.id === prog.id)
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800'
+                                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-emerald-950/30 dark:hover:text-emerald-300'
+                              }`}
+                            >
+                              <Calculator className="w-3.5 h-3.5" />
+                              {budgetedPrograms.some(p => p.id === prog.id) ? 'In ERAS Budget ✓' : '+ Add to Budget'}
+                            </button>
                           </div>
                         </Card>
                       </motion.div>
@@ -1220,7 +1276,7 @@ export default function IMGPrograms() {
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
+                        <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
                           {prog.website && (
                             <div>
                               <span className="font-semibold text-slate-700 dark:text-slate-350">Website:</span>{' '}
@@ -1229,6 +1285,18 @@ export default function IMGPrograms() {
                               </a>
                             </div>
                           )}
+                          <button
+                            type="button"
+                            onClick={(e) => toggleBudgetProgram(e, prog)}
+                            className={`ml-auto text-xs px-2.5 py-1 rounded-xl font-medium transition-all flex items-center gap-1.5 ${
+                              budgetedPrograms.some(p => p.id === prog.id)
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800'
+                                : 'bg-white text-slate-600 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-emerald-950/30 dark:hover:text-emerald-300'
+                            }`}
+                          >
+                            <Calculator className="w-3.5 h-3.5" />
+                            {budgetedPrograms.some(p => p.id === prog.id) ? 'In ERAS Budget ✓' : '+ Add to Budget'}
+                          </button>
                         </div>
                         {prog.description && (
                           <p className="text-sm text-slate-600 dark:text-slate-400">{prog.description}</p>

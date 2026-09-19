@@ -3,12 +3,13 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
@@ -28,8 +29,13 @@ import {
   Sparkles,
   Building2,
   Calendar,
-  FileText
+  FileText,
+  Trash2,
+  Check,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const EXCHANGE_RATES = {
   Other: { code: 'USD', symbol: '$', rate: 1, name: 'US Dollars' },
@@ -118,6 +124,32 @@ export default function MatchCostCalculator() {
 
   const [useAgency, setUseAgency] = useState(false);
   const [agencyCost, setAgencyCost] = useState(3000);
+
+  // Synced Budgeted Programs from Directory
+  const [budgetedPrograms, setBudgetedPrograms] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('matchamd_budgeted_programs') || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [showBudgetedList, setShowBudgetedList] = useState(false);
+
+  const handleSyncBudgetCount = () => {
+    if (budgetedPrograms.length === 0) {
+      toast.info('No programs in budget planner yet. Add some from the Programs Directory!');
+      return;
+    }
+    setErasProgramsCount(budgetedPrograms.length);
+    toast.success(`ERAS program count synced to ${budgetedPrograms.length} planned programs!`);
+  };
+
+  const handleRemoveBudgetedProgram = (progId, progName) => {
+    const updated = budgetedPrograms.filter(p => p.id !== progId && p.name !== progName);
+    setBudgetedPrograms(updated);
+    localStorage.setItem('matchamd_budgeted_programs', JSON.stringify(updated));
+    toast.info(`Removed ${progName || 'program'} from ERAS Budget`);
+  };
 
   // Sync country selection with user profile country on load
   useEffect(() => {
@@ -628,6 +660,88 @@ export default function MatchCostCalculator() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
+                
+                {/* Budgeted Programs Directory Sync Banner */}
+                {budgetedPrograms.length > 0 ? (
+                  <div className="p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <span className="text-xs font-bold text-emerald-850 dark:text-emerald-300 flex items-center gap-1.5">
+                          <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                          {budgetedPrograms.length} Specific Programs in Your Budget
+                        </span>
+                        <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                          Tagged directly from the MatchAMD Residency & Fellowship Directory.
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleSyncBudgetCount}
+                          className="text-xs h-8 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+                        >
+                          Sync ({budgetedPrograms.length}) to Slider
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setShowBudgetedList(!showBudgetedList)}
+                          className="text-xs h-8 rounded-xl text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 px-2"
+                        >
+                          {showBudgetedList ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Collapsible List */}
+                    {showBudgetedList && (
+                      <div className="pt-2 border-t border-emerald-200 dark:border-emerald-800 space-y-2 max-h-56 overflow-y-auto pr-1">
+                        {budgetedPrograms.map((prog, idx) => (
+                          <div
+                            key={prog.id || `prog-${idx}`}
+                            className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900 border border-emerald-100 dark:border-slate-800 text-xs gap-2"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                                {prog.name}
+                              </p>
+                              <p className="text-[11px] text-slate-500 truncate">
+                                {prog.institution ? `${prog.institution} • ` : ''}{prog.city ? `${prog.city}, ${prog.state}` : prog.state}
+                              </p>
+                            </div>
+                            {prog.specialty && (
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-slate-50 dark:bg-slate-800">
+                                {prog.specialty}
+                              </Badge>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveBudgetedProgram(prog.id, prog.name)}
+                              className="p-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                              title="Remove from budget"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs flex items-center justify-between gap-3">
+                    <p className="text-slate-600 dark:text-slate-400">
+                      💡 <strong>Pro-Tip:</strong> Save exact residencies and fellowships to your ERAS budget with 1-click while browsing the directory.
+                    </p>
+                    <Link
+                      to={createPageUrl('IMGPrograms')}
+                      className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex-shrink-0"
+                    >
+                      Browse Programs →
+                    </Link>
+                  </div>
+                )}
                 
                 <div className="space-y-4">
                   <div className="space-y-2">

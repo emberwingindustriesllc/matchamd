@@ -26,6 +26,7 @@ import PremiumGate from '@/components/premium/PremiumGate';
 import { toast } from 'sonner';
 import { generateLessonHandoutPDF } from '@/utils/pdfHandoutGenerator';
 import MockInterviewVideoPlayer from '@/components/interview/MockInterviewVideoPlayer';
+import STARPracticeFlashcards from '@/components/interview/STARPracticeFlashcards';
 
 const courseModules = [
   {
@@ -268,6 +269,7 @@ const lessonDetails = {
 };
 
 export default function InterviewCourse() {
+  const [courseTab, setCourseTab] = useState('lessons'); // 'lessons' | 'star_flashcards' | 'resources'
   const [activeLesson, setActiveLesson] = useState(null);
   const [activeResource, setActiveResource] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -647,106 +649,162 @@ Strategy: Present (current role/USCE), Past (med school & key achievement), Futu
           </Card>
         </motion.div>
 
-        {/* Course Modules */}
-        <div className="space-y-6">
-          {courseModules.map((module, idx) => (
-            <motion.div
-              key={module.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-            >
-              <Card>
-                <CardHeader className="pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[rgba(var(--color-primary),0.1)] dark:bg-[rgba(var(--color-primary),0.2)] flex items-center justify-center">
-                      <span className="text-lg font-bold text-[rgb(var(--color-primary))]">
-                        {module.id}
-                      </span>
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">{module.title}</CardTitle>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
-                        {module.lessons.length} lessons
-                      </p>
-                    </div>
-                    <Badge variant="outline">
-                      {module.id === 1 ? '1' : '0'}/{module.lessons.length}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {module.lessons.map((lesson) => (
-                    <div
-                      key={lesson.id}
-                      onClick={() => setActiveLesson(lesson)}
-                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-[rgba(var(--color-primary),0.1)] dark:group-hover:bg-[rgba(var(--color-primary),0.2)] transition-colors">
-                        {lesson.completed ? (
-                          <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                        ) : (
-                          <PlayCircle className="w-5 h-5 text-slate-400 group-hover:text-[rgb(var(--color-primary))] transition-colors" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-[rgb(var(--color-primary))] transition-colors">
-                          {lesson.title}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {lesson.duration}
-                        </p>
-                      </div>
-                      <Button size="sm" variant="ghost" className="text-xs text-[rgb(var(--color-primary))]">
-                        Watch
-                      </Button>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+        {/* Navigation Tabs */}
+        <div className="flex gap-2 p-1.5 bg-slate-100 dark:bg-slate-850 rounded-2xl mb-6 max-w-lg mx-auto">
+          <button
+            type="button"
+            onClick={() => setCourseTab('lessons')}
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
+              courseTab === 'lessons'
+                ? 'bg-white dark:bg-slate-900 text-[rgb(var(--color-primary))] shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Video className="w-4 h-4" />
+            <span>Video Modules</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCourseTab('star_flashcards')}
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
+              courseTab === 'star_flashcards'
+                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            <span>STAR Practice Studio</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCourseTab('resources')}
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
+              courseTab === 'resources'
+                ? 'bg-white dark:bg-slate-900 text-[rgb(var(--color-primary))] shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            <span>Handouts & Docs</span>
+          </button>
         </div>
 
-        {/* Bonus Resources */}
-        <Card className="mt-8 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Star className="w-5 h-5 text-amber-500" />
-              Bonus Resources Included
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid md:grid-cols-2 gap-4">
-            <div 
-              onClick={() => setActiveResource({ title: 'Interview Question Bank', desc: '50+ curated questions categorized by Behavioral, Clinical, and IMG-specific themes with full sample response frameworks.' })}
-              className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all cursor-pointer border border-transparent hover:border-amber-200"
-            >
-              <FileText className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-1 flex-shrink-0" />
-              <div>
-                <p className="font-semibold text-slate-900 dark:text-white text-sm">
-                  Interview Question Bank
-                </p>
-                <p className="text-xs text-slate-600 dark:text-slate-400">
-                  50+ common questions with sample answers
-                </p>
+        {/* Tab 1: Course Video Modules */}
+        {courseTab === 'lessons' && (
+          <div className="space-y-6">
+            {courseModules.map((module, idx) => (
+              <motion.div
+                key={module.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+              >
+                <Card>
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-[rgba(var(--color-primary),0.1)] dark:bg-[rgba(var(--color-primary),0.2)] flex items-center justify-center">
+                        <span className="text-lg font-bold text-[rgb(var(--color-primary))]">
+                          {module.id}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{module.title}</CardTitle>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          {module.lessons.length} lessons
+                        </p>
+                      </div>
+                      <Badge variant="outline">
+                        {module.id === 1 ? '1' : '0'}/{module.lessons.length}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {module.lessons.map((lesson) => (
+                      <div
+                        key={lesson.id}
+                        onClick={() => setActiveLesson(lesson)}
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-[rgba(var(--color-primary),0.1)] dark:group-hover:bg-[rgba(var(--color-primary),0.2)] transition-colors">
+                          {lesson.completed ? (
+                            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                          ) : (
+                            <PlayCircle className="w-5 h-5 text-slate-400 group-hover:text-[rgb(var(--color-primary))] transition-colors" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-[rgb(var(--color-primary))] transition-colors">
+                            {lesson.title}
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {lesson.duration}
+                          </p>
+                        </div>
+                        <Button size="sm" variant="ghost" className="text-xs text-[rgb(var(--color-primary))]">
+                          Watch
+                        </Button>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        {/* Tab 2: STAR Practice Flashcards */}
+        {courseTab === 'star_flashcards' && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <STARPracticeFlashcards />
+          </motion.div>
+        )}
+
+        {/* Tab 3: Bonus Resources */}
+        {courseTab === 'resources' && (
+          <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Star className="w-5 h-5 text-amber-500" />
+                Bonus Resources Included
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid md:grid-cols-2 gap-4">
+              <div 
+                onClick={() => setActiveResource({ title: 'Interview Question Bank', desc: '50+ curated questions categorized by Behavioral, Clinical, and IMG-specific themes with full sample response frameworks.' })}
+                className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all cursor-pointer border border-transparent hover:border-amber-200"
+              >
+                <FileText className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold text-slate-900 dark:text-white text-sm">
+                    Interview Question Bank
+                  </p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    50+ common questions with sample answers
+                  </p>
+                </div>
               </div>
-            </div>
-            <div 
-              onClick={() => setActiveResource({ title: 'Interview Cheat Sheet', desc: 'A 2-page rapid summary guide with last-minute high-yield reminders for interview day morning.' })}
-              className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all cursor-pointer border border-transparent hover:border-amber-200"
-            >
-              <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-1 flex-shrink-0" />
-              <div>
-                <p className="font-semibold text-slate-900 dark:text-white text-sm">
-                  Interview Cheat Sheet
-                </p>
-                <p className="text-xs text-slate-600 dark:text-slate-400">
-                  Quick reference guide for interview day
-                </p>
+              <div 
+                onClick={() => setActiveResource({ title: 'Interview Cheat Sheet', desc: 'A 2-page rapid summary guide with last-minute high-yield reminders for interview day morning.' })}
+                className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all cursor-pointer border border-transparent hover:border-amber-200"
+              >
+                <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold text-slate-900 dark:text-white text-sm">
+                    Interview Cheat Sheet
+                  </p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    Quick reference guide for interview day
+                  </p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </main>
 
       {/* Lesson Video Player Modal */}
