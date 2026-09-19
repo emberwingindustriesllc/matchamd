@@ -183,20 +183,24 @@ export default function Mentors() {
           <div className="relative">
             <div className="flex items-center justify-between mb-3">
               <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                <Star className="w-6 h-6" />
+                <Users className="w-6 h-6" />
               </div>
               <Button
                 onClick={() => setShowBecomeMentorModal(true)}
                 variant="secondary"
                 size="sm"
-                className="bg-white/20 hover:bg-white/30 text-white border-white/30 rounded-xl text-xs"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30 rounded-xl text-xs font-semibold"
               >
-                <Plus className="w-3.5 h-3.5 mr-1" /> Join as Mentor
+                <Plus className="w-3.5 h-3.5 mr-1" /> Apply as Founding Mentor
               </Button>
             </div>
-            <h2 className="text-xl font-bold mb-1">Connect with Verified FMG Mentors</h2>
-            <p className="text-white/90 text-sm">
-              Get personalized 1-on-1 guidance, personal statement edits, and mock interviews from physicians who matched.
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[11px] font-semibold mb-2">
+              <Sparkles className="w-3 h-3 text-amber-200" />
+              Phase 2 Founding Mentor Network
+            </div>
+            <h2 className="text-xl font-bold mb-1">Founding Physician Mentors</h2>
+            <p className="text-white/90 text-xs sm:text-sm leading-relaxed">
+              We are actively onboarding verified US attending physicians, fellows, and resident alumni. If you are a practicing US clinician, join our Founding Mentor network today!
             </p>
           </div>
         </motion.div>

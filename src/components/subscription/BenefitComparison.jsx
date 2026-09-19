@@ -1,85 +1,84 @@
 import React from 'react';
-import { Check, X, Zap, Crown, Sparkles } from 'lucide-react';
+import { Check, X, Zap, Crown, Sparkles, Database, FileSpreadsheet, Calculator, FileDown, ShieldCheck, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 const features = [
   { 
-    category: 'Core Features',
+    category: 'Program & Clinical Intelligence',
     items: [
-      { name: 'Pathway Guides', free: 'Basic', premium: 'All Guides', pro: 'All Guides + Custom' },
-      { name: 'Progress Tracking', free: true, premium: true, pro: true },
-      { name: 'Community Access', free: true, premium: true, pro: true },
-      { name: 'Notifications', free: 'Basic', premium: 'All', pro: 'Priority' }
+      { name: '50-State Residency Program Database', free: 'Preview (5/specialty)', premium: 'Unlimited (All 50 States)', pro: 'Unlimited (All 50 States)' },
+      { name: 'Fellowship Programs (NICU, PHM, Cardio, GI, Pulm)', free: 'Preview', premium: 'Full Database Access', pro: 'Full Database Access' },
+      { name: 'Real Verified Hospital Observership Directory', free: 'Preview (3 programs)', premium: 'Full Directory (25+ Centers)', pro: 'Full Directory (25+ Centers)' },
+      { name: 'Visa Sponsorship Filters (H-1B, J-1, OPT/EAD)', free: false, premium: true, pro: true },
+      { name: 'IMG Match % & Score Cutoff Intel', free: 'Basic', premium: 'Detailed Analytics', pro: 'Detailed Analytics' },
+      { name: 'Program Coordinator & Contact Emails', free: false, premium: true, pro: true },
     ]
   },
   {
-    category: 'Mentorship',
+    category: 'Application Planning & Budgeting',
     items: [
-      { name: 'Mentor Requests', free: '3/month', premium: 'Unlimited', pro: 'Unlimited + Priority' },
-      { name: 'Mentor Directory', free: true, premium: true, pro: true },
-      { name: '1-on-1 Sessions', free: false, premium: false, pro: '1/month' },
-      { name: 'Direct Messaging', free: false, premium: true, pro: true }
+      { name: 'Match Cost & Live Budget Deductor Calculator', free: 'Basic Calculator', premium: 'Full Budgeting + Live Deduction', pro: 'Full Budgeting + Live Deduction' },
+      { name: 'Standardized Medical CV & Profile Exporter (PDF/JSON)', free: 'View Only', premium: 'Unlimited Exports (PDF, JSON, Text)', pro: 'Unlimited Exports (PDF, JSON, Text)' },
+      { name: 'Specialty Roadmap Guides (Peds, IM, Surg, FM)', free: 'Basic Guides', premium: 'Full Specialty Roadmaps', pro: 'Full Specialty Roadmaps' },
+      { name: 'Self-Guided Behavioral Interview Question Bank', free: 'Preview', premium: 'Full Question Bank + STAR Guides', pro: 'Full Question Bank + STAR Guides' },
+      { name: 'Milestone Progress Tracker & Portal Gateway', free: true, premium: true, pro: true },
     ]
   },
   {
-    category: 'Content & Resources',
+    category: 'Physician Clinical Review (Asynchronous)',
     items: [
-      { name: 'Specialty Guides', free: false, premium: true, pro: true },
-      { name: 'Interview Prep', free: false, premium: 'Materials', pro: 'Materials + Mock' },
-      { name: 'CV/PS Templates', free: false, premium: true, pro: true },
-      { name: 'Webinars', free: false, premium: 'Recordings', pro: 'Live + Recordings' }
-    ]
-  },
-  {
-    category: 'Support',
-    items: [
-      { name: 'Response Time', free: '48 hours', premium: '24 hours', pro: '2 hours' },
-      { name: 'Application Review', free: false, premium: false, pro: true },
-      { name: 'Research Assistance', free: false, premium: false, pro: true },
-      { name: 'Priority Support', free: false, premium: false, pro: true }
+      { name: 'Founder CV & Personal Statement Review', free: 'Not Included', premium: 'Available as Add-On', pro: '1 Review Included (5-7d SLA)' },
+      { name: 'Research Abstract & Study Design Critique', free: 'Not Included', premium: 'Available as Add-On', pro: '1 Review Included (5-7d SLA)' },
+      { name: 'Standard Review Turnaround Time', free: '—', premium: '5-7 Business Days (Add-on)', pro: '5-7 Business Days' },
     ]
   }
 ];
 
 export default function BenefitComparison() {
   const renderValue = (value) => {
-    if (value === true) return <Check className="w-5 h-5 text-green-500 mx-auto" />;
-    if (value === false) return <X className="w-5 h-5 text-slate-300 mx-auto" />;
-    return <span className="text-sm text-slate-700 dark:text-slate-300">{value}</span>;
+    if (value === true) return <Check className="w-5 h-5 text-emerald-500 mx-auto" />;
+    if (value === false) return <X className="w-5 h-5 text-slate-300 dark:text-slate-600 mx-auto" />;
+    return <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">{value}</span>;
   };
 
   return (
-    <Card className="p-6 overflow-x-auto">
-      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-        Compare All Features
-      </h3>
+    <Card className="p-6 overflow-x-auto border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+          Compare Platform Features
+        </h3>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Honest, transparent features designed to save you thousands in application fees and optimize your match strategy.
+        </p>
+      </div>
       
-      <table className="w-full">
+      <table className="w-full text-left">
         <thead>
           <tr className="border-b border-slate-200 dark:border-slate-700">
-            <th className="text-left py-3 px-4 text-slate-700 dark:text-slate-300 font-semibold">Feature</th>
-            <th className="text-center py-3 px-4">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-white" />
+            <th className="py-3 px-4 text-slate-700 dark:text-slate-300 font-semibold text-sm">Feature</th>
+            <th className="text-center py-3 px-3">
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                  <Zap className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                 </div>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">Free</span>
+                <span className="font-semibold text-xs sm:text-sm text-slate-700 dark:text-slate-300">Free</span>
               </div>
             </th>
-            <th className="text-center py-3 px-4">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                  <Crown className="w-4 h-4 text-white" />
+            <th className="text-center py-3 px-3 bg-emerald-50/40 dark:bg-emerald-950/20 rounded-t-lg">
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="w-7 h-7 rounded-lg bg-[rgb(var(--color-primary))] flex items-center justify-center">
+                  <Crown className="w-3.5 h-3.5 text-white" />
                 </div>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">Premium</span>
+                <span className="font-semibold text-xs sm:text-sm text-[rgb(var(--color-primary))]">MatchaMD+</span>
               </div>
             </th>
-            <th className="text-center py-3 px-4">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
+            <th className="text-center py-3 px-3">
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center">
+                  <Sparkles className="w-3.5 h-3.5 text-white" />
                 </div>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">Pro</span>
+                <span className="font-semibold text-xs sm:text-sm text-amber-600 dark:text-amber-400">MatchaMD Pro</span>
               </div>
             </th>
           </tr>
@@ -89,19 +88,19 @@ export default function BenefitComparison() {
             <React.Fragment key={catIdx}>
               <tr>
                 <td colSpan={4} className="pt-6 pb-2">
-                  <h4 className="font-semibold text-slate-800 dark:text-white text-sm uppercase tracking-wide">
+                  <h4 className="font-bold text-slate-800 dark:text-white text-xs uppercase tracking-wider bg-slate-50 dark:bg-slate-800/60 py-1.5 px-3 rounded">
                     {category.category}
                   </h4>
                 </td>
               </tr>
               {category.items.map((item, itemIdx) => (
-                <tr key={itemIdx} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="py-3 px-4 text-sm text-slate-600 dark:text-slate-400">
+                <tr key={itemIdx} className="border-b border-slate-100 dark:border-slate-800/80 hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                  <td className="py-3 px-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium">
                     {item.name}
                   </td>
-                  <td className="py-3 px-4 text-center">{renderValue(item.free)}</td>
-                  <td className="py-3 px-4 text-center">{renderValue(item.premium)}</td>
-                  <td className="py-3 px-4 text-center">{renderValue(item.pro)}</td>
+                  <td className="py-3 px-3 text-center">{renderValue(item.free)}</td>
+                  <td className="py-3 px-3 text-center bg-emerald-50/20 dark:bg-emerald-950/10 font-semibold">{renderValue(item.premium)}</td>
+                  <td className="py-3 px-3 text-center">{renderValue(item.pro)}</td>
                 </tr>
               ))}
             </React.Fragment>
