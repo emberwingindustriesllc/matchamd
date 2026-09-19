@@ -1,29 +1,17 @@
 import { supabase } from '@/api/supabaseClient';
+import { STATE_NAME_TO_CODE, STATE_CODE_TO_NAME, normalizeStateTerm } from '@/utils/stateMap';
 
 let locationCache = null;
 
-/**
- * Load the full location list from the search_locations view.
- * Call once on page load / component mount.
- */
-export async function loadLocations() {
-  if (locationCache) return locationCache;
+// Generate statewide entries for all 50 states + PR & DC
+const STATEWIDE_LOCATIONS = Object.entries(STATE_NAME_TO_CODE).map(([name, code]) => ({
+  city: '',
+  state: code,
+  location_label: `${name.replace(/\b\w/g, l => l.toUpperCase())} (Entire State)`,
+  program_count: 50
+}));
 
-  const { data, error } = await supabase
-    .from('search_locations')
-    .select('city, state, location_label, program_count')
-    .order('program_count', { ascending: false });
-
-  if (error) {
-    console.error('Failed to load locations:', error);
-    return [];
-  }
-
-  locationCache = data || [];
-  return locationCache;
-}
-
-const DEFAULT_LOCATIONS = [
+const DEFAULT_CITY_LOCATIONS = [
   { city: 'Huntington', state: 'WV', location_label: 'Huntington, WV', program_count: 5 },
   { city: 'Morgantown', state: 'WV', location_label: 'Morgantown, WV', program_count: 6 },
   { city: 'Charleston', state: 'WV', location_label: 'Charleston, WV', program_count: 5 },
@@ -48,47 +36,97 @@ const DEFAULT_LOCATIONS = [
   { city: 'Washington', state: 'DC', location_label: 'Washington, DC', program_count: 15 },
 ];
 
+export const DEFAULT_LOCATIONS = [
+  ...STATEWIDE_LOCATIONS,
+  ...DEFAULT_CITY_LOCATIONS
+];
+
 /**
- * Filter cached locations by query.
- * Matches against "City, ST" label, city, or state.
+ * Load the full location list from the search_locations view.
  */
-export function filterLocations(query, limit = 15) {
+export async function loadLocations() {
+  if (locationCache) return locationCache;
+
+  const { data, error } = await supabase
+    .from('search_locations')
+    .select('city, state, location_label, program_count')
+    .order('program_count', { ascending: false });
+
+  if (error) {
+    console.error('Failed to load locations:', error);
+    return DEFAULT_LOCATIONS;
+  }
+
+  // Merge database cities with statewide options
+  locationCache = [
+    ...STATEWIDE_LOCATIONS,
+    ...(data || [])
+  ];
+  return locationCache;
+}
+
+/**
+ * Filter cached locations by query (state name, 2-letter state code, or city).
+ */
+export function filterLocations(query, limit = 20) {
   const pool = (locationCache && locationCache.length > 0) ? locationCache : DEFAULT_LOCATIONS;
   if (!query || query.trim() === '') {
     return pool.slice(0, limit);
   }
 
   const q = query.toLowerCase().trim();
-  const matches = pool.filter(loc =>
-    (loc.location_label || '').toLowerCase().includes(q) ||
-    (loc.city || '').toLowerCase().includes(q) ||
-    (loc.state || '').toLowerCase().includes(q)
-  );
+  const normalizedStateTerms = normalizeStateTerm(q).map(s => s.toLowerCase());
 
-  // If Supabase cache didn't have matches but DEFAULT_LOCATIONS might, fallback search DEFAULT_LOCATIONS
-  if (matches.length === 0 && pool !== DEFAULT_LOCATIONS) {
-    return DEFAULT_LOCATIONS.filter(loc =>
-      (loc.location_label || '').toLowerCase().includes(q) ||
-      (loc.city || '').toLowerCase().includes(q) ||
-      (loc.state || '').toLowerCase().includes(q)
-    ).slice(0, limit);
-  }
+  const matches = pool.filter(loc => {
+    const locLabel = (loc.location_label || '').toLowerCase();
+    const locCity = (loc.city || '').toLowerCase();
+    const locState = (loc.state || '').toLowerCase();
+    const locStateName = (STATE_CODE_TO_NAME[loc.state] || '').toLowerCase();
+
+    return (
+      locLabel.includes(q) ||
+      locCity.includes(q) ||
+      locState === q ||
+      locState.includes(q) ||
+      locStateName.includes(q) ||
+      normalizedStateTerms.some(st => locState === st || locStateName.includes(st))
+    );
+  });
 
   return matches.slice(0, limit);
 }
 
 /**
- * Parse a location string like "Cleveland, OH" into { city, state }.
+ * Parse a location string into { city, state }.
+ * Handles:
+ * - "West Virginia (Entire State)" -> { city: '', state: 'WV' }
+ * - "West Virginia" -> { city: '', state: 'WV' }
+ * - "WV" -> { city: '', state: 'WV' }
+ * - "Huntington, WV" -> { city: 'Huntington', state: 'WV' }
  */
 export function parseLocationLabel(label) {
   if (!label) return { city: '', state: '' };
-  const trimmed = label.trim();
+  let trimmed = label.trim();
+
+  // Strip "(Entire State)" or "(Statewide)"
+  const cleanStateLabel = trimmed.replace(/\s*\((?:entire state|statewide|all statewide)\)/i, '').trim().toLowerCase();
+
+  // Check if it matches a whole state
+  if (STATE_NAME_TO_CODE[cleanStateLabel]) {
+    return { city: '', state: STATE_NAME_TO_CODE[cleanStateLabel] };
+  }
+  if (cleanStateLabel.length === 2 && STATE_CODE_TO_NAME[cleanStateLabel.toUpperCase()]) {
+    return { city: '', state: cleanStateLabel.toUpperCase() };
+  }
+
   const commaIdx = trimmed.lastIndexOf(',');
   if (commaIdx > 0) {
     const city = trimmed.slice(0, commaIdx).trim();
-    const state = trimmed.slice(commaIdx + 1).trim();
-    if (city && state) return { city, state };
+    const rawState = trimmed.slice(commaIdx + 1).trim().toLowerCase();
+    const parsedState = STATE_NAME_TO_CODE[rawState] || (rawState.length === 2 ? rawState.toUpperCase() : rawState.toUpperCase());
+    return { city, state: parsedState };
   }
+
   return { city: trimmed, state: '' };
 }
 

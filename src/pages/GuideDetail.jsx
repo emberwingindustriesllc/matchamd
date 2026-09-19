@@ -6,9 +6,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import ResourceLink from '@/components/common/ResourceLink';
-import ProgressMountain from '@/components/gamification/ProgressMountain';
-import ProgressTree from '@/components/gamification/ProgressTree';
-import ProgressRocket from '@/components/gamification/ProgressRocket';
+import ProgressMilestoneTracker from '@/components/gamification/ProgressMilestoneTracker';
+import DocumentSubmissionNotice from '@/components/guides/DocumentSubmissionNotice';
 import ShareMilestone from '@/components/gamification/ShareMilestone';
 import PathwayBreakdown from '@/components/guides/PathwayBreakdown';
 import OETRequirements from '@/components/guides/OETRequirements';
@@ -56,7 +55,6 @@ export default function GuideDetail() {
   const pathway = normalizePathwayKey(urlParams.get('pathway') || 'residency');
 
   const [notes, setNotes] = useState('');
-  const [visualMode, setVisualMode] = useState('mountain');
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [localChecklist, setLocalChecklist] = useState([]);
   const [highlightedSectionIndex, setHighlightedSectionIndex] = useState(null);
@@ -254,79 +252,31 @@ export default function GuideDetail() {
       <main className="px-4 py-6 max-w-lg mx-auto space-y-6">
         <Breadcrumb items={breadcrumbItems} />
 
-        {/* Visual Progress */}
+        {/* Professional Milestone Progress Tracker */}
         <motion.div
           ref={visualRef}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm"
+          className="space-y-4"
         >
-          {/* Header with Share Button */}
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-800 dark:text-white">Your Progress</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {completedCount} of {localChecklist.length} tasks completed ({progressPercentage}%)
-              </p>
-            </div>
-            <Button
-              onClick={() => setShowShareDialog(true)}
-              size="sm"
-              variant="outline"
-              className="rounded-xl"
-            >
-              <Share2 className="w-4 h-4 mr-1" />
-              Share
-            </Button>
-          </div>
-
-          {/* Mode Selector */}
-          <div className="flex gap-2 mb-4 justify-center">
-            <Button
-              variant={visualMode === 'mountain' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setVisualMode('mountain')}
-              className="rounded-xl"
-            >
-              🏔️ Mountain
-            </Button>
-            <Button
-              variant={visualMode === 'tree' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setVisualMode('tree')}
-              className="rounded-xl"
-            >
-              🌳 Tree
-            </Button>
-            <Button
-              variant={visualMode === 'rocket' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setVisualMode('rocket')}
-              className="rounded-xl"
-            >
-              🚀 Rocket
-            </Button>
-          </div>
-
-          {/* Visual Display */}
-          {visualMode === 'mountain' && (
-            <ProgressMountain completedCount={completedCount} totalCount={localChecklist.length} />
-          )}
-          {visualMode === 'tree' && (
-            <ProgressTree completedCount={completedCount} totalCount={localChecklist.length} />
-          )}
-          {visualMode === 'rocket' && (
-            <ProgressRocket completedCount={completedCount} totalCount={localChecklist.length} />
-          )}
+          <ProgressMilestoneTracker
+            completedCount={completedCount}
+            totalCount={localChecklist.length}
+          />
 
           {/* Deadline */}
           {guide.deadline && (
-            <div className="flex items-center justify-center gap-2 mt-4 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800/40">
+            <div className="flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-200 dark:border-amber-800/40">
               <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <span className="text-sm font-medium text-amber-700 dark:text-amber-400">Due: {guide.deadline}</span>
+              <span className="text-xs font-semibold text-amber-800 dark:text-amber-300">
+                Target Timeline Milestone: {guide.deadline}
+              </span>
             </div>
           )}
         </motion.div>
+
+        {/* Official Document Upload Notice */}
+        <DocumentSubmissionNotice />
 
         {/* Interactive Actionable Checklist */}
         <Card className="p-5 rounded-2xl border-2 border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50/40 via-white to-purple-50/30 dark:from-slate-900 dark:to-indigo-950/20 shadow-sm">

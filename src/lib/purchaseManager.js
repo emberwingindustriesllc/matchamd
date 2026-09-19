@@ -115,9 +115,46 @@ export const purchaseManager = {
         return { success: false, error: 'User cancelled' };
       }
       console.error('[MatchaMD RevenueCat] Native purchase failed:', error);
-      alert(`MATCHAMD: Native purchase failed. ${error.message || error}`);
       throw error;
     }
+  },
+
+  /**
+   * Activate Demo Mode subscription locally for staging/testing when Stripe merchant setup is in progress.
+   */
+  activateDemoSubscription(planId = 'premium') {
+    const demoSub = {
+      id: `demo_${Date.now()}`,
+      plan: planId,
+      status: 'active',
+      is_demo: true,
+      created_at: new Date().toISOString()
+    };
+    localStorage.setItem('matchamd_active_subscription', JSON.stringify(demoSub));
+    return demoSub;
+  },
+
+  /**
+   * Activate Demo Mode add-on content locally for staging/testing.
+   */
+  activateDemoAddOn(addOnId, addOnName) {
+    let current = [];
+    try {
+      current = JSON.parse(localStorage.getItem('matchamd_purchased_content') || '[]');
+    } catch (e) {}
+
+    const newPurchase = {
+      id: `demo_purchase_${Date.now()}`,
+      content_id: addOnId,
+      content_name: addOnName,
+      created_at: new Date().toISOString()
+    };
+
+    if (!current.some(p => p.content_id === addOnId)) {
+      current.push(newPurchase);
+      localStorage.setItem('matchamd_purchased_content', JSON.stringify(current));
+    }
+    return newPurchase;
   },
 
   /**
@@ -148,14 +185,13 @@ export const purchaseManager = {
           window.location.href = data.url;
           return { success: true, method: 'stripe_redirect' };
         } else {
-          throw new Error('Stripe client failed to initialize. Verify VITE_STRIPE_PUBLISHABLE_KEY in .env.local.');
+          throw new Error('Stripe client failed to initialize. Verify VITE_STRIPE_PUBLISHABLE_KEY.');
         }
       } else {
         throw new Error('No checkout URL returned from Stripe session creation.');
       }
     } catch (edgeErr) {
-      console.error('[MatchaMD Stripe] Stripe checkout error:', edgeErr);
-      alert(`MATCHAMD: Stripe Checkout failed. ${edgeErr.message || edgeErr}`);
+      console.warn('[MatchaMD Stripe] Stripe checkout Edge Function unavailable / not configured:', edgeErr);
       throw edgeErr;
     }
   },
@@ -187,14 +223,13 @@ export const purchaseManager = {
           window.location.href = data.url;
           return { success: true, method: 'stripe_redirect' };
         } else {
-          throw new Error('Stripe client failed to initialize. Verify VITE_STRIPE_PUBLISHABLE_KEY in .env.local.');
+          throw new Error('Stripe client failed to initialize.');
         }
       } else {
         throw new Error('No checkout URL returned from Stripe session creation.');
       }
     } catch (edgeErr) {
-      console.error('[MatchaMD Stripe] Stripe checkout error:', edgeErr);
-      alert(`MATCHAMD: Stripe Checkout failed. ${edgeErr.message || edgeErr}`);
+      console.warn('[MatchaMD Stripe] Stripe checkout error:', edgeErr);
       throw edgeErr;
     }
   },
@@ -210,7 +245,6 @@ export const purchaseManager = {
 
       console.log(`[MatchaMD RevenueCat] Redirecting to native subscription management settings: ${url}`);
       window.open(url, '_system');
-      alert(`MATCHAMD: Opening subscription settings. Redirecting to ${this.isIOS() ? 'App Store' : 'Google Play Store'}...`);
       return { success: true };
     }
 

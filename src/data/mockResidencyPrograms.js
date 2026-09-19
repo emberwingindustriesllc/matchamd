@@ -4202,5 +4202,63 @@ export const mockResidencyPrograms = [
     "lor_required": 3,
     "application_deadline": "2026-12-01",
     "description": "ACGME-accredited Internal Medicine Residency Program at Kirk Kerkorian School of Medicine at UNLV in Las Vegas, NV. High clinical volume and IMG-friendly environment."
+  },
+  {
+    "id": "fel_marshall_nicu",
+    "program_name": "Marshall University Neonatal-Perinatal Medicine (NICU) Fellowship",
+    "name": "Marshall University Neonatal-Perinatal Medicine (NICU) Fellowship",
+    "institution": "Marshall University Joan C. Edwards School of Medicine / Hoops Family Children's Hospital",
+    "specialty": [
+      "Pediatrics",
+      "Neonatal-Perinatal Medicine"
+    ],
+    "subspecialty": "Neonatal-Perinatal Medicine (NICU)",
+    "city": "Huntington",
+    "state": "WV",
+    "region": "Northeast",
+    "acgme_program_number": "3295521035",
+    "nrmp_code": "1775329F0",
+    "program_type": "fellowship",
+    "visa_j1": true,
+    "visa_h1b": false,
+    "program_size": 6,
+    "annual_intake": 2,
+    "interview_format": "Virtual",
+    "website": "https://jcesom.marshall.edu/residents-fellows/programs/neonatal-perinatal-medicine-fellowship/",
+    "img_percentage": 50,
+    "graduation_rate": "100%",
+    "step2_score_min": 220,
+    "step2_score_avg": 242,
+    "min_usce_months": 0,
+    "description": "ACGME-accredited 3-year Neonatal-Perinatal Medicine fellowship at the Hoops Family Children's Hospital at Cabell Huntington Hospital in Huntington, WV. Comprehensive Level III/IV NICU training, high-risk delivery management, and clinical research."
+  },
+  {
+    "id": "fel_marshall_phm",
+    "program_name": "Marshall University Pediatric Hospital Medicine (PHM) Fellowship",
+    "name": "Marshall University Pediatric Hospital Medicine (PHM) Fellowship",
+    "institution": "Marshall University Joan C. Edwards School of Medicine / Hoops Family Children's Hospital",
+    "specialty": [
+      "Pediatrics",
+      "Pediatric Hospital Medicine"
+    ],
+    "subspecialty": "Pediatric Hospital Medicine (PHM)",
+    "city": "Huntington",
+    "state": "WV",
+    "region": "Northeast",
+    "acgme_program_number": "3315521001",
+    "nrmp_code": "1775331F0",
+    "program_type": "fellowship",
+    "visa_j1": true,
+    "visa_h1b": false,
+    "program_size": 2,
+    "annual_intake": 1,
+    "interview_format": "Virtual",
+    "website": "https://jcesom.marshall.edu/residents-fellows/programs/pediatric-hospital-medicine-fellowship/",
+    "img_percentage": 45,
+    "graduation_rate": "100%",
+    "step2_score_min": 218,
+    "step2_score_avg": 240,
+    "min_usce_months": 0,
+    "description": "ACGME-accredited 2-year fellowship in Pediatric Hospital Medicine at Hoops Family Children's Hospital at Cabell Huntington Hospital in Huntington, WV. Inpatient pediatric care, sedation, quality improvement, and clinical scholarship."
   }
 ];

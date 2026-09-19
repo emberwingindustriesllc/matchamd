@@ -1,4 +1,4 @@
-const STATE_NAME_TO_CODE = {
+export const STATE_NAME_TO_CODE = {
   alabama: 'AL', alaska: 'AK', arizona: 'AZ', arkansas: 'AR', california: 'CA',
   colorado: 'CO', connecticut: 'CT', delaware: 'DE', florida: 'FL', georgia: 'GA',
   hawaii: 'HI', idaho: 'ID', illinois: 'IL', indiana: 'IN', iowa: 'IA',
@@ -12,7 +12,7 @@ const STATE_NAME_TO_CODE = {
   'puerto rico': 'PR', 'district of columbia': 'DC'
 };
 
-const STATE_CODE_TO_NAME = Object.fromEntries(
+export const STATE_CODE_TO_NAME = Object.fromEntries(
   Object.entries(STATE_NAME_TO_CODE).map(([name, code]) => [code, name])
 );
 

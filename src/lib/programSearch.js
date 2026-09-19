@@ -184,6 +184,19 @@ export function filterIMGPrograms(programs, filters = {}, profile = null, fitFn 
         const stateStr = (prog.state || '').toLowerCase();
         const cityState = `${city}, ${stateStr}`;
 
+        // Case 1: Whole state filter (e.g., "West Virginia (Entire State)", "WV", "California")
+        if (parsed.state && !parsed.city) {
+          return stateTerms.some(st => stateStr === st || stateStr.includes(st));
+        }
+
+        // Case 2: City + State filter (e.g., "Huntington, WV")
+        if (parsed.city && parsed.state) {
+          const matchesCity = city.includes(parsed.city.toLowerCase());
+          const matchesState = stateTerms.some(st => stateStr === st || stateStr.includes(st));
+          return matchesCity && matchesState;
+        }
+
+        // Case 3: Fallback general text search
         return (
           city.includes(q) ||
           stateTerms.some(st => stateStr === st || stateStr.includes(st)) ||

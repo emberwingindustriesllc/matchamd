@@ -82,6 +82,60 @@ describe('programSearch pure helpers', () => {
       });
       expect(results.map((p) => p.id)).toEqual(['p2']);
     });
+    it('filters by statewide location chip (e.g. West Virginia or WV)', () => {
+      const wvPrograms = [
+        ...samplePrograms,
+        {
+          id: 'p_wv1',
+          program_name: 'Marshall Pediatrics',
+          city: 'Huntington',
+          state: 'WV',
+          specialty: 'Pediatrics'
+        },
+        {
+          id: 'p_wv2',
+          program_name: 'WVU Internal Medicine',
+          city: 'Morgantown',
+          state: 'WV',
+          specialty: 'Internal Medicine'
+        }
+      ];
+
+      const results = filterIMGPrograms(wvPrograms, {
+        locations: ['West Virginia (Entire State)']
+      });
+      expect(results.map(p => p.id)).toEqual(['p_wv1', 'p_wv2']);
+
+      const resultsAbbr = filterIMGPrograms(wvPrograms, {
+        locations: ['WV']
+      });
+      expect(resultsAbbr.map(p => p.id)).toEqual(['p_wv1', 'p_wv2']);
+    });
+
+    it('filters by specific city and state location chip', () => {
+      const wvPrograms = [
+        ...samplePrograms,
+        {
+          id: 'p_wv1',
+          program_name: 'Marshall Pediatrics',
+          city: 'Huntington',
+          state: 'WV',
+          specialty: 'Pediatrics'
+        },
+        {
+          id: 'p_wv2',
+          program_name: 'WVU Internal Medicine',
+          city: 'Morgantown',
+          state: 'WV',
+          specialty: 'Internal Medicine'
+        }
+      ];
+
+      const results = filterIMGPrograms(wvPrograms, {
+        locations: ['Huntington, WV']
+      });
+      expect(results.map(p => p.id)).toEqual(['p_wv1']);
+    });
   });
 
   describe('hasActiveIMGFilters', () => {

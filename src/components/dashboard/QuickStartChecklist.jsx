@@ -39,7 +39,7 @@ export default function QuickStartChecklist({ profile, progressList }) {
       id: 'oet_medicine',
       title: 'Schedule OET Medicine',
       description: 'Minimum 350 per sub-test required for ECFMG',
-      link: 'https://www.occupationalenglishtest.org',
+      link: 'https://oet.com/book-a-test',
       external: true,
       priority: 'high'
     },

@@ -12,7 +12,7 @@ const officialLinks = {
   usmle: { title: 'USMLE Official', url: 'https://www.usmle.org', description: 'United States Medical Licensing Examination' },
   eras: { title: 'ERAS for IMGs', url: 'https://students-residents.aamc.org/eras', description: 'Electronic Residency Application Service' },
   nrmp: { title: 'NRMP Official', url: 'https://www.nrmp.org', description: 'National Resident Matching Program' },
-  oet: { title: 'OET Medicine', url: 'https://www.occupationalenglishtest.org', description: 'Occupational English Test' },
+  oet: { title: 'OET Medicine Preparation & Samples', url: 'https://oet.com/learn/preparation-portal', description: 'Occupational English Test Official Sample Tests & Booking' },
   amcas: { title: 'AMCAS', url: 'https://students-residents.aamc.org/applying-medical-school-amcas', description: 'American Medical College Application Service' },
   myintrhealth: { title: 'MyIntrHealth', url: 'https://www.myintrhealth.com', description: 'Occupational health requirements for medical professionals' }
 };

@@ -27,6 +27,16 @@ INSERT INTO programs (
 ('Internal Medicine Residency Program', 'WVU Charleston Division / Charleston Area Medical Center (CAMC)', ARRAY['Internal Medicine'], 'Charleston', 'WV', 'residency', true, true, true, true, true, 'ACGME-accredited Internal Medicine Residency Program at Charleston Area Medical Center (CAMC) / WVU Charleston in Charleston, WV.'),
 ('Family Medicine Residency Program', 'WVU Medicine Wheeling Hospital', ARRAY['Family Medicine'], 'Wheeling', 'WV', 'residency', true, true, true, false, true, 'ACGME-accredited Family Medicine Residency Program at WVU Medicine Wheeling Hospital in Wheeling, WV.'),
 
+-- West Virginia Fellowships
+('Neonatal-Perinatal Medicine (NICU) Fellowship', 'Marshall University Joan C. Edwards School of Medicine / Hoops Family Children''s Hospital', ARRAY['Pediatrics'], 'Huntington', 'WV', 'fellowship', true, true, true, false, true, 'ACGME-accredited 3-year Neonatal-Perinatal Medicine fellowship at Cabell Huntington Hospital in Huntington, WV.'),
+('Pediatric Hospital Medicine (PHM) Fellowship', 'Marshall University Joan C. Edwards School of Medicine / Hoops Family Children''s Hospital', ARRAY['Pediatrics'], 'Huntington', 'WV', 'fellowship', true, true, true, false, true, 'ACGME-accredited 2-year Pediatric Hospital Medicine fellowship at Hoops Family Children''s Hospital in Huntington, WV.'),
+
+-- Real US Observerships
+('Center for International Medical Education Clinical Observership', 'Cleveland Clinic Foundation', ARRAY['Internal Medicine'], 'Cleveland', 'OH', 'observership', false, true, false, false, true, 'Prestigious 4-week clinical observership at Cleveland Clinic Main Campus in Cleveland, OH.'),
+('International Visiting Physician Observership', 'Mayo Clinic College of Medicine', ARRAY['Surgery'], 'Rochester', 'MN', 'observership', false, true, false, false, true, '4-week observational experience at Mayo Clinic Hospital in Rochester, MN.'),
+('International Clinical Observership Program', 'Johns Hopkins University School of Medicine', ARRAY['Internal Medicine'], 'Baltimore', 'MD', 'observership', false, true, false, false, true, 'Clinical observership at Johns Hopkins Hospital in Baltimore, MD.'),
+('Clinical Observership Program', 'Marshall University Joan C. Edwards School of Medicine', ARRAY['Pediatrics'], 'Huntington', 'WV', 'observership', false, true, false, false, true, 'Clinical observership at Cabell Huntington Hospital in Huntington, WV.'),
+
 -- New York Programs
 ('Pediatric Residency Program', 'Kravis Children''s Hospital at Mount Sinai', ARRAY['Pediatrics'], 'New York', 'NY', 'residency', true, true, true, true, true, 'Comprehensive pediatric residency program in Manhattan, New York, NY.'),
 ('Internal Medicine Residency Program', 'NYU Grossman School of Medicine / NYU Langone Health', ARRAY['Internal Medicine'], 'New York', 'NY', 'residency', true, true, true, true, true, 'Leading medical center in New York, NY.')

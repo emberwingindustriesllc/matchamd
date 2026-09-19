@@ -69,51 +69,51 @@ export default function OETRequirements() {
           </h4>
           <div className="space-y-2">
             <a
-              href="https://oet.com/en-us/test/book-a-test"
+              href="https://oet.com/book-a-test"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg hover:shadow-md transition-shadow"
             >
               <div>
                 <div className="font-medium text-sm text-slate-800 dark:text-white">
-                  Official OET Registration
+                  Official OET Registration & Scheduling
                 </div>
                 <div className="text-xs text-slate-600 dark:text-slate-400">
-                  Book your test and access prep materials
+                  Book your OET Medicine test
                 </div>
               </div>
               <ExternalLink className="w-4 h-4 text-indigo-600" />
             </a>
 
             <a
-              href="https://oet.com/en-us/ready/sample-tests"
+              href="https://oet.com/learn/preparation-portal"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg hover:shadow-md transition-shadow"
             >
               <div>
                 <div className="font-medium text-sm text-slate-800 dark:text-white">
-                  Free OET Practice Tests
+                  Official Free OET Sample Tests & Preparation
                 </div>
                 <div className="text-xs text-slate-600 dark:text-slate-400">
-                  Official practice materials
+                  Access free official practice tests for Medicine
                 </div>
               </div>
               <ExternalLink className="w-4 h-4 text-indigo-600" />
             </a>
 
             <a
-              href="https://oet.com/en-us"
+              href="https://oet.com"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg hover:shadow-md transition-shadow"
             >
               <div>
                 <div className="font-medium text-sm text-slate-800 dark:text-white">
-                  OET Online Preparation
+                  OET Official Portal
                 </div>
                 <div className="text-xs text-slate-600 dark:text-slate-400">
-                  Premium prep courses and materials
+                  Test format, rules, and global testing dates
                 </div>
               </div>
               <ExternalLink className="w-4 h-4 text-indigo-600" />

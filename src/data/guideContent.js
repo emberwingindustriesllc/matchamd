@@ -508,8 +508,8 @@ export const guideContent = {
         id: 1,
         text: 'Book OET Medicine test date',
         sectionIndex: 0,
-        howTo: 'Register on occupationalenglishtest.org, choose test center or OET@Home, and book a seat at least 2 months ahead.',
-        actionUrl: 'https://www.occupationalenglishtest.org',
+        howTo: 'Register on oet.com, choose an authorized test center or OET@Home, and book a seat at least 2 months ahead.',
+        actionUrl: 'https://oet.com/book-a-test',
         actionLabel: 'Book OET Seat'
       },
       {
@@ -517,7 +517,7 @@ export const guideContent = {
         text: 'Practice 10+ official referral writing samples',
         sectionIndex: 1,
         howTo: 'Practice transforming clinical case notes into concise 180–200 word referral letters without copying irrelevant background.',
-        actionUrl: 'https://www.occupationalenglishtest.org/sample-tests',
+        actionUrl: 'https://oet.com/learn/preparation-portal',
         actionLabel: 'Practice Sample Tests'
       },
       {
@@ -533,7 +533,7 @@ export const guideContent = {
         text: 'Achieve ≥350 in all 4 sub-tests',
         sectionIndex: 0,
         howTo: 'Verify your scores online upon release; ensure all 4 components meet the minimum threshold in a single administration.',
-        actionUrl: 'https://www.occupationalenglishtest.org',
+        actionUrl: 'https://oet.com',
         actionLabel: 'Check Results'
       },
       {
@@ -541,7 +541,7 @@ export const guideContent = {
         text: 'Release scores to ECFMG via OET portal',
         sectionIndex: 0,
         howTo: 'Log into your OET account, go to "Manage Verifier Access", and grant ECFMG permission to view your verified results.',
-        actionUrl: 'https://my.occupationalenglishtest.org',
+        actionUrl: 'https://oet.com',
         actionLabel: 'Release Scores to ECFMG'
       }
     ],
@@ -549,7 +549,7 @@ export const guideContent = {
       'Writing is the most common failed sub-test — keep referral letters under 200 words and stick to relevant clinical facts'
     ],
     resources: [
-      { title: 'OET Official Website', url: 'https://www.occupationalenglishtest.org', type: 'website' }
+      { title: 'OET Official Website & Free Sample Tests', url: 'https://oet.com/learn/preparation-portal', type: 'website' }
     ]
   },
 

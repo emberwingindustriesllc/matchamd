@@ -24,8 +24,17 @@ import {
   TrendingUp,
   Lock,
   Eye,
-  Loader2
+  Loader2,
+  ShieldCheck,
+  Zap
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import BenefitComparison from '@/components/subscription/BenefitComparison';
 
 const plans = [
@@ -115,6 +124,8 @@ export default function Subscription() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [showStagingModal, setShowStagingModal] = useState(false);
+  const [stagingItem, setStagingItem] = useState(null);
   const [purchasingPlanId, setPurchasingPlanId] = useState(null);
   const [purchasingAddOnId, setPurchasingAddOnId] = useState(null);
 
@@ -163,6 +174,31 @@ export default function Subscription() {
 
   const currentSubscription = subscriptions?.[0];
 
+  const handleActivateDemo = (item) => {
+    if (!item || item.type === 'plan') {
+      const planId = item?.id || 'premium';
+      purchaseManager.activateDemoSubscription(planId);
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+      setShowStagingModal(false);
+      toast({
+        title: 'Demo Access Activated! 🎉',
+        description: `Unlocked MatchaMD+ (${planId}) in staging/demo mode.`
+      });
+      navigate(createPageUrl('Profile'), { replace: true });
+    } else if (item.type === 'addon') {
+      purchaseManager.activateDemoAddOn(item.id, item.name);
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
+      setShowStagingModal(false);
+      toast({
+        title: 'Content Unlocked! 🎉',
+        description: `Successfully unlocked ${item.name} in demo mode.`
+      });
+      if (item.route) {
+        navigate(createPageUrl(item.route));
+      }
+    }
+  };
+
   const purchaseMutation = useMutation({
     /** @param {string} planId */
     mutationFn: async (planId) => {
@@ -190,12 +226,10 @@ export default function Subscription() {
         navigate(createPageUrl('Profile'), { replace: true });
       }
     },
-    onError: (error) => {
-      toast({
-        title: 'Subscription Error',
-        description: error.message || 'Could not process subscription.',
-        variant: 'destructive'
-      });
+    onError: (error, planId) => {
+      console.warn('Purchase plan error (Stripe staging):', error);
+      setStagingItem({ type: 'plan', id: planId });
+      setShowStagingModal(true);
     },
     onSettled: () => {
       setPurchasingPlanId(null);
@@ -218,12 +252,10 @@ export default function Subscription() {
         navigate(createPageUrl(addOn.route));
       }
     },
-    onError: (error) => {
-      toast({
-        title: 'Purchase Error',
-        description: error.message || 'Could not process purchase.',
-        variant: 'destructive'
-      });
+    onError: (error, addOn) => {
+      console.warn('Purchase add-on error (Stripe staging):', error);
+      setStagingItem({ type: 'addon', id: addOn.id, name: addOn.name, route: addOn.route });
+      setShowStagingModal(true);
     },
     onSettled: () => {
       setPurchasingAddOnId(null);
@@ -469,6 +501,62 @@ export default function Subscription() {
           </p>
         </Card>
       </main>
+
+      {/* Stripe Staging & Demo Mode Modal */}
+      <Dialog open={showStagingModal} onOpenChange={setShowStagingModal}>
+        <DialogContent className="rounded-3xl max-w-md p-6">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
+                  Payment Gateway Notice
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-500">
+                  Staging Mode & Test Access
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-3.5 my-2">
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              MatchaMD production payment processing is currently in staging mode while merchant banking accounts and live webhooks are being connected.
+            </p>
+
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50/80 to-purple-50/60 dark:from-indigo-950/30 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/60">
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="text-xs font-bold text-indigo-950 dark:text-indigo-200">
+                  Instant Demo Access Available
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                You can activate complete MatchaMD+ features in Demo Mode right now to preview and explore all premium content.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2.5 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowStagingModal(false)}
+              className="flex-1 rounded-xl text-xs"
+            >
+              Dismiss
+            </Button>
+            <Button
+              onClick={() => handleActivateDemo(stagingItem)}
+              className="flex-1 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-semibold shadow-md shadow-indigo-500/20"
+            >
+              <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+              Unlock in Demo Mode
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <BottomNav />
     </div>
