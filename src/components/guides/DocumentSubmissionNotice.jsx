@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ShieldCheck, ExternalLink, Info, FileText, CheckCircle2, ArrowUpRight } from 'lucide-react';
+import { ShieldCheck, ArrowUpRight } from 'lucide-react';
 
 export default function DocumentSubmissionNotice({ compact = false }) {
   return (

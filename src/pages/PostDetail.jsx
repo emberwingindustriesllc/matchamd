@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Heart, MessageCircle, Award, Send } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -24,8 +25,9 @@ const categoryColors = {
 
 export default function PostDetail() {
   const queryClient = useQueryClient();
-  const urlParams = new URLSearchParams(window.location.search);
-  const postId = urlParams.get('id');
+  const { id: paramId } = useParams();
+  const [searchParams] = useSearchParams();
+  const postId = paramId || searchParams.get('id');
   const [newComment, setNewComment] = useState('');
 
   const { user } = useAuth();

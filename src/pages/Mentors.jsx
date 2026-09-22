@@ -32,7 +32,6 @@ import {
   Stethoscope, 
   MessageSquare,
   CheckCircle2,
-  Star,
   Filter,
   X,
   Users,

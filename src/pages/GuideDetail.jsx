@@ -30,7 +30,6 @@ import {
   Lightbulb,
   FileText,
   Zap,
-  Share2,
   HelpCircle,
   ChevronDown,
   ChevronUp,
@@ -43,16 +42,17 @@ import {
 import { createPageUrl } from '@/utils';
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getGuideContent } from '@/data/guideContent';
 import { normalizePathwayKey } from '@/data/pathways';
 
 export default function GuideDetail() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const urlParams = new URLSearchParams(window.location.search);
-  const guideId = urlParams.get('id') || 'ecfmg_pathways';
-  const pathway = normalizePathwayKey(urlParams.get('pathway') || 'residency');
+  const { id: paramId } = useParams();
+  const [searchParams] = useSearchParams();
+  const guideId = paramId || searchParams.get('id') || 'ecfmg_pathways';
+  const pathway = normalizePathwayKey(searchParams.get('pathway') || 'residency');
 
   const [notes, setNotes] = useState('');
   const [showShareDialog, setShowShareDialog] = useState(false);

@@ -50,7 +50,7 @@ const AuthenticatedRoutes = () => (
       } />
       {Object.entries(Pages)
         .filter(([path]) => path !== 'Login')
-        .map(([path, Page]) => (
+        .flatMap(([path, Page]) => [
           <Route
             key={path}
             path={`/${path}`}
@@ -59,8 +59,17 @@ const AuthenticatedRoutes = () => (
                 <Page />
               </LayoutWrapper>
             }
+          />,
+          <Route
+            key={`${path}-id`}
+            path={`/${path}/:id`}
+            element={
+              <LayoutWrapper currentPageName={path}>
+                <Page />
+              </LayoutWrapper>
+            }
           />
-        ))}
+        ])}
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   </RequireAuth>

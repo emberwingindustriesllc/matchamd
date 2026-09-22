@@ -402,13 +402,13 @@ export default function Dashboard() {
 
         {/* Premium Feature Teaser */}
         <PremiumFeatureCard
-          title="Advanced Mentorship"
-          description="Get personalized 1-on-1 guidance from verified mentors who've successfully matched"
+          title="MatchaMD Pro & Application Review"
+          description="Unlock complete program intelligence, ERAS budget planning, and physician review"
           features={[
-            'Monthly video sessions with matched physicians',
-            'Personal statement review & feedback',
-            'Mock interviews with specialty-specific mentors',
-            'Priority access to limited mentorship slots'
+            'Full 50-State ACGME Residency & Fellowship Database',
+            'Real Verified Hospital Observerships (USCE) Directory',
+            'STAR Behavioral Interview Studio & Flashcard Prep',
+            'Physician Personal Statement & CV Review (Async 5-7d SLA)'
           ]}
           isPremium={true}
           unlocked={false}

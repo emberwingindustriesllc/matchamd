@@ -18,7 +18,6 @@ import {
   Crown, 
   Star,
   Sparkles,
-  Trophy,
   BookOpen,
   MessageSquare,
   TrendingUp,
@@ -30,12 +29,8 @@ import {
   Clock,
   Compass,
   FileText,
-  Send,
   Users,
-  Video,
-  Database,
-  Calculator,
-  FileDown
+  Video
 } from 'lucide-react';
 import {
   Dialog,

@@ -1,7 +1,6 @@
 import React from 'react';
-import { Check, X, Zap, Crown, Sparkles, Database, FileSpreadsheet, Calculator, FileDown, ShieldCheck, Clock } from 'lucide-react';
+import { Check, X, Zap, Crown, Sparkles } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 
 const features = [
   { 

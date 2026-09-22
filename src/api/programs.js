@@ -1,6 +1,9 @@
 import { supabase } from './supabaseClient';
 import { normalizeProgramCounts, sanitizeIlikeTerm } from '@/lib/programSearch';
 import { expandMedicalSearchTerms } from '@/lib/medicalSynonyms';
+import { mockResidencyPrograms } from '@/data/mockResidencyPrograms';
+import { mockFellowships } from '@/data/mockFellowships';
+import { mockObserverships } from '@/data/mockObserverships';
 
 /**
  * Programs API - Community-driven program intelligence
@@ -222,26 +225,50 @@ export async function deleteSavedSearch(id) {
 }
 
 export async function fetchProgramById(id) {
-  const { data, error } = await supabase
-    .from('programs')
-    .select(
+  try {
+    const { data, error } = await supabase
+      .from('programs')
+      .select(
+        `
+        *,
+        program_notes (
+          *,
+          user:auth.users(email, user_metadata)
+        ),
+        scam_reports (
+          *,
+          user:auth.users(email, user_metadata)
+        )
       `
-      *,
-      program_notes (
-        *,
-        user:auth.users(email, user_metadata)
-      ),
-      scam_reports (
-        *,
-        user:auth.users(email, user_metadata)
       )
-    `
-    )
-    .eq('id', id)
-    .single();
+      .eq('id', id)
+      .single();
 
-  if (error) throw error;
-  return normalizeProgramCounts(data);
+    if (!error && data) {
+      return normalizeProgramCounts(data);
+    }
+  } catch (err) {
+    console.warn('Supabase fetchProgramById query failed, checking local dataset:', err);
+  }
+
+  // Fallback to local datasets
+  const allLocal = [
+    ...mockResidencyPrograms.map(p => ({ ...p, program_type: p.program_type || 'residency' })),
+    ...mockFellowships.map(p => ({ ...p, program_type: p.program_type || 'fellowship' })),
+    ...mockObserverships.map(p => ({ ...p, program_type: p.program_type || 'observership', name: p.name || p.title }))
+  ];
+
+  const found = allLocal.find(p => String(p.id) === String(id) || p.name === id || p.program_name === id);
+  if (found) {
+    return normalizeProgramCounts({
+      ...found,
+      name: found.name || found.program_name || found.title,
+      program_notes: [],
+      scam_reports: []
+    });
+  }
+
+  throw new Error('Program not found');
 }
 
 export async function createProgram(program) {

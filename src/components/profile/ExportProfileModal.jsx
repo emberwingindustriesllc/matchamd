@@ -13,10 +13,7 @@ import {
   Printer,
   Copy,
   Check,
-  Share2,
-  Sparkles,
-  Database,
-  ShieldCheck
+  Database
 } from 'lucide-react';
 import {
   generateProfileSummaryText,

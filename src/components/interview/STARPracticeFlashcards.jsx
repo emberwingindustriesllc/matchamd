@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { 
   Sparkles, 
@@ -14,12 +13,9 @@ import {
   CheckCircle2, 
   BookOpen, 
   Save, 
-  Download, 
-  Eye, 
-  HelpCircle,
+  Download,
   Lightbulb,
-  FileText,
-  Copy
+  FileText
 } from 'lucide-react';
 
 export const STAR_QUESTIONS = [

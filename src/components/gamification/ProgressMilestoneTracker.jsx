@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Circle, Trophy, Award, Sparkles, Stethoscope, FileCheck } from 'lucide-react';
+import { CheckCircle2, Trophy, Award, Sparkles, Stethoscope, FileCheck } from 'lucide-react';
 
 export default function ProgressMilestoneTracker({ completedCount = 0, totalCount = 1 }) {
   const safeTotal = totalCount > 0 ? totalCount : 1;

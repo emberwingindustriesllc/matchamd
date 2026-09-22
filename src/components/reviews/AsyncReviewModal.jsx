@@ -25,8 +25,7 @@ import {
   Send, 
   Clock, 
   CheckCircle2, 
-  ShieldCheck, 
-  Sparkles,
+  ShieldCheck,
   Link as LinkIcon
 } from 'lucide-react';
 
