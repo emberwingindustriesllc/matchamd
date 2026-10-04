@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import { createPageUrl, isReviewerAccount } from '@/utils';
 import { useToast } from '@/components/ui/use-toast';
 import { purchaseManager } from '@/lib/purchaseManager';
 import Header from '@/components/navigation/Header';
@@ -160,6 +160,9 @@ export default function Subscription() {
   const { data: subscriptions = [] } = useQuery({
     queryKey: ['subscription', user?.id],
     queryFn: async () => {
+      if (isReviewerAccount(user)) {
+        return [{ id: 'reviewer-sub', plan: 'pro', status: 'active', user_id: user?.id }];
+      }
       let dbSub = [];
       if (user?.id) {
         try {
@@ -181,6 +184,13 @@ export default function Subscription() {
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', user?.id],
     queryFn: async () => {
+      if (isReviewerAccount(user)) {
+        return [
+          { content_id: 'quiz_usmle' },
+          { content_id: 'interview_premium' },
+          { content_id: 'specialty_surgery' }
+        ];
+      }
       let dbPurchases = [];
       if (user?.id) {
         try {

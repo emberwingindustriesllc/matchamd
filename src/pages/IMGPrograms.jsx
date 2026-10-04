@@ -107,6 +107,7 @@ export default function IMGPrograms() {
   const [selectedFormat, setSelectedFormat] = useState('all');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [fitFilter, setFitFilter] = useState(false);
+  const [highImgOnly, setHighImgOnly] = useState(false);
   const [sortBy, setSortBy] = useState('fit');
   
   // Detail dialog state
@@ -138,9 +139,17 @@ export default function IMGPrograms() {
   const { data: profiles } = useQuery({
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user?.id);
-      if (error) throw error;
-      return data || [];
+      try {
+        const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user?.id);
+        if (error) {
+          console.warn('Error loading user_profiles:', error);
+          return [];
+        }
+        return data || [];
+      } catch (err) {
+        console.warn('Network or Supabase exception in user_profiles:', err);
+        return [];
+      }
     },
     enabled: !!user?.id
   });
@@ -331,6 +340,7 @@ export default function IMGPrograms() {
     setSelectedSize('all');
     setSelectedFormat('all');
     setFitFilter(false);
+    setHighImgOnly(false);
     setSortBy('fit');
   };
 
@@ -371,13 +381,21 @@ export default function IMGPrograms() {
     }
   };
 
-  // Query Residency Programs
+  // Query Residency Programs with try/catch guard
   const { data: dbPrograms = [], isLoading: isProgramsLoading } = useQuery({
     queryKey: ['residencyPrograms'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('residency_programs').select('*');
-      if (error) throw error;
-      return data || [];
+      try {
+        const { data, error } = await supabase.from('residency_programs').select('*');
+        if (error) {
+          console.warn('Supabase query error on residency_programs:', error);
+          return [];
+        }
+        return data || [];
+      } catch (err) {
+        console.warn('Network or database exception loading residency_programs:', err);
+        return [];
+      }
     }
   });
 
@@ -389,23 +407,31 @@ export default function IMGPrograms() {
   const { data: rpcPrograms = [] } = useQuery({
     queryKey: ['rpcPrograms', selectedSpecialties, selectedLocations, debouncedSearch, rpcFilters],
     queryFn: async () => {
-      const state = {
-        programTypes: ['residency', 'fellowship', 'observership', 'research', 'elective'],
-        specialties: selectedSpecialties,
-        locations: selectedLocations,
-        searchQuery: debouncedSearch,
-        filters: rpcFilters,
-        pagination: { limit: 100, offset: 0 }
-      };
-      const { data, error } = await multiSearch(state);
-      if (error) throw error;
-      return (data || []).map(p => ({
-        ...p,
-        program_name: p.program_name || p.name,
-        visa_j1: p.visa_j1 ?? p.j1_visa,
-        visa_h1b: p.visa_h1b ?? p.h1b_visa,
-        specialty: Array.isArray(p.specialty) ? p.specialty : (p.specialty ? [p.specialty] : [])
-      }));
+      try {
+        const state = {
+          programTypes: ['residency', 'fellowship', 'observership', 'research', 'elective'],
+          specialties: selectedSpecialties,
+          locations: selectedLocations,
+          searchQuery: debouncedSearch,
+          filters: rpcFilters,
+          pagination: { limit: 100, offset: 0 }
+        };
+        const { data, error } = await multiSearch(state);
+        if (error) {
+          console.warn('multiSearch query error:', error);
+          return [];
+        }
+        return (data || []).map(p => ({
+          ...p,
+          program_name: p.program_name || p.name,
+          visa_j1: p.visa_j1 ?? p.j1_visa,
+          visa_h1b: p.visa_h1b ?? p.h1b_visa,
+          specialty: Array.isArray(p.specialty) ? p.specialty : (p.specialty ? [p.specialty] : [])
+        }));
+      } catch (err) {
+        console.warn('Network or multiSearch exception:', err);
+        return [];
+      }
     },
     enabled: hasActiveRemoteCriteria
   });
@@ -439,11 +465,19 @@ export default function IMGPrograms() {
   const fitMap = useMemo(() => buildFitScoreMap(activeProgramList, profile), [activeProgramList, profile]);
 
   const filteredPrograms = useMemo(() => {
-    const filtered = filterIMGPrograms(activeProgramList, searchFilters, profile);
-    return sortPrograms(filtered, sortBy, fitMap);
-  }, [activeProgramList, searchFilters, profile, sortBy, fitMap]);
+    try {
+      let filtered = filterIMGPrograms(activeProgramList, searchFilters, profile);
+      if (highImgOnly) {
+        filtered = filtered.filter(p => Number(p.img_percentage || 0) >= 50);
+      }
+      return sortPrograms(filtered, sortBy, fitMap);
+    } catch (err) {
+      console.warn('Error filtering programs:', err);
+      return [];
+    }
+  }, [activeProgramList, searchFilters, profile, sortBy, fitMap, highImgOnly]);
 
-  // Fellowships — Supabase RPC via multiSearch + Verified Fellowships fallback
+  // Fellowships — Supabase RPC via multiSearch + Verified Fellowships fallback with try/catch guard
   const { data: fellowshipPrograms = [], isLoading: isFellowshipsLoading } = useQuery({
     queryKey: ['fellowships', debouncedSearch, selectedVisa],
     queryFn: async () => {
@@ -475,12 +509,13 @@ export default function IMGPrograms() {
         const missingVerified = mockFellowships.filter(mf => !dbItems.some(di => di.acgme_program_number === mf.acgme_program_number));
         return [...dbItems, ...missingVerified];
       } catch (err) {
+        console.warn('Network or multiSearch exception on fellowships:', err);
         return mockFellowships;
       }
     }
   });
 
-  // Observerships — Supabase RPC via multiSearch + Real Verified Observerships dataset
+  // Observerships — Supabase RPC via multiSearch + Real Verified Observerships dataset with try/catch guard
   const { data: observershipPrograms = [], isLoading: isObservershipsLoading } = useQuery({
     queryKey: ['observerships', debouncedSearch],
     queryFn: async () => {
@@ -511,34 +546,43 @@ export default function IMGPrograms() {
         const missingVerified = mockObserverships.filter(mo => !dbItems.some(di => di.id === mo.id));
         return [...dbItems, ...missingVerified];
       } catch (err) {
+        console.warn('Network or multiSearch exception on observerships:', err);
         return mockObserverships;
       }
     }
   });
 
-  // Medical Schools — Supabase RPC via multiSearch (program_type = 'medical_school')
+  // Medical Schools — Supabase RPC via multiSearch with try/catch guard
   const { data: medSchoolPrograms = [], isLoading: isMedSchoolsLoading } = useQuery({
     queryKey: ['medschools', debouncedSearch],
     queryFn: async () => {
-      const { data, error } = await multiSearch({
-        programTypes: ['medical_school'],
-        specialties: [],
-        locations: [],
-        searchQuery: debouncedSearch,
-        filters: {
-          acgmeAccredited: null,
-          ecfmgPathway: null,
-          j1Visa: null,
-          h1bVisa: null,
-        },
-        pagination: { limit: 200, offset: 0 }
-      });
-      if (error) throw error;
-      return (data || []).map(p => ({
-        ...p,
-        school_name: p.name,
-        specialty: Array.isArray(p.specialty) ? p.specialty.join('; ') : p.specialty || ''
-      }));
+      try {
+        const { data, error } = await multiSearch({
+          programTypes: ['medical_school'],
+          specialties: [],
+          locations: [],
+          searchQuery: debouncedSearch,
+          filters: {
+            acgmeAccredited: null,
+            ecfmgPathway: null,
+            j1Visa: null,
+            h1bVisa: null,
+          },
+          pagination: { limit: 200, offset: 0 }
+        });
+        if (error) {
+          console.warn('multiSearch medschool query error:', error);
+          return [];
+        }
+        return (data || []).map(p => ({
+          ...p,
+          school_name: p.name,
+          specialty: Array.isArray(p.specialty) ? p.specialty.join('; ') : p.specialty || ''
+        }));
+      } catch (err) {
+        console.warn('Network or multiSearch exception on medschools:', err);
+        return [];
+      }
     }
   });
 
@@ -623,7 +667,7 @@ export default function IMGPrograms() {
     });
   }, [medSchoolPrograms, debouncedSearch]);
 
-  const filtersActive = hasActiveIMGFilters(searchFilters) || sortBy !== 'fit';
+  const filtersActive = hasActiveIMGFilters(searchFilters) || sortBy !== 'fit' || highImgOnly;
 
 
   // Saved Programs Map
@@ -758,30 +802,30 @@ export default function IMGPrograms() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:from-slate-900 dark:to-slate-800 pb-24 text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 pb-24 text-slate-900 dark:text-slate-100">
       <Header title="Match Journey & Programs" showBack={false} />
 
       <main className="px-4 py-6 max-w-4xl mx-auto space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 w-full bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl p-1 mb-6 border border-slate-200 dark:border-slate-700 shadow-inner">
-            <TabsTrigger value="search" className="rounded-xl py-2.5 font-semibold text-sm">Directory</TabsTrigger>
-            <TabsTrigger value="saved" className="rounded-xl py-2.5 font-semibold text-sm">Checklist</TabsTrigger>
-            <TabsTrigger value="interviews" className="rounded-xl py-2.5 font-semibold text-sm">Interviews</TabsTrigger>
-            <TabsTrigger value="ranklist" className="rounded-xl py-2.5 font-semibold text-sm">Rank List</TabsTrigger>
-            <TabsTrigger value="advisor" className="rounded-xl py-2.5 font-semibold text-sm">Advisors</TabsTrigger>
+          <TabsList className="grid grid-cols-5 w-full bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl p-1 mb-6 border border-slate-200/80 dark:border-slate-700 shadow-inner">
+            <TabsTrigger value="search" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#1B4332] dark:data-[state=active]:text-[#D8F3DC]">Directory</TabsTrigger>
+            <TabsTrigger value="saved" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#1B4332] dark:data-[state=active]:text-[#D8F3DC]">Checklist</TabsTrigger>
+            <TabsTrigger value="interviews" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#1B4332] dark:data-[state=active]:text-[#D8F3DC]">Interviews</TabsTrigger>
+            <TabsTrigger value="ranklist" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#1B4332] dark:data-[state=active]:text-[#D8F3DC]">Rank List</TabsTrigger>
+            <TabsTrigger value="advisor" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#1B4332] dark:data-[state=active]:text-[#D8F3DC]">Advisors</TabsTrigger>
           </TabsList>
 
           {/* Directory Tab */}
           <TabsContent value="search" className="space-y-6">
             {/* Intro Header */}
-            <Card className="p-6 bg-gradient-to-br from-indigo-50 via-purple-50 to-white dark:from-indigo-950/20 dark:to-slate-900 border-indigo-200 dark:border-indigo-900/60 rounded-3xl">
+            <Card className="p-6 bg-gradient-to-br from-[#1B4332]/10 via-[#D8F3DC]/30 to-white dark:from-[#1B4332]/25 dark:to-slate-900 border-[#1B4332]/20 dark:border-[#1B4332]/40 rounded-2xl shadow-xs">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-200 dark:shadow-none">
+                  <div className="w-12 h-12 rounded-2xl bg-[#1B4332] flex items-center justify-center flex-shrink-0 shadow-md">
                     <Globe className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold mb-1">Global Medical Opportunities Directory</h2>
+                    <h2 className="text-xl font-bold mb-1 text-slate-900 dark:text-white">Global Medical Opportunities Directory</h2>
                     <p className="text-slate-600 dark:text-slate-400 text-sm">
                       Explore US Residencies, Fellowships, Clinical Observerships/Rotations, and International Medical Schools.
                     </p>
@@ -790,7 +834,7 @@ export default function IMGPrograms() {
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={() => setShowAddProgramModal(true)}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md"
+                    className="bg-[#1B4332] hover:bg-[#1B4332]/90 text-white rounded-xl shadow-xs font-semibold"
                   >
                     <Plus className="w-4 h-4 mr-1.5" />
                     Submit / Add Program
@@ -808,13 +852,13 @@ export default function IMGPrograms() {
             />
 
             {/* Category Selector Tabs */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-200/60 dark:bg-slate-800/80 p-1.5 rounded-2xl">
               <button
                 type="button"
                 onClick={() => setCategoryTab('residencies')}
                 className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
                   categoryTab === 'residencies'
-                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    ? 'bg-white dark:bg-slate-900 text-[#1B4332] dark:text-[#D8F3DC] shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
@@ -827,7 +871,7 @@ export default function IMGPrograms() {
                 onClick={() => setCategoryTab('fellowships')}
                 className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
                   categoryTab === 'fellowships'
-                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    ? 'bg-white dark:bg-slate-900 text-[#1B4332] dark:text-[#D8F3DC] shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
@@ -840,7 +884,7 @@ export default function IMGPrograms() {
                 onClick={() => setCategoryTab('observerships')}
                 className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
                   categoryTab === 'observerships'
-                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    ? 'bg-white dark:bg-slate-900 text-[#1B4332] dark:text-[#D8F3DC] shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
@@ -850,7 +894,155 @@ export default function IMGPrograms() {
             </div>
 
             {/* Filters Container */}
-            <div className="space-y-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="space-y-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+              {/* Quick Filter Chips for Instant 1-Click Filtering */}
+              <div className="space-y-2 pb-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#1B4332] dark:bg-[#D8F3DC]"></span>
+                    <span>Quick Filter Chips</span>
+                  </div>
+                  {filtersActive && (
+                    <button
+                      type="button"
+                      onClick={clearAllFilters}
+                      className="text-xs text-[#1B4332] dark:text-[#D8F3DC] hover:underline font-semibold"
+                    >
+                      Reset filters
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-hide py-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedVisa(selectedVisa === 'j1' ? 'all' : 'j1')}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap border ${
+                      selectedVisa === 'j1'
+                        ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-xs dark:bg-[#D8F3DC] dark:text-[#1B4332] dark:border-[#D8F3DC]'
+                        : 'bg-[#D8F3DC]/40 text-[#1B4332] border-[#1B4332]/20 hover:bg-[#D8F3DC] dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                    }`}
+                  >
+                    🛂 J-1 Visa
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedVisa(selectedVisa === 'h1b' ? 'all' : 'h1b')}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap border ${
+                      selectedVisa === 'h1b'
+                        ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-xs dark:bg-[#D8F3DC] dark:text-[#1B4332] dark:border-[#D8F3DC]'
+                        : 'bg-[#D8F3DC]/40 text-[#1B4332] border-[#1B4332]/20 hover:bg-[#D8F3DC] dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                    }`}
+                  >
+                    💼 H-1B Visa
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setHighImgOnly(!highImgOnly)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap border ${
+                      highImgOnly
+                        ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-xs dark:bg-[#D8F3DC] dark:text-[#1B4332] dark:border-[#D8F3DC]'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[#1B4332]/30 hover:bg-[#D8F3DC]/20'
+                    }`}
+                  >
+                    🌟 High IMG Match (≥50%)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const spec = 'Internal Medicine';
+                      setSelectedSpecialties(prev => 
+                        prev.includes(spec) ? prev.filter(s => s !== spec) : [...prev, spec]
+                      );
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap border ${
+                      selectedSpecialties.includes('Internal Medicine')
+                        ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-xs dark:bg-[#D8F3DC] dark:text-[#1B4332] dark:border-[#D8F3DC]'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[#1B4332]/30 hover:bg-[#D8F3DC]/20'
+                    }`}
+                  >
+                    🩺 Internal Medicine
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const spec = 'Family Medicine';
+                      setSelectedSpecialties(prev => 
+                        prev.includes(spec) ? prev.filter(s => s !== spec) : [...prev, spec]
+                      );
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap border ${
+                      selectedSpecialties.includes('Family Medicine')
+                        ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-xs dark:bg-[#D8F3DC] dark:text-[#1B4332] dark:border-[#D8F3DC]'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[#1B4332]/30 hover:bg-[#D8F3DC]/20'
+                    }`}
+                  >
+                    🩺 Family Medicine
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const spec = 'Pediatrics';
+                      setSelectedSpecialties(prev => 
+                        prev.includes(spec) ? prev.filter(s => s !== spec) : [...prev, spec]
+                      );
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap border ${
+                      selectedSpecialties.includes('Pediatrics')
+                        ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-xs dark:bg-[#D8F3DC] dark:text-[#1B4332] dark:border-[#D8F3DC]'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[#1B4332]/30 hover:bg-[#D8F3DC]/20'
+                    }`}
+                  >
+                    👶 Pediatrics
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const spec = 'Surgery';
+                      setSelectedSpecialties(prev => 
+                        prev.includes(spec) ? prev.filter(s => s !== spec) : [...prev, spec]
+                      );
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap border ${
+                      selectedSpecialties.includes('Surgery')
+                        ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-xs dark:bg-[#D8F3DC] dark:text-[#1B4332] dark:border-[#D8F3DC]'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[#1B4332]/30 hover:bg-[#D8F3DC]/20'
+                    }`}
+                  >
+                    ✂️ Surgery
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedFormat(selectedFormat === 'Virtual' ? 'all' : 'Virtual')}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap border ${
+                      selectedFormat === 'Virtual'
+                        ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-xs dark:bg-[#D8F3DC] dark:text-[#1B4332] dark:border-[#D8F3DC]'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[#1B4332]/30 hover:bg-[#D8F3DC]/20'
+                    }`}
+                  >
+                    💻 Virtual Only
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFitFilter(!fitFilter)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap border ${
+                      fitFilter
+                        ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-xs dark:bg-[#D8F3DC] dark:text-[#1B4332] dark:border-[#D8F3DC]'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[#1B4332]/30 hover:bg-[#D8F3DC]/20'
+                    }`}
+                  >
+                    🎯 Profile Fit Only
+                  </button>
+                </div>
+              </div>
+
               {/* Multi-Search Chip Search Bar */}
               <ChipSearchBar
                 specialties={selectedSpecialties}
@@ -1050,17 +1242,17 @@ export default function IMGPrograms() {
               {categoryTab === 'residencies' && (
                 isProgramsLoading ? (
                   <div className="text-center py-12">
-                    <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                    <div className="w-8 h-8 border-3 border-[#1B4332] border-t-transparent rounded-full animate-spin mx-auto" />
                   </div>
                 ) : filteredPrograms.length === 0 ? (
-                  <Card className="p-12 text-center rounded-3xl border-slate-200 dark:border-slate-700">
+                  <Card className="p-12 text-center rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                     <GraduationCap className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
-                    <p className="text-slate-700 dark:text-slate-300 font-medium mb-1">No residency programs match</p>
+                    <p className="text-slate-800 dark:text-slate-200 font-semibold mb-1 text-base">No programs found matching these criteria</p>
                     <p className="text-slate-500 text-sm mb-4">
                       Try a broader search, turn off the fit filter, or clear all filters.
                     </p>
                     {filtersActive && (
-                      <Button onClick={clearAllFilters} className="rounded-xl">
+                      <Button onClick={clearAllFilters} className="rounded-xl bg-[#1B4332] hover:bg-[#1B4332]/90 text-white font-semibold">
                         Clear all filters
                       </Button>
                     )}
@@ -1075,16 +1267,16 @@ export default function IMGPrograms() {
                         animate={{ opacity: 1, y: 0 }}
                       >
                         <Card 
-                          className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 space-y-4"
+                          className="p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-[#1B4332]/40 dark:hover:border-[#D8F3DC]/40 bg-white dark:bg-slate-900 space-y-3.5 shadow-xs"
                           onClick={() => setSelectedProgram(prog)}
                         >
-                          <div className="flex items-start justify-between gap-4 mb-3">
+                          <div className="flex items-start justify-between gap-4 mb-2">
                             <div className="flex-1 min-w-0">
                               <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
                                 {prog.program_name}
                               </h3>
                               <p className="text-sm text-slate-500 flex items-center gap-1">
-                                <Building className="w-4 h-4 flex-shrink-0" />
+                                <Building className="w-4 h-4 flex-shrink-0 text-slate-400" />
                                 <span className="truncate">{prog.institution}</span>
                               </p>
                             </div>
@@ -1103,11 +1295,11 @@ export default function IMGPrograms() {
 
                               {/* Fit Score Indicator */}
                               <Badge 
-                                className={`font-bold px-2 py-0.5 text-xs ${
+                                className={`font-bold px-2.5 py-0.5 text-xs rounded-full ${
                                   fit.visaIssue 
                                     ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400' 
                                     : fit.score >= 90 
-                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                      ? 'bg-[#D8F3DC] text-[#1B4332] border-[#1B4332]/20 dark:bg-[#1B4332]/40 dark:text-[#D8F3DC]'
                                       : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
                                 }`}
                                 variant="outline"
@@ -1117,29 +1309,36 @@ export default function IMGPrograms() {
                             </div>
                           </div>
 
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
                               {prog.specialty}
-                            </Badge>
-                            <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                              <MapPin className="w-3 h-3 mr-1 text-slate-400" />
+                            </span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
+                              <MapPin className="w-3 h-3 mr-0.5 text-slate-400" />
                               {prog.city}, {prog.state}
-                            </Badge>
-                            <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                            </span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
                               Format: {prog.interview_format}
-                            </Badge>
-                            <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                            </span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
                               Size: {prog.program_size} residents
-                            </Badge>
+                            </span>
+                            {/* Distinct Visa Sponsorship Badge Pills */}
                             {prog.visa_j1 && (
-                              <Badge className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400" variant="outline">
-                                Sponsors J-1
-                              </Badge>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#D8F3DC] text-[#1B4332] dark:bg-[#1B4332]/40 dark:text-[#D8F3DC] border border-[#1B4332]/10 shadow-2xs">
+                                🛂 Sponsors J-1
+                              </span>
                             )}
                             {prog.visa_h1b && (
-                              <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-400" variant="outline">
-                                Sponsors H-1B
-                              </Badge>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-[#1B4332] dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300/30 shadow-2xs">
+                                💼 Sponsors H-1B
+                              </span>
+                            )}
+                            {/* Distinct IMG Match Rate Badge Pill */}
+                            {prog.img_percentage != null && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#1B4332] text-white dark:bg-[#D8F3DC] dark:text-[#1B4332] shadow-2xs">
+                                🌟 IMG Match: {Math.round(prog.img_percentage)}%
+                              </span>
                             )}
                           </div>
 
@@ -1156,6 +1355,7 @@ export default function IMGPrograms() {
                               <Badge variant="outline" className="bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 font-bold px-1.5 py-0.5">
                                 {prog.graduation_rate || '98%'}
                               </Badge>
+
                             </div>
                             {prog.step2_score_min && (
                               <div>
@@ -1189,17 +1389,17 @@ export default function IMGPrograms() {
               {categoryTab === 'fellowships' && (
                 isFellowshipsLoading ? (
                   <div className="text-center py-12">
-                    <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                    <div className="w-8 h-8 border-3 border-[#1B4332] border-t-transparent rounded-full animate-spin mx-auto" />
                   </div>
                 ) : filteredFellowships.length === 0 ? (
-                  <Card className="p-12 text-center rounded-3xl border-slate-200 dark:border-slate-700">
+                  <Card className="p-12 text-center rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                     <Stethoscope className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
-                    <p className="text-slate-700 dark:text-slate-300 font-medium mb-1">No fellowship programs found</p>
+                    <p className="text-slate-800 dark:text-slate-200 font-semibold mb-1 text-base">No programs found matching these criteria</p>
                     <p className="text-slate-500 text-sm mb-4">
                       Try a broader search or clear all filters.
                     </p>
                     {filtersActive && (
-                      <Button onClick={clearAllFilters} className="rounded-xl">
+                      <Button onClick={clearAllFilters} className="rounded-xl bg-[#1B4332] hover:bg-[#1B4332]/90 text-white font-semibold">
                         Clear all filters
                       </Button>
                     )}
@@ -1212,16 +1412,16 @@ export default function IMGPrograms() {
                       animate={{ opacity: 1, y: 0 }}
                     >
                       <Card
-                        className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 space-y-4"
+                        className="p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-[#1B4332]/40 dark:hover:border-[#D8F3DC]/40 bg-white dark:bg-slate-900 space-y-3.5 shadow-xs"
                         onClick={() => setSelectedProgram(prog)}
                       >
-                        <div className="flex items-start justify-between gap-4 mb-3">
+                        <div className="flex items-start justify-between gap-4 mb-2">
                           <div className="flex-1 min-w-0">
                             <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
                               {prog.program_name}
                             </h3>
                             <p className="text-sm text-slate-500 flex items-center gap-1">
-                              <Building className="w-4 h-4 flex-shrink-0" />
+                              <Building className="w-4 h-4 flex-shrink-0 text-slate-400" />
                               <span className="truncate">{prog.institution}</span>
                             </p>
                           </div>
@@ -1237,9 +1437,9 @@ export default function IMGPrograms() {
                               <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
                             </button>
                             <Badge
-                              className={`font-bold px-2 py-0.5 text-xs ${
+                              className={`font-bold px-2.5 py-0.5 text-xs rounded-full ${
                                 prog.visa_j1
-                                  ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400'
+                                  ? 'bg-[#D8F3DC] text-[#1B4332] border-[#1B4332]/20 dark:bg-[#1B4332]/40 dark:text-[#D8F3DC]'
                                   : fit.score >= 90
                                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400'
                                     : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
@@ -1251,28 +1451,28 @@ export default function IMGPrograms() {
                           </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
                             {prog.specialty}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
-                            <MapPin className="w-3 h-3 mr-1 text-slate-400" />
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
+                            <MapPin className="w-3 h-3 mr-0.5 text-slate-400" />
                             {prog.city}, {prog.state}
-                          </Badge>
+                          </span>
                           {prog.visa_j1 && (
-                            <Badge className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400" variant="outline">
-                              Sponsors J-1
-                            </Badge>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#D8F3DC] text-[#1B4332] dark:bg-[#1B4332]/40 dark:text-[#D8F3DC] border border-[#1B4332]/10 shadow-2xs">
+                              🛂 Sponsors J-1
+                            </span>
                           )}
                           {prog.visa_h1b && (
-                            <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-400" variant="outline">
-                              Sponsors H-1B
-                            </Badge>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-[#1B4332] dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300/30 shadow-2xs">
+                              💼 Sponsors H-1B
+                            </span>
                           )}
                           {prog.is_acgme_accredited && (
-                            <Badge className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400" variant="outline">
-                              ACGME Accredited
-                            </Badge>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-300/30">
+                              ✓ ACGME Accredited
+                            </span>
                           )}
                         </div>
 
@@ -1280,7 +1480,7 @@ export default function IMGPrograms() {
                           {prog.website && (
                             <div>
                               <span className="font-semibold text-slate-700 dark:text-slate-350">Website:</span>{' '}
-                              <a href={prog.website} target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                              <a href={prog.website} target="_blank" rel="noopener noreferrer" className="text-[#1B4332] dark:text-[#D8F3DC] font-medium hover:underline">
                                 {prog.website.replace(/^https?:\/\//, '')}
                               </a>
                             </div>
@@ -1314,14 +1514,14 @@ export default function IMGPrograms() {
                     <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
                   </div>
                 ) : filteredObserverships.length === 0 ? (
-                  <Card className="p-12 text-center rounded-3xl border-slate-200 dark:border-slate-700">
+                  <Card className="p-12 text-center rounded-2xl border-slate-200/80 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
                     <ClipboardList className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
-                    <p className="text-slate-700 dark:text-slate-300 font-medium mb-1">No observerships or clinical rotations found</p>
+                    <p className="text-slate-800 dark:text-slate-200 font-semibold mb-1 text-base">No programs found matching these criteria</p>
                     <p className="text-slate-500 text-sm mb-4">
-                      Try a broader search or clear all filters.
+                      Try adjusting your filters or search keywords.
                     </p>
                     {filtersActive && (
-                      <Button onClick={clearAllFilters} className="rounded-xl">
+                      <Button onClick={clearAllFilters} className="rounded-xl bg-[#1B4332] hover:bg-[#1B4332]/90 text-[#D8F3DC]">
                         Clear all filters
                       </Button>
                     )}
@@ -1334,7 +1534,7 @@ export default function IMGPrograms() {
                       animate={{ opacity: 1, y: 0 }}
                     >
                       <Card
-                        className="p-5 hover:shadow-md transition-all cursor-pointer rounded-3xl border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 space-y-4"
+                        className="p-5 hover:shadow-md transition-all cursor-pointer rounded-2xl border-slate-200/80 dark:border-slate-800 hover:border-emerald-300/80 dark:hover:border-emerald-700/60 bg-white dark:bg-slate-900 space-y-4"
                         onClick={() => setSelectedProgram(prog)}
                       >
                         <div className="flex items-start justify-between gap-4 mb-3">
@@ -1358,44 +1558,43 @@ export default function IMGPrograms() {
                             >
                               <Heart className={`w-5 h-5 ${profile?.favorite_programs?.includes(prog.id) ? 'fill-current' : ''}`} />
                             </button>
-                            <Badge
-                              className={`font-bold px-2 py-0.5 text-xs ${
+                            <span
+                              className={`font-semibold px-2.5 py-0.5 rounded-full text-xs ${
                                 prog.j1_visa
-                                  ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400'
-                                  : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
+                                  ? 'bg-[#D8F3DC] text-[#1B4332] dark:bg-emerald-950/50 dark:text-[#D8F3DC] border border-emerald-300/40'
+                                  : 'bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/20 dark:text-amber-400'
                               }`}
-                              variant="outline"
                             >
-                              {prog.j1_visa ? "J-1 Visa" : "No Visa Sponsorship"}
-                            </Badge>
+                              {prog.j1_visa ? "J-1 Visa Sponsored" : "No Visa Sponsorship"}
+                            </span>
                           </div>
                         </div>
 
                         <div className="flex flex-wrap gap-2 mb-3">
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full">
                             {prog.specialty}
                           </Badge>
-                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-850">
+                          <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full">
                             <MapPin className="w-3 h-3 mr-1 text-slate-400" />
                             {prog.city}, {prog.state}
                           </Badge>
                           {prog.j1_visa && (
-                            <Badge className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400" variant="outline">
-                              J-1 Available
-                            </Badge>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#D8F3DC] text-[#1B4332] dark:bg-emerald-950/50 dark:text-[#D8F3DC] border border-emerald-300/40">
+                              ✓ J-1 Available
+                            </span>
                           )}
                           {prog.h1b_visa && (
-                            <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-400" variant="outline">
-                              H-1B Available
-                            </Badge>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#D8F3DC] text-[#1B4332] dark:bg-emerald-950/50 dark:text-[#D8F3DC] border border-emerald-300/40">
+                              ✓ H-1B Available
+                            </span>
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
+                        <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 text-xs text-slate-500 border border-slate-100 dark:border-slate-800/60">
                           {prog.website && (
                             <div>
                               <span className="font-semibold text-slate-700 dark:text-slate-350">Apply:</span>{' '}
-                              <a href={prog.website} target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                              <a href={prog.website} target="_blank" rel="noopener noreferrer" className="text-[#1B4332] dark:text-[#D8F3DC] font-medium hover:underline">
                                 {prog.website.replace(/^https?:\/\//, '')}
                               </a>
                             </div>
@@ -1414,6 +1613,7 @@ export default function IMGPrograms() {
                   ))
                 )
               )}
+
 
             </div>
           </TabsContent>

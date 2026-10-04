@@ -18,8 +18,10 @@ dist-ssr
 
 # Editor directories and files
 .vscode/*
+android/.vscode/*
 !.vscode/extensions.json
 .idea
+android/.idea
 .DS_Store
 *.suo
 *.ntvs*

@@ -617,7 +617,7 @@ export const guidesData = {
           },
           {
             "type": "bullet",
-            "text": "**FSMB USMLE Portal:** [fsmb.org](https://www.fsmb.org) \u2013 The portal for registering, paying, and securing eligibility periods for USMLE Step 1 and Step 2 CK."
+            "text": "**FSMB USMLE Portal:** [fsmb.org/step-3](https://www.fsmb.org/step-3/) \u2013 The portal for registering, paying, and securing eligibility periods for USMLE Step 1, Step 2 CK, and Step 3."
           },
           {
             "type": "bullet",
@@ -625,7 +625,7 @@ export const guidesData = {
           },
           {
             "type": "bullet",
-            "text": "**OET Medicine Registration:** [oet.com](https://oet.com) \u2013 To register for the Occupational English Test and review language study materials."
+            "text": "**OET Medicine Preparation:** [oet.com/learn/test-preparation](https://oet.com/learn/test-preparation) \u2013 To register for the Occupational English Test and review test preparation study materials."
           },
           {
             "type": "bullet",
@@ -2130,7 +2130,7 @@ export const guidesData = {
           },
           {
             "type": "bullet",
-            "text": "Supplement weak subjects with targeted resources (e.g., Divine Interventions podcasts for biostatistics and preventive medicine)"
+            "text": "Supplement weak subjects with targeted resources (e.g., Divine Intervention Podcasts for biostatistics and preventive medicine)"
           },
           {
             "type": "paragraph",
@@ -2326,8 +2326,8 @@ export const guidesData = {
           {
             "type": "tablerow",
             "cells": [
-              "**Divine Interventions Podcast**",
-              "Highly recommended for biostatistics, preventive medicine, ethics, and high-yield topics"
+              "**Divine Intervention Podcasts**",
+              "Highly recommended for biostatistics, preventive medicine, ethics, and high-yield topics \u2014 [divineinterventionpodcasts.com](https://divineinterventionpodcasts.com/category/usmle-step-2-ck/)"
             ]
           },
           {
@@ -2547,7 +2547,7 @@ export const guidesData = {
           },
           {
             "type": "bullet",
-            "text": "**NRMP Charting Outcomes in the Match:** [nrmp.org](https://www.nrmp.org/match-data/)"
+            "text": "**NRMP Charting Outcomes in the Match:** [nrmp.org](https://www.nrmp.org/match-data/2024/08/charting-outcomes-characteristics-of-international-medical-graduates-who-matched-to-their-preferred-specialty-2024-main-residency-match/)"
           },
           {
             "type": "bullet",

@@ -50,26 +50,32 @@ const AuthenticatedRoutes = () => (
       } />
       {Object.entries(Pages)
         .filter(([path]) => path !== 'Login')
-        .flatMap(([path, Page]) => [
-          <Route
-            key={path}
-            path={`/${path}`}
-            element={
-              <LayoutWrapper currentPageName={path}>
-                <Page />
-              </LayoutWrapper>
-            }
-          />,
-          <Route
-            key={`${path}-id`}
-            path={`/${path}/:id`}
-            element={
-              <LayoutWrapper currentPageName={path}>
-                <Page />
-              </LayoutWrapper>
-            }
-          />
-        ])}
+        .flatMap(([path, Page]) => {
+          const normalizedPageName = 
+            (path === 'interviewcourse' || path === 'interview-course') 
+              ? 'InterviewCourse' 
+              : path;
+          return [
+            <Route
+              key={path}
+              path={`/${path}`}
+              element={
+                <LayoutWrapper currentPageName={normalizedPageName}>
+                  <Page />
+                </LayoutWrapper>
+              }
+            />,
+            <Route
+              key={`${path}-id`}
+              path={`/${path}/:id`}
+              element={
+                <LayoutWrapper currentPageName={normalizedPageName}>
+                  <Page />
+                </LayoutWrapper>
+              }
+            />
+          ];
+        })}
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   </RequireAuth>

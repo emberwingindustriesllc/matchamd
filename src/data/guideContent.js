@@ -75,10 +75,10 @@ export const guideContent = {
       },
       {
         id: 4,
-        text: 'Review Divine Interventions podcasts (Biostats, Ethics, QI, Risk Factors)',
+        text: 'Review Divine Intervention Podcasts (Biostats, Ethics, QI, Risk Factors)',
         sectionIndex: 6,
         howTo: 'Listen to Episode 37 (Risk Factors), Episode 97 (Ethics), and Episode 143 (Biostats) during commutes.',
-        actionUrl: 'https://divineinterventionspodcasts.com',
+        actionUrl: 'https://divineinterventionpodcasts.com/category/usmle-step-2-ck/',
         actionLabel: 'Open Divine Podcasts'
       },
       {
@@ -116,9 +116,9 @@ export const guideContent = {
     resources: [
       { title: 'USMLE Official Step 2 CK', url: 'https://www.usmle.org/step-2-ck', type: 'website' },
       { title: 'UWorld Step 2 CK QBank', url: 'https://www.uworld.com', type: 'website' },
-      { title: 'Divine Interventions Podcast', url: 'https://divineinterventionspodcasts.com', type: 'website' },
+      { title: 'Divine Intervention Podcasts', url: 'https://divineinterventionpodcasts.com/category/usmle-step-2-ck/', type: 'website' },
       { title: 'AMBOSS Step 2 Library', url: 'https://www.amboss.com', type: 'website' },
-      { title: 'NRMP Charting Outcomes 2024', url: 'https://www.nrmp.org/main-residency-match-data', type: 'document' }
+      { title: 'NRMP Charting Outcomes 2024', url: 'https://www.nrmp.org/match-data/2024/08/charting-outcomes-characteristics-of-international-medical-graduates-who-matched-to-their-preferred-specialty-2024-main-residency-match/', type: 'document' }
     ],
     faq: [
       {
@@ -454,9 +454,9 @@ export const guideContent = {
     resources: [
       { title: 'ECFMG Official Portal', url: 'https://www.ecfmg.org', type: 'website' },
       { title: 'MyIntealth Portal', url: 'https://www.myintealth.app', type: 'website' },
-      { title: 'FSMB USMLE Portal', url: 'https://www.fsmb.org', type: 'website' },
+      { title: 'FSMB USMLE Portal', url: 'https://www.fsmb.org/step-3/', type: 'website' },
       { title: 'World Directory of Medical Schools (WDOMS)', url: 'https://www.wdoms.org', type: 'website' },
-      { title: 'OET Medicine Portal', url: 'https://www.occupationalenglishtest.org', type: 'website' }
+      { title: 'OET Medicine Preparation', url: 'https://oet.com/learn/test-preparation', type: 'website' }
     ],
     faq: [
       {

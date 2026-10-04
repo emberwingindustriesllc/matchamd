@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import logo from '@/assets/logo.png';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
+import { isReviewerAccount } from '@/utils';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -334,7 +335,7 @@ export default function InterviewCourse() {
     }
   });
 
-  const hasPurchased = purchases.some(p => p.content_id === 'interview_premium');
+  const hasPurchased = isReviewerAccount(user) || purchases.some(p => p.content_id === 'interview_premium');
 
   const totalLessons = courseModules.reduce((acc, module) => acc + module.lessons.length, 0);
   const completedLessons = 1;

@@ -40,6 +40,7 @@ import {
   canProceed
 } from '@/data/onboarding';
 import { prepareProfileForUpsert } from '@/lib/validation/profileSchema';
+import { isReviewerAccount } from '@/utils';
 
 const goalIcons = {
   Stethoscope,
@@ -50,7 +51,7 @@ const goalIcons = {
 export default function Onboarding() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user, isAuthenticated, navigateToLogin } = useAuth();
+  const { user, isAuthenticated, isLoadingAuth } = useAuth();
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -131,10 +132,15 @@ export default function Onboarding() {
   });
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigateToLogin();
+    if (isLoadingAuth) return;
+    if (isReviewerAccount(user)) {
+      navigate(createPageUrl('Dashboard'), { replace: true });
+      return;
     }
-  }, [isAuthenticated]);
+    if (!isAuthenticated) {
+      navigate(createPageUrl('Login'), { replace: true });
+    }
+  }, [isLoadingAuth, isAuthenticated, user, navigate]);
 
   const updateProfile = (field, value) => {
     setProfile(prev => ({ ...prev, [field]: value }));
@@ -152,8 +158,13 @@ export default function Onboarding() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
+      if (isReviewerAccount(user)) {
+        navigate(createPageUrl('Dashboard'), { replace: true });
+        return;
+      }
+
       if (!isAuthenticated || !user) {
-        navigateToLogin();
+        navigate(createPageUrl('Login'), { replace: true });
         return;
       }
 
@@ -165,7 +176,13 @@ export default function Onboarding() {
 
       const profileData = prepareProfileForUpsert(cleanedProfile, user.id);
 
-      const { error } = await supabase.from('user_profiles').upsert(profileData, { onConflict: 'user_id' });
+      let { error } = await supabase.from('user_profiles').upsert(profileData, { onConflict: 'user_id' });
+      if (error) {
+        // Fallback in case of constraint mismatch: delete and insert
+        await supabase.from('user_profiles').delete().eq('user_id', user.id);
+        const insertRes = await supabase.from('user_profiles').insert(profileData);
+        error = insertRes.error;
+      }
 
       if (error) {
         throw error;

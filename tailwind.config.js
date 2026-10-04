@@ -59,6 +59,14 @@ module.exports = {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
+  			},
+  			matcha: {
+  				forest: '#1B4332',
+  				mint: '#D8F3DC',
+  				slate: '#F8FAFC',
+  				emerald: '#2D6A4F',
+  				sage: '#95D5B2',
+  				deep: '#081c15',
   			}
   		},
   		keyframes: {

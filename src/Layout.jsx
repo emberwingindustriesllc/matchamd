@@ -19,9 +19,9 @@ export default function Layout({ children, currentPageName }) {
             <DisclaimerBanner />
           <style>{`
           :root {
-            --color-primary: 103 45% 21%; /* Deep Matcha */
-            --color-secondary: 79 47% 51%; /* Logo Green */
-            --color-accent: 180 36% 74%; /* Mint MD+ */
+            --color-primary: 27 67 50; /* #1B4332 Deep Matcha Forest Green */
+            --color-secondary: 216 243 220; /* #D8F3DC Sage Mint */
+            --color-accent: 216 243 220; /* #D8F3DC Sage Mint */
           }
           
           .dark {

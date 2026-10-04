@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import { createPageUrl, isReviewerAccount } from '@/utils';
 import { sanitizeDisplayName } from '@/lib/utils';
 import Header from '@/components/navigation/Header';
 
@@ -50,6 +50,29 @@ export default function Dashboard() {
   const { data: profiles, error: profileError } = useQuery({
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
+      if (isReviewerAccount(user)) {
+        return [{
+          id: 'reviewer-profile-id',
+          user_id: user?.id,
+          display_name: 'Dr. Reviewer',
+          country: 'United States',
+          medical_school: 'International Medical University',
+          medical_school_country: 'India',
+          target_specialty: 'Internal Medicine',
+          target_state: 'New York',
+          primary_goal: 'residency',
+          step_1_status: 'passed',
+          step_2_ck_status: 'passed',
+          usmle_step1_status: 'passed',
+          usmle_step2_status: 'passed',
+          ecfmg_certified: true,
+          us_clinical_experience: true,
+          onboarding_complete: true,
+          badges: ['early_bird', 'roadmap_explorer'],
+          points: 120,
+          created_at: new Date().toISOString()
+        }];
+      }
       const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user?.id);
       if (error) throw error;
       return data || [];
@@ -102,7 +125,7 @@ export default function Dashboard() {
   const profile = profiles?.[0];
 
   useEffect(() => {
-    if (user && profiles !== undefined && !profile) {
+    if (user && !isReviewerAccount(user) && profiles !== undefined && !profile) {
       navigate(createPageUrl('Onboarding'));
     }
   }, [user, profiles, profile, navigate]);

@@ -46,6 +46,8 @@ export const PAGES = {
     "USMLEQuizPack": USMLEQuizPack,
     "Dashboard": Dashboard,
     "InterviewCourse": InterviewCourse,
+    "interviewcourse": InterviewCourse,
+    "interview-course": InterviewCourse,
     "Onboarding": Onboarding,
     "Subscription": Subscription,
     "SurgeryGuide": SurgeryGuide,

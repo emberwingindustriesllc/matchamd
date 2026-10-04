@@ -39,16 +39,16 @@ export default function AnkiGuide() {
       badge: 'Add-ons'
     },
     {
-      title: 'Download AnKing Deck (MEGA mirror)',
-      url: 'https://bit.ly/2Z4MBvI',
-      description: 'Direct AnKing Overhaul Step 1 & Step 2 CK high-yield medical flashcard deck mirror on MEGA.',
-      badge: 'Deck Download'
+      title: 'AnKing Medical Decks on AnkiHub',
+      url: 'https://www.ankihub.net/',
+      description: 'Official collaborative AnKing Step 1 & Step 2 CK decks with continuous live updates and media sync.',
+      badge: 'AnkiHub Official'
     },
     {
-      title: 'Download AnKing Deck (Google Drive mirror)',
-      url: 'http://bit.ly/2Z169RB',
-      description: 'Direct AnKing Overhaul Step 1 & Step 2 CK deck mirror hosted on Google Drive.',
-      badge: 'Deck Download'
+      title: 'Reddit Medical School Anki Deck Directory',
+      url: 'https://www.reddit.com/r/medicalschoolanki/wiki/decks/',
+      description: 'Comprehensive medical deck directory with download links for AnKing, Cheesy Dorian, and subspecialty decks.',
+      badge: 'Deck Directory'
     },
     {
       title: 'Reddit Medical School Anki Community',

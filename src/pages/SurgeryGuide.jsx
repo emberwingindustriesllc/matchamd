@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
+import { isReviewerAccount } from '@/utils';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +13,8 @@ import {
   BookOpen,
   Target,
   FileText,
-  Award
+  Award,
+  ExternalLink
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PremiumGate from '@/components/premium/PremiumGate';
@@ -152,7 +154,7 @@ export default function SurgeryGuide() {
     }
   });
 
-  const hasPurchased = purchases.some(p => p.content_id === 'specialty_surgery');
+  const hasPurchased = isReviewerAccount(user) || purchases.some(p => p.content_id === 'specialty_surgery');
 
   if (!hasPurchased) {
     return (
@@ -273,10 +275,21 @@ export default function SurgeryGuide() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-            <p>• AMA FREIDA: freida.ama-assn.org</p>
-            <p>• NRMP Match Data: nrmp.org</p>
-            <p>• Student Doctor Network Surgery Forums</p>
-            <p>• Reddit: r/IMGreddit, r/surgery</p>
+            <p>
+              • <a href="https://freida.ama-assn.org/" target="_blank" rel="noopener noreferrer" className="font-medium text-[rgb(var(--color-primary))] hover:underline inline-flex items-center gap-1">AMA FREIDA <ExternalLink className="w-3 h-3 inline opacity-70" /></a>: Program search and fellowship directory
+            </p>
+            <p>
+              • <a href="https://www.nrmp.org/match-data/" target="_blank" rel="noopener noreferrer" className="font-medium text-[rgb(var(--color-primary))] hover:underline inline-flex items-center gap-1">NRMP Match Data <ExternalLink className="w-3 h-3 inline opacity-70" /></a>: Charting outcomes and match reports
+            </p>
+            <p>
+              • <a href="https://forums.studentdoctor.net/forums/general-surgery.36/" target="_blank" rel="noopener noreferrer" className="font-medium text-[rgb(var(--color-primary))] hover:underline inline-flex items-center gap-1">Student Doctor Network Surgery Forums <ExternalLink className="w-3 h-3 inline opacity-70" /></a>
+            </p>
+            <p>
+              • Reddit Communities:{' '}
+              <a href="https://www.reddit.com/r/IMGreddit/" target="_blank" rel="noopener noreferrer" className="font-medium text-[rgb(var(--color-primary))] hover:underline inline-flex items-center gap-1">r/IMGreddit <ExternalLink className="w-3 h-3 inline opacity-70" /></a>
+              {', '}
+              <a href="https://www.reddit.com/r/surgery/" target="_blank" rel="noopener noreferrer" className="font-medium text-[rgb(var(--color-primary))] hover:underline inline-flex items-center gap-1">r/surgery <ExternalLink className="w-3 h-3 inline opacity-70" /></a>
+            </p>
           </CardContent>
         </Card>
       </main>

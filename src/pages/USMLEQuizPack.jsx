@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import { isReviewerAccount } from '@/utils';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -691,7 +692,7 @@ export default function USMLEQuizPack() {
     }
   });
 
-  const hasPurchased = purchases.some(p => p.content_id === 'quiz_usmle');
+  const hasPurchased = isReviewerAccount(user) || purchases.some(p => p.content_id === 'quiz_usmle');
 
   const difficultyColors = {
     Easy: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',

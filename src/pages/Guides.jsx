@@ -4,7 +4,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import { createPageUrl, isReviewerAccount } from '@/utils';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import PathwayAccordion from '@/components/guides/PathwayAccordion';
@@ -190,7 +190,7 @@ export default function Guides() {
               },
             ].map((course) => {
               const Icon = course.icon;
-              const isUnlocked = purchases.some((p) => p.content_id === course.id);
+              const isUnlocked = isReviewerAccount(user) || purchases.some((p) => p.content_id === course.id);
               return (
                 <button
                   key={course.id}
