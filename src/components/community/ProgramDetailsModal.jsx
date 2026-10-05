@@ -149,22 +149,26 @@ export default function ProgramDetailsModal({ open, onClose, program, profile, c
                   <span className="text-slate-500">Annual Intake Slots:</span>
                   <span className="font-bold text-slate-700 dark:text-slate-300">{program.annual_intake || 'N/A'}</span>
                 </div>
-                <div className="flex justify-between border-t border-slate-200 dark:border-slate-700/60 pt-2">
-                  <span className="font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1">
-                    👥 IMG Representation:
-                  </span>
-                  <span className="font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
-                    {program.img_percentage != null ? `${program.img_percentage}%` : '—'} ({program.img_residents || '—'} IMGs)
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
-                    🎓 Graduation Rate:
-                  </span>
-                  <span className="font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">
-                    {program.graduation_rate || '98%'}
-                  </span>
-                </div>
+                {(program.img_percentage != null || program.img_residents != null) && (
+                  <div className="flex justify-between border-t border-slate-200 dark:border-slate-700/60 pt-2">
+                    <span className="font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                      👥 IMG Representation:
+                    </span>
+                    <span className="font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
+                      {program.img_percentage != null ? `${program.img_percentage}%` : '—'} ({program.img_residents != null ? `${program.img_residents} IMGs` : '—'})
+                    </span>
+                  </div>
+                )}
+                {program.graduation_rate && (
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                      🎓 Graduation Rate:
+                    </span>
+                    <span className="font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">
+                      {program.graduation_rate}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {program.website && (
@@ -187,7 +191,11 @@ export default function ProgramDetailsModal({ open, onClose, program, profile, c
                   <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/30">
                     <span className="text-slate-700 dark:text-slate-300">Step 2 CK Score</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-450">Min: {program.step2_score_min} (Avg: {program.step2_score_avg})</span>
+                      <span className="text-slate-450">
+                        {program.step2_score_min == null && program.step2_score_avg == null
+                          ? 'No score data'
+                          : `Min: ${program.step2_score_min ?? '—'} (Avg: ${program.step2_score_avg ?? '—'})`}
+                      </span>
                       <Badge className="font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-900/50">
                         You: {profile?.usmle_step2_score || "N/A"}
                       </Badge>
@@ -257,10 +265,12 @@ export default function ProgramDetailsModal({ open, onClose, program, profile, c
                   <span className="text-xs text-slate-455 block">Application Deadline</span>
                   <span className="font-semibold text-sm text-amber-600 dark:text-amber-500">{program.application_deadline}</span>
                 </div>
-                <div className="space-y-1">
-                  <span className="text-xs text-slate-455 block">Graduation Rate</span>
-                  <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">{program.graduation_rate || 'N/A'}</span>
-                </div>
+                {program.graduation_rate && (
+                  <div className="space-y-1">
+                    <span className="text-xs text-slate-455 block">Graduation Rate</span>
+                    <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">{program.graduation_rate}</span>
+                  </div>
+                )}
               </div>
 
               <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl text-xs space-y-3">

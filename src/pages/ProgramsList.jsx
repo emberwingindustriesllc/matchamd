@@ -294,7 +294,7 @@ export default function ProgramsList() {
                         )}
                         {program.scam_reports_count > 0 && (
                           <Badge variant="destructive" className="shrink-0">
-                            <AlertTriangle className="mr-1 h-3 w-3" /> {program.scam_reports_count} Reports
+                            <AlertTriangle className="mr-1 h-3 w-3" /> {program.scam_reports_count} Verified {program.scam_reports_count === 1 ? 'Report' : 'Reports'}
                           </Badge>
                         )}
                       </div>
@@ -365,7 +365,7 @@ export default function ProgramsList() {
 
                   <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
                     <span>{program.program_notes_count || 0} notes</span>
-                    <span>{program.scam_reports_count || 0} reports</span>
+                    <span>{program.scam_reports_count || 0} verified reports</span>
                   </div>
                 </CardContent>
               </Card>
@@ -625,7 +625,7 @@ export default function ProgramsList() {
           <TabsTrigger value="all" className="rounded-full">All ({totalCount})</TabsTrigger>
           <TabsTrigger value="verified" className="rounded-full">Verified ({verifiedCount})</TabsTrigger>
           <TabsTrigger value="unverified" className="rounded-full">Unverified ({programs.filter(p => !p.verified).length})</TabsTrigger>
-          <TabsTrigger value="scams" className="rounded-full">⚠️ Reports ({reportedCount})</TabsTrigger>
+          <TabsTrigger value="scams" className="rounded-full">⚠️ Verified Reports ({reportedCount})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="mt-4">
@@ -647,7 +647,7 @@ export default function ProgramsList() {
         </TabsContent>
 
         <TabsContent value="scams" className="mt-4">
-          {!loading && filteredPrograms.length === 0 && <Card><CardContent className="py-12 text-center text-muted-foreground">No scam reports for matching programs.</CardContent></Card>}
+          {!loading && filteredPrograms.length === 0 && <Card><CardContent className="py-12 text-center text-muted-foreground">No verified scam reports match these filters.<br /><span className="mt-2 block text-xs">Reports are only counted here after a moderator has checked them against evidence, and they expire after 12 months. An empty tab means nothing has been verified — not that nothing was reported.</span></CardContent></Card>}
           {!loading && filteredPrograms.length > 0 && renderProgramCards(filteredPrograms)}
         </TabsContent>
       </Tabs>
