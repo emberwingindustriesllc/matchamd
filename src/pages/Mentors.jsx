@@ -38,7 +38,8 @@ import {
   Video,
   ChevronRight,
   UserCheck,
-  Plus
+  Plus,
+  Sparkles
 } from 'lucide-react';
 import VideoCallModal from '@/components/mentorship/VideoCallModal';
 import MentorDetailModal from '@/components/mentorship/MentorDetailModal';

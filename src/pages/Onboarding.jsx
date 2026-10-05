@@ -23,7 +23,8 @@ import {
   ChevronRight, 
   ChevronLeft,
   Globe,
-  Target
+  Target,
+  ShieldCheck
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';

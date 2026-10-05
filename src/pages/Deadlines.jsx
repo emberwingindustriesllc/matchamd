@@ -96,7 +96,7 @@ export default function Deadlines() {
 
   const { user } = useAuth();
 
-  const { data: dbDeadlines = [] } = useQuery({
+  const { data: dbDeadlines = [], isLoading } = useQuery({
     queryKey: ['deadlines'],
     queryFn: async () => {
       try {

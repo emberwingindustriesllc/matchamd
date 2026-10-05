@@ -88,13 +88,13 @@ export async function fetchPrograms(filters = {}) {
   } else if (opts.specialty) {
     const specLower = opts.specialty.toLowerCase();
     if (specLower.includes('pediatric hematology') || specLower.includes('peds hem')) {
-      query = query.or('specialty.ilike.%Pediatric Hematology%,name.ilike.%Pediatric Hematology%,name.ilike.%Pediatric Oncology%');
+      query = query.or('specialty.ov.{"Pediatric Hematology-Oncology","Pediatric Hematology"},name.ilike.%Pediatric Hematology%,name.ilike.%Pediatric Oncology%');
     } else if (specLower.includes('pediatric cardiology')) {
-      query = query.or('specialty.ilike.%Pediatric Cardiology%,name.ilike.%Pediatric Cardiology%');
+      query = query.or('specialty.ov.{"Pediatric Cardiology"},name.ilike.%Pediatric Cardiology%');
     } else if (specLower.includes('pediatric gastroenterology')) {
-      query = query.or('specialty.ilike.%Pediatric Gastroenterology%,name.ilike.%Pediatric Gastroenterology%');
+      query = query.or('specialty.ov.{"Pediatric Gastroenterology"},name.ilike.%Pediatric Gastroenterology%');
     } else if (specLower.includes('urogynecology')) {
-      query = query.or('specialty.ilike.%Urogynecology%,name.ilike.%Urogynecology%');
+      query = query.or('specialty.ov.{"Urogynecology"},name.ilike.%Urogynecology%');
     } else {
       query = query.contains('specialty', [opts.specialty]);
     }
@@ -143,7 +143,11 @@ export async function fetchPrograms(filters = {}) {
     }
 
     const primaryKw = keywords[0] || rawSearch;
-    query = query.or(`name.ilike.%${primaryKw}%,institution.ilike.%${primaryKw}%,city.ilike.%${primaryKw}%,state.ilike.%${primaryKw}%,specialty.ilike.%${primaryKw}%${specialtyFilter}`);
+    // NOTE: `specialty` is a text[] column. It must NOT appear as
+    // `specialty.ilike.%x%` here -- Postgres rejects `text[] ~~* unknown`
+    // with code 42883 and the whole query fails. Array columns are matched
+    // with the overlaps operator instead (see specialtyFilter above).
+    query = query.or(`name.ilike.%${primaryKw}%,institution.ilike.%${primaryKw}%,city.ilike.%${primaryKw}%,state.ilike.%${primaryKw}%${specialtyFilter}`);
   }
 
   const page = opts.page || 1;

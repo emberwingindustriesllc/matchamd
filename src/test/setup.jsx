@@ -115,11 +115,16 @@ if (typeof window !== 'undefined' && !window.localStorage) {
 }
 
 // Global test utilities
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+// Must be a real CLASS: Radix components do `new ResizeObserver(...)`, and a
+// vi.fn() whose implementation is an arrow function is not a constructor
+// ("... is not a constructor"), which fails the mount before any assertion.
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+global.ResizeObserver = ResizeObserverMock;
+globalThis.ResizeObserver = ResizeObserverMock;
 
 global.matchMedia = vi.fn().mockImplementation(query => ({
   matches: false,
