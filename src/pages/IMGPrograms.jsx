@@ -107,7 +107,6 @@ export default function IMGPrograms() {
   const [selectedFormat, setSelectedFormat] = useState('all');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [fitFilter, setFitFilter] = useState(false);
-  const [highImgOnly, setHighImgOnly] = useState(false);
   const [sortBy, setSortBy] = useState('fit');
   
   // Detail dialog state
@@ -469,16 +468,13 @@ export default function IMGPrograms() {
 
   const filteredPrograms = useMemo(() => {
     try {
-      let filtered = filterIMGPrograms(activeProgramList, searchFilters, profile);
-      if (highImgOnly) {
-        filtered = filtered.filter(p => Number(p.img_percentage || 0) >= 50);
-      }
+      const filtered = filterIMGPrograms(activeProgramList, searchFilters, profile);
       return sortPrograms(filtered, sortBy, fitMap);
     } catch (err) {
       console.warn('Error filtering programs:', err);
       return [];
     }
-  }, [activeProgramList, searchFilters, profile, sortBy, fitMap, highImgOnly]);
+  }, [activeProgramList, searchFilters, profile, sortBy, fitMap]);
 
   // Fellowships — Supabase RPC via multiSearch + Verified Fellowships fallback with try/catch guard
   const { data: fellowshipPrograms = [], isLoading: isFellowshipsLoading } = useQuery({
@@ -670,7 +666,7 @@ export default function IMGPrograms() {
     });
   }, [medSchoolPrograms, debouncedSearch]);
 
-  const filtersActive = hasActiveIMGFilters(searchFilters) || sortBy !== 'fit' || highImgOnly;
+  const filtersActive = hasActiveIMGFilters(searchFilters) || sortBy !== 'fit';
 
 
   // Saved Programs Map
@@ -942,18 +938,6 @@ export default function IMGPrograms() {
 
                   <button
                     type="button"
-                    onClick={() => setHighImgOnly(!highImgOnly)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap border ${
-                      highImgOnly
-                        ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-xs dark:bg-[#D8F3DC] dark:text-[#1B4332] dark:border-[#D8F3DC]'
-                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[#1B4332]/30 hover:bg-[#D8F3DC]/20'
-                    }`}
-                  >
-                    🌟 High IMG Match (≥50%)
-                  </button>
-
-                  <button
-                    type="button"
                     onClick={() => {
                       const spec = 'Internal Medicine';
                       setSelectedSpecialties(prev => 
@@ -1181,9 +1165,6 @@ export default function IMGPrograms() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="fit">Best fit</SelectItem>
-                        <SelectItem value="img_percentage">Highest % IMGs</SelectItem>
-                        <SelectItem value="graduation_rate">Highest graduation rate</SelectItem>
-                        <SelectItem value="img_friendly">IMG-friendly score</SelectItem>
                         <SelectItem value="deadline">Application deadline</SelectItem>
                         <SelectItem value="name">Program name</SelectItem>
                       </SelectContent>
@@ -1337,10 +1318,9 @@ export default function IMGPrograms() {
                                 💼 Sponsors H-1B
                               </span>
                             )}
-                            {/* Distinct IMG Match Rate Badge Pill */}
-                            {prog.img_percentage != null && (
+                            {prog.accepts_img && (
                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#1B4332] text-white dark:bg-[#D8F3DC] dark:text-[#1B4332] shadow-2xs">
-                                🌟 IMG Match: {Math.round(prog.img_percentage)}%
+                                🌟 Accepts IMGs
                               </span>
                             )}
                           </div>
@@ -1350,13 +1330,13 @@ export default function IMGPrograms() {
                             <div className="flex items-center gap-1.5">
                               <span className="font-semibold text-slate-700 dark:text-slate-300">👥 IMGs:</span> 
                               <Badge variant="outline" className="bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 font-bold px-1.5 py-0.5">
-                                {prog.img_percentage != null ? `${Math.round(prog.img_percentage)}%` : '—'}
+                                {prog.accepts_img ? 'Accepted' : '—'}
                               </Badge>
                             </div>
                             <div className="flex items-center gap-1.5">
                               <span className="font-semibold text-slate-700 dark:text-slate-300">🎓 Grad Rate:</span> 
                               <Badge variant="outline" className="bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 font-bold px-1.5 py-0.5">
-                                {prog.graduation_rate || '98%'}
+                                {prog.graduation_rate || '—'}
                               </Badge>
 
                             </div>

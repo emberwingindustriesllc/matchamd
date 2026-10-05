@@ -253,28 +253,6 @@ export function sortPrograms(programs, sortBy = 'fit', fitMap = {}) {
     return list.sort(byName);
   }
 
-  if (sortBy === 'img_friendly') {
-    return list.sort((a, b) => {
-      const diff = (Number(b.img_friendly_score) || 0) - (Number(a.img_friendly_score) || 0);
-      return diff !== 0 ? diff : byName(a, b);
-    });
-  }
-
-  if (sortBy === 'img_percentage') {
-    return list.sort((a, b) => {
-      const diff = (Number(b.img_percentage) || 0) - (Number(a.img_percentage) || 0);
-      return diff !== 0 ? diff : byName(a, b);
-    });
-  }
-
-  if (sortBy === 'graduation_rate') {
-    return list.sort((a, b) => {
-      const parseRate = (r) => parseInt(String(r).replace(/[^0-9]/g, ''), 10) || 0;
-      const diff = parseRate(b.graduation_rate) - parseRate(a.graduation_rate);
-      return diff !== 0 ? diff : byName(a, b);
-    });
-  }
-
   if (sortBy === 'deadline') {
     return list.sort((a, b) => {
       const da = a.application_deadline ? new Date(a.application_deadline).getTime() : Infinity;
@@ -289,8 +267,7 @@ export function sortPrograms(programs, sortBy = 'fit', fitMap = {}) {
     const sa = fitMap[a.id]?.score ?? 0;
     const sb = fitMap[b.id]?.score ?? 0;
     if (sb !== sa) return sb - sa;
-    const imgDiff = (Number(b.img_friendly_score) || 0) - (Number(a.img_friendly_score) || 0);
-    return imgDiff !== 0 ? imgDiff : byName(a, b);
+    return byName(a, b);
   });
 }
 
