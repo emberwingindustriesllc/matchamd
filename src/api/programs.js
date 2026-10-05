@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient';
 import { normalizeProgramCounts, sanitizeIlikeTerm } from '@/lib/programSearch';
 import { getCurrentUser } from '@/lib/currentUser';
+import { loadSpecialties } from '@/lib/search/specialtyTypeahead';
 import { expandMedicalSearchTerms } from '@/lib/medicalSynonyms';
 import { mockResidencyPrograms } from '@/data/mockResidencyPrograms';
 import { mockFellowships } from '@/data/mockFellowships';
@@ -131,14 +132,32 @@ export async function fetchPrograms(filters = {}) {
     const expandedTerms = expandMedicalSearchTerms(rawSearch);
     const keywords = Array.from(new Set([rawSearch.toLowerCase(), ...rawSearch.split(/\s+/).filter(Boolean), ...expandedTerms]));
 
-    const matchedSpecs = SPECIALTIES.filter(spec => {
-      const specLower = spec.toLowerCase();
-      return keywords.some(kw => specLower.includes(kw) || kw.includes(specLower));
+    // Match against the DATABASE's specialty vocabulary, not the hardcoded
+    // list. The DB names look like "Neonatal-Perinatal Medicine (Pediatrics)"
+    // and "Pediatric Cardiology (Pediatrics)", so a term such as "neonatal" or
+    // "cardiology" only resolves if it is matched against real values. Falls
+    // back to the hardcoded list if the view is unreachable.
+    let vocabulary = SPECIALTIES;
+    try {
+      const loaded = await loadSpecialties();
+      if (Array.isArray(loaded) && loaded.length > 0) {
+        const names = loaded
+          .map((s) => s.specialty || s.name)
+          .filter(Boolean);
+        if (names.length > 0) vocabulary = names;
+      }
+    } catch (e) {
+      console.warn('specialty vocabulary load failed, using fallback list:', e);
+    }
+
+    const matchedSpecs = vocabulary.filter((spec) => {
+      const specLower = String(spec).toLowerCase();
+      return keywords.some((kw) => specLower.includes(kw) || kw.includes(specLower));
     });
 
     let specialtyFilter = '';
     if (matchedSpecs.length > 0) {
-      const formattedSpecs = matchedSpecs.map(s => `"${s}"`).join(',');
+      const formattedSpecs = matchedSpecs.map((s) => `"${s}"`).join(',');
       specialtyFilter = `,specialty.ov.{${formattedSpecs}}`;
     }
 
