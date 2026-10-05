@@ -12,6 +12,7 @@ This file is the project's long-term memory. It is loaded at the start of every 
 - 2026-08-09: Shipped Nepal medical schools expansion, multi-specialty & location array search, Post Research Position modal, Become a Mentor application modal, on-the-fly PDF Handout generator (`jsPDF`), Interactive Mock Interview Video Player with timestamped chapters & faculty scorecards, USMLE Quiz Pack expansion (Pharmacology & Ethics), ERAS Program CSV Exporter, Profile Avatar upload with Base64 fallback, and updated master `supabase_migration_idempotent.sql`. Pushed to `emberwingindustriesllc/matchamd` main.
 
 ## Open Items
+- [ ] Merge PR #1 (`fix/search-crash-routing`): search crash fix, `/ProgramDetail/:id` routing, typeahead abbreviation matching, test-infra fixes. 166/166 tests, lint clean, build green. NOT verified against live Supabase (anon key is write-only in Vercel) - smoke-test search on the deployed site before release.
 - [x] Integrate `book-catalog-shell` into `matchamd` main
 - [x] Run `npm run build` production web bundle compilation
 - [x] Run full test suite (140/140 passed)
@@ -31,6 +32,7 @@ This file is the project's long-term memory. It is loaded at the start of every 
 - Metadata draft: `store_assets/store_listing_metadata.md`
 
 ## Session Notes
+- 2026-10-04: Fixed program search "Something went wrong" crash (null module cache in specialtyTypeahead/locationTypeahead), unreachable typeahead matching strategies, dead `/programs/:id` links (route is `/ProgramDetail/:id`), missing free-text debounce, and the unfiltered-directory fallback masking narrow searches. Also repaired test infra (lucide mock, Node 22 localStorage shadowing). PR #1. 166/166 tests.
 - 2026-08-14: Created persistent OB/GYN residency import & reconciliation system (`supabase_obgyn_import_schema.sql`, `scripts/obgyn-reconcile.js`, `scripts/stage-obgyn-candidates.js`) and multi-location search overhaul with saved searches engine. Audited baseline Supabase data: 12,503 total program records, 171 OB/GYN related records, 112 core OB/GYN residencies.
 - 2026-08-09: Expanded Nepal support (13 MBBS colleges + ECFMG tips), multi-select search dropdowns, research position modal, mentor registration modal, PDF handout downloads, interactive video timeline player, expanded quiz pack, CSV exporter, avatar upload Base64 fallback, and idempotent SQL migration. All 87 unit tests passed. Saved Google Play Store audit report for tomorrow (`play_store_audit.md`).
 - 2026-07-25: Implemented React.lazy route code-splitting and Vite vendor manualChunks. Verified ESLint (0 errors), Vite production build, Capacitor Android sync, and native Android Gradle build (`assembleDebug` succeeded in 1m 53s).
