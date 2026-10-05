@@ -42,7 +42,7 @@ const SPECIALTY_PRESETS = [
 ];
 
 const PROGRAM_TYPES = [
-  { value: '', label: 'All Types' },
+  { value: 'all', label: 'All Types' },
   { value: 'residency_categorical', label: 'Categorical Residency' },
   { value: 'residency_preliminary', label: 'Preliminary Residency (Prelim)' },
   { value: 'fellowship', label: 'Fellowship' },
@@ -514,7 +514,7 @@ export default function ProgramsList() {
               />
             </div>
 
-            <Select value={filters.program_type} onValueChange={v => handleFilterChange('program_type', v)}>
+            <Select value={filters.program_type || 'all'} onValueChange={v => handleFilterChange('program_type', v === 'all' ? '' : v)}>
               <SelectTrigger className="w-[180px] h-11 rounded-xl"><SelectValue placeholder="Type" /></SelectTrigger>
               <SelectContent>{PROGRAM_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent>
             </Select>

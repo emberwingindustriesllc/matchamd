@@ -18,6 +18,19 @@ class ErrorBoundary extends React.Component {
     console.error('Error caught by boundary:', error, errorInfo);
   }
 
+  /**
+   * Without this, the boundary LATCHES: once any page throws, every later
+   * navigation keeps rendering the error screen until the user does a full
+   * reload. That makes a single broken page look like the whole app is down.
+   * `resetKey` (the current pathname) clears the error on navigation, so the
+   * user can move to another page and keep working.
+   */
+  componentDidUpdate(prevProps) {
+    if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
+      this.setState({ hasError: false, error: null });
+    }
+  }
+
   render() {
     if (this.state.hasError) {
       return (

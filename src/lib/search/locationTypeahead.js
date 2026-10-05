@@ -47,10 +47,21 @@ export const DEFAULT_LOCATIONS = [
 export async function loadLocations() {
   if (locationCache) return locationCache;
 
-  const { data, error } = await supabase
-    .from('search_locations')
-    .select('city, state, location_label, program_count')
-    .order('program_count', { ascending: false });
+  let data = null;
+  let error = null;
+  try {
+    const res = await supabase
+      .from('search_locations')
+      .select('city, state, location_label, program_count')
+      .order('program_count', { ascending: false });
+    data = res?.data ?? null;
+    error = res?.error ?? null;
+  } catch (thrown) {
+    // A thrown rejection must land on the same fallback path as an error
+    // response; otherwise the cache stays null and filterLocations() feeds an
+    // empty pool downstream.
+    error = thrown;
+  }
 
   if (error) {
     console.error('Failed to load locations:', error);

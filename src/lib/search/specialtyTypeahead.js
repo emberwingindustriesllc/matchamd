@@ -11,10 +11,19 @@ let aliasCache = null;
 export async function loadSpecialties() {
   if (specialtyCache) return specialtyCache;
 
-  const { data, error } = await supabase
-    .from('search_specialties')
-    .select('specialty, name, program_count')
-    .order('program_count', { ascending: false });
+  let data = null;
+  let error = null;
+  try {
+    const res = await supabase
+      .from('search_specialties')
+      .select('specialty, name, program_count')
+      .order('program_count', { ascending: false });
+    data = res?.data ?? null;
+    error = res?.error ?? null;
+  } catch (thrown) {
+    // See loadLocations(): a thrown rejection must not leave the cache null.
+    error = thrown;
+  }
 
   if (error) {
     console.error('Failed to load specialties:', error);

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClientInstance } from '@/lib/query-client';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
@@ -9,11 +10,14 @@ import DisclaimerBanner from '@/components/common/DisclaimerBanner';
 import ServiceWorkerRegistration from '@/components/common/ServiceWorkerRegistration';
 
 export default function Layout({ children, currentPageName }) {
+  // Key the boundary on the route so a crash on one page does not latch the
+  // error screen for every later navigation.
+  const { pathname } = useLocation();
   return (
     <QueryClientProvider client={queryClientInstance}>
       <LanguageProvider>
         <ThemeProvider>
-          <ErrorBoundary>
+          <ErrorBoundary resetKey={pathname}>
             <ServiceWorkerRegistration />
             <OfflineIndicator />
             <DisclaimerBanner />
