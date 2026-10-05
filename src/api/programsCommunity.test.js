@@ -53,7 +53,10 @@ describe('fetchProgramNotes', () => {
     supabaseMock.auth.getUser.mockReset();
   });
 
-  it('returns rows for the requested program', async () => {
+  // This suite does no real I/O -- it is pure mock plumbing. It has flaked on
+  // the default 5s timeout when the full suite runs in parallel on a loaded
+  // Windows host, which is contention, not a logic failure. Give it headroom.
+  it('returns rows for the requested program', { timeout: 20000 }, async () => {
     const rows = [{ id: 'n1', title: 'Great APD', content: 'Very organized', program_id: 'p1' }];
     supabaseMock.from.mockReturnValue(builder({ data: rows, error: null }));
 
