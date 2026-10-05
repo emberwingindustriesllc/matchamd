@@ -16,6 +16,25 @@ const NOTE_TYPE_COLORS = {
   culture: 'bg-teal-100 text-teal-800',
 };
 
+/**
+ * Resolve the author label.
+ *
+ * `author_display_name` is the denormalized value written by
+ * createProgramNote(); the auth.users embed that used to supply this is gone
+ * because it needs privileges the anon key lacks. The remaining fallbacks
+ * cover rows written before the column existed and legacy `user` shapes that
+ * may still be present in a cached payload.
+ */
+function resolveAuthorLabel(item, { anonymousLabel = 'Anonymous' } = {}) {
+  if (item?.is_anonymous) return anonymousLabel;
+  return (
+    item?.author_display_name ||
+    item?.user?.user_metadata?.display_name ||
+    item?.user?.email?.split('@')[0] ||
+    'Unknown'
+  );
+}
+
 export default function ProgramNoteCard({ note, currentUserId, onVote = () => {} }) {
   const isAuthor = note.user_id === currentUserId;
   const [voted, setVoted] = React.useState(false);
@@ -49,7 +68,7 @@ export default function ProgramNoteCard({ note, currentUserId, onVote = () => {}
             </div>
             <div>
               <p className="font-medium text-sm">
-                {note.is_anonymous ? 'Anonymous' : (note.user?.user_metadata?.display_name || note.user?.email?.split('@')[0] || 'Unknown')}
+                {resolveAuthorLabel(note)}
               </p>
               <p className="text-xs text-muted-foreground">
                 {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}

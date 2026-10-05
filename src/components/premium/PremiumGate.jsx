@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/components/ui/use-toast';
 import logo from '@/assets/logo.png';
 import { purchaseManager } from '@/lib/purchaseManager';
+import { activateDemoAddOnGuarded } from '@/lib/demoGuard';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -26,9 +27,14 @@ export default function PremiumGate({ title, description, price, features, conte
   const [showStagingModal, setShowStagingModal] = useState(false);
 
   const handleActivateDemo = () => {
-    purchaseManager.activateDemoAddOn(contentId, title);
-    queryClient.invalidateQueries({ queryKey: ['purchases'] });
+    // Guarded: demo activation is a no-op in production builds (issue #3).
+    const activated = activateDemoAddOnGuarded(contentId, title);
     setShowStagingModal(false);
+    if (!activated) {
+      // The guard already surfaced a toast; do not claim success.
+      return;
+    }
+    queryClient.invalidateQueries({ queryKey: ['purchases'] });
     toast({
       title: 'Content Unlocked! 🎉',
       description: `Successfully unlocked ${title} in demo mode.`

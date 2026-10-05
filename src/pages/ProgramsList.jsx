@@ -16,6 +16,7 @@ import { fetchPrograms, fetchSavedSearches, saveSearch, deleteSavedSearch } from
 import AddProgramModal from '@/components/community/AddProgramModal';
 import MultiSelectDropdown from '@/components/ui/MultiSelectDropdown';
 import { exportProgramsToCSV } from '@/utils/csvExporter';
+import { describeDataFreshness } from '@/lib/programFreshness';
 import { toast } from 'sonner';
 
 const SPECIALTIES = [
@@ -256,9 +257,26 @@ export default function ProgramsList() {
         const specialtyLabel = Array.isArray(program.specialty) ? program.specialty[0] : program.specialty;
         const typeLabel = (program.program_type || '').replace(/_/g, ' ');
         const isHighSignal = program.verified || program.scam_reports_count > 0;
+        const freshness = describeDataFreshness(program);
+
+        // Grouped so the card stays readable: identity/status in the primary
+        // badge row, matching logistics in a second muted row.
+        const trainingYearsLabel = program.training_years != null
+          ? `${program.training_years} yr program`
+          : '';
+        const statusLabel = program.program_status && program.program_status !== 'active'
+          ? String(program.program_status).replace(/_/g, ' ')
+          : '';
+        const matchingParts = [];
+        if (program.nrmp_participating) matchingParts.push('NRMP');
+        if (program.eras_participating) matchingParts.push('ERAS');
+        const matchingLabel = matchingParts.length ? matchingParts.join(' / ') : '';
+        const pgy1Label = program.pgy1_positions != null && program.pgy1_positions !== ''
+          ? `${program.pgy1_positions} PGY-1 spots`
+          : '';
 
         return (
-          <Link key={program.id} to={`/programs/${program.id}`} className="text-inherit no-underline">
+          <Link key={program.id} to={`/ProgramDetail/${program.id}`} className="text-inherit no-underline">
             <motion.div
               whileHover={{ y: -4, scale: 1.01 }}
               transition={{ type: 'spring', stiffness: 220, damping: 18 }}
@@ -276,7 +294,7 @@ export default function ProgramsList() {
                         )}
                         {program.scam_reports_count > 0 && (
                           <Badge variant="destructive" className="shrink-0">
-                            <AlertTriangle className="mr-1 h-3 w-3" /> {program.scam_reports_count} Reports
+                            <AlertTriangle className="mr-1 h-3 w-3" /> {program.scam_reports_count} Verified {program.scam_reports_count === 1 ? 'Report' : 'Reports'}
                           </Badge>
                         )}
                       </div>
@@ -298,20 +316,34 @@ export default function ProgramsList() {
                     {program.visa_h1b && (
                       <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">H-1B Visa</Badge>
                     )}
-                    {program.img_percentage != null && (
-                      <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
-                        👥 {Math.round(program.img_percentage)}% IMGs
-                      </Badge>
-                    )}
-                    {program.accepts_img && program.img_percentage == null && (
+                    {program.accepts_img && (
                       <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">IMG Friendly</Badge>
                     )}
-                    {program.graduation_rate && (
-                      <Badge variant="outline" className="bg-teal-50 text-teal-800 border-teal-200">
-                        🎓 {program.graduation_rate} Grad
-                      </Badge>
+                    {trainingYearsLabel && (
+                      <Badge variant="outline" className="text-xs text-slate-600 border-slate-200">{trainingYearsLabel}</Badge>
+                    )}
+                    {statusLabel && (
+                      <Badge variant="outline" className="text-xs capitalize text-slate-600 border-slate-200">{statusLabel}</Badge>
                     )}
                   </div>
+
+                  {(matchingLabel || pgy1Label) && (
+                    <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                      {matchingLabel && (
+                        <Badge variant="outline" className="text-xs text-slate-500 border-slate-200">{matchingLabel}</Badge>
+                      )}
+                      {pgy1Label && (
+                        <Badge variant="outline" className="text-xs text-slate-500 border-slate-200">{pgy1Label}</Badge>
+                      )}
+                    </div>
+                  )}
+
+                  {freshness.level !== 'ok' && (
+                    <p className="flex items-center gap-1.5 text-xs text-slate-400">
+                      <AlertTriangle className="h-3 w-3 shrink-0" />
+                      <span>{freshness.label}</span>
+                    </p>
+                  )}
 
                   <div className="space-y-1.5 text-sm text-slate-600">
                     <div className="flex items-center gap-2">
@@ -333,7 +365,7 @@ export default function ProgramsList() {
 
                   <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
                     <span>{program.program_notes_count || 0} notes</span>
-                    <span>{program.scam_reports_count || 0} reports</span>
+                    <span>{program.scam_reports_count || 0} verified reports</span>
                   </div>
                 </CardContent>
               </Card>
@@ -593,7 +625,7 @@ export default function ProgramsList() {
           <TabsTrigger value="all" className="rounded-full">All ({totalCount})</TabsTrigger>
           <TabsTrigger value="verified" className="rounded-full">Verified ({verifiedCount})</TabsTrigger>
           <TabsTrigger value="unverified" className="rounded-full">Unverified ({programs.filter(p => !p.verified).length})</TabsTrigger>
-          <TabsTrigger value="scams" className="rounded-full">⚠️ Reports ({reportedCount})</TabsTrigger>
+          <TabsTrigger value="scams" className="rounded-full">⚠️ Verified Reports ({reportedCount})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="mt-4">
@@ -615,7 +647,7 @@ export default function ProgramsList() {
         </TabsContent>
 
         <TabsContent value="scams" className="mt-4">
-          {!loading && filteredPrograms.length === 0 && <Card><CardContent className="py-12 text-center text-muted-foreground">No scam reports for matching programs.</CardContent></Card>}
+          {!loading && filteredPrograms.length === 0 && <Card><CardContent className="py-12 text-center text-muted-foreground">No verified scam reports match these filters.<br /><span className="mt-2 block text-xs">Reports are only counted here after a moderator has checked them against evidence, and they expire after 12 months. An empty tab means nothing has been verified — not that nothing was reported.</span></CardContent></Card>}
           {!loading && filteredPrograms.length > 0 && renderProgramCards(filteredPrograms)}
         </TabsContent>
       </Tabs>

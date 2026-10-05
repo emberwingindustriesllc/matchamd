@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client';
@@ -7,17 +8,26 @@ import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'r
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { LanguageProvider } from '@/components/i18n/LanguageContext';
-import Login from './pages/Login';
 
 import logo from '@/assets/logo.png';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
 const MainPage = mainPageKey ? Pages[mainPageKey] : <></>;
+// Login is lazy like every other page; take it from the shared map so the
+// public route is not eagerly bundled into the entry chunk.
+const Login = Pages.Login;
 
-const LayoutWrapper = ({ children, currentPageName }) => Layout ?
-  <Layout currentPageName={currentPageName}>{children}</Layout>
-  : <>{children}</>;
+/**
+ * Layout chrome stays mounted while the lazy page chunk loads, so Suspense is
+ * placed inside the layout rather than around it.
+ */
+const LayoutWrapper = ({ children, currentPageName }) => {
+  const content = <Suspense fallback={<LoadingScreen />}>{children}</Suspense>;
+  return Layout
+    ? <Layout currentPageName={currentPageName}>{content}</Layout>
+    : content;
+};
 
 /** Loading spinner shown while Supabase session is being resolved */
 const LoadingScreen = () => (
@@ -90,8 +100,13 @@ function App() {
           <LanguageProvider>
             <NavigationTracker />
             <Routes>
-              {/* Public route — no auth required */}
-              <Route path="/Login" element={<Login />} />
+              {/* Public route — no auth required. Suspense sits here because
+                  this route renders outside the shared LayoutWrapper. */}
+              <Route path="/Login" element={
+                <Suspense fallback={<LoadingScreen />}>
+                  <Login />
+                </Suspense>
+              } />
               {/* All other routes require auth */}
               <Route path="/*" element={<AuthenticatedRoutes />} />
             </Routes>

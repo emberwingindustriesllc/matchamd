@@ -1,4 +1,5 @@
 import { supabase } from '@/api/supabaseClient';
+import { expandMedicalSearchTerms } from '@/lib/medicalSynonyms';
 
 let specialtyCache = null;
 let aliasCache = null;
@@ -17,10 +18,14 @@ export async function loadSpecialties() {
 
   if (error) {
     console.error('Failed to load specialties:', error);
-    return [];
+    // Populate the cache with the fallback list. Leaving it null makes
+    // filterSpecialties() dereference null, which crashes the page into the
+    // error boundary whenever the view is unreachable.
+    specialtyCache = DEFAULT_SPECIALTIES;
+    return specialtyCache;
   }
 
-  specialtyCache = data || [];
+  specialtyCache = data && data.length > 0 ? data : DEFAULT_SPECIALTIES;
   return specialtyCache;
 }
 
@@ -117,14 +122,13 @@ export function filterSpecialties(query, limit = 15) {
   }
 
   const normalized = normalizeQuery(query);
-  
+
   // 1. Try alias match first (highest priority)
   if (aliasCache) {
     const aliasMap = buildAliasMap(aliasCache);
     const canonical = aliasMap[normalized];
     if (canonical) {
-      // Find the specialty item with this canonical name
-      const match = specialtyCache.find(
+      const match = pool.find(
         item => (item.specialty || item.name || '').toLowerCase() === canonical.toLowerCase()
       );
       if (match) {
@@ -133,39 +137,43 @@ export function filterSpecialties(query, limit = 15) {
     }
   }
 
-  // 2. Try fuzzy/partial matching on specialty names
-  const matches = specialtyCache.filter(item => {
+  // 2. Synonym expansion: map colloquial/abbreviated input onto the canonical
+  //    specialty vocabulary ("obgyn" -> "Obstetrics and Gynecology", "peds" ->
+  //    "Pediatrics") before doing any name matching.
+  const synonyms = expandMedicalSearchTerms(normalized)
+    .map((t) => normalizeQuery(t))
+    .filter(Boolean);
+
+  const queryTokens = normalized.split(/\s+/).filter(t => t.length > 0);
+  const compactQuery = normalized.replace(/\s/g, '');
+
+  // 3. Fuzzy/partial matching on specialty names.
+  //    Every strategy must `return true` from the predicate. The previous
+  //    version returned from the whole filter callback inside the token loop,
+  //    which made the compact/prefix strategies unreachable dead code.
+  const matches = pool.filter(item => {
     const name = (item.specialty || item.name || '').toLowerCase();
-    
-    // Direct substring match
+    if (!name) return false;
+
+    if (synonyms.some(s => name.includes(s) || s.includes(name))) return true;
     if (name.includes(normalized)) return true;
-    
-    // Token-based match: every query token must appear in the name
-    const queryTokens = normalized.split(/\s+/).filter(t => t.length > 0);
+
     if (queryTokens.length === 0) return false;
-    
-    return queryTokens.every(token => {
-      if (token.length < 2) return true; // skip very short tokens
-      return name.includes(token);
-    });
-    
-    // Also check if the name can be tokenized and matches query tokens
+    if (queryTokens.every(token => token.length < 2 || name.includes(token))) return true;
+
+    // Compare in both directions so "obgyn" matches "Obstetrics and Gynecology"
+    // and "Peds" matches "Pediatrics".
     const nameTokens = name.replace(/[&\/\-]/g, ' ').split(/\s+/).filter(t => t.length > 0);
-    if (nameTokens.length > 0 && queryTokens.length > 0) {
-      // Check for common abbreviation patterns
-      // e.g. "obgyn" should match "obstetrics and gynecology"
-      const compactQuery = normalized.replace(/\s/g, '');
+    if (nameTokens.length > 0) {
       const compactName = name.replace(/\s/g, '');
-      if (compactName.includes(compactQuery) || compactQuery.includes(compactName)) {
+      if (compactName.includes(compactQuery) || (compactQuery.length >= 3 && compactQuery.includes(compactName))) {
         return true;
       }
-      
-      // Check if query is a prefix of any name token
-      return queryTokens.some(qt => 
-        nameTokens.some(nt => nt.startsWith(qt) || qt.startsWith(nt))
-      );
+      if (queryTokens.some(qt => nameTokens.some(nt => nt.startsWith(qt) || qt.startsWith(nt)))) {
+        return true;
+      }
     }
-    
+
     return false;
   });
 

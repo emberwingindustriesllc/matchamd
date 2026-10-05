@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, User, DollarSign, Link2, Eye, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { AlertTriangle, User, DollarSign, Link2, Eye, CheckCircle, XCircle, Clock, Archive } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 const STATUS_COLORS = {
@@ -30,12 +30,35 @@ const CATEGORY_LABELS = {
   other: 'Other',
 };
 
+/**
+ * Resolve the reporter label.
+ *
+ * `author_display_name` is the denormalized value; the auth.users embed that
+ * used to supply this was removed because it fails under the anon key. The
+ * is_anonymous flag wins unconditionally -- an anonymous report must never
+ * surface a name, even if a stale non-null value survived on the row.
+ */
+function resolveReporterLabel(report) {
+  if (report?.is_anonymous) return 'Anonymous Reporter';
+  return (
+    report?.author_display_name ||
+    report?.user?.user_metadata?.display_name ||
+    'Unknown'
+  );
+}
+
 export default function ScamReportCard({ report, currentUserId, isModerator, onStatusChange }) {
   const StatusIcon = STATUS_ICONS[report.status] || AlertTriangle;
   const isReporter = report.reporter_id === currentUserId;
 
+  // Verified reports carry a 12-month expiry. A report past that date is kept for
+  // the historical record but must not be presented as a current accusation, so
+  // it is muted and labelled rather than dropped.
+  const expiresAt = report.expires_at ? new Date(report.expires_at) : null;
+  const isExpired = !!expiresAt && expiresAt.getTime() <= Date.now();
+
   return (
-    <Card className={`border-l-4 ${report.status === 'verified' ? 'border-destructive' : 'border-amber-500'}`}>
+    <Card className={`border-l-4 ${isExpired ? 'border-muted-foreground/40 opacity-70' : report.status === 'verified' ? 'border-destructive' : 'border-amber-500'}`}>
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -45,7 +68,7 @@ export default function ScamReportCard({ report, currentUserId, isModerator, onS
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-medium text-sm">
-                  {report.is_anonymous ? 'Anonymous Reporter' : (report.user?.user_metadata?.display_name || 'Unknown')}
+                  {resolveReporterLabel(report)}
                 </span>
                 {report.is_anonymous && (
                   <Badge variant="secondary" className="text-xs">
@@ -63,6 +86,12 @@ export default function ScamReportCard({ report, currentUserId, isModerator, onS
               <StatusIcon className="h-3 w-3 mr-1" />
               {report.status.replace('_', ' ')}
             </Badge>
+            {isExpired && (
+              <Badge variant="outline" className="bg-muted text-muted-foreground">
+                <Archive className="h-3 w-3 mr-1" />
+                Expired
+              </Badge>
+            )}
           </div>
         </div>
       </CardHeader>
@@ -94,6 +123,13 @@ export default function ScamReportCard({ report, currentUserId, isModerator, onS
         <div className="pt-2">
           <p className="text-sm text-foreground whitespace-pre-wrap">{report.description}</p>
         </div>
+
+        {isExpired && (
+          <p className="text-xs text-muted-foreground border-t pt-3">
+            This report is past its 12-month window and may no longer reflect current
+            conditions at this program. It is kept for the historical record only.
+          </p>
+        )}
 
         {report.evidence_urls?.length > 0 && (
           <div className="pt-2 border-t">
@@ -149,7 +185,9 @@ export default function ScamReportCard({ report, currentUserId, isModerator, onS
         {/* Reporter view */}
         {isReporter && !isModerator && (
           <div className="pt-2 text-xs text-muted-foreground">
-            Your report is {report.status === 'pending' ? 'awaiting review' : `currently ${report.status.replace('_', ' ')}`}.
+            {isExpired
+              ? 'Your report expired and is no longer shown as current.'
+              : `Your report is ${report.status === 'pending' ? 'awaiting review' : `currently ${report.status.replace('_', ' ')}`}.`}
           </div>
         )}
       </CardContent>

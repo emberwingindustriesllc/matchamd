@@ -8,6 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl, isReviewerAccount } from '@/utils';
 import { useToast } from '@/components/ui/use-toast';
 import { purchaseManager } from '@/lib/purchaseManager';
+import {
+  activateDemoSubscriptionGuarded,
+  activateDemoAddOnGuarded,
+} from '@/lib/demoGuard';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -211,20 +215,24 @@ export default function Subscription() {
   const currentSubscription = subscriptions?.[0];
 
   const handleActivateDemo = (item) => {
+    // Guarded: in a production build these return null and no entitlement is
+    // written to localStorage (issue #3).
     if (!item || item.type === 'plan') {
       const planId = item?.id || 'premium';
-      purchaseManager.activateDemoSubscription(planId);
-      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+      const activated = activateDemoSubscriptionGuarded(planId);
       setShowStagingModal(false);
+      if (!activated) return;
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
       toast({
         title: 'Demo Access Activated! 🎉',
         description: `Unlocked MatchaMD+ (${planId}) in staging/demo mode.`
       });
       navigate(createPageUrl('Profile'), { replace: true });
     } else if (item.type === 'addon') {
-      purchaseManager.activateDemoAddOn(item.id, item.name);
-      queryClient.invalidateQueries({ queryKey: ['purchases'] });
+      const activated = activateDemoAddOnGuarded(item.id, item.name);
       setShowStagingModal(false);
+      if (!activated) return;
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
       toast({
         title: 'Content Unlocked! 🎉',
         description: `Successfully unlocked ${item.name} in demo mode.`

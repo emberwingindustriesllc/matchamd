@@ -1,27 +1,38 @@
-import AdminModeration from './pages/AdminModeration';
-import Login from './pages/Login';
-import Community from './pages/Community';
-import Deadlines from './pages/Deadlines';
-import GuideDetail from './pages/GuideDetail';
-import Guides from './pages/Guides';
-import IMGPrograms from './pages/IMGPrograms';
-import Legal from './pages/Legal';
-import Mentors from './pages/Mentors';
-import Notifications from './pages/Notifications';
-import PostDetail from './pages/PostDetail';
-import Profile from './pages/Profile';
-import ProgramDetail from './pages/ProgramDetail';
-import ProgramsList from './pages/ProgramsList';
-import ResearchOpportunities from './pages/ResearchOpportunities';
-import USMLEQuizPack from './pages/USMLEQuizPack';
-import Dashboard from './pages/Dashboard';
-import InterviewCourse from './pages/InterviewCourse';
-import Onboarding from './pages/Onboarding';
-import Subscription from './pages/Subscription';
-import SurgeryGuide from './pages/SurgeryGuide';
-import AnkiGuide from './pages/AnkiGuide';
-import MatchCostCalculator from './pages/MatchCostCalculator';
-import BookCatalog from './pages/BookCatalog';
+import { lazy } from 'react';
+
+/*
+ * Route-level code splitting.
+ * Each page is a dynamic import, so Vite emits one chunk per route instead of a
+ * single monolithic bundle. Values in PAGES are React lazy elements (they
+ * unwrap their own `.default`), so consumers must render them inside a
+ * <Suspense> boundary — App.jsx does exactly that.
+ * Keys are the route contract (NavigationTracker, search, tests), so they are
+ * unchanged, including the interview-course aliases.
+ */
+const AdminModeration = lazy(() => import('./pages/AdminModeration'));
+const Login = lazy(() => import('./pages/Login'));
+const Community = lazy(() => import('./pages/Community'));
+const Deadlines = lazy(() => import('./pages/Deadlines'));
+const GuideDetail = lazy(() => import('./pages/GuideDetail'));
+const Guides = lazy(() => import('./pages/Guides'));
+const IMGPrograms = lazy(() => import('./pages/IMGPrograms'));
+const Legal = lazy(() => import('./pages/Legal'));
+const Mentors = lazy(() => import('./pages/Mentors'));
+const Notifications = lazy(() => import('./pages/Notifications'));
+const PostDetail = lazy(() => import('./pages/PostDetail'));
+const Profile = lazy(() => import('./pages/Profile'));
+const ProgramDetail = lazy(() => import('./pages/ProgramDetail'));
+const ProgramsList = lazy(() => import('./pages/ProgramsList'));
+const ResearchOpportunities = lazy(() => import('./pages/ResearchOpportunities'));
+const USMLEQuizPack = lazy(() => import('./pages/USMLEQuizPack'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const InterviewCourse = lazy(() => import('./pages/InterviewCourse'));
+const Onboarding = lazy(() => import('./pages/Onboarding'));
+const Subscription = lazy(() => import('./pages/Subscription'));
+const SurgeryGuide = lazy(() => import('./pages/SurgeryGuide'));
+const AnkiGuide = lazy(() => import('./pages/AnkiGuide'));
+const MatchCostCalculator = lazy(() => import('./pages/MatchCostCalculator'));
+const BookCatalog = lazy(() => import('./pages/BookCatalog'));
 import __Layout from './Layout.jsx';
 
 

@@ -37,7 +37,11 @@ const renderWithRouter = (component, { initialPath = '/' } = {}) => {
 describe('NavigationTracker', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
+    // This suite unmocks react-router-dom, which changes module init order;
+    // guard the global so a missing jsdom localStorage cannot fail every test.
+    if (typeof localStorage !== 'undefined' && localStorage) {
+      localStorage.clear();
+    }
   });
 
   it('tracks page view for authenticated user on Dashboard', async () => {

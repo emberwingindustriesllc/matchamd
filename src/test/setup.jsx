@@ -73,14 +73,46 @@ vi.mock('sonner', () => ({
   },
 }));
 
-// Mock lucide-react icons
-vi.mock('lucide-react', () => {
-  const icons = ['Bell', 'ChevronRight', 'Calendar', 'Trophy', 'Flame', 'Sparkles', 'Users', 'GraduationCap', 'Target', 'Stethoscope', 'Bot', 'Send', 'AlertCircle', 'Globe', 'CheckCircle2', 'Camera', 'Moon', 'BookOpen', 'Crown', 'Shield', 'MapPin', 'Settings', 'LogOut', 'ChevronLeft', 'GraduationCap', 'Shield', 'Home', 'User', 'Coins', 'Calculator', 'Plane', 'DollarSign', 'ShieldCheck', 'HelpCircle', 'Briefcase', 'Building2', 'FileText', 'ArrowLeft', 'Percent', 'AlertTriangle'];
+// Mock lucide-react icons.
+// Spread the real module so newly-added icons resolve automatically; the
+// hardcoded list previously broke any test importing a component that used an
+// icon not on it (e.g. LinkIcon in ResourceLink.jsx).
+vi.mock('lucide-react', async (importOriginal) => {
+  const actual = await importOriginal();
   const mockIcon = ({ children, ...props }) => <svg data-testid="icon" {...props} />;
   const mocked = {};
-  icons.forEach(name => { mocked[name] = mockIcon; });
+  for (const key of Object.keys(actual)) {
+    mocked[key] = typeof actual[key] === 'function' && /^[A-Z]/.test(key) ? mockIcon : actual[key];
+  }
   return mocked;
 });
+
+// Node >=22 exposes an experimental global `localStorage` that is undefined
+// unless --localstorage-file is passed. It shadows jsdom's window.localStorage,
+// so any test touching storage fails with "Cannot read properties of undefined".
+// Restore a working in-memory implementation when that happens.
+function createMemoryStorage() {
+  let store = new Map();
+  return {
+    getItem: (k) => (store.has(String(k)) ? store.get(String(k)) : null),
+    setItem: (k, v) => { store.set(String(k), String(v)); },
+    removeItem: (k) => { store.delete(String(k)); },
+    clear: () => { store = new Map(); },
+    key: (i) => Array.from(store.keys())[i] ?? null,
+    get length() { return store.size; },
+  };
+}
+
+if (!globalThis.localStorage) {
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    writable: true,
+    value: createMemoryStorage(),
+  });
+}
+if (typeof window !== 'undefined' && !window.localStorage) {
+  window.localStorage = globalThis.localStorage;
+}
 
 // Global test utilities
 global.ResizeObserver = vi.fn().mockImplementation(() => ({

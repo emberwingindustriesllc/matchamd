@@ -436,9 +436,12 @@ export default function IMGPrograms() {
     enabled: hasActiveRemoteCriteria
   });
 
-  const activeProgramList = (hasActiveRemoteCriteria && rpcPrograms.length > 0)
-    ? rpcPrograms
-    : programs;
+  // Prefer RPC results whenever criteria are active. Falling back to the
+  // unfiltered local list when the RPC returns zero rows made a narrow query
+  // ("Internal Medicine" + Pittsburgh) display the entire directory instead of
+  // an honest empty state, which is why searches "didn't work".
+  const activeProgramList = hasActiveRemoteCriteria ? rpcPrograms : programs;
+  const searchReturnedNothing = hasActiveRemoteCriteria && rpcPrograms.length === 0;
 
   const getFit = (prog) => calculateFitScore(prog, profile);
 
