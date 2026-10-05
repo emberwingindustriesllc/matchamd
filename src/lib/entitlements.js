@@ -1,5 +1,5 @@
 /**
- * Central entitlement resolution.
+ * Client-side entitlement CACHE over the server-authoritative answer.
  *
  * Why this file exists: access decisions were scattered across pages, each doing
  * its own localStorage + table read, and most advertised premium features were
@@ -7,11 +7,17 @@
  * user use X", so that gating an existing feature is a one-line change here
  * rather than an audit of every page.
  *
- * IMPORTANT (issue #3): this is still CLIENT-side resolution. It stops a casual
- * user from clicking through a paywall, which is the bar we can actually meet
- * in a client app, but a determined user can still forge localStorage. Real
- * enforcement requires the server to own entitlement -- see the proposal in
- * issue #3. Do not mistake this for security.
+ * SECURITY (issue #3): this is a CACHE, not the authority.
+ * `fetchServerEntitlements()` calls the `getEntitlements` Edge Function, which
+ * verifies the user's JWT, asks Stripe what they actually pay for, and returns
+ * the entitlement map. Everything here is downstream of that response.
+ *
+ * Consequences to keep in mind:
+ * - A tampered local cache only affects this device until the next server fetch.
+ * - `resolveEntitlements` remains as an OFFLINE fallback so the app is not
+ *   unusable on a plane, but it is explicitly marked non-authoritative: prefer
+ *   `fetchServerEntitlements` everywhere an entitlement gates a feature.
+ * - Demo activation stays blocked in production via `src/lib/demoGuard.js`.
  */
 
 import { supabase } from '@/api/supabaseClient';
@@ -122,10 +128,94 @@ export async function resolveEntitlements(user) {
   return { plan, content, isReviewer: false };
 }
 
+/**
+ * Fetch the AUTHORITATIVE entitlement map from the server.
+ *
+ * This is the call that actually matters for revenue protection: the Edge
+ * Function verifies the JWT and cross-checks Stripe, so its answer cannot be
+ * forged from the client. Use this for anything gating a paid feature.
+ *
+ * @returns {Promise<{plan: string, entitlements: Record<string, boolean>, content: string[]}>}
+ *   On failure returns a FREE-ONLY entitlement set -- fail closed.
+ */
+export async function fetchServerEntitlements() {
+  const FREE_ONLY = {
+    plan: 'free',
+    entitlements: {
+      // Free forever, per the pricing decision.
+      PROGRAM_SEARCH: true,
+      PROGRAM_DETAIL: true,
+      SAVED_SEARCHES: true,
+      COST_CALCULATOR: true,
+      GUIDES_CORE: true,
+      DEADLINES: true,
+      COMMUNITY_READ: true,
+      // Everything else denied until the server says otherwise.
+      INTERVIEW_COURSE: false,
+      SURGERY_GUIDE: false,
+      QUIZ_PACK: false,
+      PROFILE_EXPORTS: false,
+      FIT_ANALYSIS: false,
+      DEADLINE_ALERTS: false,
+      COMMUNITY_POST: false,
+      DATA_EXPORT: false,
+      ASYNC_REVIEW: false,
+    },
+    content: [],
+  };
+
+  try {
+    const { data, error } = await supabase.functions.invoke('getEntitlements');
+    if (error) {
+      console.warn('[entitlements] server call failed, falling back to free-only:', error);
+      return FREE_ONLY;
+    }
+    if (!data || typeof data !== 'object' || !data.entitlements) {
+      console.warn('[entitlements] malformed server response, falling back to free-only');
+      return FREE_ONLY;
+    }
+
+    // Backfill any key the server omitted with its fail-closed default, so a
+    // partial or empty map can never leave a paid feature implicitly undefined
+    // (which `=== true` would deny anyway, but an explicit false is clearer and
+    // protects any future code that reads the map loosely).
+    const merged = { ...FREE_ONLY.entitlements, ...data.entitlements };
+    for (const key of Object.keys(merged)) {
+      if (merged[key] !== true) merged[key] = false;
+    }
+
+    return { ...FREE_ONLY, ...data, entitlements: merged };
+  } catch (err) {
+    console.warn('[entitlements] server call threw, falling back to free-only:', err);
+    return FREE_ONLY;
+  }
+}
+
+/**
+ * Adapt a server entitlement response into the shape canAccess() expects.
+ * Treats the server's boolean map as authoritative for the named feature.
+ */
+export function entitlementsFromServer(response) {
+  const map = response?.entitlements || {};
+  return {
+    plan: response?.plan || 'free',
+    content: new Set(response?.content || []),
+    isReviewer: false,
+    serverVerified: true,
+    // canAccess consults this map first when present.
+    serverMap: map,
+  };
+}
+
 /** Does the resolved entitlement set allow `feature`? */
 export function canAccess(entitlements, feature) {
   if (!entitlements) return false;
   if (entitlements.isReviewer) return true;
+
+  // Server-verified answer wins outright when we have one.
+  if (entitlements.serverVerified && entitlements.serverMap) {
+    return entitlements.serverMap[feature] === true;
+  }
 
   const required = FEATURE_ACCESS[feature];
   if (required === undefined) {

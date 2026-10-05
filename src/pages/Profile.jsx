@@ -67,7 +67,7 @@ import {
   FileDown
 } from 'lucide-react';
 import ExportProfileModal from '@/components/profile/ExportProfileModal';
-import { canAccess, resolveEntitlements } from '@/lib/entitlements';
+import { canAccess, entitlementsFromServer, fetchServerEntitlements } from '@/lib/entitlements';
 import { useToast } from '@/components/ui/use-toast';
 
 const languages = [
@@ -107,11 +107,13 @@ export default function Profile() {
 
   const { user, logout } = useAuth();
 
-  // Resolve paid entitlements once the user is known (issue #3).
+  // Resolve paid entitlements from the SERVER, which verifies the JWT and
+  // cross-checks Stripe. The local resolver is an offline fallback only --
+  // a client-decided entitlement is exactly what issue #3 is about.
   useEffect(() => {
     let cancelled = false;
-    resolveEntitlements(user).then((ent) => {
-      if (!cancelled) setEntitlements(ent);
+    fetchServerEntitlements().then((response) => {
+      if (!cancelled) setEntitlements(entitlementsFromServer(response));
     });
     return () => { cancelled = true; };
   }, [user?.id]);
