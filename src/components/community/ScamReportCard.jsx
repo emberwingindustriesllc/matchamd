@@ -30,6 +30,23 @@ const CATEGORY_LABELS = {
   other: 'Other',
 };
 
+/**
+ * Resolve the reporter label.
+ *
+ * `author_display_name` is the denormalized value; the auth.users embed that
+ * used to supply this was removed because it fails under the anon key. The
+ * is_anonymous flag wins unconditionally -- an anonymous report must never
+ * surface a name, even if a stale non-null value survived on the row.
+ */
+function resolveReporterLabel(report) {
+  if (report?.is_anonymous) return 'Anonymous Reporter';
+  return (
+    report?.author_display_name ||
+    report?.user?.user_metadata?.display_name ||
+    'Unknown'
+  );
+}
+
 export default function ScamReportCard({ report, currentUserId, isModerator, onStatusChange }) {
   const StatusIcon = STATUS_ICONS[report.status] || AlertTriangle;
   const isReporter = report.reporter_id === currentUserId;
@@ -45,7 +62,7 @@ export default function ScamReportCard({ report, currentUserId, isModerator, onS
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-medium text-sm">
-                  {report.is_anonymous ? 'Anonymous Reporter' : (report.user?.user_metadata?.display_name || 'Unknown')}
+                  {resolveReporterLabel(report)}
                 </span>
                 {report.is_anonymous && (
                   <Badge variant="secondary" className="text-xs">

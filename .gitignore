@@ -34,6 +34,8 @@ android/.idea
 .env*.local
 hermes_session.json
 
+errors.txt
+
 # Data and large seeds
 store_assets/supabase_seeds/
 supabase/.temp/

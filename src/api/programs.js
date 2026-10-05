@@ -330,17 +330,47 @@ export async function fetchProgramNotes(programId) {
   return data || [];
 }
 
+/**
+ * Best-effort lookup of the signed-in user's display name.
+ *
+ * The cards cannot resolve an author on read: `user:auth.users(...)` needs
+ * privileges the anon key does not have. So the name is denormalized onto the
+ * row at write time instead. A profile that is missing, unreadable, or simply
+ * has no display_name yields null, and the card falls back rather than the
+ * whole note failing to post -- a note with no name is a cosmetic problem,
+ * losing the note itself is not.
+ */
+async function getAuthorDisplayName(userId) {
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('display_name')
+      .eq('user_id', userId)
+      .single();
+    if (error) return null;
+    return data?.display_name ?? null;
+  } catch {
+    // Network/RLS failure on the profile read must not block the note.
+    return null;
+  }
+}
+
 export async function createProgramNote(programId, note) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Must be logged in');
 
+  const authorDisplayName = note?.is_anonymous
+    ? null
+    : await getAuthorDisplayName(user.id);
+
   const { data, error } = await supabase
     .from('program_notes')
     .insert({
       program_id: programId,
       user_id: user.id,
+      author_display_name: authorDisplayName,
       ...note,
     })
     .select()
