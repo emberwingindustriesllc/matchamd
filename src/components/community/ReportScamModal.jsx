@@ -52,6 +52,10 @@ export default function ReportScamModal({ programId, programName, open, onOpenCh
     const newErrors = {};
     if (step === 1) {
       if (!formData.entity_name.trim()) newErrors.entity_name = 'Entity name is required';
+      // Evidence is mandatory: the database trigger rejects a report without it.
+      if (step === 3 && !formData.evidence_urls.trim()) {
+        newErrors.evidence_urls = 'At least one evidence URL is required. Reports without evidence cannot be submitted.';
+      }
       if (!formData.entity_type) newErrors.entity_type = 'Select entity type';
       if (!formData.scam_category) newErrors.scam_category = 'Select scam category';
     }
@@ -80,7 +84,7 @@ export default function ReportScamModal({ programId, programName, open, onOpenCh
         is_anonymous: formData.is_anonymous,
       });
 
-      toast.success('Report submitted for review. Thank you for helping keep the community safe.');
+      toast.success('Report submitted for moderator review. It is not published until a moderator verifies it. Thank you for helping keep the community safe.');
       onOpenChange(false);
       setFormData({
         entity_name: '',
@@ -237,7 +241,7 @@ export default function ReportScamModal({ programId, programName, open, onOpenCh
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="evidence_urls">Evidence URLs (one per line, optional)</Label>
+                <Label htmlFor="evidence_urls">Evidence URLs (one per line, required)</Label>
                 <Textarea
                   id="evidence_urls"
                   rows={3}
@@ -270,7 +274,7 @@ https://whatsapp.com/chat/..."
                 <div><strong>Type:</strong> {ENTITY_TYPES.find(t => t.value === formData.entity_type)?.label}</div>
                 <div><strong>Category:</strong> {SCAM_CATEGORIES.find(c => c.value === formData.scam_category)?.label}</div>
                 <div><strong>Amount:</strong> {formData.amount_usd ? `$${parseFloat(formData.amount_usd).toLocaleString()}` : 'Not specified'}</div>
-                <div><strong>Evidence:</strong> {formData.evidence_urls.trim() ? formData.evidence_urls.trim().split('\n').length + ' link(s)' : 'None provided'}</div>
+                <div><strong>Evidence:</strong> {formData.evidence_urls.trim() ? formData.evidence_urls.trim().split('\n').length + ' link(s)' : 'None provided'}{!formData.evidence_urls.trim() && ' (required to submit)'}</div>
                 <div><strong>Anonymous:</strong> {formData.is_anonymous ? 'Yes' : 'No'}</div>
               </div>
 

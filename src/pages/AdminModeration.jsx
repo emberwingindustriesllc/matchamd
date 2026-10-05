@@ -17,11 +17,13 @@ import {
   MessageSquare,
   Search,
   AlertTriangle,
-  Eye
+  Eye,
+  ShieldAlert
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import ScamReportModerationQueue from '@/components/community/ScamReportModerationQueue';
 
 export default function AdminModeration() {
   const navigate = useNavigate();
@@ -157,7 +159,7 @@ export default function AdminModeration() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="posts" className="gap-2">
               <MessageSquare className="w-4 h-4" />
               Posts ({filteredPosts.length})
@@ -166,7 +168,16 @@ export default function AdminModeration() {
               <MessageSquare className="w-4 h-4" />
               Comments ({filteredComments.length})
             </TabsTrigger>
+            <TabsTrigger value="reports" className="gap-2">
+              <ShieldAlert className="w-4 h-4" />
+              Scam Reports
+            </TabsTrigger>
           </TabsList>
+
+          {/* Scam Reports Tab -- review before publication (LEGAL-01) */}
+          <TabsContent value="reports" className="space-y-4">
+            <ScamReportModerationQueue />
+          </TabsContent>
 
           {/* Posts Tab */}
           <TabsContent value="posts" className="space-y-4">

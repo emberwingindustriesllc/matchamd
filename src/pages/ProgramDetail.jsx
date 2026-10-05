@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  MapPin, Globe, Mail, Shield, AlertTriangle, BookOpen, Plus, Loader2,
+  MapPin, Globe, Mail, Shield, ShieldCheck, AlertTriangle, BookOpen, Plus, Loader2,
   Verified, Calculator
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -220,6 +220,15 @@ export default function ProgramDetail() {
             <AlertTriangle className="h-4 w-4 mr-2" /> Report Scam
           </Button>
         </div>
+        <p className="text-xs text-muted-foreground max-w-3xl">
+          <strong>Before you report:</strong> nothing you file is published until a moderator
+          verifies it. An unverified allegation about a real institution can hurt real
+          people, which is why at least one piece of evidence is required and why a
+          moderator &mdash; not you and not the program &mdash; decides what gets shown.
+          Verified reports expire after 12 months, because programs and circumstances
+          change. Please use this for facts you can document, not to settle a personal
+          dispute with a coordinator or a program.
+        </p>
       </div>
 
       {/* Contact Info */}
@@ -251,8 +260,8 @@ export default function ProgramDetail() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="notes">Community Notes ({notes.length})</TabsTrigger>
-          <TabsTrigger value="reports">Scam Reports ({reports.length})</TabsTrigger>
+          <TabsTrigger value="notes">Community Notes{notes.length > 0 ? ` (${notes.length})` : ''}</TabsTrigger>
+          <TabsTrigger value="reports">Scam Reports{reports.length > 0 ? ` (${reports.length})` : ''}</TabsTrigger>
           <TabsTrigger value="add">Add Note</TabsTrigger>
         </TabsList>
 
@@ -325,7 +334,21 @@ export default function ProgramDetail() {
 
           <div className="space-y-4">
             {notes.length === 0 ? (
-              <Card><CardContent className="py-8 text-center text-muted-foreground">No notes yet. Be the first to share!</CardContent></Card>
+              <Card>
+                <CardContent className="py-10 px-6 text-center space-y-2">
+                  <p className="font-medium text-foreground">No notes on this program yet</p>
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                    Community notes are firsthand write-ups from people who actually
+                    interviewed here, matched here, or spent a rotation here &mdash; what the
+                    PD really asked, how the interview felt, what the program does not
+                    advertise. If that is you, you are the only one who can write it.
+                  </p>
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                    Add your experience above (or log in first) to be the first note on
+                    this program.
+                  </p>
+                </CardContent>
+              </Card>
             ) : (
               notes.map(note => <ProgramNoteCard key={note.id} note={note} currentUserId={user?.id} />)
             )}
@@ -340,7 +363,26 @@ export default function ProgramDetail() {
             </AlertDescription>
           </Alert>
           {reports.length === 0 ? (
-            <Card><CardContent className="py-8 text-center text-muted-foreground">No scam reports for this program yet.</CardContent></Card>
+            <Card>
+              <CardContent className="py-10 px-6 text-center space-y-2">
+                <div className="flex items-center justify-center gap-2 text-foreground font-medium">
+                  <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  No verified scam reports for this program
+                </div>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  Nothing appears here until a moderator has checked it. That is on
+                  purpose: an unverified accusation against a real hospital or program
+                  can do real damage to real people, so every report is read by a human
+                  before anyone else sees it.
+                </p>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  Reports are anonymous and require evidence (screenshots, contracts,
+                  emails, chat logs). If something happened to you here, file it &mdash; it
+                  appears once a moderator verifies it, and verified reports expire
+                  after 12 months.
+                </p>
+              </CardContent>
+            </Card>
           ) : (
             reports.map(report => <ScamReportCard key={report.id} report={report} currentUserId={user?.id} isModerator={isModerator} onStatusChange={handleReportStatusChange} />)
           )}
