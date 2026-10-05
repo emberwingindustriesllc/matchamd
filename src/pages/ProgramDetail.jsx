@@ -14,7 +14,13 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/lib/AuthContext';
-import { fetchProgramById, createProgramNote } from '@/api/programs';
+import {
+  fetchProgramById,
+  createProgramNote,
+  fetchProgramNotes,
+  fetchScamReports,
+  updateScamReportStatus,
+} from '@/api/programs';
 import { createPageUrl } from '@/utils';
 import ReportScamModal from '@/components/community/ReportScamModal';
 import AddProgramModal from '@/components/community/AddProgramModal';
@@ -90,10 +96,8 @@ export default function ProgramDetail() {
       setLoading(true);
       const [programData, notesData, reportsData] = await Promise.all([
         fetchProgramById(id),
-        // fetchProgramNotes(id), // Would need to add this to api
-        Promise.resolve([]), // placeholder
-        // fetchScamReports(id), // Would need to add this to api
-        Promise.resolve([]), // placeholder
+        fetchProgramNotes(id),
+        fetchScamReports(id),
       ]);
       setProgram(programData);
       setNotes(notesData);
@@ -133,9 +137,13 @@ export default function ProgramDetail() {
   };
 
   const handleReportStatusChange = async (reportId, status, moderatorNotes) => {
-    // Would call updateScamReportStatus from api
-    toast.success(`Report marked as ${status}`);
-    loadProgram();
+    try {
+      await updateScamReportStatus(reportId, status, moderatorNotes);
+      toast.success(`Report marked as ${status}`);
+      loadProgram();
+    } catch (error) {
+      toast.error(error.message || 'Failed to update report status');
+    }
   };
 
   if (loading) {
