@@ -12,13 +12,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const supabaseMock = {
   from: vi.fn(),
-  auth: { getUser: vi.fn() },
+  auth: { getSession: vi.fn() },
 };
 
 vi.mock('@/api/supabaseClient', () => ({
   supabase: {
     from: (...a) => supabaseMock.from(...a),
-    auth: { getUser: (...a) => supabaseMock.auth.getUser(...a) },
+    auth: { getSession: (...a) => supabaseMock.auth.getSession(...a) },
+    // Programs now read the LOCAL session (getSession) instead of making a
+    // network getUser() call, to avoid concurrent refresh-token races.
   },
 }));
 
@@ -47,11 +49,11 @@ const NOTE = { title: 'Great APD', content: 'Very organized', note_type: 'experi
 describe('createProgramNote author_display_name', () => {
   beforeEach(() => {
     supabaseMock.from.mockReset();
-    supabaseMock.auth.getUser.mockReset();
+    supabaseMock.auth.getSession.mockReset();
   });
 
   it('includes author_display_name from the user profile in the insert payload', async () => {
-    supabaseMock.auth.getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
+    supabaseMock.auth.getSession.mockResolvedValue({ data: { session: { user: { id: 'u1' } } }, error: null });
 
     const inserts = [];
     // First from() is the user_profiles lookup, second is the program_notes insert.
@@ -74,7 +76,7 @@ describe('createProgramNote author_display_name', () => {
   });
 
   it('degrades to null when the profile read returns an error, without throwing', async () => {
-    supabaseMock.auth.getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
+    supabaseMock.auth.getSession.mockResolvedValue({ data: { session: { user: { id: 'u1' } } }, error: null });
 
     const inserts = [];
     supabaseMock.from
@@ -93,7 +95,7 @@ describe('createProgramNote author_display_name', () => {
   });
 
   it('degrades to null when the profile read throws, without throwing', async () => {
-    supabaseMock.auth.getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
+    supabaseMock.auth.getSession.mockResolvedValue({ data: { session: { user: { id: 'u1' } } }, error: null });
 
     const inserts = [];
     supabaseMock.from
@@ -114,7 +116,7 @@ describe('createProgramNote author_display_name', () => {
   });
 
   it('does not persist a name on an anonymous note', async () => {
-    supabaseMock.auth.getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
+    supabaseMock.auth.getSession.mockResolvedValue({ data: { session: { user: { id: 'u1' } } }, error: null });
 
     const inserts = [];
     // Only one from() call: the profile is not even read for an anonymous note.
@@ -131,7 +133,7 @@ describe('createProgramNote author_display_name', () => {
   });
 
   it('still throws when there is no signed-in user', async () => {
-    supabaseMock.auth.getUser.mockResolvedValue({ data: { user: null } });
+    supabaseMock.auth.getSession.mockResolvedValue({ data: { session: null }, error: null });
 
     const { createProgramNote } = await import('@/api/programs');
     await expect(createProgramNote('p1', NOTE)).rejects.toThrow(/logged in/i);

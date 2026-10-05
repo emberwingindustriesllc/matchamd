@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { normalizeProgramCounts, sanitizeIlikeTerm } from '@/lib/programSearch';
+import { getCurrentUser } from '@/lib/currentUser';
 import { expandMedicalSearchTerms } from '@/lib/medicalSynonyms';
 import { mockResidencyPrograms } from '@/data/mockResidencyPrograms';
 import { mockFellowships } from '@/data/mockFellowships';
@@ -161,7 +162,7 @@ export async function fetchPrograms(filters = {}) {
 // --- Saved Searches API ---
 
 export async function fetchSavedSearches() {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) {
     const local = localStorage.getItem('matchamd_saved_searches');
     return local ? JSON.parse(local) : [];
@@ -183,7 +184,7 @@ export async function fetchSavedSearches() {
 export async function saveSearch(name, filters) {
   const searchObj = { id: `search-${Date.now()}`, name, filters, created_at: new Date().toISOString() };
   
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) {
     const local = localStorage.getItem('matchamd_saved_searches');
     const existing = local ? JSON.parse(local) : [];
@@ -210,7 +211,7 @@ export async function saveSearch(name, filters) {
 }
 
 export async function deleteSavedSearch(id) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user || id.startsWith('search-')) {
     const local = localStorage.getItem('matchamd_saved_searches');
     if (local) {
@@ -272,9 +273,7 @@ export async function fetchProgramById(id) {
 }
 
 export async function createProgram(program) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) throw new Error('Must be logged in');
 
   const { data, error } = await supabase
@@ -356,9 +355,7 @@ async function getAuthorDisplayName(userId) {
 }
 
 export async function createProgramNote(programId, note) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) throw new Error('Must be logged in');
 
   const authorDisplayName = note?.is_anonymous
@@ -381,9 +378,7 @@ export async function createProgramNote(programId, note) {
 }
 
 export async function voteNoteHelpful(noteId) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) throw new Error('Must be logged in');
 
   const { data, error } = await supabase.rpc('vote_note_helpful', {
@@ -422,9 +417,7 @@ export async function fetchScamReports(programId = null) {
 }
 
 export async function createScamReport(report) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) throw new Error('Must be logged in');
 
   const { data, error } = await supabase
@@ -443,9 +436,7 @@ export async function createScamReport(report) {
 }
 
 export async function updateScamReportStatus(id, status, moderatorNotes = '') {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) throw new Error('Must be logged in');
 
   const { data: profile } = await supabase

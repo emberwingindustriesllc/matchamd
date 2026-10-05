@@ -10,13 +10,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const supabaseMock = {
   from: vi.fn(),
-  auth: { getUser: vi.fn() },
+  auth: { getSession: vi.fn() },
 };
 
 vi.mock('@/api/supabaseClient', () => ({
   supabase: {
     from: (...a) => supabaseMock.from(...a),
-    auth: { getUser: (...a) => supabaseMock.auth.getUser(...a) },
+    auth: { getSession: (...a) => supabaseMock.auth.getSession(...a) },
+    // Programs now read the LOCAL session (getSession) instead of making a
+    // network getUser() call, to avoid concurrent refresh-token races.
   },
 }));
 
@@ -50,7 +52,7 @@ function builder(result, { failOn = null } = {}) {
 describe('fetchProgramNotes', () => {
   beforeEach(() => {
     supabaseMock.from.mockReset();
-    supabaseMock.auth.getUser.mockReset();
+    supabaseMock.auth.getSession.mockReset();
   });
 
   // This suite does no real I/O -- it is pure mock plumbing. It has flaked on
@@ -111,12 +113,13 @@ describe('fetchScamReports', () => {
 describe('updateScamReportStatus', () => {
   beforeEach(() => {
     supabaseMock.from.mockReset();
-    supabaseMock.auth.getUser.mockReset();
+    supabaseMock.auth.getSession.mockReset();
   });
 
   it('rejects when the caller is not a verified contributor', async () => {
-    supabaseMock.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'u1', email: 'someone@example.com' } },
+    supabaseMock.auth.getSession.mockResolvedValue({
+      data: { session: { user: { id: 'u1', email: 'someone@example.com' } } },
+      error: null,
     });
     supabaseMock.from.mockReturnValue(
       builder({ data: { user_id: 'u1', verified_contributor: false }, error: null })
@@ -127,8 +130,9 @@ describe('updateScamReportStatus', () => {
   });
 
   it('updates the status for a verified contributor', async () => {
-    supabaseMock.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'u1', email: 'mod@example.com' } },
+    supabaseMock.auth.getSession.mockResolvedValue({
+      data: { session: { user: { id: 'u1', email: 'mod@example.com' } } },
+      error: null,
     });
     const updated = [{ id: 'r1', status: 'verified' }];
     supabaseMock.from.mockReturnValue(
