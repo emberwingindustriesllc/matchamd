@@ -50,12 +50,16 @@ Software value: personalization and automation that a static directory cannot do
 
 ## Tier 3 — MatchaMD Pro ($39/mo, includes one review)
 
+**Owner decision 2026-10-04: the review moves to a 14-day window.** The 5–7 business
+day promise below is retired; see the capacity section for why this is the
+right call at current scale.
+
 The only tier that involves a human, and therefore the only one with a real
 cost to serve. Keep it narrow.
 
 | Feature | Basis |
 |---|---|
-| **1 physician CV + personal statement review, 14-day turnaround** | Owner-reviewed. |
+| **1 physician CV + personal statement review, 14-day turnaround** | Owner-reviewed. Owner-confirmed 2026-10-04. |
 | Research abstract / study design critique | Same reviewer capacity, cheaper to deliver. |
 | Everything in MatchaMD+ | |
 | Priority support | |
@@ -79,11 +83,55 @@ it is a promise you'll break, and the refund/review-credit policy is a
 disclosure problem, not just a policy problem. Either staff it to 7 days or
 quote 14. I would quote 14 and let it usually come in under that.
 
-**Capacity math (worth checking before publishing):** at ~1 hour per review and
-10 reviews/week, that is ~10 review slots per week ≈ 50 per match season. At
-$39 with a stated 14-day window, that's roughly $2–4k/season of review revenue
-against 10–15 hours of your time. Fine as a differentiator and honest-feeling;
-not a business. Treat it as retention and word-of-mouth, not revenue.
+**Capacity math — how many people will use it?** (owner asked 2026-10-04)
+
+Measured from the live database on 2026-10-04 (`mmfixpgfaskufmrfmzcc`):
+
+| Signal | Value |
+|---|---|
+| Registered users (`auth.users`) | **10** |
+| Completed onboarding | 5 |
+| Set a target specialty | 5 |
+| Set a graduation year | 4 |
+| Set a Step 2 score | 3 |
+| Subscription rows | 2 |
+| One-time purchases | 6 |
+
+**The honest answer: at today's scale the review will not overwhelm you.** Ten
+registered users, five of whom finished onboarding and set a specialty. Even a
+100% conversion rate on a Pro tier is five to ten reviews per season — a few
+hours of your time.
+
+That number is also the whole problem for planning purposes: 10 users is not a
+demand signal, it is a pre-launch count. You cannot size a service from it.
+
+So the practical answer is a **soft capacity cap**, not a guess:
+
+1. **Publish the 14-day window and the cap together.** "14 days, capped at 20
+   reviews per match season." A stated cap converts an unbounded promise into a
+   sellable, honest one, and it is what makes the review tier defensible as you
+   grow.
+2. **Cap sells out, then the software tier carries the value.** MatchaMD+ is
+   unlimited and self-serve; only the human review is rationed. That ordering
+   matters — it means the thing you cannot scale is never load-bearing for the
+   product.
+3. **When the cap binds, the conversion metric to watch is cap-hit rate**, not
+   raw signups. If 20 slots sell out, price and raise the cap. If they don't,
+   the review is not the product.
+4. **Your real constraint is a match season, not a month.** Demand will cluster
+   in the ~8 weeks before ERAS submission and again before rank lists. A cap
+   per season, not per month, is the right unit.
+
+Reviewing the original "5–7 business days" copy: that was the risky promise, not
+the 14 days. At one reviewer, 5–7 business days is 8–10 hours of work in a
+single week, which is not sustainable across a season without dropping quality —
+and a missed clinical-admissions deadline is the kind of failure that produces a
+refund request and a bad review. Fourteen days quoted up front, usually beaten, is
+the version I would defend.
+
+---
+
+**Original copy (retired):** "5–7 business day written review turnaround."
 
 ---
 
@@ -121,8 +169,15 @@ Done:
 - Profile export gated to premium with an upgrade path
 - 15 entitlement tests including a tripwire that free-tier features stay free
 - Entitlement self-grant hole closed in the database (SEC-04)
+- `src/lib/demoGuard.js` — demo activation blocked in production builds via the
+  compile-time `import.meta.env.PROD` gate. Both call sites now use the guarded
+  wrappers and no longer show a false "Content Unlocked" toast. 9 tests.
+- Review window set to 14 days, with a per-season cap of 20 as the rationing unit.
 
 Still open (issue #3):
-- `localStorage` demo activation can still forge a Pro entitlement client-side.
-  Real enforcement means the server owns entitlement.
-- `Subscription.jsx` copy does not match this proposal yet.
+- Entitlement is still resolved client-side. The demo-mode hole is closed, but a
+  determined user can still hand-edit the `subscriptions` read path. Real
+  enforcement means the server owns entitlement — the remaining architectural
+  half.
+- `Subscription.jsx` copy does not match this proposal yet (still advertises the
+  old tiers and the retired 5–7 business day turnaround).
