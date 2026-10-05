@@ -9,13 +9,22 @@ export const AuthProvider = ({ children }) => {
   const [session, setSession]             = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  // False until getSession() actually settles. Distinguishes "we know there is
+  // no session" from "we do not know yet", so a slow refresh cannot be
+  // mistaken for a logged-out user and bounce them to /Login.
+  const [authResolved, setAuthResolved] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
+    let settled = false;
 
-    // Safety fallback: force isLoadingAuth to false after 2.5s max
+    // Safety fallback for a hung auth client. It only releases the loading
+    // flag; `authResolved` stays false, and RequireAuth treats "not resolved"
+    // as "keep showing the loading screen" rather than "not authenticated".
+    // Without that distinction a slow refresh would log the user out.
     const timer = setTimeout(() => {
-      if (isMounted) {
+      if (isMounted && !settled) {
+        console.warn('[AuthContext] auth did not settle within 2.5s; releasing loading state');
         setIsLoadingAuth(false);
       }
     }, 2500);
@@ -24,6 +33,8 @@ export const AuthProvider = ({ children }) => {
     supabase.auth.getSession()
       .then(({ data }) => {
         if (!isMounted) return;
+        settled = true;
+        setAuthResolved(true);
         const currentSession = data?.session ?? null;
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
@@ -40,6 +51,8 @@ export const AuthProvider = ({ children }) => {
       .catch((err) => {
         console.error('[AuthContext] getSession error:', err);
         if (isMounted) {
+          settled = true;
+          setAuthResolved(true);
           setIsLoadingAuth(false);
           clearTimeout(timer);
         }
@@ -95,6 +108,7 @@ export const AuthProvider = ({ children }) => {
       session,
       isAuthenticated,
       isLoadingAuth,
+      authResolved,
       // Legacy compat: these kept so existing callers don't crash
       isLoadingPublicSettings: false,
       authError: null,

@@ -40,10 +40,13 @@ const LoadingScreen = () => (
 
 /** Guard: redirects to /Login if the user is not authenticated */
 const RequireAuth = ({ children }) => {
-  const { isLoadingAuth, isAuthenticated } = useAuth();
+  const { isLoadingAuth, isAuthenticated, authResolved } = useAuth();
   const location = useLocation();
 
-  if (isLoadingAuth) return <LoadingScreen />;
+  // Keep showing the loading screen until the session is actually known.
+  // Redirecting on `!isAuthenticated` alone would bounce a logged-in user to
+  // /Login whenever the token refresh was merely slow.
+  if (isLoadingAuth || !authResolved) return <LoadingScreen />;
   if (!isAuthenticated) return <Navigate to="/Login" state={{ from: location }} replace />;
 
   return children;
