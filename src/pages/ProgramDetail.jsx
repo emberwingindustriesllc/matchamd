@@ -15,6 +15,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/lib/AuthContext';
 import { fetchProgramById, createProgramNote } from '@/api/programs';
+import { createPageUrl } from '@/utils';
 import ReportScamModal from '@/components/community/ReportScamModal';
 import AddProgramModal from '@/components/community/AddProgramModal';
 import ProgramNoteCard from '@/components/community/ProgramNoteCard';
@@ -100,7 +101,7 @@ export default function ProgramDetail() {
     } catch (error) {
       console.error('Failed to load program:', error);
       toast.error('Failed to load program');
-      navigate('/programs');
+      navigate(createPageUrl('ProgramsList'));
     } finally {
       setLoading(false);
     }
@@ -150,7 +151,7 @@ export default function ProgramDetail() {
       <div className="text-center py-12">
         <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
         <h2 className="text-xl font-medium">Program Not Found</h2>
-        <Button onClick={() => navigate('/programs')} className="mt-4">Browse Programs</Button>
+        <Button onClick={() => navigate(createPageUrl('ProgramsList'))} className="mt-4">Browse Programs</Button>
       </div>
     );
   }

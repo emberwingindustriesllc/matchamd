@@ -54,14 +54,21 @@ export async function loadLocations() {
 
   if (error) {
     console.error('Failed to load locations:', error);
-    return DEFAULT_LOCATIONS;
+    // Populate the cache with the fallback list. Leaving it null makes
+    // filterLocations() operate on null and, downstream, feed an empty pool
+    // to the search RPC so chips resolve to nothing.
+    locationCache = DEFAULT_LOCATIONS;
+    return locationCache;
   }
 
-  // Merge database cities with statewide options
-  locationCache = [
-    ...STATEWIDE_LOCATIONS,
-    ...(data || [])
-  ];
+  // Merge database cities with statewide options. If the view returns nothing
+  // usable, fall back rather than serving a list that can never match.
+  const dbLocations = (data || []).filter(
+    (loc) => loc && (loc.location_label || loc.city)
+  );
+  locationCache = dbLocations.length > 0
+    ? [...STATEWIDE_LOCATIONS, ...dbLocations]
+    : DEFAULT_LOCATIONS;
   return locationCache;
 }
 

@@ -258,7 +258,7 @@ export default function ProgramsList() {
         const isHighSignal = program.verified || program.scam_reports_count > 0;
 
         return (
-          <Link key={program.id} to={`/programs/${program.id}`} className="text-inherit no-underline">
+          <Link key={program.id} to={`/ProgramDetail/${program.id}`} className="text-inherit no-underline">
             <motion.div
               whileHover={{ y: -4, scale: 1.01 }}
               transition={{ type: 'spring', stiffness: 220, damping: 18 }}
