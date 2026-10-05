@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
@@ -67,6 +67,8 @@ import {
   FileDown
 } from 'lucide-react';
 import ExportProfileModal from '@/components/profile/ExportProfileModal';
+import { canAccess, resolveEntitlements } from '@/lib/entitlements';
+import { useToast } from '@/components/ui/use-toast';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -86,6 +88,8 @@ const specialties = [
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [entitlements, setEntitlements] = useState({ plan: 'free', content: new Set(), isReviewer: false });
   const queryClient = useQueryClient();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -102,6 +106,15 @@ export default function Profile() {
   const [passwordSuccess, setPasswordSuccess] = useState('');
 
   const { user, logout } = useAuth();
+
+  // Resolve paid entitlements once the user is known (issue #3).
+  useEffect(() => {
+    let cancelled = false;
+    resolveEntitlements(user).then((ent) => {
+      if (!cancelled) setEntitlements(ent);
+    });
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
 
   const { data: profiles, isLoading } = useQuery({
@@ -631,7 +644,19 @@ export default function Profile() {
         {/* Export Profile */}
         <Button 
           variant="outline" 
-          onClick={() => setIsExportOpen(true)}
+          onClick={() => {
+            // Profile/CV export is a paid entitlement (FEATURE_ACCESS.PROFILE_EXPORTS).
+            // Previously ungated -- anyone could export their whole profile for free.
+            if (canAccess(entitlements, 'PROFILE_EXPORTS')) {
+              setIsExportOpen(true);
+            } else {
+              toast({
+                title: 'Profile export is a premium feature',
+                description: 'Upgrade to MatchaMD+ to export your CV and profile data.',
+              });
+              navigate(createPageUrl('Subscription'));
+            }
+          }}
           className="w-full h-12 rounded-xl text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-900/50 hover:bg-teal-50 dark:hover:bg-teal-950/20 shadow-sm"
         >
           <FileDown className="w-5 h-5 mr-2 text-teal-600 dark:text-teal-400" />
