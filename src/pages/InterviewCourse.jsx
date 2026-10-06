@@ -15,7 +15,6 @@ import {
   Video,
   CheckCircle2,
   PlayCircle,
-  Play,
   Lightbulb,
   FileText,
   Star,
@@ -27,7 +26,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import PremiumGate from '@/components/premium/PremiumGate';
 import { toast } from 'sonner';
-import { generateLessonHandoutPDF } from '@/utils/pdfHandoutGenerator';
+import { generateLessonHandoutPDF, openLessonHandoutPreview } from '@/utils/pdfHandoutGenerator';
 import MockInterviewVideoPlayer from '@/components/interview/MockInterviewVideoPlayer';
 import STARPracticeFlashcards from '@/components/interview/STARPracticeFlashcards';
 
@@ -36,9 +35,9 @@ const courseModules = [
     id: 1,
     title: 'Interview Fundamentals',
     lessons: [
-      { id: 1, title: 'What Program Directors Look For', duration: '8 min', completed: true, videoUrl: 'https://www.youtube.com/embed/DiUI7_oKxho', summary: 'Learn the core criteria US program directors evaluate: clinical competence, communication skills, professionalism, and team fit.' },
-      { id: 2, title: 'Virtual vs In-Person Interviews', duration: '6 min', completed: false, videoUrl: 'https://www.youtube.com/embed/b3vI35Zc_Z8', summary: 'Master lighting, camera setup, eye contact, and avoiding common virtual residency interview mistakes.' },
-      { id: 3, title: 'First Impressions & Body Language', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'Key posture tips, confident vocal tone, and engaging storytelling techniques.' },
+      { id: 1, title: 'What Program Directors Look For', duration: '8 min', completed: true, videoUrl: 'https://www.youtube.com/embed/yO7VlC-WbQQ', summary: 'Learn the core criteria US program directors evaluate: clinical competence, communication skills, professionalism, and team fit.' },
+      { id: 2, title: 'Virtual vs In-Person Interviews', duration: '6 min', completed: false, videoUrl: 'https://www.youtube.com/embed/r0b-C_n2aZk', summary: 'Master lighting, camera setup, eye contact, and avoiding common virtual residency interview mistakes.' },
+      { id: 3, title: 'First Impressions & Body Language', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI?start=0', summary: 'Key posture tips, confident vocal tone, and engaging storytelling techniques.' },
       { id: 4, title: 'Structuring Your Answers (STAR Method)', duration: '12 min', completed: false, videoUrl: 'https://www.youtube.com/embed/WRLF8ULhZmw', summary: 'Situation, Task, Action, Result framework tailored for medical clinical vignettes.' }
     ]
   },
@@ -46,40 +45,40 @@ const courseModules = [
     id: 2,
     title: 'Common Interview Questions',
     lessons: [
-      { id: 5, title: '"Tell Me About Yourself" - Perfect Answer', duration: '15 min', completed: false, videoUrl: 'https://www.youtube.com/embed/JTnTbzskEuo', summary: 'Crafting a 2-minute elevated pitch connecting your medical background to your residency goals.' },
-      { id: 6, title: '"Why Our Program?" Research Strategies', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/b3vI35Zc_Z8', summary: 'How to analyze hospital patient volume, fellowship matches, and faculty research.' },
-      { id: 7, title: '"Why This Specialty?" Compelling Narratives', duration: '12 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'Articulating passion through patient encounters and rotation highlights.' },
-      { id: 8, title: 'Handling Weakness Questions', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'Authentic self-reflection paired with tangible action steps for improvement.' },
-      { id: 9, title: 'Discussing Gap Years & Challenges', duration: '14 min', completed: false, videoUrl: 'https://www.youtube.com/embed/b3vI35Zc_Z8', summary: 'Framing clinical gaps or visa hurdles into stories of resilience and dedication.' }
+      { id: 5, title: '"Tell Me About Yourself" - Perfect Answer', duration: '15 min', completed: false, videoUrl: 'https://www.youtube.com/embed/DiUI7_oKxho', summary: 'Crafting a 2-minute elevator pitch connecting your medical background to your residency goals.' },
+      { id: 6, title: '"Why Our Program?" Research Strategies', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/3rnt2mfkRu4', summary: 'How to analyze hospital patient volume, fellowship matches, and faculty research.' },
+      { id: 7, title: '"Why This Specialty?" Compelling Narratives', duration: '12 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI?start=240', summary: 'Articulating passion through patient encounters and rotation highlights.' },
+      { id: 8, title: 'Handling Weakness Questions', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI?start=648', summary: 'Authentic self-reflection paired with tangible action steps for improvement.' },
+      { id: 9, title: 'Discussing Gap Years & Challenges', duration: '14 min', completed: false, videoUrl: 'https://www.youtube.com/embed/jm9wswVZkc8', summary: 'Framing clinical gaps or visa hurdles into stories of resilience and dedication.' }
     ]
   },
   {
     id: 3,
     title: 'IMG-Specific Challenges',
     lessons: [
-      { id: 10, title: 'Addressing Visa Status Confidently', duration: '8 min', completed: false, videoUrl: 'https://www.youtube.com/embed/DiUI7_oKxho', summary: 'Clear explanations of J-1 vs H-1B requirements and state licensing.' },
-      { id: 11, title: 'Explaining Multiple Step Attempts', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/b3vI35Zc_Z8', summary: 'Addressing exam setbacks proactively with proven growth metrics.' },
-      { id: 12, title: 'Showcasing International Experience', duration: '9 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'Translating global healthcare insights into unique clinical strengths.' },
-      { id: 13, title: 'Cultural Differences & Communication', duration: '11 min', completed: false, videoUrl: 'https://www.youtube.com/embed/DiUI7_oKxho', summary: 'Navigating US medical hierarchy, patient autonomy, and interprofessional teams.' }
+      { id: 10, title: 'Addressing Visa Status Confidently', duration: '8 min', completed: false, videoUrl: 'https://www.youtube.com/embed/JTnTbzskEuo', summary: 'Clear explanations of J-1 vs H-1B requirements and state licensing.' },
+      { id: 11, title: 'Explaining Multiple Step Attempts', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/V1WUsQgHkPA', summary: 'Addressing exam setbacks proactively with proven growth metrics.' },
+      { id: 12, title: 'Showcasing International Experience', duration: '9 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI?start=440', summary: 'Translating global healthcare insights into unique clinical strengths.' },
+      { id: 13, title: 'Cultural Differences & Communication', duration: '11 min', completed: false, videoUrl: 'https://www.youtube.com/embed/M-nLZyxMlfU', summary: 'Navigating US medical hierarchy, patient autonomy, and interprofessional teams.' }
     ]
   },
   {
     id: 4,
     title: 'Advanced Techniques',
     lessons: [
-      { id: 14, title: 'Asking Smart Questions to Interviewers', duration: '12 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'High-yield questions that demonstrate deep interest and clinical ambition.' },
-      { id: 15, title: 'Reading the Room & Adapting', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/b3vI35Zc_Z8', summary: 'Adjusting tone based on interviewer style—academic vs clinical focus.' },
-      { id: 16, title: 'Ranking Programs After Interviews', duration: '15 min', completed: false, videoUrl: 'https://www.youtube.com/embed/DiUI7_oKxho', summary: 'Objective scoring matrices for gut feeling, geography, and career trajectory.' },
-      { id: 17, title: 'Thank You Notes That Stand Out', duration: '8 min', completed: false, videoUrl: 'https://www.youtube.com/embed/ysM3qTOmvxI', summary: 'Timing, personalized references, and post-interview communication etiquette.' }
+      { id: 14, title: 'Asking Smart Questions to Interviewers', duration: '12 min', completed: false, videoUrl: 'https://www.youtube.com/embed/NGHQG5ZSUqk', summary: 'High-yield questions that demonstrate deep interest and clinical ambition.' },
+      { id: 15, title: 'Reading the Room & Adapting', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/Ern4eqcjPwY', summary: 'Adjusting tone based on interviewer style—academic vs clinical focus.' },
+      { id: 16, title: 'Ranking Programs After Interviews', duration: '15 min', completed: false, videoUrl: 'https://www.youtube.com/embed/kYJvM9x0JqE', summary: 'Objective scoring matrices for gut feeling, geography, and career trajectory.' },
+      { id: 17, title: 'Thank You Notes That Stand Out', duration: '8 min', completed: false, videoUrl: 'https://www.youtube.com/embed/Nib2SMXQrxc', summary: 'Timing, personalized references, and post-interview communication etiquette.' }
     ]
   },
   {
     id: 5,
     title: 'Mock Interviews & Practice',
     lessons: [
-      { id: 18, title: 'Full Mock Interview #1 - Internal Medicine', duration: '25 min', completed: false, videoUrl: 'https://www.youtube.com/embed/JTnTbzskEuo', summary: 'Watch a real IMG participate in a 25-minute mock interview with detailed faculty critique.' },
-      { id: 19, title: 'Full Mock Interview #2 - Surgery', duration: '22 min', completed: false, videoUrl: 'https://www.youtube.com/embed/JTnTbzskEuo', summary: 'Surgical subspecialty mock interview breakdown and scoring.' },
-      { id: 20, title: 'Analyzing Your Performance', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/WRLF8ULhZmw', summary: 'Self-video analysis checklist for final interview week preparation.' }
+      { id: 18, title: 'Full Mock Interview #1 - Internal Medicine', duration: '25 min', completed: false, videoUrl: 'https://www.youtube.com/embed/m8LCfdmLM3Y', summary: 'Watch a real IMG participate in a 25-minute mock interview with detailed faculty critique.' },
+      { id: 19, title: 'Full Mock Interview #2 - Surgery & Specialty', duration: '22 min', completed: false, videoUrl: 'https://www.youtube.com/embed/rjvhP37AVCo', summary: 'Specialty & surgical mock interview breakdown, clinical probing, and faculty scoring.' },
+      { id: 20, title: 'Analyzing Your Performance', duration: '10 min', completed: false, videoUrl: 'https://www.youtube.com/embed/WRLF8ULhZmw?start=300', summary: 'Self-video analysis checklist for final interview week preparation.' }
     ]
   }
 ];
@@ -313,6 +312,34 @@ export default function InterviewCourse() {
       console.error('PDF generation error:', e);
       toast.error('Failed to generate PDF handout');
     }
+  };
+
+  const handlePreviewLessonHandout = (lesson) => {
+    const detail = lessonDetails[lesson.id] || {};
+    const parentModule = courseModules.find(m => m.lessons.some(l => l.id === lesson.id));
+    const moduleTitle = parentModule ? parentModule.title : 'Interview Course';
+
+    try {
+      openLessonHandoutPreview(lesson, moduleTitle, detail, practiceNote);
+    } catch (e) {
+      console.error('PDF preview error:', e);
+      toast.error('Could not open in new tab. Downloading PDF instead...');
+      handleDownloadLessonHandout(lesson);
+    }
+  };
+
+  const handleDownloadAllHandouts = async () => {
+    toast.info('Downloading all 20 lesson handouts...');
+    const allLessons = courseModules.flatMap(m => m.lessons);
+    for (let i = 0; i < allLessons.length; i++) {
+      const lesson = allLessons[i];
+      const detail = lessonDetails[lesson.id] || {};
+      const parentModule = courseModules.find(m => m.lessons.some(l => l.id === lesson.id));
+      const moduleTitle = parentModule ? parentModule.title : 'Interview Course';
+      generateLessonHandoutPDF(lesson, moduleTitle, detail, '');
+      await new Promise(r => setTimeout(r, 350));
+    }
+    toast.success('Successfully downloaded all 20 handouts!');
   };
 
   const { user } = useAuth();
@@ -767,46 +794,119 @@ Strategy: Present (current role/USCE), Past (med school & key achievement), Futu
           </motion.div>
         )}
 
-        {/* Tab 3: Bonus Resources */}
+        {/* Tab 3: Handouts & Docs */}
         {courseTab === 'resources' && (
-          <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="w-5 h-5 text-amber-500" />
-                Bonus Resources Included
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid md:grid-cols-2 gap-4">
-              <div 
-                onClick={() => setActiveResource({ title: 'Interview Question Bank', desc: '50+ curated questions categorized by Behavioral, Clinical, and IMG-specific themes with full sample response frameworks.' })}
-                className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all cursor-pointer border border-transparent hover:border-amber-200"
-              >
-                <FileText className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-1 flex-shrink-0" />
+          <div className="space-y-6">
+            {/* All 20 Lesson Handouts Directory */}
+            <Card className="border-[rgba(var(--color-primary),0.2)] dark:border-[rgba(var(--color-primary),0.4)] shadow-sm">
+              <CardHeader className="pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <p className="font-semibold text-slate-900 dark:text-white text-sm">
-                    Interview Question Bank
-                  </p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
-                    50+ common questions with sample answers
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <FileText className="w-5 h-5 text-[rgb(var(--color-primary))]" />
+                    All 20 Lesson Study Handouts
+                  </CardTitle>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Complete high-yield summaries, faculty frameworks, and clinical practice templates for every lesson.
                   </p>
                 </div>
-              </div>
-              <div 
-                onClick={() => setActiveResource({ title: 'Interview Cheat Sheet', desc: 'A 2-page rapid summary guide with last-minute high-yield reminders for interview day morning.' })}
-                className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all cursor-pointer border border-transparent hover:border-amber-200"
-              >
-                <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-1 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold text-slate-900 dark:text-white text-sm">
-                    Interview Cheat Sheet
-                  </p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
-                    Quick reference guide for interview day
-                  </p>
+                <Button
+                  size="sm"
+                  onClick={handleDownloadAllHandouts}
+                  className="bg-[rgb(var(--color-primary))] text-white rounded-xl text-xs flex items-center gap-1.5 self-start sm:self-auto"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download All 20 Handouts</span>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {courseModules.flatMap((m) =>
+                    m.lessons.map((lesson) => (
+                      <div
+                        key={lesson.id}
+                        className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3 hover:border-[rgba(var(--color-primary),0.4)] transition-all"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-8 h-8 rounded-lg bg-[rgba(var(--color-primary),0.1)] dark:bg-[rgba(var(--color-primary),0.2)] flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs font-bold text-[rgb(var(--color-primary))]">
+                              #{lesson.id}
+                            </span>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
+                              {lesson.title}
+                            </p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                              {m.title} • {lesson.duration}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handlePreviewLessonHandout(lesson)}
+                            className="h-8 px-2 text-[11px] rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900"
+                            title="Preview in new tab"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleDownloadLessonHandout(lesson)}
+                            className="h-8 px-2.5 text-[11px] rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[rgb(var(--color-primary))] hover:bg-slate-50 shadow-sm"
+                          >
+                            <Download className="w-3 h-3 mr-1" />
+                            PDF
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Bonus Resources */}
+            <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-amber-500" />
+                  Bonus Resources Included
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid md:grid-cols-2 gap-4">
+                <div 
+                  onClick={() => setActiveResource({ title: 'Interview Question Bank', desc: '50+ curated questions categorized by Behavioral, Clinical, and IMG-specific themes with full sample response frameworks.' })}
+                  className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all cursor-pointer border border-transparent hover:border-amber-200"
+                >
+                  <FileText className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-slate-900 dark:text-white text-sm">
+                      Interview Question Bank
+                    </p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                      50+ common questions with sample answers
+                    </p>
+                  </div>
+                </div>
+                <div 
+                  onClick={() => setActiveResource({ title: 'Interview Cheat Sheet', desc: 'A 2-page rapid summary guide with last-minute high-yield reminders for interview day morning.' })}
+                  className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all cursor-pointer border border-transparent hover:border-amber-200"
+                >
+                  <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-slate-900 dark:text-white text-sm">
+                      Interview Cheat Sheet
+                    </p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                      Quick reference guide for interview day
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </main>
 
@@ -831,28 +931,15 @@ Strategy: Present (current role/USCE), Past (med school & key achievement), Futu
               </button>
 
               {/* Lesson Video Viewer */}
-              {isPlaying || activeLesson.id === 18 || activeLesson.id === 19 ? (
-                <div className="mb-4">
-                  <MockInterviewVideoPlayer
-                    lesson={activeLesson}
-                    onClose={() => setIsPlaying(false)}
-                  />
-                </div>
-              ) : (
-                <div className="relative aspect-video rounded-2xl bg-slate-950 flex items-center justify-center mb-4 overflow-hidden border border-slate-800 shadow-inner flex-shrink-0">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/60 to-purple-900/60 opacity-80" />
-                  <div className="relative text-center p-6 z-10 flex flex-col items-center">
-                    <div 
-                      onClick={() => setIsPlaying(true)}
-                      className="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center shadow-2xl mb-3 cursor-pointer hover:scale-110 transition-transform"
-                    >
-                      <Play className="w-8 h-8 text-white ml-1 fill-white" />
-                    </div>
-                    <p className="text-white font-bold text-base">Lesson #{activeLesson.id}: {activeLesson.title}</p>
-                    <p className="text-slate-300 text-xs mt-1">Duration: {activeLesson.duration} • Interactive Video & Guide</p>
-                  </div>
-                </div>
-              )}
+              <div className="mb-4">
+                <MockInterviewVideoPlayer
+                  lesson={activeLesson}
+                  onClose={() => {
+                    setActiveLesson(null);
+                    setIsPlaying(false);
+                  }}
+                />
+              </div>
 
               {/* Lesson Nav Tabs */}
               <div className="flex gap-2 mb-4 border-b border-slate-200 dark:border-slate-800 pb-2">
@@ -940,15 +1027,26 @@ Strategy: Present (current role/USCE), Past (med school & key achievement), Futu
 
               {/* Lesson Footer Controls */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-slate-800 flex-shrink-0">
-                <Button
-                  size="sm"
-                  onClick={() => handleDownloadLessonHandout(activeLesson)}
-                  variant="outline"
-                  className="rounded-xl text-xs text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800"
-                >
-                  <Download className="w-3.5 h-3.5 mr-1.5" />
-                  Download Handout
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleDownloadLessonHandout(activeLesson)}
+                    variant="outline"
+                    className="rounded-xl text-xs text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800"
+                  >
+                    <Download className="w-3.5 h-3.5 mr-1.5" />
+                    Download PDF Handout
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => handlePreviewLessonHandout(activeLesson)}
+                    variant="ghost"
+                    className="rounded-xl text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900"
+                  >
+                    <Eye className="w-3.5 h-3.5 mr-1.5" />
+                    Preview Handout
+                  </Button>
+                </div>
 
                 <div className="flex gap-2">
                   <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 text-xs">

@@ -1,13 +1,9 @@
 import { jsPDF } from 'jspdf';
 
 /**
- * Generate and download a formatted PDF handout for an Interview Course lesson.
- * @param {object} lesson
- * @param {string} moduleTitle
- * @param {object} lessonDetail
- * @param {string} userNotes
+ * Build the jsPDF document object for a given lesson.
  */
-export function generateLessonHandoutPDF(lesson, moduleTitle = '', lessonDetail = {}, userNotes = '') {
+function buildLessonHandoutDoc(lesson, moduleTitle = '', lessonDetail = {}, userNotes = '') {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'pt',
@@ -201,7 +197,38 @@ export function generateLessonHandoutPDF(lesson, moduleTitle = '', lessonDetail 
     doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 20, { align: 'right' });
   }
 
-  // Save PDF
+  return doc;
+}
+
+/**
+ * Generate and download a formatted PDF handout for an Interview Course lesson.
+ */
+export function generateLessonHandoutPDF(lesson, moduleTitle = '', lessonDetail = {}, userNotes = '') {
+  const doc = buildLessonHandoutDoc(lesson, moduleTitle, lessonDetail, userNotes);
   const filename = `MatchaMD_Lesson_${lesson.id}_${lesson.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
-  doc.save(filename);
+  
+  try {
+    const blob = doc.output('blob');
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+  } catch (err) {
+    // Fallback to standard doc.save
+    doc.save(filename);
+  }
+}
+
+/**
+ * Preview the generated lesson handout directly in a browser tab.
+ */
+export function openLessonHandoutPreview(lesson, moduleTitle = '', lessonDetail = {}, userNotes = '') {
+  const doc = buildLessonHandoutDoc(lesson, moduleTitle, lessonDetail, userNotes);
+  const blob = doc.output('blob');
+  const blobUrl = URL.createObjectURL(blob);
+  window.open(blobUrl, '_blank');
 }
