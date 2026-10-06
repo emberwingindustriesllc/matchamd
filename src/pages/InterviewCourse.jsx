@@ -9,6 +9,7 @@ import BottomNav from '@/components/navigation/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { 
   Video,
@@ -20,7 +21,8 @@ import {
   Star,
   X,
   Eye,
-  Download
+  Download,
+  Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PremiumGate from '@/components/premium/PremiumGate';

@@ -53,9 +53,10 @@ import {
   Stethoscope,
   X,
   Download,
-  Calculator
+  Calculator,
+  ChevronRight
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import MultiSelectDropdown from '@/components/ui/MultiSelectDropdown';
 import { exportProgramsToCSV } from '@/utils/csvExporter';
 import { localPrograms } from '@/api/programs.local';
@@ -72,6 +73,8 @@ import {
 } from '@/lib/programSearch';
 import ChipSearchBar from '@/components/search/ChipSearchBar';
 import { multiSearch } from '@/lib/search/multiSearch';
+import { parseLocationLabel } from '@/lib/search/locationTypeahead';
+import { normalizeStateTerm } from '@/utils/stateMap';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 
@@ -132,6 +135,7 @@ export default function IMGPrograms() {
   const [advisorCommentInput, setAdvisorCommentInput] = useState('');
 
   const { user } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   // Load User Profile
@@ -339,7 +343,6 @@ export default function IMGPrograms() {
     setSelectedSize('all');
     setSelectedFormat('all');
     setFitFilter(false);
-    setHighImgOnly(false);
     setSortBy('fit');
   };
 
@@ -443,6 +446,9 @@ export default function IMGPrograms() {
   const searchReturnedNothing = hasActiveRemoteCriteria && rpcPrograms.length === 0;
 
   const getFit = (prog) => calculateFitScore(prog, profile);
+  // Some card blocks reference only the score; centralised so no block can
+  // use an undeclared `fit` (that threw ReferenceError at render).
+  const fitScoreFor = (prog) => (fitMap[prog.id] || getFit(prog)).score;
 
   // Specialties & States lists
   const specialties = [...new Set(programs.map(p => p.specialty).filter(Boolean))];
@@ -1282,7 +1288,7 @@ export default function IMGPrograms() {
                                 className={`font-bold px-2.5 py-0.5 text-xs rounded-full ${
                                   fit.visaIssue 
                                     ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400' 
-                                    : fit.score >= 90 
+                                    : fitScoreFor(prog) >= 90 
                                       ? 'bg-[#D8F3DC] text-[#1B4332] border-[#1B4332]/20 dark:bg-[#1B4332]/40 dark:text-[#D8F3DC]'
                                       : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
                                 }`}
@@ -1423,13 +1429,13 @@ export default function IMGPrograms() {
                               className={`font-bold px-2.5 py-0.5 text-xs rounded-full ${
                                 prog.visa_j1
                                   ? 'bg-[#D8F3DC] text-[#1B4332] border-[#1B4332]/20 dark:bg-[#1B4332]/40 dark:text-[#D8F3DC]'
-                                  : fit.score >= 90
+                                  : fitScoreFor(prog) >= 90
                                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400'
                                     : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
                               }`}
                               variant="outline"
                             >
-                              {prog.visa_j1 ? "J-1 Eligible" : `${fit.score || 0}% Match`}
+                              {prog.visa_j1 ? "J-1 Eligible" : `${fitScoreFor(prog) || 0}% Match`}
                             </Badge>
                           </div>
                         </div>

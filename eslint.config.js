@@ -68,6 +68,12 @@ export default [
         { ignore: ["cmdk-input-wrapper", "toast-close"] },
       ],
       "react-hooks/rules-of-hooks": "error",
+      // This is the rule that catches a JSX component used but never imported
+      // (e.g. `<ChevronRight />` with no import), which otherwise throws
+      // "ReferenceError: X is not defined" at RUNTIME and blanks the page via
+      // the ErrorBoundary. `jsx-uses-vars` alone only marks JSX identifiers as
+      // USED; it does not check they are DEFINED.
+      "no-undef": "error",
     },
   },
 ];
