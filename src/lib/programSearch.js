@@ -2,7 +2,7 @@
  * Pure helpers for IMG program directory search, fit scoring, and sorting.
  * Kept free of React so they can be unit-tested.
  */
-import { normalizeStateTerm } from '@/utils/stateMap';
+import { normalizeStateTerm, getRegionForState } from '@/utils/stateMap';
 import { parseLocationLabel } from '@/lib/search/locationTypeahead';
 import { expandMedicalSearchTerms } from '@/lib/medicalSynonyms';
 
@@ -92,35 +92,69 @@ export function calculateFitScore(prog, profile, options = {}) {
   return { score, reasons, meetsAll, visaIssue };
 }
 
-function matchesSearchQuery(prog, searchQuery) {
+const STOP_WORDS = new Set([
+  'in', 'at', 'the', 'of', 'and', 'for', 'to', 'near', 'on', 'with', 'a', 'an', 'is', 'by', 'program', 'residency'
+]);
+
+export function matchesSearchQuery(prog, searchQuery) {
   const q = normalizeSearchText(searchQuery);
   if (!q) return true;
 
-  const tokens = q.split(/[,;\s]+/).filter(Boolean);
-  const stateTokens = tokens.flatMap(token => normalizeStateTerm(token).map(t => t.toLowerCase()));
-  const medicalTerms = expandMedicalSearchTerms(q);
+  const stateCode = prog.state ? String(prog.state).trim().toUpperCase() : '';
+  const stateNames = stateCode ? normalizeStateTerm(stateCode) : [];
+  const inferredRegion = prog.region || getRegionForState(stateCode) || '';
 
-  const allSearchTokens = Array.from(new Set([...tokens, ...stateTokens, ...medicalTerms]));
-
-  const haystack = [
+  const haystackParts = [
     prog.program_name,
     prog.name,
+    prog.title,
     prog.institution,
     prog.city,
     prog.state,
+    ...stateNames,
+    prog.region,
+    inferredRegion,
     Array.isArray(prog.specialty) ? prog.specialty.join(' ') : prog.specialty,
     prog.subspecialty,
-    prog.region,
     prog.nrmp_code,
     prog.acgme_program_number,
     prog.program_director,
-  ]
-    .filter(Boolean)
-    .map((v) => String(v).toLowerCase())
-    .join(' ');
+    prog.description,
+  ].filter(Boolean);
 
+  const haystack = haystackParts.join(' ').toLowerCase();
+
+  // 1. Direct whole-query substring match
   if (haystack.includes(q)) return true;
-  return allSearchTokens.some(token => token.length >= 2 && haystack.includes(token));
+
+  // 2. Expand medical synonyms for whole query (e.g., "peds hemonc", "obsetrics")
+  const wholeQuerySynonyms = expandMedicalSearchTerms(q);
+  for (const syn of wholeQuerySynonyms) {
+    if (syn && haystack.includes(syn.toLowerCase())) {
+      return true;
+    }
+  }
+
+  // 3. Tokenize into meaningful keywords (strip common English stop words)
+  const rawTokens = q.split(/[,;\s]+/).filter(Boolean);
+  const meaningfulTokens = rawTokens.filter(t => !STOP_WORDS.has(t));
+  const tokensToMatch = meaningfulTokens.length > 0 ? meaningfulTokens : rawTokens;
+
+  // 4. All meaningful query terms must match (AND condition across concepts)
+  return tokensToMatch.every((token) => {
+    // Exact token match
+    if (haystack.includes(token)) return true;
+
+    // State expansion (e.g., "wv" -> "west virginia")
+    const stateVariants = normalizeStateTerm(token).map(s => s.toLowerCase());
+    if (stateVariants.some(sv => haystack.includes(sv))) return true;
+
+    // Medical synonyms for this token (e.g., "peds" -> "pediatrics", "im" -> "internal medicine")
+    const tokenSynonyms = expandMedicalSearchTerms(token);
+    if (tokenSynonyms.some(ts => ts && haystack.includes(ts.toLowerCase()))) return true;
+
+    return false;
+  });
 }
 
 /**
@@ -208,7 +242,14 @@ export function filterIMGPrograms(programs, filters = {}, profile = null, fitFn 
     }
 
     if (activeRegions.length > 0) {
-      if (!activeRegions.includes(prog.region)) return false;
+      const progRegion = prog.region || getRegionForState(prog.state) || '';
+      const isMatch = activeRegions.some(reg => {
+        if (reg === progRegion) return true;
+        if (reg === 'South' && (progRegion === 'Mid-Atlantic' || progRegion === 'Southwest')) return true;
+        if (reg === 'East Coast' && (progRegion === 'Northeast' || progRegion === 'Mid-Atlantic' || progRegion === 'South')) return true;
+        return false;
+      });
+      if (!isMatch) return false;
     }
 
     if (activeStates.length > 0) {
@@ -216,15 +257,19 @@ export function filterIMGPrograms(programs, filters = {}, profile = null, fitFn 
       if (!expandedActiveStates.includes((prog.state || '').toUpperCase())) return false;
     }
 
-    if (visa === 'j1' && !prog.visa_j1) return false;
-    if (visa === 'h1b' && !prog.visa_h1b) return false;
+    const hasJ1 = Boolean(prog.visa_j1 || prog.j1_visa);
+    const hasH1B = Boolean(prog.visa_h1b || prog.h1b_visa);
+    if (visa === 'j1' && !hasJ1) return false;
+    if (visa === 'h1b' && !hasH1B) return false;
 
-    const sizeVal = Number(prog.program_size) || 0;
-    if (size === 'small' && sizeVal >= 50) return false;
-    if (size === 'medium' && (sizeVal < 50 || sizeVal > 100)) return false;
-    if (size === 'large' && sizeVal <= 100) return false;
+    if (prog.program_size != null) {
+      const sizeVal = Number(prog.program_size) || 0;
+      if (size === 'small' && sizeVal >= 50) return false;
+      if (size === 'medium' && (sizeVal < 50 || sizeVal > 100)) return false;
+      if (size === 'large' && sizeVal <= 100) return false;
+    }
 
-    if (format !== 'all' && prog.interview_format !== format) return false;
+    if (format !== 'all' && prog.interview_format && prog.interview_format !== format) return false;
 
     if (fitOnly) {
       const fit = fitFn(prog, profile);

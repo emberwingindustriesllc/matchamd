@@ -43,10 +43,10 @@ export default function ChipSearchBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Sync input value if parent searchQuery changes to empty
+  // Sync input value with parent searchQuery
   useEffect(() => {
-    if (searchQuery === '' && inputValue !== '') {
-      setInputValue('');
+    if (searchQuery !== inputValue) {
+      setInputValue(searchQuery || '');
     }
   }, [searchQuery]);
 
@@ -67,9 +67,7 @@ export default function ChipSearchBar({
     }
   };
 
-  // Debounced free-text search. Previously typing alone never searched:
-  // debouncedSearch in IMGPrograms was only set by the Search button, so a
-  // query had to be committed with a click.
+  // Debounced free-text search
   useEffect(() => {
     const term = inputValue.trim();
     if (!term || !onExecuteSearch) return undefined;
@@ -79,10 +77,18 @@ export default function ChipSearchBar({
     return () => clearTimeout(id);
   }, [inputValue, onExecuteSearch]);
 
+  const handleClearInput = () => {
+    setInputValue('');
+    onSearchQueryChange('');
+    if (onExecuteSearch) onExecuteSearch('');
+    setIsOpen(false);
+  };
+
   const handleSelectSpecialty = (specName) => {
     onAddSpecialty(specName);
     setInputValue('');
     onSearchQueryChange('');
+    if (onExecuteSearch) onExecuteSearch('');
     setIsOpen(false);
   };
 
@@ -90,6 +96,7 @@ export default function ChipSearchBar({
     onAddLocation(locLabel);
     setInputValue('');
     onSearchQueryChange('');
+    if (onExecuteSearch) onExecuteSearch('');
     setIsOpen(false);
   };
 
@@ -133,21 +140,21 @@ export default function ChipSearchBar({
     <div className="space-y-3" ref={containerRef}>
       {/* Search Input Box with Chips */}
       <div className="relative">
-        <div className="flex flex-wrap items-center gap-2 p-2 min-h-[52px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
+        <div className="flex flex-wrap items-center gap-2 p-2 min-h-[52px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-[#1B4332] dark:focus-within:ring-[#D8F3DC]">
           <Search className="w-5 h-5 text-slate-400 ml-2 shrink-0" />
 
           {/* Render Active Specialty Chips */}
           {specialties.map((spec) => (
             <Badge
               key={`spec-${spec}`}
-              className="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 border-0 py-1.5 px-3 rounded-xl flex items-center gap-1.5 text-xs font-semibold"
+              className="bg-[#D8F3DC] dark:bg-emerald-950/60 text-[#1B4332] dark:text-[#D8F3DC] hover:bg-[#D8F3DC]/80 border border-emerald-300/40 py-1.5 px-3 rounded-xl flex items-center gap-1.5 text-xs font-semibold"
             >
               <Stethoscope className="w-3.5 h-3.5" />
               <span>{spec}</span>
               <button
                 type="button"
                 onClick={() => onRemoveSpecialty(spec)}
-                className="hover:bg-indigo-300 dark:hover:bg-indigo-800 rounded-full p-0.5"
+                className="hover:bg-emerald-300 dark:hover:bg-emerald-800 rounded-full p-0.5"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -158,7 +165,7 @@ export default function ChipSearchBar({
           {locations.map((loc) => (
             <Badge
               key={`loc-${loc}`}
-              className="bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 border-0 py-1.5 px-3 rounded-xl flex items-center gap-1.5 text-xs font-semibold"
+              className="bg-[#D8F3DC] dark:bg-emerald-950/60 text-[#1B4332] dark:text-[#D8F3DC] hover:bg-[#D8F3DC]/80 border border-emerald-300/40 py-1.5 px-3 rounded-xl flex items-center gap-1.5 text-xs font-semibold"
             >
               <MapPin className="w-3.5 h-3.5" />
               <span>{loc}</span>
@@ -173,27 +180,39 @@ export default function ChipSearchBar({
           ))}
 
           {/* Text Input */}
-          <input
-            type="text"
-            className="flex-1 bg-transparent border-0 outline-none text-slate-900 dark:text-slate-100 placeholder-slate-400 text-sm px-2 min-w-[140px]"
-            placeholder={
-              hasChips
-                ? "Add more (e.g. Pediatrics, Cleveland, OH)..."
-                : "Type specialty or location (e.g. Pediatrics, Pittsburgh, California)..."
-            }
-            value={inputValue}
-            onChange={handleInputChange}
-            onFocus={() => {
-              if (inputValue.trim()) setIsOpen(true);
-            }}
-            onKeyDown={handleKeyDown}
-          />
+          <div className="flex-1 flex items-center min-w-[140px] relative">
+            <input
+              type="text"
+              className="w-full bg-transparent border-0 outline-none text-slate-900 dark:text-slate-100 placeholder-slate-400 text-sm px-2 pr-7"
+              placeholder={
+                hasChips
+                  ? "Add more (e.g. Pediatrics, Cleveland, OH)..."
+                  : "Type specialty, program, or location (e.g. Pediatrics, Miami, Cleveland, OH)..."
+              }
+              value={inputValue}
+              onChange={handleInputChange}
+              onFocus={() => {
+                if (inputValue.trim()) setIsOpen(true);
+              }}
+              onKeyDown={handleKeyDown}
+            />
+            {inputValue && (
+              <button
+                type="button"
+                onClick={handleClearInput}
+                className="absolute right-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+                aria-label="Clear search input"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
 
           {/* Search Button */}
           <Button
             type="button"
             onClick={handleExecute}
-            className="h-10 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 active:scale-95 transition-all text-white px-5 font-semibold text-xs shrink-0 cursor-pointer shadow-sm"
+            className="h-10 rounded-xl bg-[#1B4332] hover:bg-[#1B4332]/90 text-[#D8F3DC] active:scale-95 transition-all px-5 font-semibold text-xs shrink-0 cursor-pointer shadow-sm"
           >
             Search
           </Button>

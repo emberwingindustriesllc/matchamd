@@ -32,3 +32,30 @@ export function normalizeStateTerm(term = '') {
   if (name) results.add(name);
   return Array.from(results);
 }
+
+export const STATE_TO_REGION = {
+  // Northeast
+  CT: 'Northeast', ME: 'Northeast', MA: 'Northeast', NH: 'Northeast',
+  RI: 'Northeast', VT: 'Northeast', NJ: 'Northeast', NY: 'Northeast', PA: 'Northeast',
+  // Midwest
+  IL: 'Midwest', IN: 'Midwest', MI: 'Midwest', OH: 'Midwest', WI: 'Midwest',
+  IA: 'Midwest', KS: 'Midwest', MN: 'Midwest', MO: 'Midwest', NE: 'Midwest',
+  ND: 'Midwest', SD: 'Midwest',
+  // South & Mid-Atlantic
+  DE: 'South', FL: 'South', GA: 'South', MD: 'South', NC: 'South',
+  SC: 'South', VA: 'South', DC: 'South', WV: 'South', AL: 'South',
+  KY: 'South', MS: 'South', TN: 'South', AR: 'South', LA: 'South',
+  OK: 'South', TX: 'South', PR: 'South',
+  // West
+  AZ: 'West', CO: 'West', ID: 'West', MT: 'West', NV: 'West',
+  NM: 'West', UT: 'West', WY: 'West', AK: 'West', CA: 'West',
+  HI: 'West', OR: 'West', WA: 'West'
+};
+
+export function getRegionForState(stateCodeOrName = '') {
+  if (!stateCodeOrName) return null;
+  const clean = String(stateCodeOrName).trim();
+  const code = clean.length === 2 ? clean.toUpperCase() : (STATE_NAME_TO_CODE[clean.toLowerCase()] || null);
+  return STATE_TO_REGION[code] || null;
+}
+

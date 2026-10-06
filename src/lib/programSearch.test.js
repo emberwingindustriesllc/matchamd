@@ -136,6 +136,27 @@ describe('programSearch pure helpers', () => {
       });
       expect(results.map(p => p.id)).toEqual(['p_wv1']);
     });
+
+    it('filters by multi-token search query like "Pediatrics Miami"', () => {
+      const results = filterIMGPrograms(samplePrograms, {
+        searchQuery: 'Pediatrics Miami'
+      });
+      expect(results.map(p => p.id)).toEqual(['p3']);
+    });
+
+    it('filters by search query with stop words like "Pediatrics in Florida"', () => {
+      const results = filterIMGPrograms(samplePrograms, {
+        searchQuery: 'Pediatrics in Florida'
+      });
+      expect(results.map(p => p.id)).toEqual(['p3']);
+    });
+
+    it('filters by abbreviation and city like "im chicago"', () => {
+      const results = filterIMGPrograms(samplePrograms, {
+        searchQuery: 'im chicago'
+      });
+      expect(results.map(p => p.id)).toEqual(['p1']);
+    });
   });
 
   describe('hasActiveIMGFilters', () => {

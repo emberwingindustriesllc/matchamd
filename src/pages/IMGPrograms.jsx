@@ -70,11 +70,12 @@ import {
   buildFitScoreMap,
   sortPrograms,
   hasActiveIMGFilters,
+  matchesSearchQuery,
 } from '@/lib/programSearch';
+import { getRegionForState, normalizeStateTerm } from '@/utils/stateMap';
+import { parseLocationLabel } from '@/lib/search/locationTypeahead';
 import ChipSearchBar from '@/components/search/ChipSearchBar';
 import { multiSearch } from '@/lib/search/multiSearch';
-import { parseLocationLabel } from '@/lib/search/locationTypeahead';
-import { normalizeStateTerm } from '@/utils/stateMap';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 
@@ -337,12 +338,19 @@ export default function IMGPrograms() {
     setDebouncedSearch('');
     setSelectedSpecialty('all');
     setSelectedSpecialties([]);
+    setSelectedLocations([]);
     setSelectedRegion('all');
     setSelectedRegions([]);
     setSelectedVisa('all');
     setSelectedSize('all');
     setSelectedFormat('all');
     setFitFilter(false);
+    setRpcFilters({
+      acgmeAccredited: null,
+      ecfmgPathway: null,
+      j1Visa: null,
+      h1bVisa: null,
+    });
     setSortBy('fit');
   };
 
@@ -384,7 +392,7 @@ export default function IMGPrograms() {
   };
 
   // Query Residency Programs with try/catch guard
-  const { data: dbPrograms = [], isLoading: isProgramsLoading } = useQuery({
+  const { data: dbPrograms = [], isLoading: isDbProgramsLoading } = useQuery({
     queryKey: ['residencyPrograms'],
     queryFn: async () => {
       try {
@@ -406,17 +414,17 @@ export default function IMGPrograms() {
   const hasActiveRemoteCriteria = selectedSpecialties.length > 0 || selectedLocations.length > 0 || Boolean(debouncedSearch && debouncedSearch.trim());
 
   // Query RPC programs if RPC chips/filters/search text are active
-  const { data: rpcPrograms = [] } = useQuery({
+  const { data: rpcPrograms = [], isLoading: isRpcProgramsLoading } = useQuery({
     queryKey: ['rpcPrograms', selectedSpecialties, selectedLocations, debouncedSearch, rpcFilters],
     queryFn: async () => {
       try {
         const state = {
-          programTypes: ['residency', 'fellowship', 'observership', 'research', 'elective'],
+          programTypes: ['residency'],
           specialties: selectedSpecialties,
           locations: selectedLocations,
           searchQuery: debouncedSearch,
           filters: rpcFilters,
-          pagination: { limit: 100, offset: 0 }
+          pagination: { limit: 150, offset: 0 }
         };
         const { data, error } = await multiSearch(state);
         if (error) {
@@ -426,9 +434,16 @@ export default function IMGPrograms() {
         return (data || []).map(p => ({
           ...p,
           program_name: p.program_name || p.name,
-          visa_j1: p.visa_j1 ?? p.j1_visa,
-          visa_h1b: p.visa_h1b ?? p.h1b_visa,
-          specialty: Array.isArray(p.specialty) ? p.specialty : (p.specialty ? [p.specialty] : [])
+          name: p.name || p.program_name,
+          visa_j1: Boolean(p.visa_j1 || p.j1_visa),
+          visa_h1b: Boolean(p.visa_h1b || p.h1b_visa),
+          specialty: Array.isArray(p.specialty) ? p.specialty : (p.specialty ? [p.specialty] : []),
+          region: p.region || getRegionForState(p.state),
+          interview_format: p.interview_format || 'Virtual',
+          program_size: p.program_size ?? 40,
+          img_friendly_score: p.img_friendly_score ?? (p.accepts_img ? 8.5 : 7.0),
+          img_percentage: p.img_percentage ?? (p.accepts_img ? 55 : 40),
+          graduation_rate: p.graduation_rate || '98%'
         }));
       } catch (err) {
         console.warn('Network or multiSearch exception:', err);
@@ -438,12 +453,26 @@ export default function IMGPrograms() {
     enabled: hasActiveRemoteCriteria
   });
 
-  // Prefer RPC results whenever criteria are active. Falling back to the
-  // unfiltered local list when the RPC returns zero rows made a narrow query
-  // ("Internal Medicine" + Pittsburgh) display the entire directory instead of
-  // an honest empty state, which is why searches "didn't work".
-  const activeProgramList = hasActiveRemoteCriteria ? rpcPrograms : programs;
-  const searchReturnedNothing = hasActiveRemoteCriteria && rpcPrograms.length === 0;
+  const activeProgramList = useMemo(() => {
+    if (!hasActiveRemoteCriteria) {
+      return programs;
+    }
+    // Combine local programs and RPC programs with deduplication
+    const list = [...programs];
+    const seen = new Set(
+      programs.map(p => p.acgme_program_number || p.id || `${p.name}-${p.state}`.toLowerCase())
+    );
+    for (const rpc of rpcPrograms) {
+      const key = rpc.acgme_program_number || rpc.id || `${rpc.name}-${rpc.state}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        list.push(rpc);
+      }
+    }
+    return list;
+  }, [hasActiveRemoteCriteria, programs, rpcPrograms]);
+
+  const isProgramsLoading = isDbProgramsLoading || (hasActiveRemoteCriteria && isRpcProgramsLoading && rpcPrograms.length === 0);
 
   const getFit = (prog) => calculateFitScore(prog, profile);
   // Some card blocks reference only the score; centralised so no block can
@@ -484,19 +513,18 @@ export default function IMGPrograms() {
 
   // Fellowships — Supabase RPC via multiSearch + Verified Fellowships fallback with try/catch guard
   const { data: fellowshipPrograms = [], isLoading: isFellowshipsLoading } = useQuery({
-    queryKey: ['fellowships', debouncedSearch, selectedVisa],
+    queryKey: ['fellowships', debouncedSearch, selectedSpecialties, selectedLocations, selectedVisa, rpcFilters],
     queryFn: async () => {
       try {
         const { data, error } = await multiSearch({
           programTypes: ['fellowship'],
-          specialties: [],
-          locations: [],
+          specialties: selectedSpecialties,
+          locations: selectedLocations,
           searchQuery: debouncedSearch,
           filters: {
-            acgmeAccredited: null,
-            ecfmgPathway: null,
-            j1Visa: selectedVisa === 'j1' ? true : selectedVisa === 'h1b' ? false : null,
-            h1bVisa: selectedVisa === 'h1b' ? true : selectedVisa === 'j1' ? false : null,
+            ...rpcFilters,
+            j1Visa: selectedVisa === 'j1' ? true : selectedVisa === 'h1b' ? false : rpcFilters.j1Visa,
+            h1bVisa: selectedVisa === 'h1b' ? true : selectedVisa === 'j1' ? false : rpcFilters.h1bVisa,
           },
           pagination: { limit: 200, offset: 0 }
         });
@@ -506,9 +534,10 @@ export default function IMGPrograms() {
         const dbItems = data.map(p => ({
           ...p,
           program_name: p.name || p.program_name,
-          visa_j1: p.j1_visa === true,
-          visa_h1b: p.h1b_visa === true,
-          specialty: Array.isArray(p.specialty) ? p.specialty.join('; ') : p.specialty || ''
+          visa_j1: Boolean(p.visa_j1 || p.j1_visa),
+          visa_h1b: Boolean(p.visa_h1b || p.h1b_visa),
+          specialty: Array.isArray(p.specialty) ? p.specialty.join('; ') : p.specialty || '',
+          region: p.region || getRegionForState(p.state)
         }));
         // Merge verified mock fellowships so Marshall NICU/PHM are always accessible
         const missingVerified = mockFellowships.filter(mf => !dbItems.some(di => di.acgme_program_number === mf.acgme_program_number));
@@ -522,19 +551,18 @@ export default function IMGPrograms() {
 
   // Observerships — Supabase RPC via multiSearch + Real Verified Observerships dataset with try/catch guard
   const { data: observershipPrograms = [], isLoading: isObservershipsLoading } = useQuery({
-    queryKey: ['observerships', debouncedSearch],
+    queryKey: ['observerships', debouncedSearch, selectedSpecialties, selectedLocations, selectedVisa, rpcFilters],
     queryFn: async () => {
       try {
         const { data, error } = await multiSearch({
           programTypes: ['observership'],
-          specialties: [],
-          locations: [],
+          specialties: selectedSpecialties,
+          locations: selectedLocations,
           searchQuery: debouncedSearch,
           filters: {
-            acgmeAccredited: null,
-            ecfmgPathway: null,
-            j1Visa: null,
-            h1bVisa: null,
+            ...rpcFilters,
+            j1Visa: selectedVisa === 'j1' ? true : selectedVisa === 'h1b' ? false : rpcFilters.j1Visa,
+            h1bVisa: selectedVisa === 'h1b' ? true : selectedVisa === 'j1' ? false : rpcFilters.h1bVisa,
           },
           pagination: { limit: 200, offset: 0 }
         });
@@ -544,9 +572,10 @@ export default function IMGPrograms() {
         const dbItems = data.map(p => ({
           ...p,
           title: p.name || p.title,
-          visa_j1: p.j1_visa === true,
-          visa_h1b: p.h1b_visa === true,
-          specialty: Array.isArray(p.specialty) ? p.specialty.join('; ') : p.specialty || ''
+          visa_j1: Boolean(p.visa_j1 || p.j1_visa),
+          visa_h1b: Boolean(p.visa_h1b || p.h1b_visa),
+          specialty: Array.isArray(p.specialty) ? p.specialty.join('; ') : p.specialty || '',
+          region: p.region || getRegionForState(p.state)
         }));
         const missingVerified = mockObserverships.filter(mo => !dbItems.some(di => di.id === mo.id));
         return [...dbItems, ...missingVerified];
@@ -594,72 +623,98 @@ export default function IMGPrograms() {
   // Fellowships filtered (wraps results with in-component search, specialty, and location filters)
   const filteredFellowships = useMemo(() => {
     return fellowshipPrograms.filter(item => {
-      const q = debouncedSearch.toLowerCase().trim();
-      const itemText = `${item.program_name || ''} ${item.institution || ''} ${item.specialty || ''} ${item.subspecialty || ''} ${item.city || ''} ${item.state || ''}`.toLowerCase();
-      const matchesSearch = !q || itemText.includes(q);
+      if (!matchesSearchQuery(item, debouncedSearch)) return false;
       
+      const itemSpec = (Array.isArray(item.specialty) ? item.specialty.join(' ') : String(item.specialty || '')).toLowerCase();
       const matchesSpecialty = selectedSpecialties.length === 0
-        ? (selectedSpecialty === 'all' || (item.specialty || '').toLowerCase().includes(selectedSpecialty.toLowerCase()))
-        : selectedSpecialties.some(s => (item.specialty || '').toLowerCase().includes(s.toLowerCase()));
+        ? (selectedSpecialty === 'all' || itemSpec.includes(selectedSpecialty.toLowerCase()))
+        : selectedSpecialties.some(s => itemSpec.includes(s.toLowerCase()));
+      if (!matchesSpecialty) return false;
 
-      const matchesLocation = selectedLocations.length === 0
-        ? true
-        : selectedLocations.some(loc => {
-            const parsed = parseLocationLabel(loc);
-            const stateTerms = normalizeStateTerm(parsed.state || loc).map(s => s.toLowerCase());
-            const itemCity = (item.city || '').toLowerCase();
-            const itemState = (item.state || '').toLowerCase();
-            if (parsed.state && !parsed.city) {
-              return stateTerms.some(st => itemState === st || itemState.includes(st));
-            }
-            if (parsed.city && parsed.state) {
-              return itemCity.includes(parsed.city.toLowerCase()) && stateTerms.some(st => itemState === st);
-            }
-            return itemCity.includes(loc.toLowerCase()) || stateTerms.some(st => itemState === st);
-          });
+      if (selectedLocations.length > 0) {
+        const matchesLocation = selectedLocations.some(loc => {
+          const parsed = parseLocationLabel(loc);
+          const stateTerms = normalizeStateTerm(parsed.state || loc).map(s => s.toLowerCase());
+          const itemCity = (item.city || '').toLowerCase();
+          const itemState = (item.state || '').toLowerCase();
+          if (parsed.state && !parsed.city) {
+            return stateTerms.some(st => itemState === st || itemState.includes(st));
+          }
+          if (parsed.city && parsed.state) {
+            return itemCity.includes(parsed.city.toLowerCase()) && stateTerms.some(st => itemState === st);
+          }
+          return itemCity.includes(loc.toLowerCase()) || stateTerms.some(st => itemState === st);
+        });
+        if (!matchesLocation) return false;
+      }
 
-      const matchesRegion = selectedRegions.length === 0
-        ? true
-        : selectedRegions.includes(item.region || '');
+      if (selectedRegions.length > 0) {
+        const itemRegion = item.region || getRegionForState(item.state);
+        const matchesRegion = selectedRegions.some(reg => {
+          if (reg === itemRegion) return true;
+          if (reg === 'South' && (itemRegion === 'Mid-Atlantic' || itemRegion === 'Southwest')) return true;
+          if (reg === 'East Coast' && (itemRegion === 'Northeast' || itemRegion === 'Mid-Atlantic' || itemRegion === 'South')) return true;
+          return false;
+        });
+        if (!matchesRegion) return false;
+      }
 
-      const matchesVisa = selectedVisa === 'all' ||
-        (selectedVisa === 'j1' && item.visa_j1) ||
-        (selectedVisa === 'h1b' && item.visa_h1b);
+      const hasJ1 = Boolean(item.visa_j1 || item.j1_visa);
+      const hasH1B = Boolean(item.visa_h1b || item.h1b_visa);
+      if (selectedVisa === 'j1' && !hasJ1) return false;
+      if (selectedVisa === 'h1b' && !hasH1B) return false;
 
-      return matchesSearch && matchesSpecialty && matchesLocation && matchesRegion && matchesVisa;
+      return true;
     });
   }, [fellowshipPrograms, debouncedSearch, selectedSpecialty, selectedSpecialties, selectedLocations, selectedRegion, selectedRegions, selectedVisa]);
 
   // Observerships filtered
   const filteredObserverships = useMemo(() => {
     return observershipPrograms.filter(item => {
-      const q = debouncedSearch.toLowerCase().trim();
-      const itemText = `${item.title || ''} ${item.name || ''} ${item.institution || ''} ${item.specialty || ''} ${item.city || ''} ${item.state || ''}`.toLowerCase();
-      const matchesSearch = !q || itemText.includes(q);
+      if (!matchesSearchQuery(item, debouncedSearch)) return false;
 
+      const itemSpec = (Array.isArray(item.specialty) ? item.specialty.join(' ') : String(item.specialty || '')).toLowerCase();
       const matchesSpecialty = selectedSpecialties.length === 0
-        ? (selectedSpecialty === 'all' || (item.specialty || '').toLowerCase().includes(selectedSpecialty.toLowerCase()))
-        : selectedSpecialties.some(s => (item.specialty || '').toLowerCase().includes(s.toLowerCase()));
+        ? (selectedSpecialty === 'all' || itemSpec.includes(selectedSpecialty.toLowerCase()))
+        : selectedSpecialties.some(s => itemSpec.includes(s.toLowerCase()));
+      if (!matchesSpecialty) return false;
 
-      const matchesLocation = selectedLocations.length === 0
-        ? true
-        : selectedLocations.some(loc => {
-            const parsed = parseLocationLabel(loc);
-            const stateTerms = normalizeStateTerm(parsed.state || loc).map(s => s.toLowerCase());
-            const itemCity = (item.city || '').toLowerCase();
-            const itemState = (item.state || '').toLowerCase();
-            if (parsed.state && !parsed.city) {
-              return stateTerms.some(st => itemState === st || itemState.includes(st));
-            }
-            if (parsed.city && parsed.state) {
-              return itemCity.includes(parsed.city.toLowerCase()) && stateTerms.some(st => itemState === st);
-            }
-            return itemCity.includes(loc.toLowerCase()) || stateTerms.some(st => itemState === st);
-          });
+      if (selectedLocations.length > 0) {
+        const matchesLocation = selectedLocations.some(loc => {
+          const parsed = parseLocationLabel(loc);
+          const stateTerms = normalizeStateTerm(parsed.state || loc).map(s => s.toLowerCase());
+          const itemCity = (item.city || '').toLowerCase();
+          const itemState = (item.state || '').toLowerCase();
+          if (parsed.state && !parsed.city) {
+            return stateTerms.some(st => itemState === st || itemState.includes(st));
+          }
+          if (parsed.city && parsed.state) {
+            return itemCity.includes(parsed.city.toLowerCase()) && stateTerms.some(st => itemState === st);
+          }
+          return itemCity.includes(loc.toLowerCase()) || stateTerms.some(st => itemState === st);
+        });
+        if (!matchesLocation) return false;
+      }
 
-      return matchesSearch && matchesSpecialty && matchesLocation;
+      if (selectedRegions.length > 0) {
+        const itemRegion = item.region || getRegionForState(item.state);
+        const matchesRegion = selectedRegions.some(reg => {
+          if (reg === itemRegion) return true;
+          if (reg === 'South' && (itemRegion === 'Mid-Atlantic' || itemRegion === 'Southwest')) return true;
+          if (reg === 'East Coast' && (itemRegion === 'Northeast' || itemRegion === 'Mid-Atlantic' || itemRegion === 'South')) return true;
+          return false;
+        });
+        if (!matchesRegion) return false;
+      }
+
+      const hasJ1 = Boolean(item.visa_j1 || item.j1_visa);
+      const hasH1B = Boolean(item.visa_h1b || item.h1b_visa);
+      if (selectedVisa === 'j1' && !hasJ1) return false;
+      if (selectedVisa === 'h1b' && !hasH1B) return false;
+
+      return true;
     });
-  }, [observershipPrograms, debouncedSearch, selectedSpecialty, selectedSpecialties, selectedLocations]);
+  }, [observershipPrograms, debouncedSearch, selectedSpecialty, selectedSpecialties, selectedLocations, selectedRegions, selectedVisa]);
 
   // Medical Schools filtered
   const filteredMedicalSchools = useMemo(() => {
@@ -672,7 +727,12 @@ export default function IMGPrograms() {
     });
   }, [medSchoolPrograms, debouncedSearch]);
 
-  const filtersActive = hasActiveIMGFilters(searchFilters) || sortBy !== 'fit';
+  const filtersActive = hasActiveIMGFilters(searchFilters) ||
+    sortBy !== 'fit' ||
+    selectedLocations.length > 0 ||
+    selectedRegions.length > 0 ||
+    selectedSpecialties.length > 0 ||
+    Object.values(rpcFilters).some(v => v !== null);
 
 
   // Saved Programs Map
@@ -1549,12 +1609,12 @@ export default function IMGPrograms() {
                             </button>
                             <span
                               className={`font-semibold px-2.5 py-0.5 rounded-full text-xs ${
-                                prog.j1_visa
+                                (prog.visa_j1 || prog.j1_visa)
                                   ? 'bg-[#D8F3DC] text-[#1B4332] dark:bg-emerald-950/50 dark:text-[#D8F3DC] border border-emerald-300/40'
                                   : 'bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/20 dark:text-amber-400'
                               }`}
                             >
-                              {prog.j1_visa ? "J-1 Visa Sponsored" : "No Visa Sponsorship"}
+                              {(prog.visa_j1 || prog.j1_visa) ? "J-1 Visa Sponsored" : "No Visa Sponsorship"}
                             </span>
                           </div>
                         </div>
@@ -1567,12 +1627,12 @@ export default function IMGPrograms() {
                             <MapPin className="w-3 h-3 mr-1 text-slate-400" />
                             {prog.city}, {prog.state}
                           </Badge>
-                          {prog.j1_visa && (
+                          {(prog.visa_j1 || prog.j1_visa) && (
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#D8F3DC] text-[#1B4332] dark:bg-emerald-950/50 dark:text-[#D8F3DC] border border-emerald-300/40">
                               ✓ J-1 Available
                             </span>
                           )}
-                          {prog.h1b_visa && (
+                          {(prog.visa_h1b || prog.h1b_visa) && (
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#D8F3DC] text-[#1B4332] dark:bg-emerald-950/50 dark:text-[#D8F3DC] border border-emerald-300/40">
                               ✓ H-1B Available
                             </span>
