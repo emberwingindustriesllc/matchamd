@@ -1,0 +1,8 @@
+{
+  "name": "MatchaMD",
+  "description": "The complete guide for medical graduates matching into US residency and fellowship programs with visa filtering, cost calculator, and USMLE quiz pack.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

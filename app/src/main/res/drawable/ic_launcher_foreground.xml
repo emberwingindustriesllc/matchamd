@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Ceramic Matcha Chawan Bowl Outer Shadow -->
+    <path
+        android:fillColor="#152B13"
+        android:pathData="M32,48 C32,68 42,78 54,78 C66,78 76,68 76,48 Z" />
+
+    <!-- Ceramic Bowl Base & Body (Warm Porcelain Cream) -->
+    <path
+        android:fillColor="#F4F7F2"
+        android:pathData="M34,49 C34,67 43,76 54,76 C65,76 74,67 74,49 Z" />
+
+    <!-- Foot Ring of Bowl -->
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M46,76 H62 V79 H46 Z" />
+
+    <!-- Whisked Rich Matcha Foam (Vibrant Leaf Green) -->
+    <path
+        android:fillColor="#88B04B"
+        android:pathData="M35,49 C35,53 44,55 54,55 C64,55 73,53 73,49 C73,46 64,44 54,44 C44,44 35,46 35,49 Z" />
+
+    <!-- Medical Cross Emblem on Bowl -->
+    <path
+        android:fillColor="#2D5A27"
+        android:pathData="M52,58 H56 V68 H52 Z" />
+    <path
+        android:fillColor="#2D5A27"
+        android:pathData="M47,61 H61 V65 H47 Z" />
+
+    <!-- Organic Matcha Tea Leaf Sprout (Top) -->
+    <path
+        android:fillColor="#A3E635"
+        android:pathData="M54,42 C51,34 56,26 64,28 C64,36 58,40 54,42 Z" />
+    <path
+        android:fillColor="#84CC16"
+        android:pathData="M54,42 C48,37 46,31 50,26 C57,28 56,36 54,42 Z" />
+
+    <!-- Stethoscope Arch Accent -->
+    <path
+        android:pathData="M31,44 C27,52 28,62 33,68"
+        android:strokeWidth="2.5"
+        android:strokeColor="#88B04B" />
+    <path
+        android:pathData="M77,44 C81,52 80,62 75,68"
+        android:strokeWidth="2.5"
+        android:strokeColor="#88B04B" />
+</vector>

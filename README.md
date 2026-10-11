@@ -1,76 +1,22 @@
-# MatchaMD
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
 
-**The complete guide for international medical graduates (IMGs/FMGs) matching into US residency and fellowship programs.**
+# Run and deploy your AI Studio app
 
-[![App Store](https://img.shields.io/badge/iOS-App%20Store-black?logo=apple)](https://apps.apple.com)
-[![Play Store](https://img.shields.io/badge/Android-Play%20Store-green?logo=google-play)](https://play.google.com)
+This contains everything you need to run your app locally.
 
----
+View your app in AI Studio: https://ai.studio/apps/ed6df59f-a0ba-4ada-9531-5aa6a0949e7e
 
-## 🛠 Dev Setup
+## Run Locally
 
-```bash
-npm install
-npm run dev
-```
+**Prerequisites:**  [Android Studio](https://developer.android.com/studio)
 
-## 📱 Mobile Builds (Capacitor)
 
-### First-time setup
-```bash
-# Add platforms (only needed once)
-npm run cap:add:android
-
-# Build web app and sync to both platforms
-npm run cap:sync
-```
-
-### Android (Google Play)
-```bash
-npm run cap:build:android   # Build + sync
-npm run cap:open:android    # Open in Android Studio
-```
-Then in Android Studio: Build → Generate Signed Bundle/APK
-
-### iOS (App Store)
-```bash
-npm run cap:build:ios       # Build + sync
-npm run cap:open:ios        # Open in Xcode
-```
-Then in Xcode: Product → Archive
-
----
-
-## 🏗 Tech Stack
-
-- **React 18** + Vite
-- **Capacitor 8** — iOS + Android native wrapper
-- **shadcn/ui** — component library
-- **Tailwind CSS** — styling
-- **TanStack Query** — data fetching
-- **Framer Motion** — animations
-- **Stripe** — premium subscriptions
-- **Supabase** — backend, auth, database
-
-## 📁 Project Structure
-
-```
-src/
-  pages/          # All app screens
-  components/     # Reusable UI components
-  lib/            # Utilities and hooks
-  api/            # Supabase Client
-ios/              # iOS Capacitor platform
-android/          # Android Capacitor platform
-supabase/         # Supabase Edge Functions (Stripe)
-```
-
-## 🔑 Environment
-
-The app uses Supabase for backend services. Configure via the Supabase dashboard.
-
-Stripe keys are set as environment variables in the Supabase Edge Function deployment.
-
----
-
-*Built with ❤️ for the global medical community*
+1. Open Android Studio
+2. Select **Open** and choose the directory containing this project
+3. Allow Android Studio to fix any incompatibilities as it imports the project.
+4. Create a file named `.env` in the project directory and set `GEMINI_API_KEY` in that file to your Gemini API key (see `.env.example` for an example)
+5. Remove this line from the app's `build.gradle.kts` file: `signingConfig = signingConfigs.getByName("debugConfig")`
+6. Run the app on an emulator or physical device
+7. If you have already published your app in AI Studio, please [request upload key reset](https://support.google.com/googleplay/android-developer/answer/9842756#zippy=%2Crequest-an-upload-key-reset) in Google Play Console.
