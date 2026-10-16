@@ -27,34 +27,40 @@ export default function AnkiGuide() {
 
   const ankiLinks = [
     {
-      title: 'Download Anki Software',
+      title: 'Download Anki Software (Desktop & Mobile)',
       url: 'https://apps.ankiweb.net/',
       description: 'Official desktop client (Windows, macOS, Linux) and mobile companion app.',
       badge: 'Software'
     },
     {
-      title: 'Browse Official Anki Add-ons',
-      url: 'https://ankiweb.net/shared/addons/2.1',
-      description: 'Search 2.1 compatible add-ons like Heatmap, Image Occlusion, and Pop-up Dictionary.',
-      badge: 'Add-ons'
-    },
-    {
-      title: 'AnKing Medical Decks on AnkiHub',
+      title: 'AnKing Overhaul on AnkiHub (Live Sync)',
       url: 'https://www.ankihub.net/',
-      description: 'Official collaborative AnKing Step 1 & Step 2 CK decks with continuous live updates and media sync.',
+      description: 'Official collaborative AnKing Step 1 & Step 2 CK v12 decks with continuous live updates and media sync.',
       badge: 'AnkiHub Official'
     },
     {
-      title: 'Reddit Medical School Anki Deck Directory',
-      url: 'https://www.reddit.com/r/medicalschoolanki/wiki/decks/',
-      description: 'Comprehensive medical deck directory with download links for AnKing, Cheesy Dorian, and subspecialty decks.',
-      badge: 'Deck Directory'
+      title: 'The AnKing Official Guides & Deck Mirrors',
+      url: 'https://www.theanking.com/',
+      description: 'Official AnKing setup tutorials, FSRS algorithm configuration, and Step 1 / Step 2 CK tag guides.',
+      badge: 'AnKing Official'
     },
     {
-      title: 'Reddit Medical School Anki Community',
-      url: 'https://www.reddit.com/r/medicalschoolanki/',
-      description: 'Community deck releases, updates, custom deck shares, and Step 1/Step 2 CK review discussions.',
-      badge: 'Community'
+      title: 'r/medicalschoolanki Free Deck Mirror Directory',
+      url: 'https://www.reddit.com/r/medicalschoolanki/wiki/decks/',
+      description: 'Comprehensive medical deck mirror wiki with free download links for AnKing v11, Cheesy Dorian, Duke Pathoma, and Sketchy decks.',
+      badge: 'Free Mirror Wiki'
+    },
+    {
+      title: 'Browse Official Anki 2.1+ Add-ons',
+      url: 'https://ankiweb.net/shared/addons/',
+      description: 'Search compatible add-ons like Review Heatmap, Image Occlusion Enhanced, and Custom Background.',
+      badge: 'Add-ons'
+    },
+    {
+      title: 'r/IMGreddit & r/medicalschoolanki Community',
+      url: 'https://www.reddit.com/r/IMGreddit/',
+      description: 'Connect with fellow IMGs sharing Step 1/Step 2 CK Anki study schedules, UWorld tag workflows, and NBME score jumps.',
+      badge: 'IMG Community'
     }
   ];
 

@@ -23,9 +23,11 @@ export default function Layout({ children, currentPageName }) {
             <DisclaimerBanner />
           <style>{`
           :root {
-            --color-primary: 27 67 50; /* #1B4332 Deep Matcha Forest Green */
-            --color-secondary: 216 243 220; /* #D8F3DC Sage Mint */
-            --color-accent: 216 243 220; /* #D8F3DC Sage Mint */
+            --color-primary: 16 185 129; /* #10B981 Electric Matcha */
+            --color-secondary: 74 222 128; /* #4ADE80 Matcha Neon */
+            --color-accent: 74 222 128; /* #4ADE80 Matcha Neon */
+            --color-coral: 244 63 94; /* #F43F5E Coral Red */
+            --color-amber: 245 158 11; /* #F59E0B Warm Amber */
           }
           
           .dark {
@@ -38,12 +40,12 @@ export default function Layout({ children, currentPageName }) {
             -moz-osx-font-smoothing: grayscale;
           }
           
-          .safe-area-top {
-            padding-top: env(safe-area-inset-top, 0);
+          .safe-area-top, .pt-safe {
+            padding-top: env(safe-area-inset-top, 0px);
           }
           
-          .safe-area-bottom {
-            padding-bottom: env(safe-area-inset-bottom, 0);
+          .safe-area-bottom, .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
           }
           
           .scrollbar-hide {
@@ -58,7 +60,7 @@ export default function Layout({ children, currentPageName }) {
           /* Custom animations */
           @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
           }
           
           .animate-float {
@@ -67,7 +69,7 @@ export default function Layout({ children, currentPageName }) {
           
           /* Gradient text */
           .gradient-text {
-            background: linear-gradient(135deg, hsl(103 45% 21%) 0%, hsl(79 47% 51%) 50%, hsl(180 36% 74%) 100%);
+            background: linear-gradient(135deg, #10B981 0%, #4ADE80 50%, #34D399 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -75,27 +77,27 @@ export default function Layout({ children, currentPageName }) {
           
           /* Glass effect */
           .glass {
-            background: rgba(var(--color-secondary), 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(var(--color-primary), 0.2);
+            background: rgba(30, 41, 59, 0.78);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(74, 222, 128, 0.22);
           }
           
           /* Smooth page transitions */
           main {
-            animation: fadeIn 0.3s ease-out;
+            animation: fadeIn 0.25s ease-out;
           }
           
           @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
           }
         `}</style>
-        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 transition-colors duration-300">
           {children}
         </div>
         </ErrorBoundary>
         </ThemeProvider>
         </LanguageProvider>
         </QueryClientProvider>
-        );
-        }
+  );
+}

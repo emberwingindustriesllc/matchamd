@@ -31,9 +31,9 @@ const LayoutWrapper = ({ children, currentPageName }) => {
 
 /** Loading spinner shown while Supabase session is being resolved */
 const LoadingScreen = () => (
-  <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#0b132b] text-white z-50">
+  <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#0F172A] text-white z-50">
     <img src={logo} alt="MatchaMD" className="w-16 h-16 mb-4 animate-bounce" />
-    <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-400 rounded-full animate-spin shadow-lg" />
+    <div className="w-8 h-8 border-4 border-[#10B981]/30 border-t-[#4ADE80] rounded-full animate-spin shadow-lg" />
     <p className="mt-4 text-xs text-slate-400 font-medium tracking-wide">Loading MatchaMD...</p>
   </div>
 );
@@ -67,6 +67,10 @@ const AuthenticatedRoutes = () => (
           const normalizedPageName = 
             (path === 'interviewcourse' || path === 'interview-course') 
               ? 'InterviewCourse' 
+              : (path === 'scamshield' || path === 'scam-shield')
+              ? 'ScamShield'
+              : (path === 'imgprograms' || path === 'img-programs')
+              ? 'IMGPrograms'
               : path;
           return [
             <Route

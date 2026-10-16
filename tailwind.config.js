@@ -63,7 +63,12 @@ module.exports = {
   			matcha: {
   				forest: '#1B4332',
   				mint: '#D8F3DC',
-  				slate: '#F8FAFC',
+  				slate: '#0F172A',
+  				card: '#1E293B',
+  				electric: '#10B981',
+  				neon: '#4ADE80',
+  				coral: '#F43F5E',
+  				amber: '#F59E0B',
   				emerald: '#2D6A4F',
   				sage: '#95D5B2',
   				deep: '#081c15',

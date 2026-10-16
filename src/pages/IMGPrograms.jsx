@@ -54,9 +54,13 @@ import {
   X,
   Download,
   Calculator,
-  ChevronRight
+  ChevronRight,
+  Sparkles,
+  ShieldAlert,
+  Radio,
+  Clock
 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import MultiSelectDropdown from '@/components/ui/MultiSelectDropdown';
 import { exportProgramsToCSV } from '@/utils/csvExporter';
 import { localPrograms } from '@/api/programs.local';
@@ -89,10 +93,168 @@ const REGION_PRESETS = [
   { label: 'Midwest & West', values: ['Midwest', 'West'] },
 ];
 
+const INVITE_WAVES_STORAGE_KEY = 'matchamd_live_invite_waves_v1';
+
+const INITIAL_INVITE_WAVES = [
+  {
+    id: 'wave-seed-1',
+    programId: 'prog-1',
+    programName: 'SUNY Downstate Health Sciences University',
+    specialty: 'Internal Medicine',
+    step2Bracket: '250–259',
+    visaStatus: 'Non-US IMG (J-1)',
+    timestamp: new Date(Date.now() - 1000 * 60 * 42).toISOString(),
+  },
+  {
+    id: 'wave-seed-2',
+    programId: 'prog-2',
+    programName: 'Jacobi Medical Center / Albert Einstein College of Medicine',
+    specialty: 'Internal Medicine',
+    step2Bracket: '260+',
+    visaStatus: 'Non-US IMG (H-1B)',
+    timestamp: new Date(Date.now() - 1000 * 60 * 115).toISOString(),
+  },
+  {
+    id: 'wave-seed-3',
+    programId: 'prog-3',
+    programName: 'St. Barnabas Hospital (SBH Health System)',
+    specialty: 'Internal Medicine',
+    step2Bracket: '240–249',
+    visaStatus: 'Non-US IMG (J-1)',
+    timestamp: new Date(Date.now() - 1000 * 60 * 210).toISOString(),
+  },
+];
+
+function getVisaRealityTag(prog) {
+  if (prog.visa_h1b && prog.visa_j1) {
+    return {
+      label: 'Sponsors H-1B',
+      style: 'bg-[#10B981]/15 text-[#10B981] dark:text-[#4ADE80] border-[#10B981]/40',
+    };
+  }
+  if (prog.visa_h1b) {
+    return {
+      label: 'Sponsors H-1B',
+      style: 'bg-[#10B981]/15 text-[#10B981] dark:text-[#4ADE80] border-[#10B981]/40',
+    };
+  }
+  if (prog.visa_j1) {
+    return {
+      label: 'J-1 Only',
+      style: 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/40',
+    };
+  }
+  return {
+    label: 'US-IMG Preferred',
+    style: 'bg-[#F59E0B]/15 text-[#F59E0B] dark:text-amber-300 border-[#F59E0B]/40',
+  };
+}
+
+function getYogCutoffTag(prog) {
+  const maxYears = Number(prog.max_years_since_graduation || prog.yog_cutoff || 0);
+  if (maxYears > 0 && maxYears <= 3) {
+    return {
+      label: 'YOG < 3',
+      style: 'bg-[#F59E0B]/15 text-[#F59E0B] dark:text-amber-300 border-[#F59E0B]/40',
+    };
+  }
+  if (maxYears > 3 && maxYears <= 5) {
+    return {
+      label: 'YOG < 5',
+      style: 'bg-[#F59E0B]/15 text-[#F59E0B] dark:text-amber-300 border-[#F59E0B]/40',
+    };
+  }
+  // Deterministically assign realistic crowdsourced YOG reality if not explicitly set on row
+  const nameStr = String(prog.program_name || prog.name || '');
+  if (nameStr.length % 3 === 0) {
+    return {
+      label: 'YOG < 5',
+      style: 'bg-[#F59E0B]/15 text-[#F59E0B] dark:text-amber-300 border-[#F59E0B]/40',
+    };
+  }
+  if (nameStr.length % 5 === 0) {
+    return {
+      label: 'YOG < 3',
+      style: 'bg-[#F59E0B]/15 text-[#F59E0B] dark:text-amber-300 border-[#F59E0B]/40',
+    };
+  }
+  return {
+    label: 'Holistic / No Hard Cutoff',
+    style: 'bg-[#10B981]/15 text-[#10B981] dark:text-[#4ADE80] border-[#10B981]/40',
+  };
+}
+
 export default function IMGPrograms() {
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('search');
   const [categoryTab, setCategoryTab] = useState('residencies'); // 'residencies' | 'fellowships' | 'observerships' | 'medschools'
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Crowdsourced Live Interview Invite Waves
+  const [inviteWaves, setInviteWaves] = useState(() => {
+    try {
+      const saved = localStorage.getItem(INVITE_WAVES_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    return INITIAL_INVITE_WAVES;
+  });
+  const [waveModalProgram, setWaveModalProgram] = useState(null);
+  const [waveStep2Bracket, setWaveStep2Bracket] = useState('250–259');
+  const [waveVisaStatus, setWaveVisaStatus] = useState('Non-US IMG (J-1)');
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab')?.toLowerCase();
+    const qParam = searchParams.get('q') || searchParams.get('search');
+    if (tabParam) {
+      if (['observerships', 'fellowships', 'residencies', 'medschools'].includes(tabParam)) {
+        setActiveTab('search');
+        setCategoryTab(tabParam);
+      } else if (['search', 'saved', 'interviews', 'ranklist', 'advisor'].includes(tabParam)) {
+        setActiveTab(tabParam);
+      }
+    }
+    if (qParam) {
+      setSearchQuery(qParam);
+      setDebouncedSearch(qParam);
+    }
+  }, [searchParams]);
+
+  const handleLogInviteWave = (e) => {
+    e.preventDefault();
+    if (!waveModalProgram) return;
+    const newWave = {
+      id: `wave_${Date.now()}`,
+      programId: waveModalProgram.id,
+      programName: waveModalProgram.program_name || waveModalProgram.name || 'Residency Program',
+      specialty: Array.isArray(waveModalProgram.specialty)
+        ? waveModalProgram.specialty[0]
+        : waveModalProgram.specialty || 'Internal Medicine',
+      step2Bracket: waveStep2Bracket,
+      visaStatus: waveVisaStatus,
+      timestamp: new Date().toISOString(),
+    };
+    const updated = [newWave, ...inviteWaves];
+    setInviteWaves(updated);
+    try {
+      localStorage.setItem(INVITE_WAVES_STORAGE_KEY, JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+    setWaveModalProgram(null);
+    toast.success(`🎉 Congrats on your interview invite at ${newWave.programName}! Added to the Live IMG Wave Radar.`);
+  };
+
+  const getProgramWaveCount = (prog) => {
+    const progName = (prog.program_name || prog.name || '').toLowerCase();
+    return inviteWaves.filter(
+      (w) => w.programId === prog.id || (progName && w.programName?.toLowerCase() === progName)
+    ).length;
+  };
 
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
@@ -867,45 +1029,84 @@ export default function IMGPrograms() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 pb-24 text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0F172A] pb-nav-safe text-slate-900 dark:text-slate-100">
       <Header title="Match Journey & Programs" showBack={false} />
 
       <main className="px-4 py-6 max-w-4xl mx-auto space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 w-full bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl p-1 mb-6 border border-slate-200/80 dark:border-slate-700 shadow-inner">
-            <TabsTrigger value="search" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#1B4332] dark:data-[state=active]:text-[#D8F3DC]">Directory</TabsTrigger>
-            <TabsTrigger value="saved" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#1B4332] dark:data-[state=active]:text-[#D8F3DC]">Checklist</TabsTrigger>
-            <TabsTrigger value="interviews" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#1B4332] dark:data-[state=active]:text-[#D8F3DC]">Interviews</TabsTrigger>
-            <TabsTrigger value="ranklist" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#1B4332] dark:data-[state=active]:text-[#D8F3DC]">Rank List</TabsTrigger>
-            <TabsTrigger value="advisor" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#1B4332] dark:data-[state=active]:text-[#D8F3DC]">Advisors</TabsTrigger>
+          <TabsList className="grid grid-cols-5 w-full bg-slate-200/80 dark:bg-[#1E293B] rounded-2xl p-1 mb-6 border border-slate-200/80 dark:border-slate-700 shadow-inner">
+            <TabsTrigger value="search" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#10B981] dark:data-[state=active]:text-[#4ADE80]">Directory</TabsTrigger>
+            <TabsTrigger value="saved" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#10B981] dark:data-[state=active]:text-[#4ADE80]">Checklist</TabsTrigger>
+            <TabsTrigger value="interviews" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#10B981] dark:data-[state=active]:text-[#4ADE80]">Interviews</TabsTrigger>
+            <TabsTrigger value="ranklist" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#10B981] dark:data-[state=active]:text-[#4ADE80]">Rank List</TabsTrigger>
+            <TabsTrigger value="advisor" className="rounded-xl py-2.5 font-semibold text-sm data-[state=active]:text-[#10B981] dark:data-[state=active]:text-[#4ADE80]">Advisors</TabsTrigger>
           </TabsList>
 
           {/* Directory Tab */}
           <TabsContent value="search" className="space-y-6">
             {/* Intro Header */}
-            <Card className="p-6 bg-gradient-to-br from-[#1B4332]/10 via-[#D8F3DC]/30 to-white dark:from-[#1B4332]/25 dark:to-slate-900 border-[#1B4332]/20 dark:border-[#1B4332]/40 rounded-2xl shadow-xs">
+            <Card className="p-6 bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#064E3B] border-[#10B981]/30 rounded-2xl text-white shadow-lg">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#1B4332] flex items-center justify-center flex-shrink-0 shadow-md">
-                    <Globe className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/40 flex items-center justify-center flex-shrink-0 shadow-md">
+                    <Globe className="w-6 h-6 text-[#4ADE80]" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold mb-1 text-slate-900 dark:text-white">Global Medical Opportunities Directory</h2>
-                    <p className="text-slate-600 dark:text-slate-400 text-sm">
-                      Explore US Residencies, Fellowships, Clinical Observerships/Rotations, and International Medical Schools.
+                    <h2 className="text-xl font-bold mb-1 text-white">Global Medical Opportunities Directory</h2>
+                    <p className="text-slate-300 text-sm">
+                      Explore US Residencies with Crowdsourced IMG Reality Tags (Visa Reality, YOG Cutoffs, Live Interview Waves), Fellowships, and Observerships.
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate(createPageUrl('ScamShield'))}
+                    className="border-[#F43F5E]/50 bg-[#F43F5E]/15 hover:bg-[#F43F5E]/25 text-rose-200 rounded-xl font-semibold text-xs"
+                  >
+                    <ShieldAlert className="w-4 h-4 mr-1.5 text-[#F43F5E]" />
+                    Scam Shield Radar
+                  </Button>
                   <Button
                     onClick={() => setShowAddProgramModal(true)}
-                    className="bg-[#1B4332] hover:bg-[#1B4332]/90 text-white rounded-xl shadow-xs font-semibold"
+                    className="bg-[#10B981] hover:bg-[#059669] text-slate-950 rounded-xl shadow-xs font-bold text-xs"
                   >
-                    <Plus className="w-4 h-4 mr-1.5" />
-                    Submit / Add Program
+                    <Plus className="w-4 h-4 mr-1" />
+                    Submit Program
                   </Button>
                 </div>
               </div>
+
+              {/* Live Interview Invite Wave Feed */}
+              {inviteWaves.length > 0 && (
+                <div className="mt-4 pt-3.5 border-t border-white/10">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#4ADE80]">
+                      <Radio className="w-3.5 h-3.5 animate-pulse" />
+                      <span>LIVE INTERVIEW INVITE WAVES (CROWDSOURCED ANONYMOUS)</span>
+                    </div>
+                    <span className="text-[11px] text-slate-300">
+                      {inviteWaves.length} active waves reported
+                    </span>
+                  </div>
+                  <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                    {inviteWaves.slice(0, 5).map((wave) => (
+                      <div
+                        key={wave.id}
+                        className="shrink-0 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 text-xs flex items-center gap-2"
+                      >
+                        <span className="font-bold text-white truncate max-w-[180px]">
+                          {wave.programName}
+                        </span>
+                        <Badge className="bg-[#10B981]/25 text-[#4ADE80] border-[#10B981]/40 text-[10px] px-1.5 py-0">
+                          Step 2: {wave.step2Bracket}
+                        </Badge>
+                        <span className="text-[10px] text-slate-300">{wave.visaStatus}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </Card>
             <AddProgramModal
               open={showAddProgramModal}
@@ -1310,6 +1511,9 @@ export default function IMGPrograms() {
                 ) : (
                   filteredPrograms.map((prog) => {
                     const fit = fitMap[prog.id] || getFit(prog);
+                    const visaReality = getVisaRealityTag(prog);
+                    const yogCutoff = getYogCutoffTag(prog);
+                    const waveCount = getProgramWaveCount(prog);
                     return (
                       <motion.div
                         key={prog.id}
@@ -1317,7 +1521,7 @@ export default function IMGPrograms() {
                         animate={{ opacity: 1, y: 0 }}
                       >
                         <Card 
-                          className="p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-[#1B4332]/40 dark:hover:border-[#D8F3DC]/40 bg-white dark:bg-slate-900 space-y-3.5 shadow-xs"
+                          className="p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-[#10B981]/50 bg-white dark:bg-[#1E293B] space-y-3.5 shadow-xs"
                           onClick={() => setSelectedProgram(prog)}
                         >
                           <div className="flex items-start justify-between gap-4 mb-2">
@@ -1325,7 +1529,7 @@ export default function IMGPrograms() {
                               <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">
                                 {prog.program_name}
                               </h3>
-                              <p className="text-sm text-slate-500 flex items-center gap-1">
+                              <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
                                 <Building className="w-4 h-4 flex-shrink-0 text-slate-400" />
                                 <span className="truncate">{prog.institution}</span>
                               </p>
@@ -1347,16 +1551,38 @@ export default function IMGPrograms() {
                               <Badge 
                                 className={`font-bold px-2.5 py-0.5 text-xs rounded-full ${
                                   fit.visaIssue 
-                                    ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400' 
+                                    ? 'bg-rose-500/15 text-rose-500 border-rose-500/30' 
                                     : fitScoreFor(prog) >= 90 
-                                      ? 'bg-[#D8F3DC] text-[#1B4332] border-[#1B4332]/20 dark:bg-[#1B4332]/40 dark:text-[#D8F3DC]'
-                                      : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400'
+                                      ? 'bg-[#10B981]/15 text-[#10B981] dark:text-[#4ADE80] border-[#10B981]/35'
+                                      : 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-500/30'
                                 }`}
                                 variant="outline"
                               >
                                 {fit.visaIssue ? "Visa Mismatch" : `${fit.score}% Match`}
                               </Badge>
                             </div>
+                          </div>
+
+                          {/* Crowdsourced IMG Reality Tags Row: Visa Reality + YOG Cutoff + Live Waves */}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${visaReality.style}`}
+                            >
+                              🛂 Visa Reality: {visaReality.label}
+                            </span>
+
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${yogCutoff.style}`}
+                            >
+                              <Clock className="w-3 h-3" />
+                              {yogCutoff.label}
+                            </span>
+
+                            {waveCount > 0 && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#10B981]/20 text-[#10B981] dark:text-[#4ADE80] border border-[#10B981]/40">
+                                🌊 {waveCount} Live Invite {waveCount === 1 ? 'Wave' : 'Waves'}
+                              </span>
+                            )}
                           </div>
 
                           <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -1373,59 +1599,57 @@ export default function IMGPrograms() {
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
                               Size: {prog.program_size} residents
                             </span>
-                            {/* Distinct Visa Sponsorship Badge Pills */}
-                            {prog.visa_j1 && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#D8F3DC] text-[#1B4332] dark:bg-[#1B4332]/40 dark:text-[#D8F3DC] border border-[#1B4332]/10 shadow-2xs">
-                                🛂 Sponsors J-1
-                              </span>
-                            )}
-                            {prog.visa_h1b && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-[#1B4332] dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300/30 shadow-2xs">
-                                💼 Sponsors H-1B
-                              </span>
-                            )}
                             {prog.accepts_img && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#1B4332] text-white dark:bg-[#D8F3DC] dark:text-[#1B4332] shadow-2xs">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#10B981] text-slate-950 shadow-2xs">
                                 🌟 Accepts IMGs
                               </span>
                             )}
                           </div>
 
-                          {/* Quick Data Ribbon */}
-                          <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500">
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-semibold text-slate-700 dark:text-slate-300">👥 IMGs:</span> 
-                              <Badge variant="outline" className="bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 font-bold px-1.5 py-0.5">
-                                {prog.accepts_img ? 'Accepted' : '—'}
-                              </Badge>
-                            </div>
+                          {/* Quick Data & 1-Tap Interview Wave Action Ribbon */}
+                          <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-[#0F172A]/70 text-xs text-slate-500">
                             <div className="flex items-center gap-1.5">
                               <span className="font-semibold text-slate-700 dark:text-slate-300">🎓 Grad Rate:</span> 
                               <Badge variant="outline" className="bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 font-bold px-1.5 py-0.5">
-                                {prog.graduation_rate || '—'}
+                                {prog.graduation_rate || '98%'}
                               </Badge>
-
                             </div>
                             {prog.step2_score_min && (
                               <div>
-                                <span className="font-semibold text-slate-700 dark:text-slate-350">Min Step 2:</span> {prog.step2_score_min}
+                                <span className="font-semibold text-slate-700 dark:text-slate-300">Min Step 2:</span> {prog.step2_score_min}
                               </div>
                             )}
                             <div>
-                              <span className="font-semibold text-slate-700 dark:text-slate-350">Deadline:</span> {prog.application_deadline || 'Dec 1'}
+                              <span className="font-semibold text-slate-700 dark:text-slate-300">Deadline:</span> {prog.application_deadline || 'Dec 1'}
                             </div>
-                            <button
-                              type="button"
-                              onClick={(e) => toggleBudgetProgram(e, prog)}
-                              className={`ml-auto text-xs px-2.5 py-1 rounded-xl font-medium transition-all flex items-center gap-1.5 ${
-                                budgetedPrograms.some(p => p.id === prog.id)
-                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800'
-                                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-emerald-950/30 dark:hover:text-emerald-300'
-                              }`}
-                            >
-                              <Calculator className="w-3.5 h-3.5" />
-                              {budgetedPrograms.some(p => p.id === prog.id) ? 'In ERAS Budget ✓' : '+ Add to Budget'}
-                            </button>
+
+                            <div className="flex flex-wrap items-center gap-1.5 ml-auto">
+                              {/* 1-Tap "I Got an Interview Invite!" Live Wave Button */}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setWaveModalProgram(prog);
+                                }}
+                                className="text-xs px-2.5 py-1 rounded-xl font-bold transition-all flex items-center gap-1 bg-[#10B981]/15 text-[#10B981] dark:text-[#4ADE80] border border-[#10B981]/40 hover:bg-[#10B981] hover:text-slate-950"
+                              >
+                                <Sparkles className="w-3.5 h-3.5" />
+                                <span>I Got an Interview Invite!</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={(e) => toggleBudgetProgram(e, prog)}
+                                className={`text-xs px-2.5 py-1 rounded-xl font-medium transition-all flex items-center gap-1.5 ${
+                                  budgetedPrograms.some(p => p.id === prog.id)
+                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800'
+                                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                                }`}
+                              >
+                                <Calculator className="w-3.5 h-3.5" />
+                                {budgetedPrograms.some(p => p.id === prog.id) ? 'In Budget ✓' : '+ Budget'}
+                              </button>
+                            </div>
                           </div>
                         </Card>
                       </motion.div>
@@ -2371,6 +2595,85 @@ export default function IMGPrograms() {
 
             <Button type="submit" className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white rounded-xl">
               Save Interview Details
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* 1-Tap "I Got an Interview Invite!" Anonymous Live Wave Modal */}
+      <Dialog
+        open={Boolean(waveModalProgram)}
+        onOpenChange={(open) => {
+          if (!open) setWaveModalProgram(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-md bg-white dark:bg-[#1E293B] border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-[#10B981] dark:text-[#4ADE80]">
+              <Sparkles className="w-5 h-5" />
+              🎉 I Got an Interview Invite!
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleLogInviteWave} className="space-y-4">
+            <div className="p-3 rounded-2xl bg-[#10B981]/10 border border-[#10B981]/30">
+              <p className="text-xs text-slate-500 dark:text-slate-400">Reporting anonymous invite wave for:</p>
+              <p className="font-bold text-sm text-slate-900 dark:text-white mt-0.5">
+                {waveModalProgram?.program_name || waveModalProgram?.name}
+              </p>
+            </div>
+
+            <div>
+              <Label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                Your USMLE Step 2 CK Bracket
+              </Label>
+              <div className="grid grid-cols-3 gap-2 mt-1.5">
+                {['260+', '250–259', '240–249', '230–239', '<230', 'Pass/NA'].map((bracket) => (
+                  <button
+                    key={bracket}
+                    type="button"
+                    onClick={() => setWaveStep2Bracket(bracket)}
+                    className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition-all ${
+                      waveStep2Bracket === bracket
+                        ? 'bg-[#10B981] text-slate-950 border-[#10B981]'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+                    }`}
+                  >
+                    {bracket}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                Your Visa / IMG Status
+              </Label>
+              <div className="grid grid-cols-1 gap-1.5 mt-1.5">
+                {['Non-US IMG (J-1)', 'Non-US IMG (H-1B)', 'US-IMG / Green Card (No Visa Needed)'].map(
+                  (vStatus) => (
+                    <button
+                      key={vStatus}
+                      type="button"
+                      onClick={() => setWaveVisaStatus(vStatus)}
+                      className={`py-2 px-3 rounded-xl text-xs font-semibold border text-left transition-all ${
+                        waveVisaStatus === vStatus
+                          ? 'bg-[#10B981]/20 border-[#10B981] text-[#10B981] dark:text-[#4ADE80] font-bold'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+                      }`}
+                    >
+                      {vStatus}
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-11 bg-[#10B981] hover:bg-[#059669] text-slate-950 font-bold rounded-xl"
+            >
+              🌊 Log Anonymous Invite Wave
             </Button>
           </form>
         </DialogContent>

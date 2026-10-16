@@ -87,6 +87,7 @@ const PAGES = {
   SurgeryGuide: () => import('@/pages/SurgeryGuide'),
   USMLEQuizPack: () => import('@/pages/USMLEQuizPack'),
   InterviewCourse: () => import('@/pages/InterviewCourse'),
+  ScamShield: () => import('@/pages/ScamShield'),
 };
 
 describe('page render sweep', () => {

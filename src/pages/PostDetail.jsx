@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/api/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/navigation/Header';
 import BottomNav from '@/components/navigation/BottomNav';
+import UGCSafetyMenu from '@/components/common/UGCSafetyMenu';
+import { isItemFlagged, isUserBlocked } from '@/lib/ugcSafety';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Award, Send } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { createPageUrl } from '@/utils';
 
 const categoryColors = {
   usmle_prep: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   visa_questions: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-  eras_tips: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  eras_tips: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
   interviews: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   match: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
   success_stories: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
@@ -25,13 +28,20 @@ const categoryColors = {
 
 export default function PostDetail() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { id: paramId } = useParams();
   const [searchParams] = useSearchParams();
   const postId = paramId || searchParams.get('id');
   const [newComment, setNewComment] = useState('');
+  const [ugcVersion, setUgcVersion] = useState(0);
 
   const { user } = useAuth();
 
+  useEffect(() => {
+    const handler = () => setUgcVersion((v) => v + 1);
+    window.addEventListener('matchamd-ugc-updated', handler);
+    return () => window.removeEventListener('matchamd-ugc-updated', handler);
+  }, []);
 
   const { data: profiles } = useQuery({
     queryKey: ['userProfile', user?.id],
@@ -129,16 +139,22 @@ export default function PostDetail() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['comments', postId] })
   });
 
+  const visibleComments = comments.filter(
+    (c) => !isItemFlagged(c.id) && !isUserBlocked(c.author_name) && !isUserBlocked(c.author_id)
+  );
+
+  void ugcVersion;
+
   if (!post) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0F172A] flex items-center justify-center">
+        <div className="w-8 h-8 border-3 border-[#10B981] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-32">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0F172A] pb-32">
       <Header title="Discussion" showBack />
 
       <main className="px-4 py-6 max-w-lg mx-auto">
@@ -146,13 +162,13 @@ export default function PostDetail() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm mb-6"
+          className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm mb-6"
         >
           {/* Author */}
           <div className="flex items-start gap-3 mb-4">
             <Avatar className="w-12 h-12">
               <AvatarImage src={post.author_avatar} />
-              <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-500 text-white">
+              <AvatarFallback className="bg-gradient-to-br from-[#10B981] to-[#059669] text-slate-950 font-bold">
                 {post.author_name?.[0]?.toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
@@ -178,50 +194,63 @@ export default function PostDetail() {
           <h1 className="text-xl font-bold text-slate-800 dark:text-white mb-3">
             {post.title}
           </h1>
-          <p className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap leading-relaxed">
+          <p className="text-slate-600 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
             {post.content}
           </p>
 
-          {/* Actions */}
-          <div className="flex items-center gap-6 mt-6 pt-4 border-t border-slate-100 dark:border-slate-700">
-            <button
-              onClick={() => likePostMutation.mutate()}
-              className={`flex items-center gap-2 transition-colors ${
-                post.liked_by?.includes(user?.id)
-                  ? 'text-rose-500'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-rose-500'
-              }`}
-            >
-              <Heart className={`w-6 h-6 ${post.liked_by?.includes(user?.id) ? 'fill-current' : ''}`} />
-              <span className="font-medium">{post.likes_count || 0}</span>
-            </button>
-            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-              <MessageCircle className="w-6 h-6" />
-              <span className="font-medium">{comments.length}</span>
+          {/* Actions + Google Play UGC Report / Block */}
+          <div className="flex flex-wrap items-center justify-between gap-4 mt-6 pt-4 border-t border-slate-100 dark:border-slate-700">
+            <div className="flex items-center gap-6">
+              <button
+                onClick={() => likePostMutation.mutate()}
+                className={`flex items-center gap-2 transition-colors ${
+                  post.liked_by?.includes(user?.id)
+                    ? 'text-rose-500'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-rose-500'
+                }`}
+              >
+                <Heart className={`w-6 h-6 ${post.liked_by?.includes(user?.id) ? 'fill-current' : ''}`} />
+                <span className="font-medium">{post.likes_count || 0}</span>
+              </button>
+              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                <MessageCircle className="w-6 h-6" />
+                <span className="font-medium">{visibleComments.length}</span>
+              </div>
             </div>
+
+            <UGCSafetyMenu
+              itemId={post.id}
+              itemType="forum_post"
+              title={post.title}
+              authorName={post.author_name || 'Anonymous IMG'}
+              authorId={post.author_id || post.author_name}
+              compact
+              onReported={() => navigate(createPageUrl('Community'))}
+              onUserBlocked={() => navigate(createPageUrl('Community'))}
+            />
           </div>
         </motion.div>
 
         {/* Comments Section */}
         <div>
           <h2 className="font-semibold text-slate-800 dark:text-white mb-4">
-            Comments ({comments.length})
+            Comments ({visibleComments.length})
           </h2>
 
           <div className="space-y-4">
             <AnimatePresence>
-              {comments.map((comment, idx) => (
+              {visibleComments.map((comment, idx) => (
                 <motion.div
                   key={comment.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700"
+                  className="bg-white dark:bg-[#1E293B] rounded-xl p-4 border border-slate-200 dark:border-slate-700"
                 >
                   <div className="flex items-start gap-3">
                     <Avatar className="w-8 h-8">
                       <AvatarImage src={comment.author_avatar} />
-                      <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-500 text-white text-xs">
+                      <AvatarFallback className="bg-gradient-to-br from-[#10B981] to-[#059669] text-slate-950 text-xs font-bold">
                         {comment.author_name?.[0]?.toUpperCase() || 'U'}
                       </AvatarFallback>
                     </Avatar>
@@ -237,18 +266,29 @@ export default function PostDetail() {
                           {formatDistanceToNow(new Date(comment.created_date), { addSuffix: true })}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">{comment.content}</p>
-                      <button
-                        onClick={() => likeCommentMutation.mutate(comment)}
-                        className={`flex items-center gap-1.5 mt-2 text-xs transition-colors ${
-                          comment.liked_by?.includes(user?.id)
-                            ? 'text-rose-500'
-                            : 'text-slate-400 hover:text-rose-500'
-                        }`}
-                      >
-                        <Heart className={`w-4 h-4 ${comment.liked_by?.includes(user?.id) ? 'fill-current' : ''}`} />
-                        <span>{comment.likes_count || 0}</span>
-                      </button>
+                      <p className="text-sm text-slate-600 dark:text-slate-300">{comment.content}</p>
+                      <div className="flex flex-wrap items-center justify-between gap-2 mt-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <button
+                          onClick={() => likeCommentMutation.mutate(comment)}
+                          className={`flex items-center gap-1.5 text-xs transition-colors ${
+                            comment.liked_by?.includes(user?.id)
+                              ? 'text-rose-500'
+                              : 'text-slate-400 hover:text-rose-500'
+                          }`}
+                        >
+                          <Heart className={`w-4 h-4 ${comment.liked_by?.includes(user?.id) ? 'fill-current' : ''}`} />
+                          <span>{comment.likes_count || 0}</span>
+                        </button>
+
+                        <UGCSafetyMenu
+                          itemId={comment.id}
+                          itemType="comment"
+                          title={comment.content?.slice(0, 40)}
+                          authorName={comment.author_name || 'Anonymous IMG'}
+                          authorId={comment.author_id || comment.author_name}
+                          compact
+                        />
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -259,7 +299,7 @@ export default function PostDetail() {
       </main>
 
       {/* Comment Input */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 p-4">
+      <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-[#0F172A] border-t border-slate-200 dark:border-slate-800 p-4">
         <div className="max-w-lg mx-auto flex gap-3">
           <Textarea
             placeholder="Write a comment..."
@@ -271,7 +311,7 @@ export default function PostDetail() {
           <Button
             onClick={() => addCommentMutation.mutate(newComment)}
             disabled={!newComment.trim()}
-            className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600"
+            className="rounded-xl bg-[#10B981] hover:bg-[#059669] text-slate-950 font-bold"
           >
             <Send className="w-5 h-5" />
           </Button>

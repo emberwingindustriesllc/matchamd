@@ -33,6 +33,7 @@ const SurgeryGuide = lazy(() => import('./pages/SurgeryGuide'));
 const AnkiGuide = lazy(() => import('./pages/AnkiGuide'));
 const MatchCostCalculator = lazy(() => import('./pages/MatchCostCalculator'));
 const BookCatalog = lazy(() => import('./pages/BookCatalog'));
+const ScamShield = lazy(() => import('./pages/ScamShield'));
 import __Layout from './Layout.jsx';
 
 
@@ -46,6 +47,11 @@ export const PAGES = {
     "GuideDetail": GuideDetail,
     "Guides": Guides,
     "IMGPrograms": IMGPrograms,
+    "imgprograms": IMGPrograms,
+    "img-programs": IMGPrograms,
+    "ScamShield": ScamShield,
+    "scamshield": ScamShield,
+    "scam-shield": ScamShield,
     "Legal": Legal,
     "Mentors": Mentors,
     "Notifications": Notifications,

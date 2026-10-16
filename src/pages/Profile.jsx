@@ -69,6 +69,7 @@ import {
 import ExportProfileModal from '@/components/profile/ExportProfileModal';
 import { canAccess, entitlementsFromServer, fetchServerEntitlements } from '@/lib/entitlements';
 import { useToast } from '@/components/ui/use-toast';
+import { getBlockedUsers, unblockUser, clearAllUGCBlocksAndFlags } from '@/lib/ugcSafety';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -94,6 +95,13 @@ export default function Profile() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [blockedUsers, setBlockedUsers] = useState(() => getBlockedUsers());
+
+  useEffect(() => {
+    const syncBlocked = () => setBlockedUsers(getBlockedUsers());
+    window.addEventListener('matchamd-ugc-updated', syncBlocked);
+    return () => window.removeEventListener('matchamd-ugc-updated', syncBlocked);
+  }, []);
 
   // Change Password state
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -226,11 +234,17 @@ export default function Profile() {
     setIsDeletingAccount(true);
     try {
       if (user?.id) {
-        await supabase.from('profiles').delete().eq('id', user.id);
-        localStorage.clear();
+        await Promise.allSettled([
+          supabase.from('user_profiles').delete().eq('user_id', user.id),
+          supabase.from('profiles').delete().eq('id', user.id),
+          supabase.from('progress').delete().eq('user_id', user.id),
+          supabase.from('user_saved_searches').delete().eq('user_id', user.id),
+          supabase.from('forum_posts').delete().eq('author_id', user.id),
+        ]);
       }
+      localStorage.clear();
       await logout();
-      navigate(createPageUrl('Onboarding'));
+      navigate(createPageUrl('Login'));
     } catch (err) {
       console.error('Error deleting account:', err);
       setIsDeletingAccount(false);
@@ -675,6 +689,56 @@ export default function Profile() {
           Change Password
         </Button>
 
+        {/* Google Play UGC Safety: Blocked Users & Content Moderation */}
+        <Card className="p-4 rounded-2xl border-slate-200 dark:border-slate-700 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-[#10B981]" />
+              <h3 className="font-semibold text-sm text-slate-800 dark:text-white">
+                Content Safety & Blocked Users
+              </h3>
+            </div>
+            {blockedUsers.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  clearAllUGCBlocksAndFlags();
+                  setBlockedUsers([]);
+                }}
+                className="text-xs text-[#10B981] hover:underline font-medium"
+              >
+                Reset All
+              </button>
+            )}
+          </div>
+          {blockedUsers.length === 0 ? (
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              You haven’t blocked any community users. You can report content or block users from any post, comment, or Scam Shield review.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {blockedUsers.map((entry) => (
+                <div
+                  key={entry.id}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs"
+                >
+                  <span className="font-medium text-slate-800 dark:text-slate-200">
+                    {entry.name}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setBlockedUsers(unblockUser(entry.id))}
+                    className="h-7 text-xs rounded-lg"
+                  >
+                    Unblock
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
         {/* Legal */}
         <Button 
           variant="outline" 
@@ -700,7 +764,7 @@ export default function Profile() {
           <AlertDialogTrigger asChild>
             <Button 
               variant="outline" 
-              className="w-full h-12 rounded-xl text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20"
+              className="w-full h-12 rounded-xl text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-semibold"
             >
               <Trash2 className="w-5 h-5 mr-2" />
               Delete Account & Data
@@ -708,12 +772,12 @@ export default function Profile() {
           </AlertDialogTrigger>
           <AlertDialogContent className="rounded-2xl max-w-sm sm:max-w-md">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-red-600 dark:text-red-400 flex items-center gap-2">
+              <AlertDialogTitle className="text-rose-600 dark:text-rose-400 flex items-center gap-2">
                 <Trash2 className="w-5 h-5" />
-                Delete Account?
+                Delete Account & All Personal Data?
               </AlertDialogTitle>
               <AlertDialogDescription className="text-slate-600 dark:text-slate-400 text-sm">
-                This will permanently delete your account profile, saved residency programs, checklist progress, and quiz history. This action cannot be undone.
+                This will permanently delete your account profile, saved residency programs, checklist progress, community posts, and local device data in compliance with Google Play Data Safety standards. This action cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="flex-row gap-2 justify-end">
@@ -721,9 +785,9 @@ export default function Profile() {
               <AlertDialogAction 
                 onClick={handleDeleteAccount}
                 disabled={isDeletingAccount}
-                className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
+                className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl"
               >
-                {isDeletingAccount ? 'Deleting...' : 'Delete Everything'}
+                {isDeletingAccount ? 'Deleting...' : 'Delete Account & Data'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

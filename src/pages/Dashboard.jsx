@@ -16,6 +16,7 @@ import StepCard from '@/components/common/StepCard';
 import ErrorState from '@/components/common/ErrorState';
 import LocationAwareTips from '@/components/location/LocationAwareTips';
 import QuickStartChecklist from '@/components/dashboard/QuickStartChecklist';
+import MatchaReadinessCup from '@/components/dashboard/MatchaReadinessCup';
 import ResourceHub from '@/components/dashboard/ResourceHub';
 import PathwayEligibilityChat from '@/components/ai/PathwayEligibilityChat';
 import PremiumFeatureCard from '@/components/premium/PremiumFeatureCard';
@@ -35,7 +36,9 @@ import {
   Coins,
   Calculator,
   Brain,
-  Globe
+  Globe,
+  ShieldAlert,
+  CheckCircle2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -146,7 +149,7 @@ export default function Dashboard() {
     }
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-[rgb(var(--color-primary))] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-3 border-[#10B981] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -162,7 +165,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pb-24">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0F172A] pb-nav-safe transition-colors">
       <Header 
         title="MatchaMD" 
         rightContent={
@@ -174,40 +177,89 @@ export default function Dashboard() {
           >
             <Bell className="w-5 h-5" />
             {notifications.length > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full" />
             )}
           </Button>
         }
       />
 
       <main className="px-4 py-6 max-w-lg mx-auto space-y-6">
-        {/* Welcome Card */}
+        {/* Welcome Hero Card — Sleek Deep Espresso/Slate + Electric Matcha */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[rgb(var(--color-primary))] via-[rgb(110,135,30)] to-[rgb(80,105,20)] p-6 text-white shadow-lg"
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0F172A] via-[#132A2E] to-[#064E3B] border border-[#10B981]/30 p-6 text-white shadow-xl"
         >
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+          <div className="absolute top-0 right-0 w-44 h-44 bg-[#10B981]/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+          <div className="absolute bottom-0 left-0 w-36 h-36 bg-[#4ADE80]/15 rounded-full blur-2xl translate-y-1/2 -translate-x-1/3" />
           
           <div className="relative">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <p className="text-white/80 text-sm mb-1">Welcome back,</p>
-                <h2 className="text-2xl font-bold">{sanitizeDisplayName(profile.display_name) || user?.full_name || 'Dr. Applicant'}</h2>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#10B981]/20 border border-[#4ADE80]/30 text-[#4ADE80] text-[11px] font-bold mb-2">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>IMG / FMG Match Command Center</span>
+                </div>
+                <p className="text-slate-300 text-xs mb-0.5">Welcome back,</p>
+                <h2 className="text-2xl font-extrabold tracking-tight">{sanitizeDisplayName(profile.display_name) || user?.full_name || 'Dr. Applicant'}</h2>
               </div>
               <ProgressRing progress={overallProgress} size={80} strokeWidth={6} />
             </div>
             
-            <div className="flex items-center gap-4 mt-4">
-              <div className="flex items-center gap-2 bg-white/20 rounded-full px-3 py-1.5">
-                <Trophy className="w-4 h-4" />
-                <span className="text-sm font-medium">{profile.points || 0} pts</span>
+            <div className="flex flex-wrap items-center gap-2.5 mt-4">
+              <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/15 rounded-full px-3 py-1.5">
+                <Trophy className="w-3.5 h-3.5 text-[#4ADE80]" />
+                <span className="text-xs font-semibold">{profile.points || 0} pts</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/20 rounded-full px-3 py-1.5">
-                <Flame className="w-4 h-4" />
-                <span className="text-sm font-medium">3 day streak</span>
+              <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/15 rounded-full px-3 py-1.5">
+                <Flame className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-xs font-semibold">3 day streak</span>
               </div>
+              <button
+                type="button"
+                onClick={() => navigate(createPageUrl('ScamShield'))}
+                className="ml-auto flex items-center gap-1.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-200 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
+              >
+                <ShieldAlert className="w-3.5 h-3.5 text-[#F43F5E]" />
+                <span>Scam Shield</span>
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Interactive Matcha Readiness Cup / Ring */}
+        <MatchaReadinessCup profile={profile} />
+
+        {/* Scam Shield & USCE Truth Radar Callout Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.06 }}
+          onClick={() => navigate(createPageUrl('ScamShield'))}
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1E293B] via-[#1E293B] to-rose-950/80 border border-[#F43F5E]/40 p-5 text-white shadow-lg cursor-pointer hover:shadow-xl hover:border-[#F43F5E]/70 transition-all"
+        >
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#F43F5E]/20 rounded-full blur-2xl" />
+          <div className="relative">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 bg-[#F43F5E]/20 border border-[#F43F5E]/40 rounded-xl flex items-center justify-center">
+                  <ShieldAlert className="w-5 h-5 text-[#F43F5E]" />
+                </div>
+                <Badge className="bg-[#F43F5E]/20 text-rose-300 border border-[#F43F5E]/40 text-xs">
+                  Scam Shield & Truth Radar
+                </Badge>
+              </div>
+              <Badge className="bg-[#10B981]/20 text-[#4ADE80] border border-[#10B981]/40 text-[10px]">
+                Free USCE Filter
+              </Badge>
+            </div>
+            <h3 className="text-lg font-bold mb-1">Avoid Predatory USCE & Match Scams</h3>
+            <p className="text-slate-300 text-xs mb-3 leading-relaxed">
+              Check verified IMG reviews on rotation agencies, letterhead types (Hospital vs. Clinic), red flags (🚩 Bait-and-Switch, 🚩 Template LoRs), and find <strong className="text-[#4ADE80]">Free / Direct Hospital Coordinators</strong>.
+            </p>
+            <div className="flex items-center justify-between text-xs font-semibold text-[#4ADE80]">
+              <span>Open Scam Shield & USCE Truth Radar</span>
+              <ChevronRight className="w-4 h-4" />
             </div>
           </div>
         </motion.div>
@@ -217,11 +269,11 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 shadow-sm"
+            className="rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700/80 p-4 shadow-sm"
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-slate-800 dark:text-white text-sm">Your USMLE Status</h3>
-              <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">Click step to view guide</span>
+              <span className="text-[11px] text-[#10B981] dark:text-[#4ADE80] font-medium">Click step to view guide</span>
             </div>
             <div className="grid grid-cols-3 gap-2">
               {[

@@ -104,15 +104,39 @@ export default function OfficialReferences() {
       ]
     },
     {
-      category: 'Community Resources',
+      category: 'Match Data, Licensing & Community Portals',
       icon: BookOpen,
       color: 'amber',
       sources: [
         {
-          title: '2026 ECFMG Pathways Will Open This August – Official Update from ECFMG',
+          title: 'NRMP Charting Outcomes in the Match (International Medical Graduates)',
+          url: 'https://www.nrmp.org/match-data-analytics/residency-data-reports/',
+          type: 'Official Match Data',
+          description: 'Official IMG match probability tables by USMLE Step 2 CK, YOG, USCE, and research output'
+        },
+        {
+          title: 'AMA FREIDA Residency & Fellowship Database',
+          url: 'https://freida.ama-assn.org/',
+          type: 'Official Directory',
+          description: 'Verify ACGME program IDs, J-1/H-1B visa sponsorship, and interview formats'
+        },
+        {
+          title: 'FSMB USMLE & Step 3 Portal',
+          url: 'https://www.fsmb.org/usmle/',
+          type: 'Official Exam Portal',
+          description: 'USMLE exam registration, score transcripts, and state medical board licensing rules'
+        },
+        {
+          title: 'OET Medicine Official Preparation Portal',
+          url: 'https://oet.com/learn/preparation-portal',
+          type: 'Official Language Exam',
+          description: 'Official sample tests and booking for ECFMG communication skills requirement'
+        },
+        {
+          title: 'r/IMGreddit – International Medical Graduate Community',
           url: 'https://www.reddit.com/r/IMGreddit/',
           type: 'Community Discussion',
-          description: 'r/IMGreddit community discussions'
+          description: 'Peer discussions on ECFMG pathways, USCE rotations, and interview waves'
         }
       ]
     }

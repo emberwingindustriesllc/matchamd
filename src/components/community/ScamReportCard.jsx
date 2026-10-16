@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, User, DollarSign, Link2, Eye, CheckCircle, XCircle, Clock, Archive } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import UGCSafetyMenu from '@/components/common/UGCSafetyMenu';
+import { isItemFlagged, isUserBlocked } from '@/lib/ugcSafety';
 
 const STATUS_COLORS = {
-  pending: 'bg-amber-100 text-amber-800',
-  under_review: 'bg-blue-100 text-blue-800',
-  verified: 'bg-red-100 text-red-800',
-  disputed: 'bg-purple-100 text-purple-800',
-  dismissed: 'bg-gray-100 text-gray-800',
+  pending: 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300',
+  under_review: 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300',
+  verified: 'bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-300',
+  disputed: 'bg-purple-100 text-purple-800 dark:bg-purple-500/15 dark:text-purple-300',
+  dismissed: 'bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-slate-400',
 };
 
 const STATUS_ICONS = {
@@ -48,8 +50,14 @@ function resolveReporterLabel(report) {
 }
 
 export default function ScamReportCard({ report, currentUserId, isModerator, onStatusChange }) {
+  const [hidden, setHidden] = useState(false);
   const StatusIcon = STATUS_ICONS[report.status] || AlertTriangle;
   const isReporter = report.reporter_id === currentUserId;
+  const reporterLabel = resolveReporterLabel(report);
+
+  if (hidden || isItemFlagged(report.id) || isUserBlocked(reporterLabel)) {
+    return null;
+  }
 
   // Verified reports carry a 12-month expiry. A report past that date is kept for
   // the historical record but must not be presented as a current accusation, so
@@ -58,21 +66,21 @@ export default function ScamReportCard({ report, currentUserId, isModerator, onS
   const isExpired = !!expiresAt && expiresAt.getTime() <= Date.now();
 
   return (
-    <Card className={`border-l-4 ${isExpired ? 'border-muted-foreground/40 opacity-70' : report.status === 'verified' ? 'border-destructive' : 'border-amber-500'}`}>
+    <Card className={`border-l-4 ${isExpired ? 'border-muted-foreground/40 opacity-70' : report.status === 'verified' ? 'border-rose-500' : 'border-amber-500'}`}>
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
+            <div className="w-8 h-8 rounded-full bg-rose-500/15 flex items-center justify-center">
+              <AlertTriangle className="h-5 w-5 text-rose-500" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-medium text-sm">
-                  {resolveReporterLabel(report)}
+                  {reporterLabel}
                 </span>
                 {report.is_anonymous && (
                   <Badge variant="secondary" className="text-xs">
-                    <User className="h-2.5 w-2.5 mr-5 mr-1" /> Anonymous
+                    <User className="h-2.5 w-2.5 mr-1" /> Anonymous
                   </Badge>
                 )}
               </div>
@@ -112,7 +120,7 @@ export default function ScamReportCard({ report, currentUserId, isModerator, onS
           {report.amount_usd && (
             <div>
               <span className="text-muted-foreground">Amount:</span>
-              <p className="font-medium text-destructive">
+              <p className="font-medium text-rose-500">
                 <DollarSign className="h-3.5 w-3.5 inline mr-1" />
                 ${report.amount_usd.toLocaleString()}
               </p>
@@ -174,7 +182,7 @@ export default function ScamReportCard({ report, currentUserId, isModerator, onS
               size="sm"
               variant="outline"
               onClick={() => onStatusChange?.(report.id, 'dismissed', '')}
-              className="flex-1 text-destructive hover:text-destructive"
+              className="flex-1 text-rose-500 hover:text-rose-600"
             >
               <XCircle className="h-4 w-4 mr-1" />
               Dismiss
@@ -190,6 +198,20 @@ export default function ScamReportCard({ report, currentUserId, isModerator, onS
               : `Your report is ${report.status === 'pending' ? 'awaiting review' : `currently ${report.status.replace('_', ' ')}`}.`}
           </div>
         )}
+
+        <div className="pt-3 border-t border-border/50 flex items-center justify-between">
+          <span className="text-[11px] text-muted-foreground">Community Safety</span>
+          <UGCSafetyMenu
+            itemId={report.id}
+            itemType="scam_report"
+            title={report.entity_name}
+            authorName={reporterLabel}
+            authorId={report.reporter_id || reporterLabel}
+            compact
+            onReported={() => setHidden(true)}
+            onUserBlocked={() => setHidden(true)}
+          />
+        </div>
       </CardContent>
     </Card>
   );
