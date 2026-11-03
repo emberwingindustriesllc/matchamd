@@ -452,25 +452,51 @@ CREATE POLICY "Users can delete own saved searches"
   USING ((select auth.uid()) = user_id);
 
 -- ----------------------------------------------------------------------------
--- 2. Drop Duplicate & Redundant Indexes (duplicate_index)
+-- 2. Drop Duplicate, Redundant, and Unused Non-FK Indexes
 -- ----------------------------------------------------------------------------
 
 -- Exact duplicate index pairs reported by Supabase linter:
 DROP INDEX IF EXISTS public.idx_programs_acgme_number;         -- duplicate of idx_programs_acgme_no
 DROP INDEX IF EXISTS public.idx_programs_specialty;            -- duplicate of idx_programs_specialty_gin
-DROP INDEX IF EXISTS public.purchased_content_user_id_idx;     -- duplicate of idx_purchased_content_user_id (and covered by unique_user_content)
-DROP INDEX IF EXISTS public.subscriptions_user_id_idx;         -- duplicate of idx_subscriptions_user_id (and covered by unique_user_subscription)
+DROP INDEX IF EXISTS public.purchased_content_user_id_idx;     -- duplicate of idx_purchased_content_user_id
+DROP INDEX IF EXISTS public.subscriptions_user_id_idx;         -- duplicate of idx_subscriptions_user_id
 
 -- Single-column indexes already covered by leading column of UNIQUE constraints:
-DROP INDEX IF EXISTS public.idx_purchased_content_user_id;     -- covered by unique_user_content (user_id, content_id)
-DROP INDEX IF EXISTS public.idx_subscriptions_user_id;         -- covered by unique_user_subscription (user_id)
 DROP INDEX IF EXISTS public.idx_quiz_progress_user_id;         -- covered by unique_user_category (user_id, category_id)
 DROP INDEX IF EXISTS public.idx_user_saved_searches_user_id;   -- covered by idx_user_saved_searches_user_name (user_id, lower(name))
 DROP INDEX IF EXISTS public.idx_specialty_aliases_normalized;  -- covered by uq_specialty_alias_normalized (normalized_alias)
 
+-- Unused non-FK indexes (0 index scans; planner uses idx_programs_program_type / idx_programs_specialty_gin or seq scan on small tables):
+DROP INDEX IF EXISTS public.idx_programs_verified;
+DROP INDEX IF EXISTS public.idx_programs_state;
+DROP INDEX IF EXISTS public.idx_programs_city_state;
+DROP INDEX IF EXISTS public.idx_programs_acgme;
+DROP INDEX IF EXISTS public.idx_programs_ecfmg;
+DROP INDEX IF EXISTS public.idx_programs_name_trgm;
+DROP INDEX IF EXISTS public.idx_programs_institution_trgm;
+DROP INDEX IF EXISTS public.idx_programs_city_trgm;
+DROP INDEX IF EXISTS public.idx_programs_state_trgm;
+DROP INDEX IF EXISTS public.idx_programs_description_trgm;
+DROP INDEX IF EXISTS public.idx_programs_acgme_no;
+DROP INDEX IF EXISTS public.idx_subscriptions_stripe_sub_id;
+DROP INDEX IF EXISTS public.idx_purchased_content_content_id;
+DROP INDEX IF EXISTS public.idx_scam_reports_entity_name;
+DROP INDEX IF EXISTS public.idx_research_opportunities_specialty;
+DROP INDEX IF EXISTS public.idx_research_opportunities_state;
+DROP INDEX IF EXISTS public.idx_research_opportunities_status;
+DROP INDEX IF EXISTS public.idx_specialty_aliases_canonical;
+DROP INDEX IF EXISTS public.idx_candidates_acgme_no;
+DROP INDEX IF EXISTS public.idx_candidates_verification_status;
+
 -- ----------------------------------------------------------------------------
--- 3. Add Covering Indexes for Unindexed Foreign Keys (unindexed_foreign_keys)
+-- 3. Ensure Covering Indexes Exist for All Foreign Keys (unindexed_foreign_keys)
 -- ----------------------------------------------------------------------------
+
+CREATE INDEX IF NOT EXISTS idx_purchased_content_user_id
+  ON public.purchased_content(user_id);
+
+CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id
+  ON public.subscriptions(user_id);
 
 CREATE INDEX IF NOT EXISTS idx_comments_author_id
   ON public.comments(author_id);
@@ -483,5 +509,27 @@ CREATE INDEX IF NOT EXISTS idx_candidates_matched_program_id
 
 CREATE INDEX IF NOT EXISTS idx_scam_reports_reviewed_by
   ON public.scam_reports(reviewed_by);
+
+-- ----------------------------------------------------------------------------
+-- 4. Explicit Deny-All Policies for Internal Staging Tables (rls_enabled_no_policy)
+-- ----------------------------------------------------------------------------
+
+DROP POLICY IF EXISTS "Deny all client access to obgyn_import_batches" ON public.obgyn_import_batches;
+CREATE POLICY "Deny all client access to obgyn_import_batches"
+  ON public.obgyn_import_batches
+  AS RESTRICTIVE
+  FOR ALL
+  TO anon, authenticated
+  USING (false)
+  WITH CHECK (false);
+
+DROP POLICY IF EXISTS "Deny all client access to obgyn_program_candidates" ON public.obgyn_program_candidates;
+CREATE POLICY "Deny all client access to obgyn_program_candidates"
+  ON public.obgyn_program_candidates
+  AS RESTRICTIVE
+  FOR ALL
+  TO anon, authenticated
+  USING (false)
+  WITH CHECK (false);
 
 COMMIT;
