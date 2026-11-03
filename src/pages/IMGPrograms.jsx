@@ -164,20 +164,6 @@ function getYogCutoffTag(prog) {
       style: 'bg-[#F59E0B]/15 text-[#F59E0B] dark:text-amber-300 border-[#F59E0B]/40',
     };
   }
-  // Deterministically assign realistic crowdsourced YOG reality if not explicitly set on row
-  const nameStr = String(prog.program_name || prog.name || '');
-  if (nameStr.length % 3 === 0) {
-    return {
-      label: 'YOG < 5',
-      style: 'bg-[#F59E0B]/15 text-[#F59E0B] dark:text-amber-300 border-[#F59E0B]/40',
-    };
-  }
-  if (nameStr.length % 5 === 0) {
-    return {
-      label: 'YOG < 3',
-      style: 'bg-[#F59E0B]/15 text-[#F59E0B] dark:text-amber-300 border-[#F59E0B]/40',
-    };
-  }
   return {
     label: 'Holistic / No Hard Cutoff',
     style: 'bg-[#10B981]/15 text-[#10B981] dark:text-[#4ADE80] border-[#10B981]/40',
@@ -602,10 +588,10 @@ export default function IMGPrograms() {
           specialty: Array.isArray(p.specialty) ? p.specialty : (p.specialty ? [p.specialty] : []),
           region: p.region || getRegionForState(p.state),
           interview_format: p.interview_format || 'Virtual',
-          program_size: p.program_size ?? 40,
-          img_friendly_score: p.img_friendly_score ?? (p.accepts_img ? 8.5 : 7.0),
-          img_percentage: p.img_percentage ?? (p.accepts_img ? 55 : 40),
-          graduation_rate: p.graduation_rate || '98%'
+          program_size: p.program_size ?? null,
+          img_friendly_score: p.img_friendly_score ?? null,
+          img_percentage: p.img_percentage ?? null,
+          graduation_rate: p.graduation_rate ?? null
         }));
       } catch (err) {
         console.warn('Network or multiSearch exception:', err);
@@ -642,7 +628,7 @@ export default function IMGPrograms() {
   const fitScoreFor = (prog) => (fitMap[prog.id] || getFit(prog)).score;
 
   // Specialties & States lists
-  const specialties = [...new Set(programs.map(p => p.specialty).filter(Boolean))];
+  const specialties = [...new Set(programs.flatMap(p => Array.isArray(p.specialty) ? p.specialty : [p.specialty]).filter(Boolean))];
   const regions = ["Northeast", "Midwest", "South", "West"];
 
   const searchFilters = useMemo(
@@ -779,7 +765,8 @@ export default function IMGPrograms() {
         console.warn('Network or multiSearch exception on medschools:', err);
         return [];
       }
-    }
+    },
+    enabled: categoryTab === 'medschools'
   });
 
   // Fellowships filtered (wraps results with in-component search, specialty, and location filters)
@@ -1118,7 +1105,7 @@ export default function IMGPrograms() {
             />
 
             {/* Category Selector Tabs */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-200/60 dark:bg-slate-800/80 p-1.5 rounded-2xl">
+            <div className="grid grid-cols-3 gap-2 bg-slate-200/60 dark:bg-slate-800/80 p-1.5 rounded-2xl">
               <button
                 type="button"
                 onClick={() => setCategoryTab('residencies')}
@@ -1587,7 +1574,7 @@ export default function IMGPrograms() {
 
                           <div className="flex flex-wrap items-center gap-2 mb-2">
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
-                              {prog.specialty}
+                              {Array.isArray(prog.specialty) ? prog.specialty.join(', ') : prog.specialty}
                             </span>
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
                               <MapPin className="w-3 h-3 mr-0.5 text-slate-400" />
@@ -1596,9 +1583,11 @@ export default function IMGPrograms() {
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
                               Format: {prog.interview_format}
                             </span>
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
-                              Size: {prog.program_size} residents
-                            </span>
+                            {prog.program_size != null && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
+                                Size: {prog.program_size} residents
+                              </span>
+                            )}
                             {prog.accepts_img && (
                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#10B981] text-slate-950 shadow-2xs">
                                 🌟 Accepts IMGs
@@ -1608,12 +1597,20 @@ export default function IMGPrograms() {
 
                           {/* Quick Data & 1-Tap Interview Wave Action Ribbon */}
                           <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-[#0F172A]/70 text-xs text-slate-500">
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-semibold text-slate-700 dark:text-slate-300">🎓 Grad Rate:</span> 
-                              <Badge variant="outline" className="bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 font-bold px-1.5 py-0.5">
-                                {prog.graduation_rate || '98%'}
-                              </Badge>
-                            </div>
+                            {prog.graduation_rate ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-semibold text-slate-700 dark:text-slate-300">🎓 Grad Rate:</span> 
+                                <Badge variant="outline" className="bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 font-bold px-1.5 py-0.5">
+                                  {prog.graduation_rate}
+                                </Badge>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1.5">
+                                <Badge variant="outline" className="bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 font-bold px-1.5 py-0.5">
+                                  ✓ ACGME Accredited
+                                </Badge>
+                              </div>
+                            )}
                             {prog.step2_score_min && (
                               <div>
                                 <span className="font-semibold text-slate-700 dark:text-slate-300">Min Step 2:</span> {prog.step2_score_min}
@@ -2359,7 +2356,15 @@ export default function IMGPrograms() {
                     value={`MATCH-MD-SHARE-${user?.id?.slice(0, 8)?.toUpperCase() || 'OFFLINE'}`}
                     className="font-mono text-xs h-11 bg-slate-50 border-slate-200 rounded-xl"
                   />
-                  <Button variant="outline" className="h-11 rounded-xl" onClick={() => alert("Share link copied to clipboard!")}>
+                  <Button
+                    variant="outline"
+                    className="h-11 rounded-xl"
+                    onClick={() => {
+                      const code = `MATCH-MD-SHARE-${user?.id?.slice(0, 8)?.toUpperCase() || 'OFFLINE'}`;
+                      navigator.clipboard?.writeText(code);
+                      toast.success('Share code copied to clipboard!');
+                    }}
+                  >
                     <Share2 className="w-4 h-4" />
                   </Button>
                 </div>

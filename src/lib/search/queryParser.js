@@ -527,7 +527,7 @@ export const DEFAULT_ALIAS_MAP = {
   
   // Vascular Surgery
   'vascular surgery': 'Vascular Surgery',
-  'vascular': 'Vurgery',
+  'vascular': 'Vascular Surgery',
   
   // Plastic Surgery
   'plastic surgery': 'Plastic Surgery',

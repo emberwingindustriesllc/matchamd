@@ -593,7 +593,7 @@ export default function Subscription() {
               </div>
               <h2 className="text-xl sm:text-2xl font-bold">Upcoming in Phase 2</h2>
               <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
-                We believe in complete transparency. These high-touch human & AI services are actively being built and will launch as our verified mentor community expands.
+                We believe in complete transparency. These high-touch mentorship & coaching services are actively being built and will launch as our verified mentor community expands.
               </p>
             </div>
             <Button
@@ -629,7 +629,7 @@ export default function Subscription() {
               </div>
               <div>
                 <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                  Interactive AI Mock Interviews
+                  1-on-1 Live Mock Interviews
                   <Badge variant="outline" className="text-[10px] text-indigo-300 border-indigo-400/40">Roadmap</Badge>
                 </h4>
                 <p className="text-xs text-slate-300 mt-1">

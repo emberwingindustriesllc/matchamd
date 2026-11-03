@@ -178,7 +178,7 @@ export function filterSpecialties(query, limit = 15) {
       if (compactName.includes(compactQuery) || (compactQuery.length >= 3 && compactQuery.includes(compactName))) {
         return true;
       }
-      if (queryTokens.some(qt => nameTokens.some(nt => nt.startsWith(qt) || qt.startsWith(nt)))) {
+      if (queryTokens.every(qt => qt.length >= 2 && nameTokens.some(nt => nt.length >= 2 && (nt.startsWith(qt) || qt.startsWith(nt))))) {
         return true;
       }
     }

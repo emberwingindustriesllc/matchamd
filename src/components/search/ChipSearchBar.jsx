@@ -70,7 +70,7 @@ export default function ChipSearchBar({
   // Debounced free-text search
   useEffect(() => {
     const term = inputValue.trim();
-    if (!term || !onExecuteSearch) return undefined;
+    if (!onExecuteSearch) return undefined;
     const id = setTimeout(() => {
       onExecuteSearch(term);
     }, 450);
@@ -102,28 +102,10 @@ export default function ChipSearchBar({
 
   const handleExecute = () => {
     const term = inputValue.trim();
-    if (!term) {
-      setIsOpen(false);
-      return;
-    }
-
-    // Prefer an explicit typeahead pick when one is available...
-    const topSpecialty = specialtySuggestions[0];
-    const topLocation = locationSuggestions[0];
-    if (topSpecialty) {
-      const specName = topSpecialty.specialty || topSpecialty.name;
-      if (specName) onAddSpecialty(specName);
-    } else if (topLocation) {
-      onAddLocation(topLocation.location_label || `${topLocation.city}, ${topLocation.state}`);
-    }
-
-    // ...but always also run the raw text as a free-text query, so the search
-    // is never silently reduced to a chip the user did not choose.
     onSearchQueryChange(term);
     if (onExecuteSearch) {
       onExecuteSearch(term);
     }
-    setInputValue('');
     setIsOpen(false);
   };
 

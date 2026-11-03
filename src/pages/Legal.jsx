@@ -71,7 +71,7 @@ const TOS_SECTIONS = [
     title: 'Disclaimers & Liability',
     content: [
       { subtitle: 'Educational use only', items: ['MatchaMD is not affiliated with ECFMG, NRMP, AAMC, ERAS, or any program', 'Nothing in this app is medical, legal, or immigration advice', 'Always verify deadlines and requirements with official sources', 'No guarantee of acceptance to any program'] },
-      { subtitle: 'AI Advisor', items: ['The AI advisor provides general educational guidance only', 'It is not a substitute for official ECFMG determination or professional advice'] },
+
       { subtitle: 'Limitation of liability', items: ['App provided "as is" without warranties', 'We are not liable for decisions made based on app content', 'Maximum liability limited to fees paid in the prior 12 months'] },
     ]
   },

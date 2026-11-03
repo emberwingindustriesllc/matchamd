@@ -18,7 +18,7 @@ import LocationAwareTips from '@/components/location/LocationAwareTips';
 import QuickStartChecklist from '@/components/dashboard/QuickStartChecklist';
 import MatchaReadinessCup from '@/components/dashboard/MatchaReadinessCup';
 import ResourceHub from '@/components/dashboard/ResourceHub';
-import PathwayEligibilityChat from '@/components/ai/PathwayEligibilityChat';
+
 import PremiumFeatureCard from '@/components/premium/PremiumFeatureCard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -466,8 +466,8 @@ export default function Dashboard() {
           </motion.button>
         </div>
 
-        {/* AI Pathway Assistant - Free Feature */}
-        <PathwayEligibilityChat userProfile={profile} />
+
+
 
         {/* Quick Start Checklist - Immediate Value */}
         <QuickStartChecklist profile={profile} progressList={progressList} />

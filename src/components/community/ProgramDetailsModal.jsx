@@ -14,6 +14,7 @@ export default function ProgramDetailsModal({ open, onClose, program, profile, c
   const [scams, setScams] = useState([]);
   const [newNote, setNewNote] = useState('');
   const [newScam, setNewScam] = useState('');
+  const [newScamEvidenceUrl, setNewScamEvidenceUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [submittingNote, setSubmittingNote] = useState(false);
   const [submittingScam, setSubmittingScam] = useState(false);
@@ -69,10 +70,12 @@ export default function ProgramDetailsModal({ open, onClose, program, profile, c
       await createScamReport({
         program_id: program.id,
         incident_type: 'Other',
-        details: newScam
+        details: newScam,
+        evidence_url: newScamEvidenceUrl
       });
       toast.success('Incident flag filed successfully!');
       setNewScam('');
+      setNewScamEvidenceUrl('');
       loadNotesAndScams();
     } catch (err) {
       toast.error(err.message || 'Failed to file report');
@@ -91,7 +94,7 @@ export default function ProgramDetailsModal({ open, onClose, program, profile, c
         <div className="space-y-4">
           <DialogHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
             <DialogTitle className="text-xl font-bold text-slate-950 dark:text-white">
-              {program.program_name}
+              {program.program_name || program.title || program.name}
             </DialogTitle>
             <p className="text-slate-500 text-sm">
               {program.institution} — {program.city}, {program.state}
@@ -118,7 +121,7 @@ export default function ProgramDetailsModal({ open, onClose, program, profile, c
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <span className="text-xs text-slate-455 block">Specialty</span>
-                  <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">{program.specialty}</span>
+                  <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">{Array.isArray(program.specialty) ? program.specialty.join(', ') : program.specialty}</span>
                 </div>
                 <div className="space-y-1">
                   <span className="text-xs text-slate-455 block">Subspecialty</span>
@@ -426,17 +429,24 @@ export default function ProgramDetailsModal({ open, onClose, program, profile, c
                 )}
               </div>
 
-              <form onSubmit={handleAddScam} className="mt-4 pt-4 border-t dark:border-slate-800">
+              <form onSubmit={handleAddScam} className="mt-4 pt-4 border-t dark:border-slate-800 space-y-2">
                 <input 
                   type="text"
                   value={newScam}
                   onChange={(e) => setNewScam(e.target.value)}
-                  placeholder="Report a specific scam practice, fake offer, or malicious link..."
+                  placeholder="Report a specific scam practice, fake offer, or malicious link (min 30 chars)..."
+                  className="w-full p-3 border dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl text-sm focus:ring-2 focus:ring-amber-500 outline-none transition-shadow text-slate-805 dark:text-slate-200"
+                />
+                <input 
+                  type="url"
+                  value={newScamEvidenceUrl}
+                  onChange={(e) => setNewScamEvidenceUrl(e.target.value)}
+                  placeholder="Supporting evidence link (https://...)"
                   className="w-full p-3 border dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl text-sm focus:ring-2 focus:ring-amber-500 outline-none transition-shadow text-slate-805 dark:text-slate-200"
                 />
                 <Button 
                   type="submit" 
-                  disabled={submittingScam || !newScam.trim()}
+                  disabled={submittingScam || !newScam.trim() || !newScamEvidenceUrl.trim()}
                   className="mt-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium"
                 >
                   {submittingScam ? 'Filing Flag...' : 'File Incident Flag'}
